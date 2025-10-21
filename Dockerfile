@@ -17,6 +17,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build arguments для переменных окружения
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+
+# Устанавливаем как ENV для использования в сборке
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+
 # Следующая строка отключает telemetry во время сборки.
 # https://nextjs.org/docs/advanced-features/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1

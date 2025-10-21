@@ -119,5 +119,4 @@ Dockerfile*
 docker-compose*.yml
 .docker/
 
-# GitHub Actions
-.github/workflows/
+# GitHub Actions (workflows должны быть в репозитории)

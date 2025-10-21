@@ -2,13 +2,29 @@
 
 ## Настройка GitHub Secrets
 
-Для автоматического деплоя в Docker Hub необходимо добавить следующие секреты в настройках репозитория GitHub:
+GitHub узнает о твоем Docker Hub через секреты, которые ты настроишь. Вот как это работает:
 
-1. Перейди в Settings → Secrets and variables → Actions
+### Как GitHub узнает о твоем Docker Hub?
+
+В файле `.github/workflows/docker-deploy.yml` есть строка:
+```yaml
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+```
+
+- `REGISTRY: docker.io` - указывает на Docker Hub
+- `IMAGE_NAME: ${{ github.repository }}` - использует название твоего GitHub репозитория
+
+Например, если твой репозиторий называется `username/frontend-callcentre`, то образ будет загружен как `docker.io/username/frontend-callcentre`
+
+### Настройка секретов:
+
+1. Перейди в Settings → Secrets and variables → Actions твоего репозитория
 2. Добавь следующие секреты:
 
 ### DOCKER_USERNAME
-- Твой username в Docker Hub
+- Твой username в Docker Hub (например: `marta123`)
 
 ### DOCKER_PASSWORD
 - Твой password или access token в Docker Hub
@@ -29,7 +45,7 @@ docker build -t your-username/frontend-callcentre .
 
 ### Запуск контейнера
 ```bash
-docker run -p 3000:3000 your-username/frontend-callcentre
+docker run -p 3001:3001 your-username/frontend-callcentre
 ```
 
 ### Использование docker-compose
@@ -66,5 +82,5 @@ docker-compose up -d
 - Убедись, что все зависимости указаны в package.json
 
 ### Ошибка запуска контейнера
-- Проверь, что порт 3000 свободен
+- Проверь, что порт 3001 свободен
 - Убедись, что все переменные окружения настроены

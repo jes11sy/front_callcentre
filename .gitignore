@@ -24,9 +24,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files (исключаем только приватные)
-.env*.local
-# .env - НЕ исключаем, может быть нужен для деплоя
+# Local env files (исключаем ВСЕ env файлы - они содержат секреты)
+.env*
+.env.local
 .env.development.local
 .env.test.local
 .env.production.local

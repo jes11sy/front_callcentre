@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Устанавливаем зависимости на основе предпочитаемого менеджера пакетов
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Пересобираем исходный код только при необходимости
 FROM base AS builder
@@ -19,7 +19,7 @@ COPY . .
 
 # Следующая строка отключает telemetry во время сборки.
 # https://nextjs.org/docs/advanced-features/telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 
@@ -27,10 +27,10 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 # Следующая строка отключает telemetry во время выполнения.
 # https://nextjs.org/docs/advanced-features/telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -46,9 +46,9 @@ USER nextjs
 
 EXPOSE 3001
 
-ENV PORT 3001
+ENV PORT=3001
 # Устанавливаем hostname на localhost
-ENV HOSTNAME "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 
 # server.js создается автоматически из output: 'standalone'
 CMD ["node", "server.js"]

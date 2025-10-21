@@ -1,13 +1,7 @@
 import axios from 'axios';
 import { tokenStorage } from './secure-storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
-
-// Ensure we have the /api suffix for the API calls
-const getApiUrl = (endpoint: string) => {
-  const baseUrl = API_BASE_URL.endsWith('/api') ? API_BASE_URL : `${API_BASE_URL}/api`;
-  return endpoint.startsWith('/') ? `${baseUrl}${endpoint}` : `${baseUrl}/${endpoint}`;
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
 
 export interface LoginCredentials {
   login: string;
@@ -46,7 +40,7 @@ export interface ProfileResponse {
 
 // Create axios instance
 const api = axios.create({
-  baseURL: getApiUrl(''),
+  baseURL: API_BASE_URL,
   withCredentials: true, // Important for CORS with credentials
   headers: {
     'Content-Type': 'application/json',
@@ -67,11 +61,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     // Only handle 401 errors for authenticated requests, not login requests
-    if (error.response?.status === 401 && !error.config?.url?.includes('/v1/auth/login')) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
       const refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken) {
         try {
-          const response = await axios.post(getApiUrl('/v1/auth/refresh'), {
+          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refreshToken,
           });
           
@@ -104,7 +98,7 @@ export const authApi = {
       'operator': 'CALLCENTRE_OPERATOR'
     };
     
-    const response = await api.post('/v1/auth/login', {
+    const response = await api.post('/auth/login', {
       login: credentials.login,
       password: credentials.password,
       role: roleMap[credentials.role]
@@ -113,12 +107,12 @@ export const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await api.post('/v1/auth/logout');
+    await api.post('/auth/logout');
     await tokenStorage.clearAll();
   },
 
   getProfile: async (): Promise<ProfileResponse> => {
-    const response = await api.get('/v1/auth/profile');
+    const response = await api.get('/auth/profile');
     return response.data;
   },
 

@@ -67,7 +67,7 @@ export const useOrders = () => {
       });
 
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru'}/api/v1/orders?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -107,7 +107,7 @@ export const useOrders = () => {
   // Обновление статуса заказа
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru'}/api/v1/orders/${id}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ export const useOrders = () => {
   // Обновление заказа
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, orderData }: { id: number; orderData: Partial<Order> }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru'}/api/v1/orders/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

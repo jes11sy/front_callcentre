@@ -22,7 +22,7 @@ export const useCallsActions = () => {
       setOrderHistoryLoading(true);
       setSelectedCallForHistory(call);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru'}/api/v1/orders?search=${encodeURIComponent(call.phoneClient)}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }

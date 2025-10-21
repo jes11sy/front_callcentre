@@ -2,7 +2,7 @@
 import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
 
 // Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
 
 // Получение токена авторизации
 function getAuthToken(): string | null {
@@ -46,7 +46,7 @@ async function apiRequest<T>(
 export const ordersApi = {
   // Создание заказа с нуля
   async create(data: CreateOrderData): Promise<ApiResponse> {
-    return apiRequest('/api/orders', {
+    return apiRequest('/orders', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -54,7 +54,7 @@ export const ordersApi = {
 
   // Создание заказа из чата
   async createFromChat(data: CreateOrderFromChatData): Promise<ApiResponse> {
-    return apiRequest('/api/orders/from-chat', {
+    return apiRequest('/orders/from-chat', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -62,7 +62,7 @@ export const ordersApi = {
 
   // Создание заказа из звонка
   async createFromCall(data: CreateOrderFromCallData): Promise<ApiResponse> {
-    return apiRequest('/api/orders/from-call', {
+    return apiRequest('/orders/from-call', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -71,17 +71,17 @@ export const ordersApi = {
   // Получение заказов
   async getOrders(params?: URLSearchParams): Promise<ApiResponse> {
     const queryString = params ? `?${params.toString()}` : '';
-    return apiRequest(`/api/orders${queryString}`);
+    return apiRequest(`/orders${queryString}`);
   },
 
   // Получение заказа по ID
   async getOrderById(id: number): Promise<ApiResponse> {
-    return apiRequest(`/api/orders/${id}`);
+    return apiRequest(`/orders/${id}`);
   },
 
   // Обновление заказа
   async updateOrder(id: number, data: Partial<CreateOrderData>): Promise<ApiResponse> {
-    return apiRequest(`/api/orders/${id}`, {
+    return apiRequest(`/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     });
@@ -89,7 +89,7 @@ export const ordersApi = {
 
   // Обновление статуса заказа
   async updateStatus(id: number, status: string): Promise<ApiResponse> {
-    return apiRequest(`/api/orders/${id}/status`, {
+    return apiRequest(`/orders/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status })
     });
@@ -101,17 +101,17 @@ export const callsApi = {
   // Получение звонков
   async getCalls(params?: URLSearchParams): Promise<ApiResponse> {
     const queryString = params ? `?${params.toString()}` : '';
-    return apiRequest(`/api/calls${queryString}`);
+    return apiRequest(`/calls${queryString}`);
   },
 
   // Получение звонка по ID
   async getCallById(id: number): Promise<ApiResponse> {
-    return apiRequest(`/api/calls/${id}`);
+    return apiRequest(`/calls/${id}`);
   },
 
   // Получение истории заказов по телефону
   async getOrderHistory(phone: string): Promise<ApiResponse> {
-    return apiRequest(`/api/orders?search=${encodeURIComponent(phone)}`);
+    return apiRequest(`/orders?search=${encodeURIComponent(phone)}`);
   }
 };
 
@@ -119,17 +119,17 @@ export const callsApi = {
 export const chatsApi = {
   // Получение чатов
   async getChats(): Promise<ApiResponse> {
-    return apiRequest('/api/chats');
+    return apiRequest('/chats');
   },
 
   // Получение сообщений чата
   async getChatMessages(chatId: string): Promise<ApiResponse> {
-    return apiRequest(`/api/chats/${chatId}/messages`);
+    return apiRequest(`/chats/${chatId}/messages`);
   },
 
   // Отправка сообщения
   async sendMessage(chatId: string, message: string): Promise<ApiResponse> {
-    return apiRequest(`/api/chats/${chatId}/messages`, {
+    return apiRequest(`/chats/${chatId}/messages`, {
       method: 'POST',
       body: JSON.stringify({ message })
     });

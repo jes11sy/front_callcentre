@@ -1,0 +1,108 @@
+'use client';
+
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+interface OperatorStats {
+  operator: {
+    id: number;
+    name: string;
+    city: string;
+  };
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  calls: {
+    total: number;
+    accepted: number;
+    missed: number;
+    acceptanceRate: number;
+  };
+  orders: {
+    total: number;
+    byStatus: Record<string, number>;
+  };
+  dailyStats: Array<{
+    date: string;
+    calls: number;
+  }>;
+  cityStats: Array<{
+    city: string;
+    calls: number;
+  }>;
+  rkStats: Array<{
+    rk: string;
+    calls: number;
+  }>;
+}
+
+export const useStats = (startDate: string, endDate: string) => {
+  // Получение статистики
+  const { data: stats, isLoading, error, refetch } = useQuery<OperatorStats>({
+    queryKey: ['operatorStats', startDate, endDate],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/my?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки статистики');
+      }
+
+      return response.json();
+    },
+    enabled: !!startDate && !!endDate
+  });
+
+  // Мемоизированные функции
+  const handleDateChange = useCallback(() => {
+    if (startDate && endDate) {
+      refetch();
+    }
+  }, [startDate, endDate, refetch]);
+
+  const formatDate = useCallback((dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ru-RU');
+  }, []);
+
+  // Мемоизированная обработка ежедневной статистики
+  const processedDailyStats = useMemo(() => {
+    if (!stats?.dailyStats) return { sortedStats: [], maxCalls: 1 };
+
+    // Группируем данные по датам и суммируем звонки
+    const groupedStats = stats.dailyStats.reduce((acc, day) => {
+      if (acc[day.date]) {
+        acc[day.date].calls += day.calls;
+      } else {
+        acc[day.date] = { ...day };
+      }
+      return acc;
+    }, {} as Record<string, { date: string; calls: number }>);
+
+    // Сортируем по дате
+    const sortedStats = Object.values(groupedStats).sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    const maxCalls = Math.max(...sortedStats.map(d => d.calls), 1);
+
+    return { sortedStats, maxCalls };
+  }, [stats?.dailyStats]);
+
+  return {
+    stats,
+    isLoading,
+    error,
+    refetch,
+    handleDateChange,
+    formatDate,
+    processedDailyStats
+  };
+};

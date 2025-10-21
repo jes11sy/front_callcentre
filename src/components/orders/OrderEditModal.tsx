@@ -1,0 +1,533 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LoadingSpinner } from '@/components/ui/loading';
+import { 
+  User, 
+  Settings, 
+  AlertCircle, 
+  XCircle 
+} from 'lucide-react';
+import { Order, OrderTab } from '@/types/orders';
+import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS } from '@/constants/orders';
+
+interface OrderEditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  order: Order | null;
+  userRole?: string;
+  onSave: () => void;
+  isSaving: boolean;
+  onOrderChange: (order: Order) => void;
+}
+
+export const OrderEditModal = ({ 
+  isOpen, 
+  onClose, 
+  order, 
+  userRole, 
+  onSave, 
+  isSaving, 
+  onOrderChange 
+}: OrderEditModalProps) => {
+  const [activeTab, setActiveTab] = useState<OrderTab>('description');
+
+  if (!isOpen || !order) return null;
+
+  const handleOrderChange = (field: keyof Order, value: unknown) => {
+    onOrderChange({ ...order, [field]: value });
+  };
+
+  const handleDateChange = (field: 'dateMeeting', value: string) => {
+    if (value) {
+      // Создаем дату из локального времени, но сохраняем как UTC
+      const localDate = new Date(value);
+      const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+      handleOrderChange(field, utcDate.toISOString());
+    } else {
+      handleOrderChange(field, '');
+    }
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-[#0f0f23] rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[85vw] h-[80vh] max-w-none max-h-none flex flex-col border-2 border-[#FFD700]"
+        style={{ width: '85vw', height: '80vh' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Заголовок */}
+        <div className="flex items-center justify-between p-6 border-b border-[#FFD700]/30">
+          <div>
+            <h2 className="text-2xl font-bold text-[#FFD700]">Редактирование заказа</h2>
+            <p className="text-gray-400">ID: #{order.id}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+          >
+            <XCircle className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Навигация по вкладкам */}
+        <div className="flex border-b border-[#FFD700]/30">
+          <button
+            onClick={() => setActiveTab('description')}
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'description'
+                ? 'border-[#FFD700] text-[#FFD700]'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Описание
+          </button>
+          <button
+            onClick={() => setActiveTab('master')}
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'master'
+                ? 'border-[#FFD700] text-[#FFD700]'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Мастер
+          </button>
+          <button
+            onClick={() => setActiveTab('documents')}
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'documents'
+                ? 'border-[#FFD700] text-[#FFD700]'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Документы
+          </button>
+        </div>
+
+        {/* Содержимое вкладок */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {activeTab === 'description' && (
+            <OrderDescriptionEditTab 
+              order={order} 
+              userRole={userRole}
+              onOrderChange={handleOrderChange}
+              onDateChange={handleDateChange}
+            />
+          )}
+
+          {activeTab === 'master' && (
+            <OrderMasterEditTab 
+              order={order} 
+              userRole={userRole}
+              onOrderChange={handleOrderChange}
+            />
+          )}
+
+          {activeTab === 'documents' && (
+            <OrderDocumentsEditTab 
+              order={order} 
+              userRole={userRole}
+              onOrderChange={handleOrderChange}
+            />
+          )}
+        </div>
+
+        {/* Кнопки действий */}
+        <div className="flex items-center justify-end gap-3 p-6 border-t">
+          <Button
+            variant="outline"
+            onClick={onClose}
+          >
+            Отмена
+          </Button>
+          <Button
+            onClick={onSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" />
+                Сохранение...
+              </>
+            ) : (
+              'Сохранить изменения'
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Компонент для редактирования описания
+const OrderDescriptionEditTab = ({ 
+  order, 
+  userRole, 
+  onOrderChange, 
+  onDateChange 
+}: { 
+  order: Order; 
+  userRole?: string; 
+  onOrderChange: (field: keyof Order, value: unknown) => void;
+  onDateChange: (field: 'dateMeeting', value: string) => void;
+}) => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Основная информация */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <User className="h-5 w-5 text-blue-600" />
+            Основная информация
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium text-gray-500">РК</Label>
+            <Input 
+              value={order.rk} 
+              disabled={userRole === 'operator'}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Город</Label>
+            <Input 
+              value={order.city} 
+              onChange={(e) => onOrderChange('city', e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Авито аккаунт</Label>
+            <Input 
+              value={order.avitoName || ''} 
+              onChange={(e) => onOrderChange('avitoName', e.target.value)}
+              className="mt-1"
+              placeholder="Название аккаунта Авито"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Детали заказа */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Settings className="h-5 w-5 text-green-600" />
+            Детали заказа
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Клиент</Label>
+            <Input 
+              value={order.clientName} 
+              disabled={userRole === 'operator'}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Телефон</Label>
+            <Input 
+              value={order.phone || ''} 
+              onChange={(e) => onOrderChange('phone', e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Тип заявки</Label>
+            <Select 
+              value={order.typeOrder} 
+              onValueChange={(value: string) => onOrderChange('typeOrder', value)}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ORDER_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Адрес</Label>
+            <Input 
+              value={order.address} 
+              onChange={(e) => onOrderChange('address', e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Дата встречи</Label>
+            <Input 
+              type="datetime-local"
+              value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
+              onChange={(e) => onDateChange('dateMeeting', e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Тип техники</Label>
+            <Select 
+              value={order.typeEquipment} 
+              onValueChange={(value: string) => onOrderChange('typeEquipment', value)}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {EQUIPMENT_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Статус</Label>
+            <Select 
+              value={order.statusOrder} 
+              onValueChange={(value: string) => onOrderChange('statusOrder', value)}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.filter(option => option.value !== 'all').map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    {/* Описание проблемы */}
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <AlertCircle className="h-5 w-5 text-orange-600" />
+          Описание проблемы
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Textarea 
+          value={order.problem} 
+          onChange={(e) => onOrderChange('problem', e.target.value)}
+          className="min-h-[100px]"
+          placeholder="Опишите проблему..."
+        />
+      </CardContent>
+    </Card>
+
+    {/* Оператор */}
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <User className="h-5 w-5 text-blue-600" />
+          Оператор
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Имя оператора</Label>
+            <p className="text-lg font-semibold">{order.operator.name}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-500">ID оператора</Label>
+            <p className="text-lg font-mono">{order.operatorNameId}</p>
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium text-gray-400">Запись звонка</Label>
+          <Input 
+            value={order.callRecord || ''} 
+            disabled={userRole === 'operator'}
+            className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+            placeholder="Название файла записи..."
+          />
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+// Компонент для редактирования мастера
+const OrderMasterEditTab = ({ 
+  order, 
+  userRole, 
+  onOrderChange 
+}: { 
+  order: Order; 
+  userRole?: string; 
+  onOrderChange: (field: keyof Order, value: unknown) => void;
+}) => (
+  <div className="space-y-6">
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <User className="h-5 w-5 text-[#FFD700]" />
+          Информация о мастере
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 gap-6">
+          <div>
+            <Label className="text-sm font-medium text-gray-400">Имя мастера</Label>
+            <Input 
+              value={order.master?.name || ''} 
+              disabled
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Не назначен"
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Settings className="h-5 w-5 text-[#FFD700]" />
+          Финансовые результаты
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <Label className="text-sm font-medium text-gray-400">Итог</Label>
+            <Input 
+              type="number"
+              value={order.result || ''} 
+              disabled={userRole === 'operator'}
+              onChange={(e) => onOrderChange('result', e.target.value ? parseInt(e.target.value) : null)}
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Сумма в рублях"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-400">Расходы</Label>
+            <Input 
+              type="number"
+              value={order.expenditure || ''} 
+              disabled={userRole === 'operator'}
+              onChange={(e) => onOrderChange('expenditure', e.target.value ? parseInt(e.target.value) : null)}
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Сумма в рублях"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-400">Чистая прибыль</Label>
+            <Input 
+              type="number"
+              value={order.clean || ''} 
+              disabled={userRole === 'operator'}
+              onChange={(e) => onOrderChange('clean', e.target.value ? parseInt(e.target.value) : null)}
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Сумма в рублях"
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+// Компонент для редактирования документов
+const OrderDocumentsEditTab = ({ 
+  order, 
+  userRole, 
+  onOrderChange 
+}: { 
+  order: Order; 
+  userRole?: string; 
+  onOrderChange: (field: keyof Order, value: unknown) => void;
+}) => (
+  <div className="space-y-6">
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Settings className="h-5 w-5 text-[#FFD700]" />
+          Документы заказа
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label className="text-sm font-medium text-gray-400">БСО документ</Label>
+            <Input 
+              value={order.bsoDoc || ''} 
+              disabled={userRole === 'operator'}
+              onChange={(e) => onOrderChange('bsoDoc', e.target.value)}
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Название файла БСО..."
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-gray-400">Документ расходов</Label>
+            <Input 
+              value={order.expenditureDoc || ''} 
+              disabled={userRole === 'operator'}
+              onChange={(e) => onOrderChange('expenditureDoc', e.target.value)}
+              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              placeholder="Название файла расходов..."
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Settings className="h-5 w-5 text-[#FFD700]" />
+          Системная информация
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Дата создания:</span>
+              <span className="font-medium text-white">{new Date(order.createDate).toLocaleString('ru-RU')}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Последнее обновление:</span>
+              <span className="font-medium text-white">{order.updatedAt ? new Date(order.updatedAt).toLocaleString('ru-RU') : 'Не указано'}</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400">ID заказа:</span>
+              <span className="font-medium text-white">#{order.id}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">ID оператора:</span>
+              <span className="font-medium text-white">{order.operatorNameId}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);

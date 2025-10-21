@@ -1,0 +1,306 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 221 100% 6%;
+    --foreground: 248 100% 97%;
+    --card: 221 100% 6%;
+    --card-foreground: 248 100% 97%;
+    --popover: 221 100% 6%;
+    --popover-foreground: 248 100% 97%;
+    --primary: 51 100% 50%;
+    --primary-foreground: 221 100% 6%;
+    --secondary: 248 100% 97%;
+    --secondary-foreground: 221 100% 6%;
+    --muted: 248 100% 97%;
+    --muted-foreground: 248 100% 80%;
+    --accent: 51 100% 50%;
+    --accent-foreground: 221 100% 6%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 248 100% 97%;
+    --input: 248 100% 97%;
+    --ring: 248 100% 97%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Глобальный кастомный скроллбар */
+  *::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #1a1a2e !important;
+    border-radius: 4px !important;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: #FFD700 !important;
+    border-radius: 3px !important;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: #FFC700 !important;
+  }
+  
+  *::-webkit-scrollbar-corner {
+    background: #1a1a2e !important;
+  }
+}
+
+/* Отключаем все hover эффекты для заголовков таблицы */
+th:hover {
+  background-color: transparent !important;
+}
+
+
+@layer utilities {
+  /* Объединенные CSS переменные - убираем дублирование */
+  :root {
+    /* Основные цвета темы */
+    --primary-gold: #FFD700;
+    --primary-orange: #FFA500;
+    --primary-gold-hover: #FFC700;
+    --primary-orange-hover: #FF8C00;
+    
+    /* Фоновые цвета */
+    --bg-dark: #0f0f23;
+    --bg-darker: #02111B;
+    --bg-card: #17212b;
+    
+    /* Текстовые цвета */
+    --text-primary: #F8F7F9;
+    --text-secondary: #9CA3AF;
+    
+    /* Границы и тени */
+    --border-gold: rgba(255, 215, 0, 0.3);
+    --border-gold-hover: rgba(255, 215, 0, 0.5);
+    --shadow-gold: 0 0 20px rgba(255, 215, 0, 0.6);
+    
+    /* Утилитарные переменные для размеров */
+    --dialog-width: 70vw;
+    --dialog-max-width: 70vw;
+    --message-height: 60px;
+    --container-height: 400px;
+    --row-height: 60px;
+    --item-height: 60px;
+  }
+
+  /* Оптимизированные placeholder стили */
+  .placeholder-white::placeholder {
+    color: var(--text-primary) !important;
+    opacity: 0.6 !important;
+  }
+  
+  .placeholder-white::-webkit-input-placeholder {
+    color: var(--text-primary) !important;
+    opacity: 0.6 !important;
+  }
+  
+  .placeholder-white::-moz-placeholder {
+    color: var(--text-primary) !important;
+    opacity: 0.6 !important;
+  }
+  
+  .placeholder-white:-ms-input-placeholder {
+    color: var(--text-primary) !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Оптимизированные анимации */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-bounce {
+    animation: bounce 1s infinite;
+  }
+
+  /* Оптимизированные градиенты */
+  .gradient-gold {
+    background: linear-gradient(to right, var(--primary-gold), var(--primary-orange));
+  }
+
+  .gradient-gold-hover {
+    background: linear-gradient(to right, var(--primary-gold-hover), var(--primary-orange-hover));
+  }
+
+  /* Оптимизированные тени */
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Оптимизированные переходы */
+  .transition-optimized {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Оптимизированные скроллбары */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--border-gold);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--border-gold-hover);
+  }
+
+  /* Кастомный скроллбар в теме */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #0a0a1a !important;
+    border-radius: 7px !important;
+    border: 2px solid #FFD700 !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #FFD700, #FFA500) !important;
+    border-radius: 7px !important;
+    border: 2px solid #FFD700 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #FFC700, #FF8C00) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 215, 0, 0.6) !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #FF8C00, #FFD700) !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: #0a0a1a !important;
+  }
+
+  /* Для Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin !important;
+    scrollbar-color: #FFD700 #0a0a1a !important;
+  }
+
+  /* Оптимизированные состояния загрузки */
+  .loading-skeleton {
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-darker) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  /* Утилитарные классы для замены inline стилей */
+  .dialog-width {
+    width: var(--dialog-width);
+    max-width: var(--dialog-max-width);
+  }
+  
+  .message-height {
+    height: var(--message-height);
+  }
+  
+  .container-height {
+    height: var(--container-height);
+    overflow: auto;
+  }
+  
+  .row-height {
+    height: var(--row-height);
+  }
+  
+  .item-height {
+    height: var(--item-height);
+  }
+  
+  .grid-time-slots {
+    grid-template-columns: 80px repeat(25, 1fr);
+  }
+  
+  .progress-bar {
+    width: var(--progress-width, 0%);
+    transition: width 0.1s ease;
+  }
+  
+  .chart-container {
+    height: var(--chart-height, 300px);
+    width: var(--chart-width, 100%);
+  }
+  
+  .virtualized-container {
+    height: var(--virtual-height, 600px);
+    overflow: auto;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Анимация shimmer для скелетонов */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200px 100%;
+    animation: shimmer 2s infinite;
+  }
+}

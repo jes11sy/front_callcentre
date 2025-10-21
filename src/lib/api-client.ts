@@ -2,7 +2,7 @@
 import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
 
 // Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
 
 // Получение токена авторизации
 function getAuthToken(): string | null {

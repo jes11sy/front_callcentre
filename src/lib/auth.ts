@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { tokenStorage } from './secure-storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
 
 // Ensure we have the /api suffix for the API calls
 const getApiUrl = (endpoint: string) => {
@@ -67,11 +67,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     // Only handle 401 errors for authenticated requests, not login requests
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/v1/auth/login')) {
       const refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken) {
         try {
-          const response = await axios.post(getApiUrl('/auth/refresh'), {
+          const response = await axios.post(getApiUrl('/v1/auth/refresh'), {
             refreshToken,
           });
           
@@ -98,17 +98,27 @@ api.interceptors.response.use(
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post('/auth/login', credentials);
+    // Новый Auth Service требует роль в формате enum
+    const roleMap = {
+      'admin': 'CALLCENTRE_ADMIN',
+      'operator': 'CALLCENTRE_OPERATOR'
+    };
+    
+    const response = await api.post('/v1/auth/login', {
+      login: credentials.login,
+      password: credentials.password,
+      role: roleMap[credentials.role]
+    });
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
+    await api.post('/v1/auth/logout');
     await tokenStorage.clearAll();
   },
 
   getProfile: async (): Promise<ProfileResponse> => {
-    const response = await api.get('/auth/profile');
+    const response = await api.get('/v1/auth/profile');
     return response.data;
   },
 

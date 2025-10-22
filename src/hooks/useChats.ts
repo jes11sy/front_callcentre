@@ -32,7 +32,10 @@ export function useChats() {
       setAccountsLoading(true);
       const response = await authApi.get('/avito-messenger/accounts');
       
+      console.log('Avito accounts response:', response.data);
+      
       if (response.data.success) {
+        console.log('Avito accounts data:', response.data.data);
         setAvitoAccounts(response.data.data);
         if (response.data.data.length > 0 && !selectedAccount) {
           if (response.data.data.length > 1) {
@@ -40,6 +43,8 @@ export function useChats() {
           } else {
             setSelectedAccount(response.data.data[0].name);
           }
+        } else {
+          console.warn('No Avito accounts found or account already selected');
         }
       } else {
         throw new Error(response.data.message || 'Ошибка при получении аккаунтов');
@@ -89,8 +94,8 @@ export function useChats() {
           ]);
           
           if (allChatsResponse.data.success && unreadChatsResponse.data.success) {
-            const allChats = allChatsResponse.data.data.chats;
-            const unreadChats = unreadChatsResponse.data.data.chats;
+            const allChats = allChatsResponse.data.data || [];
+            const unreadChats = unreadChatsResponse.data.data || [];
             
             // Создаем Set с ID непрочитанных чатов
             const unreadChatIds = new Set(unreadChats.map((chat: AvitoChat) => chat.id));
@@ -195,8 +200,8 @@ export function useChats() {
       ]);
       
       if (allChatsResponse.data.success && unreadChatsResponse.data.success) {
-        const allChats = allChatsResponse.data.data.chats;
-        const unreadChats = unreadChatsResponse.data.data.chats;
+        const allChats = allChatsResponse.data.data || [];
+        const unreadChats = unreadChatsResponse.data.data || [];
         
         // Создаем Set с ID непрочитанных чатов для быстрого поиска
         const unreadChatIds = new Set(unreadChats.map((chat: AvitoChat) => chat.id));

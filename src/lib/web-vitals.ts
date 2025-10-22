@@ -2,24 +2,16 @@ import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
 
 // Функция для отправки метрик на сервер
 function sendToAnalytics(metric: { name: string; value: number; id: string; delta: number }) {
-  // В production можно отправлять на аналитический сервис
-  if (process.env.NODE_ENV === 'production') {
-    // Пример отправки на Google Analytics
-    // gtag('event', metric.name, {
-    //   value: Math.round(metric.value),
-    //   event_label: metric.id,
-    //   non_interaction: true,
-    // });
-    
-    // Или отправка на собственный API
-    fetch('/api/analytics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(metric),
-    }).catch(console.error);
-  }
+  // Временно отключено
+  // if (process.env.NODE_ENV === 'production') {
+  //   fetch('/api/analytics', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(metric),
+  //   }).catch(console.error);
+  // }
 }
 
 // Инициализация мониторинга Web Vitals

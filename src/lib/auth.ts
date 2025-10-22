@@ -92,16 +92,10 @@ api.interceptors.response.use(
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    // Новый Auth Service требует роль в формате enum
-    const roleMap = {
-      'admin': 'CALLCENTRE_ADMIN',
-      'operator': 'CALLCENTRE_OPERATOR'
-    };
-    
     const response = await api.post('/auth/login', {
       login: credentials.login,
       password: credentials.password,
-      role: roleMap[credentials.role]
+      role: credentials.role
     });
     return response.data;
   },

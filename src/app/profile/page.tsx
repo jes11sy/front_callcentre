@@ -37,6 +37,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { tokenStorage } from '@/lib/secure-storage';
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -120,9 +121,10 @@ export default function ProfilePage() {
   const { data: profile, isLoading, error } = useQuery<Profile>({
     queryKey: ['profile'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -138,9 +140,10 @@ export default function ProfilePage() {
   const { data: profileStats } = useQuery<ProfileStats>({
     queryKey: ['profileStats'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -156,11 +159,12 @@ export default function ProfilePage() {
   // Обновление профиля
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       });
@@ -185,11 +189,12 @@ export default function ProfilePage() {
   // Смена пароля
   const changePasswordMutation = useMutation({
     mutationFn: async (data: PasswordFormData) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           currentPassword: data.currentPassword,

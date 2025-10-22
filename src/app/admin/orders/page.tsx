@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import CreateOrderModal from '@/components/orders/CreateOrderModal';
 import { Order, OrdersResponse, typeOrderLabels } from '@/types/orders';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
+import { tokenStorage } from '@/lib/secure-storage';
 
 
 const statusLabels = {
@@ -78,9 +79,10 @@ export default function OrdersPage() {
         // Сортировка всегда по дате встречи и статусу "Ожидает" - не передаем параметры сортировки
       });
 
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`/api/orders?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -95,11 +97,12 @@ export default function OrdersPage() {
   // Обновление статуса заказа - removed, not used
   const _updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`/api/orders/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status })
       });
@@ -122,10 +125,11 @@ export default function OrdersPage() {
   // Удаление заказа
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: number) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`/api/orders/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

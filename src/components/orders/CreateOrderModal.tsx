@@ -23,6 +23,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { tokenStorage } from '@/lib/secure-storage';
 
 const orderSchema = z.object({
   rk: z.string().min(1, 'РК обязателен'),
@@ -76,15 +77,18 @@ export default function CreateOrderModal({
     try {
       setIsSubmitting(true);
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders`, {
+      const token = await tokenStorage.getAccessToken();
+      const user = await tokenStorage.getUser();
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           ...data,
-          operatorNameId: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).id : 0
+          operatorNameId: user?.id || 0
         })
       });
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { tokenStorage } from '@/lib/secure-storage';
 
 interface OperatorStats {
   operator: {
@@ -46,9 +47,10 @@ export const useStats = (startDate: string, endDate: string) => {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/my?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

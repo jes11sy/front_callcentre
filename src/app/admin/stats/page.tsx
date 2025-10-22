@@ -31,6 +31,7 @@ import {
   Users,
   RefreshCw
 } from 'lucide-react';
+import { tokenStorage } from '@/lib/secure-storage';
 // toast removed - not used
 
 interface OverallStats {
@@ -130,9 +131,10 @@ export default function AdminStatsPage() {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/overall?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -153,9 +155,10 @@ export default function AdminStatsPage() {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/operator/${selectedOperator}?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

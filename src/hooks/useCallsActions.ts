@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Call } from '@/types/telephony';
 import { toast } from 'sonner';
 import { notifications } from '@/components/ui/notifications';
+import { tokenStorage } from '@/lib/secure-storage';
 
 export const useCallsActions = () => {
   // States
@@ -22,9 +23,10 @@ export const useCallsActions = () => {
       setOrderHistoryLoading(true);
       setSelectedCallForHistory(call);
       
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
+      const token = await tokenStorage.getAccessToken();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -52,7 +54,7 @@ export const useCallsActions = () => {
     try {
       setPlayingCall(call.id);
       
-      const token = localStorage.getItem('accessToken');
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/recordings/call/${call.id}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -100,9 +102,10 @@ export const useCallsActions = () => {
     }
 
     try {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`/api/recordings/call/${call.id}/download`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

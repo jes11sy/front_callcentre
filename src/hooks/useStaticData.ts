@@ -1,15 +1,17 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { tokenStorage } from '@/lib/secure-storage';
 
 // Хук для получения списка городов
 export const useCities = () => {
   return useQuery({
     queryKey: ['cities'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/cities`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -31,9 +33,10 @@ export const useRKs = () => {
   return useQuery({
     queryKey: ['rks'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/rks`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -55,9 +58,10 @@ export const useAvitoAccounts = () => {
   return useQuery({
     queryKey: ['avito-accounts'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/avito-accounts`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -79,9 +83,10 @@ export const useOperators = () => {
   return useQuery({
     queryKey: ['operators'],
     queryFn: async () => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/operators`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

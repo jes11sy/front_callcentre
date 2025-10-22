@@ -1,18 +1,19 @@
 // API клиент для устранения дублирования кода в запросах
 import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
+import { tokenStorage } from '@/lib/secure-storage';
 
 // Базовый URL API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
 
 // Получение токена авторизации
-function getAuthToken(): string | null {
+async function getAuthToken(): Promise<string | null> {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
+  return await tokenStorage.getAccessToken();
 }
 
 // Базовые заголовки для запросов
-function getAuthHeaders(): HeadersInit {
-  const token = getAuthToken();
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const token = await getAuthToken();
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
@@ -25,11 +26,12 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const authHeaders = await getAuthHeaders();
   
   const response = await fetch(url, {
     ...options,
     headers: {
-      ...getAuthHeaders(),
+      ...authHeaders,
       ...options.headers
     }
   });

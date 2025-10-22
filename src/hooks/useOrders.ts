@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Order, OrdersResponse, OrderFilters, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
+import { tokenStorage } from '@/lib/secure-storage';
 
 export const useOrders = () => {
   const router = useRouter();
@@ -66,7 +67,7 @@ export const useOrders = () => {
         ...(filters.closingDate && { closingDate: filters.closingDate }),
       });
 
-      const token = localStorage.getItem('accessToken');
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -107,11 +108,12 @@ export const useOrders = () => {
   // Обновление статуса заказа
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status })
       });
@@ -134,11 +136,12 @@ export const useOrders = () => {
   // Обновление заказа
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, orderData }: { id: number; orderData: Partial<Order> }) => {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(orderData)
       });
@@ -165,12 +168,13 @@ export const useOrders = () => {
     
     setLoadingCalls(true);
     try {
+      const token = await tokenStorage.getAccessToken();
       const callIdArray = callIds.split(',');
       const calls = await Promise.all(
         callIdArray.map(async (callId) => {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/calls/${callId}`, {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+              'Authorization': `Bearer ${token}`
             }
           });
           if (response.ok) {

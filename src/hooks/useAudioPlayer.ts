@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { AudioPlayerState, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
+import { tokenStorage } from '@/lib/secure-storage';
 
 const initialAudioState: AudioPlayerState = {
   audio: null,
@@ -26,9 +27,10 @@ export const useAudioPlayer = () => {
 
   const loadRecording = useCallback(async (call: Call) => {
     try {
+      const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/recordings/call/${call.id}/download`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

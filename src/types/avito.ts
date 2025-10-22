@@ -125,7 +125,7 @@ export interface AvitoChat {
     type: 'text' | 'system' | 'quick_reply' | 'voice';
     isRead?: boolean;
   };
-  unreadCount: number;
+  unreadCount?: number;
   isArchived: boolean;
   hasNewMessage?: boolean;
   isStarred?: boolean;

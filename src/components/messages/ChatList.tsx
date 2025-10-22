@@ -106,7 +106,7 @@ export const ChatList = memo(function ChatList({
               </AvatarFallback>
             </Avatar>
             {/* Unread message indicator */}
-            {chat.unreadCount && chat.unreadCount > 0 && (
+            {(typeof chat.unreadCount === 'number' && chat.unreadCount > 0) && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-[#02111B] rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-xs font-bold text-white">
                   {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
@@ -114,7 +114,7 @@ export const ChatList = memo(function ChatList({
               </div>
             )}
             {/* New message dot (for visual indication) */}
-            {chat.hasNewMessage && !chat.unreadCount && (
+            {chat.hasNewMessage && !(typeof chat.unreadCount === 'number' && chat.unreadCount > 0) && (
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-[#02111B] rounded-full flex items-center justify-center shadow-md">
                 <Circle className="w-1.5 h-1.5 fill-white" />
               </div>

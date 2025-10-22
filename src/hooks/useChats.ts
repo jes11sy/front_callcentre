@@ -218,7 +218,8 @@ export function useChats() {
             return {
               ...chat,
               hasNewMessage: hasNewMessage,
-              unreadCount: hasNewMessage ? (chat.unreadCount || 1) : undefined,
+              // Не устанавливаем unreadCount для прочитанных чатов
+              unreadCount: hasNewMessage ? (chat.unreadCount || undefined) : undefined,
               updated: chat.updated || Date.now() / 1000
             };
           });
@@ -249,11 +250,13 @@ export function useChats() {
   // Mark chat as read
   const markChatAsRead = useCallback((chatId: string) => {
     setChats(prevChats => 
-      prevChats.map(chat => 
-        chat.id === chatId 
-          ? { ...chat, hasNewMessage: false, unreadCount: 0 }
-          : chat
-      )
+      prevChats.map(chat => {
+        if (chat.id === chatId) {
+          const { unreadCount, ...rest } = chat;
+          return { ...rest, hasNewMessage: false } as AvitoChat;
+        }
+        return chat;
+      })
     );
   }, []);
 

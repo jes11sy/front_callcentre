@@ -62,7 +62,7 @@ export function Header({ variant = 'operator' }: HeaderProps) {
     const loadWorkStatus = async () => {
       try {
         const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
           headers: {
             'Authorization': `Bearer ${await token}`,
           },

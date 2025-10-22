@@ -14,8 +14,6 @@ export interface User {
   login: string;
   role: 'admin' | 'operator';
   name?: string;
-  city?: string;
-  cities?: string[];
 }
 
 export interface AuthResponse {
@@ -94,10 +92,16 @@ api.interceptors.response.use(
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    // Новый Auth Service требует роль в формате enum
+    const roleMap = {
+      'admin': 'CALLCENTRE_ADMIN',
+      'operator': 'CALLCENTRE_OPERATOR'
+    };
+    
     const response = await api.post('/auth/login', {
       login: credentials.login,
       password: credentials.password,
-      role: credentials.role
+      role: roleMap[credentials.role]
     });
     return response.data;
   },

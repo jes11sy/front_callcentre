@@ -28,7 +28,7 @@ export function useLazySocket(options: LazySocketOptions = {}) {
         
         // Создаем соединение только если autoConnect включен
         if (autoConnect) {
-          const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000', {
+          const socketInstance = io(process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru', {
             transports: ['websocket'],
             timeout: 20000,
             forceNew: true

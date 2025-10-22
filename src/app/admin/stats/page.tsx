@@ -132,7 +132,7 @@ export default function AdminStatsPage() {
       if (endDate) params.append('endDate', endDate);
 
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/overall?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/overall?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -156,7 +156,7 @@ export default function AdminStatsPage() {
       if (endDate) params.append('endDate', endDate);
 
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/operator/${selectedOperator}?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/operator/${selectedOperator}?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -172,7 +172,7 @@ export const useOrders = () => {
       const callIdArray = callIds.split(',');
       const calls = await Promise.all(
         callIdArray.map(async (callId) => {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/calls/${callId}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/calls/${callId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

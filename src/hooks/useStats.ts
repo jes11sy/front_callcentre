@@ -48,7 +48,7 @@ export const useStats = (startDate: string, endDate: string) => {
       if (endDate) params.append('endDate', endDate);
 
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/stats/my?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/my?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

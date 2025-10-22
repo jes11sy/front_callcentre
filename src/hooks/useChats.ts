@@ -176,62 +176,23 @@ export function useChats() {
         // loadChats started
       }
       
-      // ВАЖНО: Делаем два запроса для получения полной информации о непрочитанных чатах
-      // 1. Получаем все чаты
-      const allChatsParams = new URLSearchParams({
+      // Получаем чаты (бэкенд сам определяет unread статус по last_message.is_read)
+      const chatsParams = new URLSearchParams({
         avitoAccountName: selectedAccount,
         limit: '50',
         offset: '0',
-        unread_only: 'false'
+        unread_only: filterUnread ? 'true' : 'false'
       });
 
-      // 2. Получаем только непрочитанные чаты (для определения unread статуса)
-      const unreadChatsParams = new URLSearchParams({
-        avitoAccountName: selectedAccount,
-        limit: '50',
-        offset: '0',
-        unread_only: 'true'
-      });
-
-      // Выполняем запросы параллельно
-      const [allChatsResponse, unreadChatsResponse] = await Promise.all([
-        authApi.get(`/avito-messenger/chats?${allChatsParams.toString()}`),
-        authApi.get(`/avito-messenger/chats?${unreadChatsParams.toString()}`)
-      ]);
+      const chatsResponse = await authApi.get(`/avito-messenger/chats?${chatsParams.toString()}`);
       
-      if (allChatsResponse.data.success && unreadChatsResponse.data.success) {
-        const allChats = allChatsResponse.data.data || [];
-        const unreadChats = unreadChatsResponse.data.data || [];
+      if (chatsResponse.data.success) {
+        const loadedChats = chatsResponse.data.data || [];
         
-        // Создаем Set с ID непрочитанных чатов для быстрого поиска
-        const unreadChatIds = new Set(unreadChats.map((chat: AvitoChat) => chat.id));
-        
-        // Loaded chats stats calculated
-        
-        // Используем функциональное обновление вместо зависимости от chats
-        setChats(prevChats => {
-          const updatedChats = allChats.map((chat: AvitoChat) => {
-            const _existingChat = prevChats.find(c => c.id === chat.id);
-            // Используем информацию из API об непрочитанных чатах
-            const hasNewMessage = unreadChatIds.has(chat.id);
-            
-            return {
-              ...chat,
-              hasNewMessage: hasNewMessage,
-              // Не устанавливаем unreadCount для прочитанных чатов
-              unreadCount: hasNewMessage ? (chat.unreadCount || undefined) : undefined,
-              updated: chat.updated || Date.now() / 1000
-            };
-          });
-          return updatedChats;
-        });
-        
-        // Если фильтр "только непрочитанные" включен, применяем его
-        if (filterUnread) {
-          setChats(prevChats => prevChats.filter(chat => unreadChatIds.has(chat.id)));
-        }
+        // Бэкенд уже добавил unreadCount и hasNewMessage на основе last_message
+        setChats(loadedChats);
       } else {
-        throw new Error(allChatsResponse.data.message || 'Ошибка при получении чатов');
+        throw new Error(chatsResponse.data.message || 'Ошибка при получении чатов');
       }
     } catch (err: unknown) {
       console.error('Error loading chats:', err);

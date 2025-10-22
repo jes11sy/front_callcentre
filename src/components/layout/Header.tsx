@@ -87,8 +87,8 @@ export function Header({ variant = 'operator' }: HeaderProps) {
   const handleWorkStatusChange = async (newStatus: string) => {
     try {
       const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-        method: 'PUT',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/operators/work-status`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${await token}`,
           'Content-Type': 'application/json',
@@ -114,8 +114,8 @@ export function Header({ variant = 'operator' }: HeaderProps) {
       if (variant === 'operator') {
         try {
           const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-            method: 'PUT',
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/operators/work-status`, {
+            method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${await token}`,
               'Content-Type': 'application/json',

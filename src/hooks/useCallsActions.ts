@@ -103,7 +103,7 @@ export const useCallsActions = () => {
 
     try {
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`/api/recordings/call/${call.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/v1/recordings/call/${call.id}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -113,17 +113,22 @@ export const useCallsActions = () => {
         throw new Error('Ошибка при загрузке записи');
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `call_${call.id}_recording.mp3`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      notifications.success('Запись звонка загружена');
+      // Получаем JSON с URL
+      const data = await response.json();
+      if (data.success && data.url) {
+        // Открываем S3 URL напрямую для скачивания
+        const a = document.createElement('a');
+        a.href = data.url;
+        a.download = `call_${call.id}_recording.mp3`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        notifications.success('Запись звонка загружена');
+      } else {
+        throw new Error(data.message || 'Не удалось получить URL записи');
+      }
     } catch (error) {
       console.error('Error downloading recording:', error);
       notifications.error('Ошибка при загрузке записи');

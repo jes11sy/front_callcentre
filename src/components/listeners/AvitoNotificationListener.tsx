@@ -9,9 +9,14 @@ export function AvitoNotificationListener() {
   const { socket, isConnected } = useGlobalSocket();
 
   useEffect(() => {
+    console.log('📢 AvitoNotificationListener: Mounted, socket:', !!socket, 'isConnected:', isConnected);
+    
     if (!socket || !isConnected) {
+      console.log('📢 AvitoNotificationListener: Socket not ready, waiting...');
       return;
     }
+
+    console.log('📢 AvitoNotificationListener: Registering avito-notification listener');
 
     // Слушаем avito-notification событие везде, независимо от страницы
     const notificationHandler = (...args: unknown[]) => {
@@ -23,6 +28,8 @@ export function AvitoNotificationListener() {
         timestamp: number;
       };
 
+      console.log('📢 AvitoNotificationListener: Got notification event:', data.type);
+
       if (data.type === 'new_message') {
         // Play sound for notification
         playMessageSound();
@@ -33,9 +40,11 @@ export function AvitoNotificationListener() {
     };
 
     socket.on('avito-notification', notificationHandler);
+    console.log('📢 AvitoNotificationListener: Listener registered');
 
     // Cleanup
     return () => {
+      console.log('📢 AvitoNotificationListener: Cleaning up listener');
       socket.off('avito-notification', notificationHandler);
     };
   }, [socket, isConnected]);

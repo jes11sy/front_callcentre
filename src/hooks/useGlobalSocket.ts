@@ -2,6 +2,7 @@
 // Предотвращает множественные подключения и обеспечивает оптимальную производительность
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useAuthStore } from '@/store/authStore';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
 
@@ -215,21 +216,23 @@ class SocketManager {
   }
 }
 
-// Хук для использования глобального сокета
+// Хок для использования глобального сокета
 export const useGlobalSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const socketManager = useRef<SocketManager | null>(null);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    // ❌ SAFETY CHECK: Если нет токена в localStorage, вообще не подключаемся
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      console.log('🔌 useGlobalSocket: No token found, socket will not connect');
+    // Если не аутентифицирован, не подключаемся
+    if (!isAuthenticated) {
+      console.log('🔌 useGlobalSocket: User not authenticated, socket will not connect');
       setIsConnected(false);
       setIsLoading(false);
       return;
     }
+
+    console.log('🔌 useGlobalSocket: User authenticated, attempting to connect socket...');
 
     const initSocket = async () => {
       setIsLoading(true);
@@ -238,10 +241,12 @@ export const useGlobalSocket = () => {
       const socket = await socketManager.current.connect();
       
       if (socket && (socket as any).connected) {
+        console.log('✅ useGlobalSocket: Socket connected successfully');
         setIsConnected((socket as any).connected || false);
         setIsLoading(false);
         
         const unsubscribe = socketManager.current.on('connection', () => {
+          console.log('🔌 useGlobalSocket: Connection event received');
           setIsConnected(socketManager.current?.isConnected || false);
         });
 
@@ -260,7 +265,7 @@ export const useGlobalSocket = () => {
         if (unsubscribe) unsubscribe();
       });
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const send = useCallback((event: string, data: unknown) => {
     if (socketManager.current) {

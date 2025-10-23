@@ -184,24 +184,27 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
 
     // Для небольшого количества сообщений используем обычный рендер
     return (
-      <div className="space-y-4">
-        {messages.map((message, index) => {
-          const isOwn = message.direction === 'out';
-          const prevMessage = index > 0 ? messages[index - 1] : null;
-          const showAvatar = !prevMessage || prevMessage.direction !== message.direction;
-          
-          return (
-            <MessageItem
-              key={message.id}
-              message={message}
-              selectedChat={selectedChat}
-              index={index}
-              isOwn={isOwn}
-              showAvatar={showAvatar}
-              onMessageAction={onMessageAction}
-            />
-          );
-        })}
+      <div className="flex flex-col min-h-full">
+        <div className="space-y-4">
+          {messages.map((message, index) => {
+            const isOwn = message.direction === 'out';
+            const prevMessage = index > 0 ? messages[index - 1] : null;
+            const showAvatar = !prevMessage || prevMessage.direction !== message.direction;
+            
+            return (
+              <MessageItem
+                key={message.id}
+                message={message}
+                selectedChat={selectedChat}
+                index={index}
+                isOwn={isOwn}
+                showAvatar={showAvatar}
+                onMessageAction={onMessageAction}
+              />
+            );
+          })}
+        </div>
+        <div className="flex-1" />
         <div ref={ref} />
       </div>
     );

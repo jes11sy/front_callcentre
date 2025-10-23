@@ -113,6 +113,7 @@ export const useTelephony = () => {
     playingCall: actions.playingCall,
     currentAudioUrl: actions.currentAudioUrl,
     selectedCallForOrder: actions.selectedCallForOrder,
+    selectedCallGroup: actions.selectedCallGroup,
     showCreateOrderModal: actions.showCreateOrderModal,
     showOrderHistoryModal: actions.showOrderHistoryModal,
     selectedCallForHistory: actions.selectedCallForHistory,

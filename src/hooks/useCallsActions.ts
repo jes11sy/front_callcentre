@@ -11,6 +11,7 @@ export const useCallsActions = () => {
   const [playingCall, setPlayingCall] = useState<number | null>(null);
   const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
   const [selectedCallForOrder, setSelectedCallForOrder] = useState<Call | null>(null);
+  const [selectedCallGroup, setSelectedCallGroup] = useState<Call[]>([]);
   const [showCreateOrderModal, setShowCreateOrderModal] = useState(false);
   const [showOrderHistoryModal, setShowOrderHistoryModal] = useState(false);
   const [selectedCallForHistory, setSelectedCallForHistory] = useState<Call | null>(null);
@@ -135,8 +136,9 @@ export const useCallsActions = () => {
     }
   }, []);
 
-  const createOrderFromCall = useCallback((call: Call) => {
+  const createOrderFromCall = useCallback((call: Call, groupCalls?: Call[]) => {
     setSelectedCallForOrder(call);
+    setSelectedCallGroup(groupCalls || [call]);
     setShowCreateOrderModal(true);
   }, []);
 
@@ -149,6 +151,7 @@ export const useCallsActions = () => {
     playingCall,
     currentAudioUrl,
     selectedCallForOrder,
+    selectedCallGroup,
     showCreateOrderModal,
     showOrderHistoryModal,
     selectedCallForHistory,

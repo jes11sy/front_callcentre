@@ -52,6 +52,7 @@ export default function TelephonyPage() {
     playingCall,
     currentAudioUrl,
     selectedCallForOrder,
+    selectedCallGroup,
     showCreateOrderModal,
     showOrderHistoryModal,
     selectedCallForHistory,
@@ -205,6 +206,7 @@ export default function TelephonyPage() {
         {/* Create Order Modal */}
         <CreateOrderModal
           call={selectedCallForOrder}
+          callGroup={selectedCallGroup}
           open={showCreateOrderModal}
           onOpenChange={setShowCreateOrderModal}
           onOrderCreated={handleOrderCreated}

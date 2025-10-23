@@ -70,6 +70,7 @@ interface Call {
 
 interface CreateOrderModalProps {
   call: Call | null;
+  callGroup?: Call[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOrderCreated?: (order: { id?: string | number }) => void;
@@ -77,6 +78,7 @@ interface CreateOrderModalProps {
 
 export function CreateOrderModal({ 
   call, 
+  callGroup = [],
   open, 
   onOpenChange, 
   onOrderCreated 
@@ -107,7 +109,7 @@ export function CreateOrderModal({
       setIsSubmitting(true);
 
       const orderData = {
-        callId: call.id,
+        callIds: callGroup.map(c => c.id),
         rk: data.rk,
         avitoName: data.avitoName,
         city: data.city,
@@ -122,7 +124,6 @@ export function CreateOrderModal({
       const response = await authApi.post('/orders/from-call', orderData);
 
       if (response.data.success) {
-        toast.success('Заказ успешно создан!');
         onOrderCreated?.(response.data.data);
         handleClose();
       } else {

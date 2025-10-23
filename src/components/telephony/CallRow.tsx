@@ -154,7 +154,7 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
             <Button
               variant="default"
               size="sm"
-              onClick={() => onCreateOrder(call)}
+              onClick={() => onCreateOrder(call, groupCalls)}
               className="flex items-center justify-center gap-2 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-semibold transition-colors duration-200"
             >
               <Plus className="h-4 w-4" />

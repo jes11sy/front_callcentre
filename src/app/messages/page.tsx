@@ -111,7 +111,8 @@ export default function MessagesPage() {
     selectedAccount,
     onNewMessage: addNewMessage,
     onChatUpdate: () => {
-      // Handle chat update
+      // Handle chat update by reloading chats silently
+      loadChats(true);
     },
     loadChats,
     markChatAsUnread,

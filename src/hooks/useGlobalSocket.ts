@@ -19,6 +19,7 @@ class SocketManager {
     onAny: (callback: (event: string, ...args: unknown[]) => void) => void;
     emit: (event: string, ...args: unknown[]) => void;
     disconnect: () => void;
+    connect: () => void;
   } | null = null;
   private listeners: Map<string, Set<(...args: unknown[]) => void>> = new Map();
   private isConnecting = false;
@@ -35,6 +36,13 @@ class SocketManager {
   }
 
   async connect(): Promise<unknown> {
+    // ❌ ДВОЙНАЯ ЗАЩИТА: проверяем токен перед любыми действиями
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('❌ SocketManager.connect(): No access token available, cannot connect');
+      return null;
+    }
+
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -69,12 +77,16 @@ class SocketManager {
         reconnectionDelayMax: 10000,
         reconnectionAttempts: this.maxReconnectAttempts,
         timeout: 10000,
-        autoConnect: true,
+        autoConnect: false,  // ← Отключаем автоподключение
         forceNew: false,
         path: '/socket.io/'
       });
 
       this.setupEventHandlers();
+      
+      // Явно подключаемся
+      this.socket.connect();
+      
       this.reconnectAttempts = 0;
       
       return this.socket;
@@ -173,6 +185,16 @@ class SocketManager {
     }
   }
 
+  // Переаутентификация с новым токеном
+  authenticate(token: string) {
+    if (this.socket?.connected) {
+      this.socket.emit('authenticate', { token });
+      console.log('🔐 Socket re-authenticated with new token');
+    } else {
+      console.warn('Socket not connected, cannot authenticate');
+    }
+  }
+
   // Получение статуса подключения
   get isConnected() {
     return this.socket?.connected || false;
@@ -198,29 +220,28 @@ export const useGlobalSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const socketManager = useRef<SocketManager | null>(null);
-  const isInitialized = useRef(false);
 
   useEffect(() => {
-    if (isInitialized.current) {
+    // ❌ SAFETY CHECK: Если нет токена в localStorage, вообще не подключаемся
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.log('🔌 useGlobalSocket: No token found, socket will not connect');
+      setIsConnected(false);
+      setIsLoading(false);
       return;
     }
-    
-    isInitialized.current = true;
-    
+
     const initSocket = async () => {
       setIsLoading(true);
       socketManager.current = SocketManager.getInstance();
       
       const socket = await socketManager.current.connect();
       
-      if (socket) {
-        setIsConnected(socket.connected || false);
+      if (socket && (socket as any).connected) {
+        setIsConnected((socket as any).connected || false);
         setIsLoading(false);
         
-        // ❌ Не слушаем connection событие, а используем socket.connected напрямую
-        // Подписываемся на общие события
         const unsubscribe = socketManager.current.on('connection', () => {
-          // Просто обновляем состояние
           setIsConnected(socketManager.current?.isConnected || false);
         });
 
@@ -260,12 +281,19 @@ export const useGlobalSocket = () => {
     }
   }, []);
 
+  const reAuthenticate = useCallback((token: string) => {
+    if (socketManager.current) {
+      socketManager.current.authenticate(token);
+    }
+  }, []);
+
   return {
     socket: socketManager.current?.getSocketInstance() || null,
     isConnected,
     isLoading,
     send,
     on,
-    off
+    off,
+    reAuthenticate
   };
 };

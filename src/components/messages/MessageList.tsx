@@ -163,26 +163,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
       );
     }
 
-    // Используем виртуализацию только для большого количества сообщений
-    if (messages.length > 50) {
-      return (
-        <div className="relative">
-          <div 
-            className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 container-height"
-            style={{ '--container-height': `${CONTAINER_HEIGHT}px` } as React.CSSProperties}
-          >
-            {messages.map((message, index) => (
-              <div key={message.id} className="message-height">
-                {renderMessage({ index, style: {} })}
-              </div>
-            ))}
-          </div>
-          <div ref={ref} />
-        </div>
-      );
-    }
-
-    // Для небольшого количества сообщений используем обычный рендер
+    // Всегда используем одну и ту же структуру чтобы избежать резкого изменения DOM
     return (
       <div className="space-y-4">
         {messages.map((message, index) => {

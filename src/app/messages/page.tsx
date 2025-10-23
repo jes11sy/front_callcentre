@@ -126,12 +126,10 @@ export default function MessagesPage() {
   
   // Modern utility functions
   const scrollToBottom = useCallback(() => {
-    // Для Radix ScrollArea нужно скроллить viewport, а не использовать scrollIntoView
-    const scrollViewport = document.querySelector('[data-radix-scroll-area-viewport]');
-    if (scrollViewport) {
-      scrollViewport.scrollTop = scrollViewport.scrollHeight;
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, []);
+  }, [messagesEndRef]);
 
   // scrollToMessage removed - not used
 

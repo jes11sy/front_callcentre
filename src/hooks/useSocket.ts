@@ -5,7 +5,7 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC
 
 // Мемоизированная конфигурация сокета
 const socketConfig = {
-  transports: ['polling', 'websocket'] as ('polling' | 'websocket')[],
+  transports: ['websocket'] as ('websocket')[],
   withCredentials: true,
   reconnection: true,
   reconnectionDelay: 2000,

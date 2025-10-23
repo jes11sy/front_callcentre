@@ -57,7 +57,7 @@ class SocketManager {
       const { io } = await import('socket.io-client');
       
       this.socket = io(SOCKET_URL, {
-        transports: ['polling', 'websocket'],
+        transports: ['websocket'],
         withCredentials: true,
         reconnection: true,
         reconnectionDelay: 2000,

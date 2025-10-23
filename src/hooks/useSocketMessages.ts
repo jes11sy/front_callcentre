@@ -123,10 +123,11 @@ export function useSocketMessages({
   }, [updateChatWithMessage, onChatUpdate]);
 
   useEffect(() => {
-    if (!socket || !isConnected) {
+    if (!socket) {
       return;
     }
 
+    console.log('✅ useSocketMessages: Registering 3 socket listeners');
     socket.on('avito-new-message', newMessageHandler);
     socket.on('avito-chat-updated', chatUpdateHandler);
     socket.on('avito-notification', notificationHandler);
@@ -137,5 +138,5 @@ export function useSocketMessages({
       socket.off('avito-chat-updated');
       socket.off('avito-notification');
     };
-  }, [socket, isConnected, newMessageHandler, chatUpdateHandler, notificationHandler]);
+  }, [socket, newMessageHandler, chatUpdateHandler, notificationHandler]);
 }

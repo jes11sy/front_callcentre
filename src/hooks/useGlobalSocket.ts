@@ -93,6 +93,13 @@ class SocketManager {
     this.socket.on('connect', () => {
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
+      
+      // 🔐 Отправляем токен для аутентификации
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        this.socket?.emit('authenticate', { token });
+        console.log('🔐 Sent authenticate event');
+      }
     });
 
     this.socket.on('disconnect', () => {

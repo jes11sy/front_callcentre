@@ -80,10 +80,8 @@ export function useSocketMessages({
       // Update chat with new message
       updateChatWithMessage(data.chatId, data.message);
       
-      // Show notification only for incoming messages
-      if (isIncomingMessage) {
-        notifications.info('Новое сообщение в чате Авито');
-      }
+      // ❌ Убрали дублирующееся уведомление отсюда
+      // Уведомление будет приходить только из avito-notification события
     };
 
     const chatUpdateHandler = (...args: unknown[]) => {

@@ -103,7 +103,7 @@ export const useCallsActions = () => {
 
     try {
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/v1/recordings/call/${call.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/recordings/call/${call.id}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

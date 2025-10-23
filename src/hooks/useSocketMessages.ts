@@ -51,10 +51,7 @@ export function useSocketMessages({
       const isIncomingMessage = data.message.direction === 'in';
       console.log('avito-new-message event received:', data);
       
-      // Воспроизводим звук только для входящих сообщений
-      if (isIncomingMessage) {
-        playMessageSound();
-      }
+      // ❌ Убрали звук отсюда - он будет только в avito-notification
       
       // If it's the currently open chat, add message to the list
       if (selectedChat && selectedChat.id === data.chatId) {
@@ -123,14 +120,9 @@ export function useSocketMessages({
         message: AvitoMessage;
         timestamp: number;
       };
-      if (data.type === 'new_message') {
-        // Play sound for notification
-        playMessageSound();
-        
-        // Show notification
-        notifications.info('Новое сообщение в чате Авито');
-        
-        // Update chat with message
+      // ❌ Уведомление теперь обрабатывается глобально в AvitoNotificationListener
+      // Здесь только обновляем чат с новым сообщением если нужно
+      if (data.message) {
         updateChatWithMessage(data.chatId, data.message);
       }
     };

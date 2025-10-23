@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
+import { AvitoNotificationListener } from "@/components/listeners/AvitoNotificationListener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <AuthProvider>
+            <AvitoNotificationListener />
             {children}
           </AuthProvider>
         </QueryProvider>

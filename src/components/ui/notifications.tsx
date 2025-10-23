@@ -60,6 +60,8 @@ class NotificationService {
         label: options.action.label,
         onClick: options.action.onClick
       } : undefined,
+      className: 'bg-[#0f0f23] border-2 border-yellow-400 shadow-lg shadow-yellow-400/50 text-white',
+      descriptionClassName: 'text-gray-300',
     });
   }
 

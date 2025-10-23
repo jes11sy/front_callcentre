@@ -158,16 +158,8 @@ export function useMessages() {
 
   // Add new message from socket
   const addNewMessage = useCallback((message: AvitoMessage) => {
-    console.log('🔔 addNewMessage called with:', message);
-    setMessages(prev => {
-      console.log('📝 Previous messages count:', prev.length);
-      const newMessages = [...prev, message];
-      console.log('📝 New messages count:', newMessages.length);
-      console.log('📝 All messages:', newMessages);
-      return newMessages;
-    });
+    setMessages(prev => [...prev, message]);
     setShouldScroll(true);
-    console.log('✅ Message added and scroll triggered');
   }, []);
 
   // Clear messages

@@ -150,7 +150,7 @@ const nextConfig: NextConfig = {
               isDevelopment 
                 ? "connect-src 'self' https: wss: ws: http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:*"
                 : "connect-src 'self' https: wss: ws:",
-              "media-src 'self' blob: data:",
+              "media-src 'self' blob: data: https://s3.twcstorage.ru",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

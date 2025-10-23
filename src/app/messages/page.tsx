@@ -168,7 +168,7 @@ export default function MessagesPage() {
       scrollToBottom();
       setShouldScroll(false);
     }
-  }, [messages, shouldScroll, scrollToBottom, setShouldScroll]);
+  }, [shouldScroll, scrollToBottom, setShouldScroll]);
 
   // Form removed - not used
 

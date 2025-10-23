@@ -214,13 +214,14 @@ export const useGlobalSocket = () => {
       const socket = await socketManager.current.connect();
       
       if (socket) {
-        setIsConnected(true);
+        setIsConnected(socket.connected || false);
         setIsLoading(false);
         
-        // Подписываемся на события подключения
-        const unsubscribe = socketManager.current.on('connection', (data: unknown) => {
-          const newStatus = (data as { status?: string }).status === 'connected';
-          setIsConnected(newStatus);
+        // ❌ Не слушаем connection событие, а используем socket.connected напрямую
+        // Подписываемся на общие события
+        const unsubscribe = socketManager.current.on('connection', () => {
+          // Просто обновляем состояние
+          setIsConnected(socketManager.current?.isConnected || false);
         });
 
         return unsubscribe;

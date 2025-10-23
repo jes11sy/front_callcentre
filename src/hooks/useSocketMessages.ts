@@ -43,8 +43,11 @@ export function useSocketMessages({
 
   useEffect(() => {
     if (!socket || !isConnected) {
+      console.log('🔌 useSocketMessages: socket not ready', { socket: !!socket, isConnected });
       return;
     }
+
+    console.log('🔌 useSocketMessages: setting up listeners', { socket: !!socket, isConnected });
 
     const newMessageHandler = (...args: unknown[]) => {
       const data = args[0] as { chatId: string; message: AvitoMessage };
@@ -124,6 +127,7 @@ export function useSocketMessages({
       // Здесь только обновляем чат с новым сообщением если нужно
       if (data.message) {
         updateChatWithMessage(data.chatId, data.message);
+        onChatUpdate();  // ← Обновляем список чатов
       }
     };
 

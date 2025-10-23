@@ -162,13 +162,13 @@ export default function MessagesPage() {
 
   // handleFileUpload removed - not used
 
-  // Auto-scroll effect
-  useEffect(() => {
-    if (shouldScroll && messages.length > 0) {
-      scrollToBottom();
-      setShouldScroll(false);
-    }
-  }, [shouldScroll, scrollToBottom, setShouldScroll]);
+  // Auto-scroll effect - TEMPORARILY DISABLED FOR TESTING
+  // useEffect(() => {
+  //   if (shouldScroll && messages.length > 0) {
+  //     scrollToBottom();
+  //     setShouldScroll(false);
+  //   }
+  // }, [shouldScroll, scrollToBottom, setShouldScroll]);
 
   // Form removed - not used
 

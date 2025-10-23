@@ -158,7 +158,14 @@ export function useMessages() {
 
   // Add new message from socket
   const addNewMessage = useCallback((message: AvitoMessage) => {
-    setMessages(prev => [...prev, message]);
+    setMessages(prev => {
+      // Проверяем не добавлено ли уже сообщение с таким ID (защита от дубликатов)
+      const exists = prev.some(m => m.id === message.id);
+      if (exists) {
+        return prev;
+      }
+      return [...prev, message];
+    });
     setShouldScroll(true);
   }, []);
 

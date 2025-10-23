@@ -6,19 +6,15 @@ import { notifications } from '@/components/ui/notifications';
 import { playMessageSound } from '@/lib/sound';
 
 export function AvitoNotificationListener() {
-  const { socket, isConnected } = useGlobalSocket();
+  const { socket } = useGlobalSocket();
 
   useEffect(() => {
-    console.log('📢 AvitoNotificationListener: Mounted, socket:', !!socket, 'isConnected:', isConnected);
-    
-    if (!socket || !isConnected) {
-      console.log('📢 AvitoNotificationListener: Socket not ready, waiting...');
+    // Если socket еще не создан, не регистрируем слушателя
+    if (!socket) {
       return;
     }
 
-    console.log('📢 AvitoNotificationListener: Registering avito-notification listener');
-
-    // Слушаем avito-notification событие везде, независимо от страницы
+    // Слушаем avito-notification событие
     const notificationHandler = (...args: unknown[]) => {
       const data = args[0] as {
         type: string;
@@ -27,8 +23,6 @@ export function AvitoNotificationListener() {
         message?: any;
         timestamp: number;
       };
-
-      console.log('📢 AvitoNotificationListener: Got notification event:', data.type);
 
       if (data.type === 'new_message') {
         // Play sound for notification
@@ -40,15 +34,12 @@ export function AvitoNotificationListener() {
     };
 
     socket.on('avito-notification', notificationHandler);
-    console.log('📢 AvitoNotificationListener: Listener registered');
 
     // Cleanup
     return () => {
-      console.log('📢 AvitoNotificationListener: Cleaning up listener');
       socket.off('avito-notification', notificationHandler);
     };
-  }, [socket, isConnected]);
+  }, [socket]);
 
-  // Компонент не рендерит ничего, только слушает события
   return null;
 }

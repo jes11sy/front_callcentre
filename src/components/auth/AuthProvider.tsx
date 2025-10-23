@@ -14,17 +14,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Check if user is stored in secure storage
         const storedUser = await authApi.getUser();
         const isAuthenticated = await authApi.isAuthenticated();
 
         if (storedUser && isAuthenticated) {
-          // Verify token by fetching profile
           try {
             const profile = await authApi.getProfile();
             setUser(profile.data);
           } catch {
-            // Token is invalid, clear storage
             await authApi.logout();
             setUser(null);
           }

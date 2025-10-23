@@ -104,12 +104,10 @@ class SocketManager {
       const token = localStorage.getItem('accessToken');
       if (token) {
         this.socket?.emit('authenticate', { token });
-        console.log('🔐 Sent authenticate event');
       }
     });
 
     this.socket.on('disconnect', () => {
-      console.log('Socket.IO disconnected');
       this.emit('connection', { status: 'disconnected' });
     });
 
@@ -183,7 +181,6 @@ class SocketManager {
   authenticate(token: string) {
     if (this.socket?.connected) {
       this.socket.emit('authenticate', { token });
-      console.log('🔐 Socket re-authenticated with new token');
     } else {
       console.warn('Socket not connected, cannot authenticate');
     }
@@ -217,15 +214,15 @@ export const useGlobalSocket = () => {
   const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    // Если не аутентифицирован, не подключаемся
     if (!isAuthenticated) {
-      console.log('🔌 useGlobalSocket: User not authenticated, socket will not connect');
+      // Если пользователь не аутентифицирован, отключаем socket
+      if (socketManager.current?.isConnected) {
+        socketManager.current.disconnect();
+      }
       setIsConnected(false);
       setIsLoading(false);
       return;
     }
-
-    console.log('🔌 useGlobalSocket: User authenticated, attempting to connect socket...');
 
     const initSocket = async () => {
       setIsLoading(true);
@@ -234,18 +231,15 @@ export const useGlobalSocket = () => {
       const socket = await socketManager.current.connect();
       
       if (socket && (socket as any).connected) {
-        console.log('✅ useGlobalSocket: Socket connected successfully');
         setIsConnected((socket as any).connected || false);
         setIsLoading(false);
         
         const unsubscribe = socketManager.current.on('connection', () => {
-          console.log('🔌 useGlobalSocket: Connection event received');
           setIsConnected(socketManager.current?.isConnected || false);
         });
 
         return unsubscribe;
       } else {
-        console.log('❌ useGlobalSocket: Failed to connect socket');
         setIsConnected(false);
         setIsLoading(false);
       }

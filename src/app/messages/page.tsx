@@ -126,10 +126,12 @@ export default function MessagesPage() {
   
   // Modern utility functions
   const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    // Для Radix ScrollArea нужно скроллить viewport, а не использовать scrollIntoView
+    const scrollViewport = document.querySelector('[data-radix-scroll-area-viewport]');
+    if (scrollViewport) {
+      scrollViewport.scrollTop = scrollViewport.scrollHeight;
     }
-  }, [messagesEndRef]);
+  }, []);
 
   // scrollToMessage removed - not used
 
@@ -162,13 +164,13 @@ export default function MessagesPage() {
 
   // handleFileUpload removed - not used
 
-  // Auto-scroll effect - TEMPORARILY DISABLED FOR TESTING
-  // useEffect(() => {
-  //   if (shouldScroll && messages.length > 0) {
-  //     scrollToBottom();
-  //     setShouldScroll(false);
-  //   }
-  // }, [shouldScroll, scrollToBottom, setShouldScroll]);
+  // Auto-scroll effect
+  useEffect(() => {
+    if (shouldScroll && messages.length > 0) {
+      scrollToBottom();
+      setShouldScroll(false);
+    }
+  }, [shouldScroll, scrollToBottom, setShouldScroll]);
 
   // Form removed - not used
 

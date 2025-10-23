@@ -5,6 +5,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
 
+console.log('🔌 Socket URL:', SOCKET_URL, {
+  NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
+});
+
 class SocketManager {
   private static instance: SocketManager;
   private socket: { 

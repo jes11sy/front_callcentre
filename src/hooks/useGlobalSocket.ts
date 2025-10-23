@@ -114,10 +114,10 @@ class SocketManager {
     }
     this.listeners.get(event)!.add(callback);
 
-    // Если сокет уже подключен, подписываемся на событие
-    if (this.socket?.connected) {
-      this.socket.on(event, callback);
-    }
+    // Don't subscribe to socket directly - onAny already handles all events
+    // if (this.socket?.connected) {
+    //   this.socket.on(event, callback);
+    // }
 
     return () => this.off(event, callback);
   }
@@ -132,9 +132,10 @@ class SocketManager {
       }
     }
 
-    if (this.socket) {
-      this.socket.off(event, callback);
-    }
+    // Don't call socket.off directly - we're using onAny proxy pattern
+    // if (this.socket) {
+    //   this.socket.off(event, callback);
+    // }
   }
 
   // Эмит событий

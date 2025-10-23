@@ -46,10 +46,10 @@ export function useSocketMessages({
       return;
     }
 
-    // Handle new message from webhook
-    socket.on('avito-new-message', (...args: unknown[]) => {
+    const newMessageHandler = (...args: unknown[]) => {
       const data = args[0] as { chatId: string; message: AvitoMessage };
       const isIncomingMessage = data.message.direction === 'in';
+      console.log('avito-new-message event received:', data);
       
       // Воспроизводим звук только для входящих сообщений
       if (isIncomingMessage) {
@@ -84,10 +84,9 @@ export function useSocketMessages({
       if (isIncomingMessage) {
         notifications.info('Новое сообщение в чате Авито');
       }
-    });
+    };
 
-    // Handle chat update from webhook
-    socket.on('avito-chat-updated', (...args: unknown[]) => {
+    const chatUpdateHandler = (...args: unknown[]) => {
       const data = args[0] as {
         chatId: string;
         hasNewMessage?: boolean;
@@ -97,6 +96,7 @@ export function useSocketMessages({
         updated?: number;
         isNewChat?: boolean;
       };
+      console.log('avito-chat-updated event received:', data);
       // If it's the currently open chat and we have a new message, add it
       if (selectedChat && selectedChat.id === data.chatId && data.message) {
         const newMessage: AvitoMessage = data.message;
@@ -115,10 +115,9 @@ export function useSocketMessages({
       }
       
       onChatUpdate();
-    });
+    };
 
-    // Handle notification events
-    socket.on('avito-notification', (...args: unknown[]) => {
+    const notificationHandler = (...args: unknown[]) => {
       const data = args[0] as {
         type: string;
         chatId: string;
@@ -136,13 +135,17 @@ export function useSocketMessages({
         // Update chat with message
         updateChatWithMessage(data.chatId, data.message);
       }
-    });
+    };
+
+    socket.on('avito-new-message', newMessageHandler);
+    socket.on('avito-chat-updated', chatUpdateHandler);
+    socket.on('avito-notification', notificationHandler);
 
     // Cleanup
     return () => {
-      socket.off('avito-new-message');
-      socket.off('avito-chat-updated');
-      socket.off('avito-notification');
+      socket.off('avito-new-message', newMessageHandler);
+      socket.off('avito-chat-updated', chatUpdateHandler);
+      socket.off('avito-notification', notificationHandler);
     };
   }, [socket, isConnected, selectedChat, selectedAccount, onNewMessage, onChatUpdate, loadChats, markChatAsUnread, updateChatWithMessage, formatTimestamp]);
 }

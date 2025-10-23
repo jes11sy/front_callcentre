@@ -110,9 +110,12 @@ export default function MessagesPage() {
     selectedChat,
     selectedAccount,
     onNewMessage: addNewMessage,
-    onChatUpdate: () => {
-      // Handle chat update by reloading chats silently
-      loadChats(true);
+    onChatUpdate: (chatData: any) => {
+      // chatData содержит обновленные данные чата из события
+      // Обновляем чат напрямую вместо переполучения всех чатов
+      if (chatData?.chatId && chatData?.hasNewMessage !== undefined) {
+        markChatAsUnread(chatData.chatId);
+      }
     },
     loadChats,
     markChatAsUnread,
@@ -401,7 +404,7 @@ export default function MessagesPage() {
 
       {/* Create Order Modal */}
       <LazyCreateOrderFromChatModal
-        chat={selectedChatForOrder}
+        chat={selectedChatForOrder as any}
         open={showCreateOrderModal}
         onOpenChange={setShowCreateOrderModal}
         onOrderCreated={(_order) => {

@@ -82,22 +82,28 @@ export function useSocketMessages({
       isNewChat?: boolean;
     };
     
+    console.log('📢 chatUpdateHandler called with:', data);
+    
     // If it's the currently open chat and we have a new message, add it
     if (selectedChat && selectedChat.id === data.chatId && data.message) {
       const newMessage: AvitoMessage = data.message;
+      console.log('📢 Adding message to currently open chat');
       onNewMessage(newMessage);
     }
     
     // Update chat with new message if provided
     if (data.message) {
+      console.log('📢 Updating chat with message');
       updateChatWithMessage(data.chatId, data.message);
     }
     
     // Trigger chat list reload only for new chats
     if (data.isNewChat) {
+      console.log('📢 New chat detected, loading chats');
       loadChats(true);
     }
     
+    console.log('📢 Calling onChatUpdate');
     onChatUpdate(data);
   }, [selectedChat, onNewMessage, updateChatWithMessage, loadChats, onChatUpdate]);
 

@@ -65,6 +65,13 @@ export default function MessagesPage() {
     updateChatWithMessage
   } = useChats();
   
+  // Мемоизируем onChatUpdate
+  const handleChatUpdate = useCallback((chatData: any) => {
+    if (chatData?.message) {
+      updateChatWithMessage(chatData.chatId, chatData.message);
+    }
+  }, [updateChatWithMessage]);
+  
   // Use messages hook
   const {
     messages,
@@ -110,13 +117,7 @@ export default function MessagesPage() {
     selectedChat,
     selectedAccount,
     onNewMessage: addNewMessage,
-    onChatUpdate: (chatData: any) => {
-      // chatData содержит обновленные данные чата из события
-      // Обновляем чат напрямую вместо переполучения всех чатов
-      if (chatData?.chatId && chatData?.hasNewMessage !== undefined) {
-        markChatAsUnread(chatData.chatId);
-      }
-    },
+    onChatUpdate: handleChatUpdate,
     loadChats,
     markChatAsUnread,
     updateChatWithMessage

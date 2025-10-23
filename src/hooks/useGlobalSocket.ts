@@ -37,13 +37,6 @@ class SocketManager {
   }
 
   async connect(): Promise<unknown> {
-    // ❌ ДВОЙНАЯ ЗАЩИТА: проверяем токен перед любыми действиями
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      console.error('❌ SocketManager.connect(): No access token available, cannot connect');
-      return null;
-    }
-
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -78,7 +71,7 @@ class SocketManager {
         reconnectionDelayMax: 10000,
         reconnectionAttempts: this.maxReconnectAttempts,
         timeout: 10000,
-        autoConnect: false,  // ← Отключаем автоподключение
+        autoConnect: false,
         forceNew: false,
         path: '/socket.io/'
       });

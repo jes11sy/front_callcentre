@@ -52,7 +52,7 @@ export function useSocketMessages({
     const newMessageHandler = (...args: unknown[]) => {
       const data = args[0] as { chatId: string; message: AvitoMessage };
       const isIncomingMessage = data.message.direction === 'in';
-      console.log('avito-new-message event received:', data);
+      console.log('✅ avito-new-message event received:', data);
       
       // ❌ Убрали звук отсюда - он будет только в avito-notification
       
@@ -94,7 +94,7 @@ export function useSocketMessages({
         updated?: number;
         isNewChat?: boolean;
       };
-      console.log('avito-chat-updated event received:', data);
+      console.log('✅ avito-chat-updated event received:', data);
       // If it's the currently open chat and we have a new message, add it
       if (selectedChat && selectedChat.id === data.chatId && data.message) {
         const newMessage: AvitoMessage = data.message;

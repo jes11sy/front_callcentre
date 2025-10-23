@@ -19,7 +19,7 @@ COPY . .
 
 # Build arguments для переменных окружения
 ARG NEXT_PUBLIC_API_URL=https://api.test-shem.ru/api/v1
-ARG NEXT_PUBLIC_SOCKET_URL=wss://api.test-shem.ru
+ARG NEXT_PUBLIC_SOCKET_URL=wss://realtime.test-shem.ru
 
 # Устанавливаем как ENV для использования в сборке
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

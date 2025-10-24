@@ -152,9 +152,9 @@ export const useOrders = () => {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      notifications.success('Заказ успешно обновлен');
+      notifications.success(data.message || 'Заказ успешно обновлен');
       setIsEditModalOpen(false);
     },
     onError: () => {

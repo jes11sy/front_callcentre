@@ -32,6 +32,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import authApi from '@/lib/auth';
+import { useAuthStore } from '@/store/authStore';
 
 const orderSchema = z.object({
   rk: z.enum(['Авито', 'Листовка']),
@@ -84,6 +85,7 @@ export function CreateOrderModal({
   onOrderCreated 
 }: CreateOrderModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuthStore();
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -118,7 +120,8 @@ export function CreateOrderModal({
         address: data.address,
         dateMeeting: data.dateMeeting,
         typeEquipment: data.typeEquipment,
-        problem: data.problem
+        problem: data.problem,
+        operatorNameId: user?.id || 0
       };
 
       const response = await authApi.post('/orders/from-call', orderData);

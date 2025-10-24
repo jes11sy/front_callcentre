@@ -143,7 +143,8 @@ export const useCallsActions = () => {
   }, []);
 
   const handleOrderCreated = useCallback((order: { id?: string | number }) => {
-    notifications.success(`Заказ №${order.id} успешно создан!`);
+    // Уведомление уже показывается в компоненте CreateOrderModal
+    console.log('Order created:', order);
   }, []);
 
   return {

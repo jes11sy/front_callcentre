@@ -108,7 +108,7 @@ export function CreateOrderFromChatModal({
       const response = await authApi.post('/orders/from-chat', orderData);
 
       if (response.data.success) {
-        toast.success('Заказ успешно создан!');
+        toast.success(response.data.message || 'Заказ успешно создан!');
         onOrderCreated?.(response.data.data);
         handleClose();
       } else {

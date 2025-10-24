@@ -124,6 +124,7 @@ export function CreateOrderModal({
       const response = await authApi.post('/orders/from-call', orderData);
 
       if (response.data.success) {
+        toast.success(response.data.message || 'Заказ успешно создан!');
         onOrderCreated?.(response.data.data);
         handleClose();
       } else {

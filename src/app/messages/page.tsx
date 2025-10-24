@@ -408,8 +408,8 @@ export default function MessagesPage() {
         chat={selectedChatForOrder as any}
         open={showCreateOrderModal}
         onOpenChange={setShowCreateOrderModal}
-        onOrderCreated={(_order) => {
-          notifications.success('Заказ успешно создан!');
+        onOrderCreated={(order) => {
+          // Уведомление уже показывается в компоненте CreateOrderFromChatModal
           setShowCreateOrderModal(false);
         }}
       />

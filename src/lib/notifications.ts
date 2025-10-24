@@ -125,8 +125,8 @@ export const notifications = {
 
   // Специализированные уведомления для заказов
   order: {
-    created: (orderId?: number) => 
-      notifications.success(`Заказ ${orderId ? `#${orderId}` : ''} успешно создан`),
+    created: (message?: string, orderId?: number) => 
+      notifications.success(message || `Заказ ${orderId ? `#${orderId}` : ''} успешно создан`),
     
     updated: (orderId?: number) => 
       notifications.success(`Заказ ${orderId ? `#${orderId}` : ''} успешно обновлен`),

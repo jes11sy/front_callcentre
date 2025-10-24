@@ -96,8 +96,9 @@ export default function CreateOrderModal({
         throw new Error('Ошибка при создании заказа');
       }
 
+      const result = await response.json();
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Заказ успешно создан');
+      toast.success(result.message || 'Заказ успешно создан');
       handleClose();
       onOrderCreated?.();
     } catch (error) {

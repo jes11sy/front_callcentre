@@ -74,7 +74,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(1)}
           disabled={disabled}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
         >
           1
         </Button>
@@ -94,7 +94,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={handlePrevClick}
           disabled={disabled || currentPage === 1}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700] disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -110,7 +110,9 @@ export function OptimizedPagination({
           disabled={disabled}
           className={cn(
             "h-8 w-8 p-0",
-            page === currentPage && "bg-blue-600 text-white hover:bg-blue-700"
+            page === currentPage 
+              ? "bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700] border-[#FFD700]" 
+              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
           )}
         >
           {page}
@@ -124,7 +126,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={handleNextClick}
           disabled={disabled || currentPage === totalPages}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700] disabled:opacity-50"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -144,7 +146,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(totalPages)}
           disabled={disabled}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
         >
           {totalPages}
         </Button>

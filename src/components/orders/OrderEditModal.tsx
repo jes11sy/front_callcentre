@@ -144,16 +144,18 @@ export const OrderEditModal = ({
         </div>
 
         {/* Кнопки действий */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-[#FFD700]/30">
           <Button
             variant="outline"
             onClick={onClose}
+            className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
           >
             Отмена
           </Button>
           <Button
             onClick={onSave}
             disabled={isSaving}
+            className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
           >
             {isSaving ? (
               <>
@@ -185,36 +187,36 @@ const OrderDescriptionEditTab = ({
   <div className="space-y-6">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Основная информация */}
-      <Card>
+      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <User className="h-5 w-5 text-blue-600" />
+          <CardTitle className="text-lg flex items-center gap-2 text-white">
+            <User className="h-5 w-5 text-[#FFD700]" />
             Основная информация
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-gray-500">РК</Label>
+            <Label className="text-sm font-medium text-gray-400">РК</Label>
             <Input 
               value={order.rk} 
               disabled={userRole === 'operator'}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Город</Label>
+            <Label className="text-sm font-medium text-gray-400">Город</Label>
             <Input 
               value={order.city} 
               onChange={(e) => onOrderChange('city', e.target.value)}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Авито аккаунт</Label>
+            <Label className="text-sm font-medium text-gray-400">Авито аккаунт</Label>
             <Input 
               value={order.avitoName || ''} 
               onChange={(e) => onOrderChange('avitoName', e.target.value)}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
               placeholder="Название аккаунта Авито"
             />
           </div>
@@ -222,42 +224,42 @@ const OrderDescriptionEditTab = ({
       </Card>
 
       {/* Детали заказа */}
-      <Card>
+      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Settings className="h-5 w-5 text-green-600" />
+          <CardTitle className="text-lg flex items-center gap-2 text-white">
+            <Settings className="h-5 w-5 text-[#FFD700]" />
             Детали заказа
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-gray-500">Клиент</Label>
+            <Label className="text-sm font-medium text-gray-400">Клиент</Label>
             <Input 
               value={order.clientName} 
               disabled={userRole === 'operator'}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Телефон</Label>
+            <Label className="text-sm font-medium text-gray-400">Телефон</Label>
             <Input 
               value={order.phone || ''} 
               onChange={(e) => onOrderChange('phone', e.target.value)}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Тип заявки</Label>
+            <Label className="text-sm font-medium text-gray-400">Тип заявки</Label>
             <Select 
               value={order.typeOrder} 
               onValueChange={(value: string) => onOrderChange('typeOrder', value)}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {ORDER_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
                     {type.label}
                   </SelectItem>
                 ))}
@@ -265,34 +267,34 @@ const OrderDescriptionEditTab = ({
             </Select>
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Адрес</Label>
+            <Label className="text-sm font-medium text-gray-400">Адрес</Label>
             <Input 
               value={order.address} 
               onChange={(e) => onOrderChange('address', e.target.value)}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Дата встречи</Label>
+            <Label className="text-sm font-medium text-gray-400">Дата встречи</Label>
             <Input 
               type="datetime-local"
               value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
               onChange={(e) => onDateChange('dateMeeting', e.target.value)}
-              className="mt-1"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Тип техники</Label>
+            <Label className="text-sm font-medium text-gray-400">Тип техники</Label>
             <Select 
               value={order.typeEquipment} 
               onValueChange={(value: string) => onOrderChange('typeEquipment', value)}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {EQUIPMENT_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
                     {type.label}
                   </SelectItem>
                 ))}
@@ -300,17 +302,17 @@ const OrderDescriptionEditTab = ({
             </Select>
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">Статус</Label>
+            <Label className="text-sm font-medium text-gray-400">Статус</Label>
             <Select 
               value={order.statusOrder} 
               onValueChange={(value: string) => onOrderChange('statusOrder', value)}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {STATUS_OPTIONS.filter(option => option.value !== 'all').map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value} className="text-white hover:bg-[#FFD700]/10">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -322,10 +324,10 @@ const OrderDescriptionEditTab = ({
     </div>
 
     {/* Описание проблемы */}
-    <Card>
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-orange-600" />
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <AlertCircle className="h-5 w-5 text-[#FFD700]" />
           Описание проблемы
         </CardTitle>
       </CardHeader>
@@ -333,29 +335,29 @@ const OrderDescriptionEditTab = ({
         <Textarea 
           value={order.problem} 
           onChange={(e) => onOrderChange('problem', e.target.value)}
-          className="min-h-[100px]"
+          className="min-h-[100px] bg-[#0f0f23] border-[#FFD700]/30 text-white"
           placeholder="Опишите проблему..."
         />
       </CardContent>
     </Card>
 
     {/* Оператор */}
-    <Card>
+    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <User className="h-5 w-5 text-blue-600" />
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <User className="h-5 w-5 text-[#FFD700]" />
           Оператор
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <Label className="text-sm font-medium text-gray-500">Имя оператора</Label>
-            <p className="text-lg font-semibold">{order.operator.name}</p>
+            <Label className="text-sm font-medium text-gray-400">Имя оператора</Label>
+            <p className="text-lg font-semibold text-white">{order.operator.name}</p>
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-500">ID оператора</Label>
-            <p className="text-lg font-mono">{order.operatorNameId}</p>
+            <Label className="text-sm font-medium text-gray-400">ID оператора</Label>
+            <p className="text-lg font-mono text-white">{order.operatorNameId}</p>
           </div>
         </div>
         <div>
@@ -363,7 +365,7 @@ const OrderDescriptionEditTab = ({
           <Input 
             value={order.callRecord || ''} 
             disabled={userRole === 'operator'}
-            className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+            className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
             placeholder="Название файла записи..."
           />
         </div>

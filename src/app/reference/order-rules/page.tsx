@@ -7,34 +7,26 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function OrderRulesPage() {
   return (
-    <DashboardLayout variant="operator" requiredRole="operator">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#0f0f23] min-h-screen">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-[#FFD700] flex items-center">
-                  <ClipboardList className="h-8 w-8 mr-3 text-[#FFD700]" />
-                  Правила приема заказов
-                </h1>
-                <p className="text-gray-400 mt-2">
-                  Процедуры и требования при создании заказов
-                </p>
-              </div>
-            </div>
+        <div className="flex items-center space-x-3 mb-8">
+          <ClipboardList className="h-8 w-8 text-[#FFD700]" />
+          <div>
+            <h1 className="text-3xl font-bold text-[#FFD700]">Правила приема заказов</h1>
+            <p className="text-gray-400">Процедуры и требования при создании заказов</p>
           </div>
+        </div>
 
-          <div className="grid gap-6">
-            <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-white">
-                  <User className="h-5 w-5 text-[#FFD700]" />
-                  <span>Роли и представление</span>
-                </CardTitle>
-                <CardDescription className="text-gray-400">Как представляться клиентам</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+        <div className="grid gap-6">
+          <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-white">
+                <User className="h-5 w-5 text-[#FFD700]" />
+                <span>Роли и представление</span>
+              </CardTitle>
+              <CardDescription className="text-gray-400">Как представляться клиентам</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 <div className="grid gap-3">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-4 w-4 text-green-400" />
@@ -353,8 +345,8 @@ export default function OrderRulesPage() {
                 </div>
               </CardContent>
             </Card>
+        </div>
       </div>
-      </div>
-    </>
+    </DashboardLayout>
   );
 }

@@ -216,7 +216,7 @@ const OrderDescriptionEditTab = ({
             <Input 
               value={order.avitoName || ''} 
               onChange={(e) => onOrderChange('avitoName', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Название аккаунта Авито"
             />
           </div>
@@ -335,7 +335,7 @@ const OrderDescriptionEditTab = ({
         <Textarea 
           value={order.problem} 
           onChange={(e) => onOrderChange('problem', e.target.value)}
-          className="min-h-[100px] bg-[#0f0f23] border-[#FFD700]/30 text-white"
+          className="min-h-[100px] bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
           placeholder="Опишите проблему..."
         />
       </CardContent>
@@ -399,7 +399,7 @@ const OrderMasterEditTab = ({
             <Input 
               value={order.master?.name || ''} 
               disabled
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Не назначен"
             />
           </div>
@@ -423,7 +423,7 @@ const OrderMasterEditTab = ({
               value={order.result || ''} 
               disabled={userRole === 'operator'}
               onChange={(e) => onOrderChange('result', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Сумма в рублях"
             />
           </div>
@@ -434,7 +434,7 @@ const OrderMasterEditTab = ({
               value={order.expenditure || ''} 
               disabled={userRole === 'operator'}
               onChange={(e) => onOrderChange('expenditure', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Сумма в рублях"
             />
           </div>
@@ -445,7 +445,7 @@ const OrderMasterEditTab = ({
               value={order.clean || ''} 
               disabled={userRole === 'operator'}
               onChange={(e) => onOrderChange('clean', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Сумма в рублях"
             />
           </div>
@@ -481,7 +481,7 @@ const OrderDocumentsEditTab = ({
               value={order.bsoDoc || ''} 
               disabled={userRole === 'operator'}
               onChange={(e) => onOrderChange('bsoDoc', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Название файла БСО..."
             />
           </div>
@@ -491,7 +491,7 @@ const OrderDocumentsEditTab = ({
               value={order.expenditureDoc || ''} 
               disabled={userRole === 'operator'}
               onChange={(e) => onOrderChange('expenditureDoc', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500"
+              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
               placeholder="Название файла расходов..."
             />
           </div>

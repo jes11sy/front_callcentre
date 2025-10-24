@@ -75,7 +75,7 @@ export const OrderEditModal = ({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
           >
             <XCircle className="h-5 w-5" />
           </Button>

@@ -96,7 +96,7 @@ const OrderViewModalComponent = ({
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
           >
             <span className="sr-only">Закрыть</span>
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

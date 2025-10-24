@@ -126,7 +126,7 @@ export default function CreateOrderModal({
           </h2>
           <button
             onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10 rounded flex items-center justify-center"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DollarSign, Wrench, Monitor, Home } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function PricingPage() {
   const pricingData = [
@@ -207,52 +207,51 @@ export default function PricingPage() {
   ];
 
   return (
-    <>
-      <Header variant="operator" />
-      <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center space-x-3">
-        <DollarSign className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Прайс-лист</h1>
-          <p className="text-muted-foreground">Актуальные цены на услуги по ремонту</p>
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#0f0f23] min-h-screen">
+        <div className="flex items-center space-x-3 mb-8">
+          <DollarSign className="h-8 w-8 text-[#FFD700]" />
+          <div>
+            <h1 className="text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
+            <p className="text-gray-400">Актуальные цены на услуги по ремонту</p>
+          </div>
         </div>
-      </div>
 
       <div className="space-y-8">
         {pricingData.map((category, index) => {
           const Icon = category.icon;
           return (
             <div key={index} className="space-y-6">
-              <Card>
+              <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Icon className="h-6 w-6 text-primary" />
+                  <CardTitle className="flex items-center space-x-2 text-white">
+                    <Icon className="h-6 w-6 text-[#FFD700]" />
                     <span>{category.category}</span>
                   </CardTitle>
-                  <CardDescription>Услуги по ремонту {category.category.toLowerCase()}</CardDescription>
+                  <CardDescription className="text-gray-400">Услуги по ремонту {category.category.toLowerCase()}</CardDescription>
                 </CardHeader>
               </Card>
               
               <div className="grid gap-6">
                 {category.subcategories.map((subcategory, subIndex) => (
-                  <Card key={subIndex} className="ml-4">
+                  <Card key={subIndex} className="ml-4 border-2 border-[#FFD700]/30 bg-[#17212b]">
                     <CardHeader>
-                      <CardTitle className="text-lg">{subcategory.name}</CardTitle>
+                      <CardTitle className="text-lg text-white">{subcategory.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Услуга</TableHead>
-                            <TableHead className="text-right">Цена</TableHead>
+                            <TableHead className="text-white">Услуга</TableHead>
+                            <TableHead className="text-right text-white">Цена</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {subcategory.services.map((service, serviceIndex) => (
                             <TableRow key={serviceIndex}>
-                              <TableCell className="font-medium">{service.name}</TableCell>
+                              <TableCell className="font-medium text-white">{service.name}</TableCell>
                               <TableCell className="text-right">
-                                <Badge variant="outline" className="font-semibold">
+                                <Badge variant="outline" className="font-semibold border-[#FFD700]/30 text-[#FFD700]">
                                   {service.price}
                                 </Badge>
                               </TableCell>
@@ -269,37 +268,37 @@ export default function PricingPage() {
         })}
       </div>
 
-      <Card className="border-orange-200 bg-orange-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-orange-800">
-            <Badge variant="outline" className="border-orange-300 text-orange-800">
-              Важно
-            </Badge>
-            <span>Дополнительная информация</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Гарантия</Badge>
-              <span>На все виды работ предоставляется гарантия 3-6 месяцев</span>
+        <Card className="border-2 border-orange-500/30 bg-orange-900/20">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-orange-300">
+              <Badge variant="outline" className="border-orange-500/30 text-orange-300">
+                Важно
+              </Badge>
+              <span>Дополнительная информация</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Гарантия</Badge>
+                <span className="text-white">На все виды работ предоставляется гарантия 3-6 месяцев</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Оплата</Badge>
+                <span className="text-white">Оплата производится после выполнения работ</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Скидки</Badge>
+                <span className="text-white">Постоянным клиентам предоставляются скидки до 15%</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Выезд</Badge>
+                <span className="text-white">Выезд мастера на дом: 500₽ (засчитывается в стоимость ремонта)</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Оплата</Badge>
-              <span>Оплата производится после выполнения работ</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Скидки</Badge>
-              <span>Постоянным клиентам предоставляются скидки до 15%</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Выезд</Badge>
-              <span>Выезд мастера на дом: 500₽ (засчитывается в стоимость ремонта)</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-    </>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
   );
 }

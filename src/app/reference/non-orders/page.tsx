@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { XCircle, AlertTriangle, Phone, MessageSquare, Clock, Wrench } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function NonOrdersPage() {
   const nonOrderReasons = [
@@ -99,42 +99,41 @@ export default function NonOrdersPage() {
   ];
 
   return (
-    <>
-      <Header variant="operator" />
-      <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center space-x-3">
-        <XCircle className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Незаказы</h1>
-          <p className="text-muted-foreground">Причины отказа от заказов и правила обработки</p>
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#0f0f23] min-h-screen">
+        <div className="flex items-center space-x-3 mb-8">
+          <XCircle className="h-8 w-8 text-[#FFD700]" />
+          <div>
+            <h1 className="text-3xl font-bold text-[#FFD700]">Незаказы</h1>
+            <p className="text-gray-400">Причины отказа от заказов и правила обработки</p>
+          </div>
         </div>
-      </div>
 
       <div className="space-y-6">
         {nonOrderReasons.map((category, index) => {
           const Icon = category.icon;
           return (
-            <Card key={index}>
+            <Card key={index} className="border-2 border-[#FFD700]/30 bg-[#17212b]">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Icon className="h-6 w-6 text-primary" />
+                <CardTitle className="flex items-center space-x-2 text-white">
+                  <Icon className="h-6 w-6 text-[#FFD700]" />
                   <span>{category.category}</span>
                 </CardTitle>
-                <CardDescription>Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
+                <CardDescription className="text-gray-400">Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {category.reasons.map((reason, reasonIndex) => (
-                  <div key={reasonIndex} className="border rounded-lg p-4 space-y-2">
+                  <div key={reasonIndex} className="border border-[#FFD700]/30 rounded-lg p-4 space-y-2 bg-[#0f0f23]">
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline">{reason.title}</Badge>
+                      <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">{reason.title}</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{reason.description}</p>
-                    <div className="bg-blue-50 p-3 rounded-md">
+                    <p className="text-sm text-gray-400">{reason.description}</p>
+                    <div className="bg-blue-900/20 p-3 rounded-md border border-blue-500/30">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Clock className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-800">Действия:</span>
+                        <Clock className="h-4 w-4 text-blue-400" />
+                        <span className="text-sm font-medium text-blue-400">Действия:</span>
                       </div>
-                      <p className="text-sm text-blue-700">{reason.action}</p>
+                      <p className="text-sm text-blue-300">{reason.action}</p>
                     </div>
                   </div>
                 ))}
@@ -144,107 +143,107 @@ export default function NonOrdersPage() {
         })}
       </div>
 
-      <Card className="border-red-200 bg-red-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-red-800">
-            <Badge variant="destructive">Важно</Badge>
-            <span>Правила обработки незаказов</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4 text-red-600" />
-              <span>Всегда сохранять вежливый тон, даже при отказе клиента</span>
+        <Card className="border-2 border-red-500/30 bg-red-900/20">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-red-300">
+              <Badge variant="destructive">Важно</Badge>
+              <span>Правила обработки незаказов</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-red-400" />
+                <span className="text-white">Всегда сохранять вежливый тон, даже при отказе клиента</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="h-4 w-4 text-red-400" />
+                <span className="text-white">Обязательно записывать причину отказа в системе</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4 text-red-400" />
+                <span className="text-white">Не тратить более 5 минут на попытки убедить клиента</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <XCircle className="h-4 w-4 text-red-400" />
+                <span className="text-white">При грубом поведении - завершить разговор, не отвечать грубостью</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="h-4 w-4 text-red-600" />
-              <span>Обязательно записывать причину отказа в системе</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-red-600" />
-              <span>Не тратить более 5 минут на попытки убедить клиента</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <XCircle className="h-4 w-4 text-red-600" />
-              <span>При грубом поведении - завершить разговор, не отвечать грубостью</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card className="border-red-200 bg-red-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-red-800">
-            <Badge variant="destructive">КРИТИЧЕСКИ ВАЖНО</Badge>
-            <span>Что мы НЕ делаем</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3">
-            <div className="flex items-center space-x-3">
-              <XCircle className="h-5 w-5 text-red-600" />
-              <div>
-                <div className="font-semibold text-red-800">Не выкупаем технику</div>
-                <div className="text-sm text-red-700">Мы не занимаемся выкупом техники у клиентов</div>
+        <Card className="border-2 border-red-500/30 bg-red-900/20">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-red-300">
+              <Badge variant="destructive">КРИТИЧЕСКИ ВАЖНО</Badge>
+              <span>Что мы НЕ делаем</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3">
+              <div className="flex items-center space-x-3">
+                <XCircle className="h-5 w-5 text-red-400" />
+                <div>
+                  <div className="font-semibold text-red-300">Не выкупаем технику</div>
+                  <div className="text-sm text-red-300">Мы не занимаемся выкупом техники у клиентов</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <XCircle className="h-5 w-5 text-red-400" />
+                <div>
+                  <div className="font-semibold text-red-300">Не ездим только ради диагностики</div>
+                  <div className="text-sm text-red-300">Диагностика бесплатна только при заказе ремонта</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <XCircle className="h-5 w-5 text-red-400" />
+                <div>
+                  <div className="font-semibold text-red-300">Не ремонтируем/меняем матрицы</div>
+                  <div className="text-sm text-red-300">Не работаем с матрицами экранов</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <XCircle className="h-5 w-5 text-red-400" />
+                <div>
+                  <div className="font-semibold text-red-300">Не ремонтируем мелкую бытовую технику</div>
+                  <div className="text-sm text-red-300">Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <XCircle className="h-5 w-5 text-red-600" />
-              <div>
-                <div className="font-semibold text-red-800">Не ездим только ради диагностики</div>
-                <div className="text-sm text-red-700">Диагностика бесплатна только при заказе ремонта</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <XCircle className="h-5 w-5 text-red-600" />
-              <div>
-                <div className="font-semibold text-red-800">Не ремонтируем/меняем матрицы</div>
-                <div className="text-sm text-red-700">Не работаем с матрицами экранов</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <XCircle className="h-5 w-5 text-red-600" />
-              <div>
-                <div className="font-semibold text-red-800">Не ремонтируем мелкую бытовую технику</div>
-                <div className="text-sm text-red-700">Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card className="border-green-200 bg-green-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-green-800">
-            <Badge variant="outline" className="border-green-300 text-green-800">
-              Совет
-            </Badge>
-            <span>Как минимизировать незаказы</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Цена</Badge>
-              <span>Четко объяснять ценовую политику с самого начала</span>
+        <Card className="border-2 border-green-500/30 bg-green-900/20">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-green-300">
+              <Badge variant="outline" className="border-green-500/30 text-green-300">
+                Совет
+              </Badge>
+              <span>Как минимизировать незаказы</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Цена</Badge>
+                <span className="text-white">Четко объяснять ценовую политику с самого начала</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Время</Badge>
+                <span className="text-white">Уточнять удобное время для клиента</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Гарантия</Badge>
+                <span className="text-white">Подчеркивать гарантийные обязательства</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Опыт</Badge>
+                <span className="text-white">Рассказывать о опыте и квалификации мастеров</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Время</Badge>
-              <span>Уточнять удобное время для клиента</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Гарантия</Badge>
-              <span>Подчеркивать гарантийные обязательства</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">Опыт</Badge>
-              <span>Рассказывать о опыте и квалификации мастеров</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-    </>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
   );
 }

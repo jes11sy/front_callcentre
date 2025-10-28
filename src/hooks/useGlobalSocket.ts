@@ -97,28 +97,48 @@ class SocketManager {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
+      console.log('🟢 Socket connected:', this.socket?.connected);
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
       // 🔐 Отправляем токен для аутентификации
       const token = localStorage.getItem('accessToken');
+      console.log('🔑 Token found:', token ? 'Yes' : 'No');
       if (token) {
+        console.log('📤 Sending authenticate event with token');
         this.socket?.emit('authenticate', { token });
+      } else {
+        console.warn('⚠️ No token found in localStorage');
       }
     });
 
-    this.socket.on('disconnect', () => {
+    this.socket.on('authenticated', (data: any) => {
+      console.log('✅ Socket authenticated successfully:', data);
+      this.emit('authenticated', data);
+    });
+
+    this.socket.on('disconnect', (reason: string) => {
+      console.log('🔴 Socket disconnected:', reason);
       this.emit('connection', { status: 'disconnected' });
     });
 
     this.socket.on('connect_error', (error: unknown) => {
-      console.error('Socket.IO connection error:', error);
+      console.error('❌ Socket.IO connection error:', error);
       this.reconnectAttempts++;
       this.emit('connection', { status: 'error', error });
     });
 
+    this.socket.on('error', (error: any) => {
+      console.error('❌ Socket error:', error);
+    });
+
+    this.socket.on('exception', (error: any) => {
+      console.error('❌ Socket exception:', error);
+    });
+
     // Проксируем все события
     this.socket.onAny((event: string, ...args: unknown[]) => {
+      console.log('📨 Socket event received:', event, args);
       this.emit(event, ...args);
     });
   }

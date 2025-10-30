@@ -122,7 +122,7 @@ export interface AvitoChat {
     text: string;
     created: number;
     direction: 'in' | 'out';
-    type: 'text' | 'system' | 'quick_reply' | 'voice';
+    type: 'text' | 'system' | 'quick_reply' | 'voice' | 'image' | 'link' | 'item' | 'location' | 'call' | 'deleted';
     isRead?: boolean;
   };
   unreadCount?: number;
@@ -161,7 +161,7 @@ export interface AvitoChat {
 export interface AvitoMessage {
   id: string;
   chatId: string;
-  type: 'text' | 'system' | 'quick_reply' | 'voice';
+  type: 'text' | 'system' | 'quick_reply' | 'voice' | 'image' | 'link' | 'item' | 'location' | 'call' | 'deleted';
   text: string;
   timestamp: number;
   isFromUser: boolean;
@@ -172,7 +172,43 @@ export interface AvitoMessage {
     voice?: {
       voice_id: string;
     };
+    image?: {
+      sizes: {
+        [key: string]: string; // e.g., "1280x960": "https://..."
+      };
+    };
+    link?: {
+      text: string;
+      url: string;
+      preview?: {
+        title?: string;
+        description?: string;
+        domain?: string;
+        images?: {
+          [key: string]: string;
+        };
+        url?: string;
+      };
+    };
+    item?: {
+      title: string;
+      price_string?: string;
+      image_url: string;
+      item_url: string;
+    };
+    location?: {
+      lat: number;
+      lon: number;
+      title: string;
+      text: string;
+      kind: string;
+    };
+    call?: {
+      status: 'missed';
+      target_user_id: number;
+    };
   };
+  voiceUrl?: string; // URL для прослушивания голосового сообщения
   created?: number;
   createdFormatted?: string; // Добавляем поле для отформатированной даты
   authorId?: string;

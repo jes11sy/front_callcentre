@@ -78,20 +78,97 @@ const MessageItem = memo(({ message, selectedChat, index: _index, isOwn, showAva
         {/* Message Bubble */}
         <div
           className={cn(
-            "rounded-2xl px-4 py-2 relative group/message",
+            "rounded-2xl relative group/message",
+            message.type === 'image' ? 'p-1' : 'px-4 py-2',
             isOwn 
               ? "bg-[#9EA93F] text-[#02111B]" 
               : "bg-[#F8F7F9]/20 text-[#F8F7F9]"
           )}
         >
-          {/* Message Text */}
-          <div className="text-sm whitespace-pre-wrap break-words">
-            {message.content?.text || message.text || '[Сообщение без текста]'}
-          </div>
+          {/* Message Content by Type */}
+          {message.type === 'image' && message.content?.image?.sizes ? (
+            <div className="space-y-2">
+              <img
+                src={message.content.image.sizes['640x480'] || message.content.image.sizes['1280x960'] || Object.values(message.content.image.sizes)[0]}
+                alt="Image"
+                className="rounded-xl max-w-sm w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => {
+                  const fullSizeUrl = message.content?.image?.sizes['1280x960'] || Object.values(message.content?.image?.sizes || {})[0];
+                  if (fullSizeUrl) window.open(fullSizeUrl, '_blank');
+                }}
+              />
+              {message.content.text && (
+                <div className="text-sm whitespace-pre-wrap break-words px-3 pb-2">
+                  {message.content.text}
+                </div>
+              )}
+            </div>
+          ) : message.type === 'voice' && message.voiceUrl ? (
+            <div className="space-y-2">
+              <audio controls className="w-full max-w-xs">
+                <source src={message.voiceUrl} type="audio/mp4" />
+                Ваш браузер не поддерживает аудио.
+              </audio>
+              {message.content?.text && (
+                <div className="text-sm whitespace-pre-wrap break-words">
+                  {message.content.text}
+                </div>
+              )}
+            </div>
+          ) : message.type === 'link' && message.content?.link ? (
+            <div className="space-y-2">
+              <a 
+                href={message.content.link.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline"
+              >
+                {message.content.link.text || message.content.link.url}
+              </a>
+              {message.content.link.preview && (
+                <div className="bg-black/20 rounded p-2 mt-2">
+                  <div className="font-semibold text-sm">{message.content.link.preview.title}</div>
+                  {message.content.link.preview.description && (
+                    <div className="text-xs opacity-70 mt-1">{message.content.link.preview.description}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : message.type === 'item' && message.content?.item ? (
+            <div className="flex gap-2">
+              {message.content.item.image_url && (
+                <img src={message.content.item.image_url} alt={message.content.item.title} className="w-16 h-16 rounded object-cover" />
+              )}
+              <div className="flex-1">
+                <div className="font-semibold text-sm">{message.content.item.title}</div>
+                {message.content.item.price_string && (
+                  <div className="text-xs opacity-70">{message.content.item.price_string}</div>
+                )}
+              </div>
+            </div>
+          ) : message.type === 'location' && message.content?.location ? (
+            <div className="space-y-2">
+              <div className="text-sm">{message.content.location.title || message.content.location.text}</div>
+              <a 
+                href={`https://maps.google.com/?q=${message.content.location.lat},${message.content.location.lon}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline text-xs"
+              >
+                Открыть на карте
+              </a>
+            </div>
+          ) : (
+            /* Text Message */
+            <div className="text-sm whitespace-pre-wrap break-words">
+              {message.content?.text || message.text || '[Сообщение без текста]'}
+            </div>
+          )}
 
           {/* Message Time and Read Status */}
           <div className={cn(
             "text-xs mt-1 flex items-center gap-1",
+            message.type === 'image' ? 'px-3 pb-2' : '',
             isOwn ? "text-[#02111B]/70" : "text-[#F8F7F9]/70"
           )}>
             <span>{formatMessageTime(message.created || message.timestamp)}</span>

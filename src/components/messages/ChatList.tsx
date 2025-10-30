@@ -167,6 +167,21 @@ export const ChatList = memo(function ChatList({
                     <span className="text-[#F8F7F9] mr-1 font-semibold">Вы:</span>
                   )}
                   {(() => {
+                    // Показываем разные типы сообщений
+                    if (chat.lastMessage.type === 'image') {
+                      return 'Изображение';
+                    } else if (chat.lastMessage.type === 'voice') {
+                      return 'Голосовое сообщение';
+                    } else if (chat.lastMessage.type === 'link') {
+                      return 'Ссылка';
+                    } else if (chat.lastMessage.type === 'item') {
+                      return 'Объявление';
+                    } else if (chat.lastMessage.type === 'location') {
+                      return 'Геометка';
+                    } else if (chat.lastMessage.type === 'call') {
+                      return 'Звонок';
+                    }
+                    
                     const text = typeof chat.lastMessage.text === 'string' 
                       ? chat.lastMessage.text 
                       : (chat.lastMessage as { content?: { text?: string } }).content?.text || '';

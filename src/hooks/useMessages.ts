@@ -102,7 +102,7 @@ export function useMessages() {
       
       const response = await authApi.post(`/avito-messenger/chats/${chat.id}/messages`, {
         avitoAccountName: chat.avitoAccountName,
-        message: message.trim(),
+        text: message.trim(),
         type: 'text'
       });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
@@ -23,8 +23,6 @@ import {
   NavigationMenuList,
   // NavigationMenuViewport removed - not used
 } from '@/components/ui/navigation-menu';
-// Badge removed - not used
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // Оптимизированные импорты иконок
 import { 
   Phone, 
@@ -42,7 +40,6 @@ import {
   Wallet,
   // Mail removed - not used
   Bell,
-  Circle,
   BookOpen
 } from 'lucide-react';
 
@@ -55,80 +52,9 @@ export function Header({ variant = 'operator' }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [workStatus, setWorkStatus] = useState('online');
-
-  // Загружаем текущий статус работы из БД при инициализации
-  useEffect(() => {
-    const loadWorkStatus = async () => {
-      try {
-        const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-          headers: {
-            'Authorization': `Bearer ${await token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.statusWork) {
-            setWorkStatus(data.statusWork);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading work status:', error);
-      }
-    };
-
-    if (variant === 'operator') {
-      loadWorkStatus();
-    }
-  }, [variant]);
-
-  const handleWorkStatusChange = async (newStatus: string) => {
-    try {
-      const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/operators/work-status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${await token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ statusWork: newStatus }),
-      });
-
-      if (response.ok) {
-        setWorkStatus(newStatus);
-        // Work status updated successfully
-      } else {
-        const errorData = await response.json();
-        console.error('Failed to update work status:', response.status, errorData);
-      }
-    } catch (error) {
-      console.error('Error updating work status:', error);
-    }
-  };
 
   const handleLogout = async () => {
     try {
-      // Устанавливаем статус "оффлайн" перед выходом
-      if (variant === 'operator') {
-        try {
-          const token = await import('@/lib/secure-storage').then(m => m.tokenStorage.getAccessToken());
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/operators/work-status`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${await token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ statusWork: 'offline' }),
-          });
-          // Work status set to offline before logout
-        } catch (statusError) {
-          console.error('Error setting offline status:', statusError);
-          // Продолжаем logout даже если не удалось установить статус
-        }
-      }
-
       await authApi.logout();
       logout();
       router.push('/login');
@@ -214,29 +140,6 @@ export function Header({ variant = 'operator' }: HeaderProps) {
 
           {/* Right Side Actions - справа */}
           <div className="flex items-center gap-2">
-            {/* Work Status - только для операторов */}
-            {variant === 'operator' && (
-              <div className="hidden md:flex items-center gap-2">
-                <Circle 
-                  className={`h-2 w-2 ${
-                    workStatus === 'online' ? 'text-green-500' : 
-                    workStatus === 'offline' ? 'text-red-500' : 
-                    'text-yellow-500'
-                  }`} 
-                />
-                <Select value={workStatus} onValueChange={handleWorkStatusChange}>
-                  <SelectTrigger className="w-32 h-8 text-sm bg-[#F8F7F9]/20 border-[#F8F7F9]/30 text-[#F8F7F9]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#02111B] border-[#F8F7F9]/30">
-                    <SelectItem value="online" className="text-[#F8F7F9] hover:bg-[#F8F7F9]/20">Онлайн</SelectItem>
-                    <SelectItem value="offline" className="text-[#F8F7F9] hover:bg-[#F8F7F9]/20">Оффлайн</SelectItem>
-                    <SelectItem value="break" className="text-[#F8F7F9] hover:bg-[#F8F7F9]/20">Перерыв</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
             {/* Simple notification icon */}
             <Button variant="ghost" size="icon" className="text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700]">
               <Bell className="h-4 w-4" />

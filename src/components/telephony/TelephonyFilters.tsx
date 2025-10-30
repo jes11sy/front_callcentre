@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Phone, Search } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CallFilters } from '@/types/telephony';
 
@@ -42,49 +41,58 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
   sortBy,
   sortOrder,
   onSortChange,
-  showFilters,
+  showFilters: _showFilters,
   onToggleFilters: _onToggleFilters,
   onFiltersSubmit,
   onClearFilters,
   loading,
-  groupedCallsCount,
-  totalCalls,
+  groupedCallsCount: _groupedCallsCount,
+  totalCalls: _totalCalls,
   register,
   handleSubmit,
   errors: _errors
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Card className="w-full border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-[#FFD700]/20 rounded-lg">
-              <Phone className="h-5 w-5 text-[#FFD700]" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-white">Звонки</div>
-              <div className="text-sm text-gray-400 font-normal">
-                {groupedCallsCount} групп • {totalCalls} звонков
-              </div>
-            </div>
-          </CardTitle>
+    <div className="w-full">
+      {/* Кнопка фильтров */}
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        variant="outline"
+        className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700] min-w-[140px]"
+      >
+        <Filter className="mr-2 h-4 w-4" />
+        Фильтры
+        {isOpen ? (
+          <ChevronUp className="ml-2 h-4 w-4" />
+        ) : (
+          <ChevronDown className="ml-2 h-4 w-4" />
+        )}
+      </Button>
+
+      {/* Раскрывающиеся фильтры */}
+      {isOpen && (
+        <div className="space-y-4 p-4 border border-[#FFD700]/20 rounded-lg bg-[#0f0f23]/50 mt-4">
+          {/* Поиск и сортировка */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFD700] h-4 w-4" />
               <Input
                 placeholder="Поиск по телефону, РК, городу..."
                 value={searchTerm}
                 onChange={(e) => onSearchTermChange(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && onSearch()}
-                className="w-64 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                className="pl-10 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
               />
-              <Button 
-                onClick={onSearch} 
-                size="sm" 
-                className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
             </div>
+            <Button 
+              onClick={onSearch} 
+              size="sm" 
+              className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold shrink-0"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
             <Select
               value={`${sortBy}-${sortOrder}`}
               onValueChange={(value) => {
@@ -92,7 +100,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                 onSortChange(field);
               }}
             >
-              <SelectTrigger className="w-48 bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white">
+              <SelectTrigger className="w-48 bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white shrink-0">
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
@@ -105,12 +113,8 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
               </SelectContent>
             </Select>
           </div>
-        </div>
-      </CardHeader>
 
-      {/* Filters Panel */}
-      {showFilters && (
-        <CardContent className="border-t border-[#FFD700]/30">
+          {/* Дополнительные фильтры */}
           <form onSubmit={handleSubmit(onFiltersSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
@@ -192,9 +196,9 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
               </Button>
             </div>
           </form>
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </div>
   );
 };
 

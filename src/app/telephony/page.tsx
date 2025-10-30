@@ -114,7 +114,7 @@ export default function TelephonyPage() {
 
   return (
     <DashboardLayout variant="operator">
-      <div className="w-full p-6 space-y-6 bg-[#0f0f23] min-h-screen">
+      <div className="w-full py-4 px-4 space-y-4 bg-[#0f0f23] min-h-screen">
         {/* Header */}
         <TelephonyHeader
           newCallsCount={newCallsCount}
@@ -123,53 +123,53 @@ export default function TelephonyPage() {
           loading={loading}
         />
 
-        {/* Filters and Search */}
-        <TelephonyFilters
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-          onSearch={handleSearch}
+        {/* Calls Table с встроенными фильтрами */}
+        <CallTable
+          calls={calls}
+          groupedCalls={groupedCalls}
+          expandedGroups={expandedGroups}
+          loading={loading}
+          error={error}
           sortBy={sortBy}
           sortOrder={sortOrder}
-          onSortChange={handleSort}
-          showFilters={showFilters}
-          onToggleFilters={() => setShowFilters(!showFilters)}
-          onFiltersSubmit={onFiltersSubmit}
-          onClearFilters={clearFilters}
-          loading={loading}
+          orderHistoryLoading={orderHistoryLoading}
+          onToggleGroup={toggleGroup}
+          onSort={handleSort}
+          onCreateOrder={createOrderFromCall}
+          onLoadOrderHistory={loadOrderHistory}
+          onDownloadRecording={downloadRecording}
+          onLoadRecording={loadRecording}
+          playingCall={playingCall}
+          currentAudioUrl={currentAudioUrl}
+          onClosePlayer={closePlayer}
           groupedCallsCount={Object.keys(groupedCalls).length}
           totalCalls={totalCalls}
-          register={register}
-          handleSubmit={handleSubmit}
-          errors={errors}
-        />
-
-        {/* Calls Table */}
-        <Card className="w-full border-2 border-[#FFD700]/30 bg-[#17212b]">
-          <CardContent className="p-0">
-            <CallTable
-              calls={calls}
-              groupedCalls={groupedCalls}
-              expandedGroups={expandedGroups}
-              loading={loading}
-              error={error}
+          filtersComponent={
+            <TelephonyFilters
+              searchTerm={searchTerm}
+              onSearchTermChange={setSearchTerm}
+              onSearch={handleSearch}
               sortBy={sortBy}
               sortOrder={sortOrder}
-              orderHistoryLoading={orderHistoryLoading}
-              onToggleGroup={toggleGroup}
-              onSort={handleSort}
-              onCreateOrder={createOrderFromCall}
-              onLoadOrderHistory={loadOrderHistory}
-              onDownloadRecording={downloadRecording}
-              onLoadRecording={loadRecording}
-              playingCall={playingCall}
-              currentAudioUrl={currentAudioUrl}
-              onClosePlayer={closePlayer}
+              onSortChange={handleSort}
+              showFilters={showFilters}
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              onFiltersSubmit={onFiltersSubmit}
+              onClearFilters={clearFilters}
+              loading={loading}
+              groupedCallsCount={Object.keys(groupedCalls).length}
+              totalCalls={totalCalls}
+              register={register}
+              handleSubmit={handleSubmit}
+              errors={errors}
             />
-          </CardContent>
+          }
+        />
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <CardContent className="border-t border-[#FFD700]/30 pt-6">
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Card className="w-full border-2 border-[#FFD700]/30 bg-[#17212b]">
+            <CardContent className="p-4">
               <div className="flex items-center justify-end">
                 <div className="flex items-center gap-1">
                   {(() => {
@@ -200,8 +200,8 @@ export default function TelephonyPage() {
                 </div>
               </div>
             </CardContent>
-          )}
-        </Card>
+          </Card>
+        )}
 
         {/* Create Order Modal */}
         <CreateOrderModal

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, ReactNode } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -37,6 +38,9 @@ interface CallTableProps {
   playingCall: number | null;
   currentAudioUrl: string | null;
   onClosePlayer: () => void;
+  filtersComponent?: ReactNode;
+  groupedCallsCount: number;
+  totalCalls: number;
 }
 
 export const CallTable: React.FC<CallTableProps> = ({
@@ -56,7 +60,10 @@ export const CallTable: React.FC<CallTableProps> = ({
   onLoadRecording,
   playingCall,
   currentAudioUrl,
-  onClosePlayer
+  onClosePlayer,
+  filtersComponent,
+  groupedCallsCount,
+  totalCalls
 }) => {
   useEffect(() => {
     const style = document.createElement('style');
@@ -113,17 +120,51 @@ export const CallTable: React.FC<CallTableProps> = ({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center p-8 text-red-400">
-        <div className="text-center">
-          <p className="text-lg font-medium">Ошибка загрузки</p>
-          <p className="text-sm text-gray-400">{error}</p>
-        </div>
-      </div>
+      <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
+        <CardContent className="px-6 pb-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1 flex items-center gap-3">
+              <div className="p-2 bg-[#FFD700]/20 rounded-lg">
+                <Phone className="h-5 w-5 text-[#FFD700]" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold text-white">Звонки</div>
+                <div className="text-sm text-gray-400 font-normal">
+                  {groupedCallsCount} групп • {totalCalls} звонков
+                </div>
+              </div>
+            </div>
+          </div>
+          {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
+          <div className="flex items-center justify-center p-8 text-red-400">
+            <div className="text-center">
+              <p className="text-lg font-medium">Ошибка загрузки</p>
+              <p className="text-sm text-gray-400">{error}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="overflow-x-auto w-full custom-scrollbar">
+    <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
+      <CardContent className="px-6 pb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1 flex items-center gap-3">
+            <div className="p-2 bg-[#FFD700]/20 rounded-lg">
+              <Phone className="h-5 w-5 text-[#FFD700]" />
+            </div>
+            <div>
+              <div className="text-lg font-semibold text-white">Звонки</div>
+              <div className="text-sm text-gray-400 font-normal">
+                {groupedCallsCount} групп • {totalCalls} звонков
+              </div>
+            </div>
+          </div>
+        </div>
+        {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
+        <div className="overflow-x-auto w-full custom-scrollbar">
       <Table className="w-full">
         <TableHeader>
           <TableRow className="bg-[#0f0f23] border-[#FFD700]/30 hover:bg-[#0f0f23]">
@@ -232,6 +273,8 @@ export const CallTable: React.FC<CallTableProps> = ({
           )}
         </TableBody>
       </Table>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

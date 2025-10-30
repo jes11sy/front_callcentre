@@ -11,11 +11,9 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-// Button removed - not used
-// Icons removed - not used
+import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
-import { Phone } from 'lucide-react';
 import { Call } from '@/types/telephony';
 // AudioPlayer removed - not used
 import { CallRow } from './CallRow';
@@ -39,8 +37,9 @@ interface CallTableProps {
   currentAudioUrl: string | null;
   onClosePlayer: () => void;
   filtersComponent?: ReactNode;
-  groupedCallsCount: number;
-  totalCalls: number;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export const CallTable: React.FC<CallTableProps> = ({
@@ -62,8 +61,9 @@ export const CallTable: React.FC<CallTableProps> = ({
   currentAudioUrl,
   onClosePlayer,
   filtersComponent,
-  groupedCallsCount,
-  totalCalls
+  currentPage,
+  totalPages,
+  onPageChange
 }) => {
   useEffect(() => {
     const style = document.createElement('style');
@@ -122,19 +122,6 @@ export const CallTable: React.FC<CallTableProps> = ({
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
         <CardContent className="px-6 pb-6">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex-1 flex items-center gap-3">
-              <div className="p-2 bg-[#FFD700]/20 rounded-lg">
-                <Phone className="h-5 w-5 text-[#FFD700]" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-white">Звонки</div>
-                <div className="text-sm text-gray-400 font-normal">
-                  {groupedCallsCount} групп • {totalCalls} звонков
-                </div>
-              </div>
-            </div>
-          </div>
           {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
           <div className="flex items-center justify-center p-8 text-red-400">
             <div className="text-center">
@@ -150,19 +137,6 @@ export const CallTable: React.FC<CallTableProps> = ({
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
       <CardContent className="px-6 pb-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex-1 flex items-center gap-3">
-            <div className="p-2 bg-[#FFD700]/20 rounded-lg">
-              <Phone className="h-5 w-5 text-[#FFD700]" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-white">Звонки</div>
-              <div className="text-sm text-gray-400 font-normal">
-                {groupedCallsCount} групп • {totalCalls} звонков
-              </div>
-            </div>
-          </div>
-        </div>
         {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
         <div className="overflow-x-auto w-full custom-scrollbar">
       <Table className="w-full">
@@ -211,7 +185,6 @@ export const CallTable: React.FC<CallTableProps> = ({
                 <EmptyState
                   title="Звонки не найдены"
                   description="Попробуйте изменить параметры фильтрации"
-                  icon={<Phone className="h-12 w-12 text-gray-300" />}
                 />
               </TableCell>
             </TableRow>
@@ -274,6 +247,41 @@ export const CallTable: React.FC<CallTableProps> = ({
         </TableBody>
       </Table>
         </div>
+
+        {/* Pagination */}
+        {totalPages && totalPages > 1 && currentPage && onPageChange && (
+          <div className="border-t border-[#FFD700]/30 pt-4 mt-6">
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-1">
+                {(() => {
+                  const pages = [];
+                  const startPage = Math.max(1, currentPage - 2);
+                  const endPage = Math.min(totalPages, currentPage + 2);
+                  
+                  for (let i = startPage; i <= endPage; i++) {
+                    pages.push(
+                      <Button
+                        key={i}
+                        variant={i === currentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => onPageChange(i)}
+                        disabled={loading}
+                        className={
+                          i === currentPage
+                            ? "bg-[#FFD700] text-black hover:bg-[#FFD700]/90"
+                            : "border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                        }
+                      >
+                        {i}
+                      </Button>
+                    );
+                  }
+                  return pages;
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

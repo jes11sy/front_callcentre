@@ -4,8 +4,6 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 // LoadingSpinner removed - not used
 import { useTelephony } from '@/hooks/useTelephony';
 import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
@@ -123,7 +121,7 @@ export default function TelephonyPage() {
           loading={loading}
         />
 
-        {/* Calls Table с встроенными фильтрами */}
+        {/* Calls Table с встроенными фильтрами и пагинацией */}
         <CallTable
           calls={calls}
           groupedCalls={groupedCalls}
@@ -142,8 +140,9 @@ export default function TelephonyPage() {
           playingCall={playingCall}
           currentAudioUrl={currentAudioUrl}
           onClosePlayer={closePlayer}
-          groupedCallsCount={Object.keys(groupedCalls).length}
-          totalCalls={totalCalls}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
           filtersComponent={
             <TelephonyFilters
               searchTerm={searchTerm}
@@ -165,43 +164,6 @@ export default function TelephonyPage() {
             />
           }
         />
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Card className="w-full border-2 border-[#FFD700]/30 bg-[#17212b]">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-end">
-                <div className="flex items-center gap-1">
-                  {(() => {
-                    const pages = [];
-                    const startPage = Math.max(1, currentPage - 2);
-                    const endPage = Math.min(totalPages, currentPage + 2);
-                    
-                    for (let i = startPage; i <= endPage; i++) {
-                      pages.push(
-                        <Button
-                          key={i}
-                          variant={i === currentPage ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(i)}
-                          disabled={loading}
-                          className={
-                            i === currentPage
-                              ? "bg-[#FFD700] text-black hover:bg-[#FFD700]/90"
-                              : "border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-                          }
-                        >
-                          {i}
-                        </Button>
-                      );
-                    }
-                    return pages;
-                  })()}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Create Order Modal */}
         <CreateOrderModal

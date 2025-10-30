@@ -142,7 +142,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                     <SelectValue placeholder="Все статусы" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                    <SelectItem value="" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Все статусы</SelectItem>
+                    <SelectItem value="all" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Все статусы</SelectItem>
                     <SelectItem value="answered" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Отвечен</SelectItem>
                     <SelectItem value="missed" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Пропущен</SelectItem>
                     <SelectItem value="busy" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Занято</SelectItem>

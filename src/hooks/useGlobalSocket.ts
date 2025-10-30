@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { tokenStorage } from '@/lib/secure-storage';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru';
 
@@ -102,13 +103,13 @@ class SocketManager {
       this.emit('connection', { status: 'connected' });
       
       // 🔐 Отправляем токен для аутентификации
-      const token = localStorage.getItem('accessToken');
+      const token = tokenStorage.getAccessToken();
       console.log('🔑 Token found:', token ? 'Yes' : 'No');
       if (token) {
         console.log('📤 Sending authenticate event with token');
         this.socket?.emit('authenticate', { token });
       } else {
-        console.warn('⚠️ No token found in localStorage');
+        console.warn('⚠️ No token found in storage');
       }
     });
 

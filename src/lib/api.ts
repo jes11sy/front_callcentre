@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { tokenStorage } from './secure-storage';
 
 // Создаем экземпляр axios с базовыми настройками
 const api = axios.create({
@@ -12,7 +13,7 @@ const api = axios.create({
 // Request interceptor - добавляем токен в каждый запрос
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('accessToken');
+    const token = tokenStorage.getAccessToken() as string | null;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -75,11 +76,11 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = tokenStorage.getRefreshToken() as string | null;
 
       if (!refreshToken) {
         // Нет refresh токена - очищаем хранилище и редирект
-        localStorage.clear();
+        tokenStorage.clearAll();
         window.location.href = '/login';
         return Promise.reject(error);
       }
@@ -101,8 +102,8 @@ api.interceptors.response.use(
         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
         // Сохраняем новые токены
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
+        tokenStorage.setAccessToken(accessToken);
+        tokenStorage.setRefreshToken(newRefreshToken);
 
         console.log('[API] Access token refreshed successfully');
 
@@ -124,7 +125,7 @@ api.interceptors.response.use(
         console.error('[API] Failed to refresh token:', refreshError);
         processQueue(refreshError as AxiosError, null);
         
-        localStorage.clear();
+        tokenStorage.clearAll();
         window.location.href = '/login';
         
         return Promise.reject(refreshError);
@@ -143,37 +144,36 @@ export const authUtils = {
    * Сохранить токены после логина
    */
   setTokens: (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    tokenStorage.setAccessToken(accessToken);
+    tokenStorage.setRefreshToken(refreshToken);
   },
 
   /**
    * Получить access токен
    */
   getAccessToken: () => {
-    return localStorage.getItem('accessToken');
+    return tokenStorage.getAccessToken() as string | null;
   },
 
   /**
    * Получить refresh токен
    */
   getRefreshToken: () => {
-    return localStorage.getItem('refreshToken');
+    return tokenStorage.getRefreshToken() as string | null;
   },
 
   /**
    * Проверить наличие токенов
    */
   hasTokens: () => {
-    return !!(localStorage.getItem('accessToken') && localStorage.getItem('refreshToken'));
+    return !!(tokenStorage.getAccessToken() && tokenStorage.getRefreshToken());
   },
 
   /**
    * Очистить токены (logout)
    */
   clearTokens: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    tokenStorage.clearAll();
   },
 
   /**

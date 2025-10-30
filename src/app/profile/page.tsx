@@ -23,7 +23,6 @@ import {
   X, 
   Calendar,
   MapPin,
-  // Phone removed - not used
   Mail,
   Shield,
   Clock,
@@ -124,7 +123,7 @@ export default function ProfilePage() {
       const token = await tokenStorage.getAccessToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -133,7 +132,7 @@ export default function ProfilePage() {
       }
 
       const result = await response.json();
-      return result.data || result; // Извлекаем data из ответа
+      return result.data || result;
     }
   });
 
@@ -142,9 +141,9 @@ export default function ProfilePage() {
     queryKey: ['profileStats'],
     queryFn: async () => {
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -153,7 +152,7 @@ export default function ProfilePage() {
       }
 
       const result = await response.json();
-      return result.data || result; // Извлекаем data из ответа
+      return result.data || result;
     },
     enabled: profile?.role === 'operator'
   });
@@ -166,7 +165,7 @@ export default function ProfilePage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(data)
       });
@@ -183,6 +182,7 @@ export default function ProfilePage() {
       toast.success('Профиль успешно обновлен');
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['profileStats'] });
     },
     onError: (error: unknown) => {
       toast.error((error as { message?: string }).message || 'Ошибка обновления профиля');
@@ -197,7 +197,7 @@ export default function ProfilePage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           currentPassword: data.currentPassword,
@@ -217,6 +217,9 @@ export default function ProfilePage() {
       toast.success('Пароль успешно изменен');
       setIsChangingPassword(false);
       passwordForm.reset();
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
     },
     onError: (error: unknown) => {
       toast.error((error as { message?: string }).message || 'Ошибка смены пароля');
@@ -233,7 +236,8 @@ export default function ProfilePage() {
         note: profile.note || ''
       });
     }
-  }, [profile, profileForm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   const handleEdit = () => {
     setIsEditing(true);

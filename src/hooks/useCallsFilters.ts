@@ -23,7 +23,7 @@ export const useCallsFilters = () => {
   const [sortBy, setSortBy] = useState('dateCreate');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
-  const [limit] = useState(20);
+  const [limit, setLimit] = useState(20);
   const [totalCalls, setTotalCalls] = useState(0);
 
   // Form
@@ -137,6 +137,7 @@ export const useCallsFilters = () => {
     setTotalPages,
     setTotalCalls,
     setShowFilters,
+    setLimit,
     onFiltersSubmit,
     clearFilters,
     handleSearch: search?.handleSearch || (() => {}),

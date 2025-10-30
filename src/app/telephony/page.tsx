@@ -44,6 +44,7 @@ export default function TelephonyPage() {
     currentPage,
     totalPages,
     totalCalls,
+    limit,
     sortBy,
     sortOrder,
     showFilters,
@@ -70,6 +71,7 @@ export default function TelephonyPage() {
     setSearchTerm,
     setShowFilters,
     setCurrentPage,
+    setLimit,
     setShowCreateOrderModal,
     setShowOrderHistoryModal,
     onFiltersSubmit,
@@ -142,7 +144,10 @@ export default function TelephonyPage() {
           onClosePlayer={closePlayer}
           currentPage={currentPage}
           totalPages={totalPages}
+          totalCalls={totalCalls}
+          limit={limit}
           onPageChange={setCurrentPage}
+          onLimitChange={setLimit}
           filtersComponent={
             <TelephonyFilters
               searchTerm={searchTerm}

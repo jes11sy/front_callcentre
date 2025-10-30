@@ -12,9 +12,13 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
+import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { Call } from '@/types/telephony';
+import { PAGE_SIZES } from '@/constants/orders';
 // AudioPlayer removed - not used
 import { CallRow } from './CallRow';
 
@@ -39,7 +43,10 @@ interface CallTableProps {
   filtersComponent?: ReactNode;
   currentPage?: number;
   totalPages?: number;
+  totalCalls?: number;
+  limit?: number;
   onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 }
 
 export const CallTable: React.FC<CallTableProps> = ({
@@ -63,7 +70,10 @@ export const CallTable: React.FC<CallTableProps> = ({
   filtersComponent,
   currentPage,
   totalPages,
-  onPageChange
+  totalCalls,
+  limit,
+  onPageChange,
+  onLimitChange
 }) => {
   useEffect(() => {
     const style = document.createElement('style');
@@ -249,37 +259,48 @@ export const CallTable: React.FC<CallTableProps> = ({
         </div>
 
         {/* Pagination */}
-        {totalPages && totalPages > 1 && currentPage && onPageChange && (
-          <div className="border-t border-[#FFD700]/30 pt-4 mt-6">
-            <div className="flex items-center justify-end">
-              <div className="flex items-center gap-1">
-                {(() => {
-                  const pages = [];
-                  const startPage = Math.max(1, currentPage - 2);
-                  const endPage = Math.min(totalPages, currentPage + 2);
-                  
-                  for (let i = startPage; i <= endPage; i++) {
-                    pages.push(
-                      <Button
-                        key={i}
-                        variant={i === currentPage ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => onPageChange(i)}
-                        disabled={loading}
-                        className={
-                          i === currentPage
-                            ? "bg-[#FFD700] text-black hover:bg-[#FFD700]/90"
-                            : "border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-                        }
-                      >
-                        {i}
-                      </Button>
-                    );
-                  }
-                  return pages;
-                })()}
+        {currentPage && totalPages && totalCalls && limit && onPageChange && onLimitChange && (
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-400">
+                Показано {((currentPage - 1) * limit) + 1} - {Math.min(currentPage * limit, totalCalls)} из {totalCalls} звонков
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="page-size" className="text-sm text-gray-400">
+                  На странице:
+                </Label>
+                <Select
+                  value={limit.toString()}
+                  onValueChange={(value) => {
+                    onLimitChange(parseInt(value));
+                    onPageChange(1);
+                  }}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAGE_SIZES.map((size) => (
+                      <SelectItem key={size.value} value={size.value}>
+                        {size.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+            {totalPages > 1 && (
+              <OptimizedPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                showFirstLast={true}
+                showPrevNext={true}
+                maxVisiblePages={5}
+                disabled={loading}
+              />
+            )}
           </div>
         )}
       </CardContent>

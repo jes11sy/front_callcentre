@@ -12,8 +12,8 @@ const api = axios.create({
 
 // Request interceptor - добавляем токен в каждый запрос
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = tokenStorage.getAccessToken() as string | null;
+  async (config: InternalAxiosRequestConfig) => {
+    const token = await tokenStorage.getAccessToken() as string | null;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -76,7 +76,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenStorage.getRefreshToken() as string | null;
+      const refreshToken = await tokenStorage.getRefreshToken() as string | null;
 
       if (!refreshToken) {
         // Нет refresh токена - очищаем хранилище и редирект
@@ -102,8 +102,8 @@ api.interceptors.response.use(
         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
         // Сохраняем новые токены
-        tokenStorage.setAccessToken(accessToken);
-        tokenStorage.setRefreshToken(newRefreshToken);
+        await tokenStorage.setAccessToken(accessToken);
+        await tokenStorage.setRefreshToken(newRefreshToken);
 
         console.log('[API] Access token refreshed successfully');
 
@@ -143,43 +143,47 @@ export const authUtils = {
   /**
    * Сохранить токены после логина
    */
-  setTokens: (accessToken: string, refreshToken: string) => {
-    tokenStorage.setAccessToken(accessToken);
-    tokenStorage.setRefreshToken(refreshToken);
+  setTokens: async (accessToken: string, refreshToken: string): Promise<void> => {
+    await tokenStorage.setAccessToken(accessToken);
+    await tokenStorage.setRefreshToken(refreshToken);
   },
 
   /**
    * Получить access токен
    */
-  getAccessToken: () => {
-    return tokenStorage.getAccessToken() as string | null;
+  getAccessToken: async (): Promise<string | null> => {
+    return await tokenStorage.getAccessToken() as string | null;
   },
 
   /**
    * Получить refresh токен
    */
-  getRefreshToken: () => {
-    return tokenStorage.getRefreshToken() as string | null;
+  getRefreshToken: async (): Promise<string | null> => {
+    return await tokenStorage.getRefreshToken() as string | null;
   },
 
   /**
    * Проверить наличие токенов
    */
-  hasTokens: () => {
-    return !!(tokenStorage.getAccessToken() && tokenStorage.getRefreshToken());
+  hasTokens: async (): Promise<boolean> => {
+    const [accessToken, refreshToken] = await Promise.all([
+      tokenStorage.getAccessToken(),
+      tokenStorage.getRefreshToken()
+    ]);
+    return !!(accessToken && refreshToken);
   },
 
   /**
    * Очистить токены (logout)
    */
-  clearTokens: () => {
+  clearTokens: (): void => {
     tokenStorage.clearAll();
   },
 
   /**
    * Logout с вызовом API
    */
-  logout: async () => {
+  logout: async (): Promise<void> => {
     try {
       await api.post('/auth/logout');
     } catch (error) {

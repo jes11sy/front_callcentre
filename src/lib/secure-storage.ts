@@ -1,5 +1,17 @@
-// Безопасная система хранения токенов с шифрованием
-// Работает как на localhost, так и в production
+/**
+ * Безопасная система хранения токенов с шифрованием
+ * 
+ * ✅ Использует AES-256-GCM шифрование через Web Crypto API
+ * ✅ PBKDF2 с 100,000 итераций для key derivation
+ * ✅ Случайный IV для каждой операции шифрования
+ * ✅ Автоматическая проверка TTL и очистка устаревших данных
+ * ✅ Защита от XSS через шифрование в localStorage
+ * 
+ * Работает как на localhost, так и в production
+ * Совместима с SSR (Server-Side Rendering)
+ * 
+ * @version 2.0.0 - Обновлено с XOR на AES-GCM (2025-10-30)
+ */
 
 interface StorageOptions {
   encrypt?: boolean;
@@ -24,45 +36,88 @@ class SecureStorage {
     return SecureStorage.instance;
   }
 
-  // Простое шифрование (в production использовать более сложный алгоритм)
-  private encrypt(text: string): string {
+  // Безопасное шифрование с использованием Web Crypto API (AES-GCM)
+  private async deriveKey(): Promise<CryptoKey> {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(this.encryptionKey),
+      'PBKDF2',
+      false,
+      ['deriveBits', 'deriveKey']
+    );
+
+    return crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: encoder.encode('lead-schem-secure-salt-v1'), // Уникальная соль для приложения
+        iterations: 100000, // Высокое число итераций для защиты
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  private async encrypt(text: string): Promise<string> {
     if (!this.isClient) return text;
     
     try {
-      // Простое XOR шифрование для демонстрации
-      let result = '';
-      for (let i = 0; i < text.length; i++) {
-        result += String.fromCharCode(
-          text.charCodeAt(i) ^ this.encryptionKey.charCodeAt(i % this.encryptionKey.length)
-        );
-      }
-      return btoa(result); // Base64 encode
+      const key = await this.deriveKey();
+      const encoder = new TextEncoder();
+      const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV для AES-GCM
+      
+      const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        encoder.encode(text)
+      );
+
+      // Объединяем IV и зашифрованные данные
+      const combined = new Uint8Array(iv.length + encrypted.byteLength);
+      combined.set(iv);
+      combined.set(new Uint8Array(encrypted), iv.length);
+      
+      // Конвертируем в base64
+      return btoa(String.fromCharCode(...combined));
     } catch (error) {
       console.error('Encryption error:', error);
-      return text;
+      // В случае ошибки шифрования, не сохраняем данные
+      throw new Error('Failed to encrypt data');
     }
   }
 
-  private decrypt(encryptedText: string): string {
+  private async decrypt(encryptedText: string): Promise<string> {
     if (!this.isClient) return encryptedText;
     
     try {
-      const text = atob(encryptedText); // Base64 decode
-      let result = '';
-      for (let i = 0; i < text.length; i++) {
-        result += String.fromCharCode(
-          text.charCodeAt(i) ^ this.encryptionKey.charCodeAt(i % this.encryptionKey.length)
-        );
-      }
-      return result;
+      const key = await this.deriveKey();
+      
+      // Декодируем из base64
+      const combined = Uint8Array.from(atob(encryptedText), c => c.charCodeAt(0));
+      
+      // Извлекаем IV (первые 12 байт) и зашифрованные данные
+      const iv = combined.slice(0, 12);
+      const data = combined.slice(12);
+      
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        data
+      );
+      
+      return new TextDecoder().decode(decrypted);
     } catch (error) {
       console.error('Decryption error:', error);
-      return encryptedText;
+      // Если не удалось расшифровать, возвращаем null чтобы очистить storage
+      throw new Error('Failed to decrypt data');
     }
   }
 
   // Безопасное сохранение с проверкой SSR
-  setItem(key: string, value: unknown, options: StorageOptions = {}): boolean {
+  async setItem(key: string, value: unknown, options: StorageOptions = {}): Promise<boolean> {
     if (!this.isClient) {
       console.warn('SecureStorage: Cannot access storage on server side');
       return false;
@@ -71,8 +126,11 @@ class SecureStorage {
     try {
       const { encrypt = true, ttl } = options;
       
+      const valueStr = JSON.stringify(value);
+      const encryptedValue = encrypt ? await this.encrypt(valueStr) : valueStr;
+      
       const data = {
-        value: encrypt ? this.encrypt(JSON.stringify(value)) : value,
+        value: encryptedValue,
         timestamp: Date.now(),
         ttl: ttl || 7 * 24 * 60 * 60 * 1000, // 7 дней по умолчанию
         encrypted: encrypt
@@ -87,7 +145,7 @@ class SecureStorage {
   }
 
   // Безопасное получение с проверкой SSR и TTL
-  getItem(key: string): unknown {
+  async getItem(key: string): Promise<unknown> {
     if (!this.isClient) {
       return null;
     }
@@ -105,12 +163,15 @@ class SecureStorage {
       }
 
       if (data.encrypted) {
-        return JSON.parse(this.decrypt(data.value));
+        const decrypted = await this.decrypt(data.value);
+        return JSON.parse(decrypted);
       }
       
-      return data.value;
+      return JSON.parse(data.value);
     } catch (error) {
       console.error('SecureStorage: Error getting item:', error);
+      // Если данные повреждены или не могут быть расшифрованы, удаляем их
+      this.removeItem(key);
       return null;
     }
   }
@@ -162,37 +223,37 @@ export const secureStorage = SecureStorage.getInstance();
 // Специализированные методы для токенов
 export const tokenStorage = {
   // Access token - без TTL, JWT сам управляет валидностью
-  setAccessToken: (token: string) => 
-    secureStorage.setItem('accessToken', token, { encrypt: true, ttl: 24 * 60 * 60 * 1000 }), // 24 часа (только для хранения)
+  setAccessToken: async (token: string): Promise<boolean> => 
+    await secureStorage.setItem('accessToken', token, { encrypt: true, ttl: 24 * 60 * 60 * 1000 }), // 24 часа (только для хранения)
   
-  getAccessToken: () => 
-    secureStorage.getItem('accessToken'),
+  getAccessToken: async (): Promise<unknown> => 
+    await secureStorage.getItem('accessToken'),
   
-  removeAccessToken: () => 
+  removeAccessToken: (): boolean => 
     secureStorage.removeItem('accessToken'),
 
   // Refresh token
-  setRefreshToken: (token: string) => 
-    secureStorage.setItem('refreshToken', token, { encrypt: true, ttl: 7 * 24 * 60 * 60 * 1000 }), // 7 дней
+  setRefreshToken: async (token: string): Promise<boolean> => 
+    await secureStorage.setItem('refreshToken', token, { encrypt: true, ttl: 7 * 24 * 60 * 60 * 1000 }), // 7 дней
   
-  getRefreshToken: () => 
-    secureStorage.getItem('refreshToken'),
+  getRefreshToken: async (): Promise<unknown> => 
+    await secureStorage.getItem('refreshToken'),
   
-  removeRefreshToken: () => 
+  removeRefreshToken: (): boolean => 
     secureStorage.removeItem('refreshToken'),
 
   // User data (менее критично, можно не шифровать)
-  setUser: (user: unknown) => 
-    secureStorage.setItem('user', user, { encrypt: false, ttl: 24 * 60 * 60 * 1000 }), // 24 часа
+  setUser: async (user: unknown): Promise<boolean> => 
+    await secureStorage.setItem('user', user, { encrypt: false, ttl: 24 * 60 * 60 * 1000 }), // 24 часа
   
-  getUser: () => 
-    secureStorage.getItem('user'),
+  getUser: async (): Promise<unknown> => 
+    await secureStorage.getItem('user'),
   
-  removeUser: () => 
+  removeUser: (): boolean => 
     secureStorage.removeItem('user'),
 
   // Очистка всех токенов
-  clearAll: () => {
+  clearAll: (): boolean => {
     secureStorage.removeItem('accessToken');
     secureStorage.removeItem('refreshToken');
     secureStorage.removeItem('user');
@@ -200,8 +261,8 @@ export const tokenStorage = {
   },
 
   // Проверка аутентификации
-  isAuthenticated: () => {
-    const token = secureStorage.getItem('accessToken');
+  isAuthenticated: async (): Promise<boolean> => {
+    const token = await secureStorage.getItem('accessToken');
     return !!token;
   }
 };

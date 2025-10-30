@@ -132,7 +132,8 @@ export default function ProfilePage() {
         throw new Error('Ошибка загрузки профиля');
       }
 
-      return response.json();
+      const result = await response.json();
+      return result.data || result; // Извлекаем data из ответа
     }
   });
 
@@ -141,7 +142,7 @@ export default function ProfilePage() {
     queryKey: ['profileStats'],
     queryFn: async () => {
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -151,7 +152,8 @@ export default function ProfilePage() {
         throw new Error('Ошибка загрузки статистики профиля');
       }
 
-      return response.json();
+      const result = await response.json();
+      return result.data || result; // Извлекаем data из ответа
     },
     enabled: profile?.role === 'operator'
   });
@@ -171,10 +173,11 @@ export default function ProfilePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Ошибка обновления профиля');
+        throw new Error(errorData.message || errorData.error?.message || 'Ошибка обновления профиля');
       }
 
-      return response.json();
+      const result = await response.json();
+      return result.data || result;
     },
     onSuccess: () => {
       toast.success('Профиль успешно обновлен');
@@ -204,10 +207,11 @@ export default function ProfilePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Ошибка смены пароля');
+        throw new Error(errorData.message || errorData.error?.message || 'Ошибка смены пароля');
       }
 
-      return response.json();
+      const result = await response.json();
+      return result.data || result;
     },
     onSuccess: () => {
       toast.success('Пароль успешно изменен');

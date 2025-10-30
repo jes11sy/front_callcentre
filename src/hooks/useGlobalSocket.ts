@@ -27,6 +27,7 @@ class SocketManager {
   private isConnecting = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private handlersSetup = false; // Флаг для предотвращения повторной установки обработчиков
 
   private constructor() {}
 
@@ -95,7 +96,13 @@ class SocketManager {
   }
 
   private setupEventHandlers() {
-    if (!this.socket) return;
+    if (!this.socket || this.handlersSetup) {
+      console.log('⏭️ Handlers already setup, skipping...');
+      return;
+    }
+
+    console.log('🔧 Setting up socket event handlers...');
+    this.handlersSetup = true;
 
     this.socket.on('connect', () => {
       console.log('🟢 Socket connected:', this.socket?.connected);
@@ -219,6 +226,7 @@ class SocketManager {
       this.socket = null;
     }
     this.listeners.clear();
+    this.handlersSetup = false; // Сбрасываем флаг при отключении
   }
 
   // Публичный метод для получения socket

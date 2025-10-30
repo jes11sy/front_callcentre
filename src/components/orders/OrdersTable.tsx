@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,25 +56,22 @@ const OrdersTableComponent = ({
   if (isLoading) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
-          <Button 
-            onClick={onCreateOrder}
-            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Создать заказ
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {filtersComponent}
-          <div className="mt-6">
-            <LoadingState 
-              message="Загрузка заказов..." 
-              size="lg"
-              className="py-12"
-            />
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between mb-6">
+            {filtersComponent}
+            <Button 
+              onClick={onCreateOrder}
+              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Создать заказ
+            </Button>
           </div>
+          <LoadingState 
+            message="Загрузка заказов..." 
+            size="lg"
+            className="py-12"
+          />
         </CardContent>
       </Card>
     );
@@ -83,34 +80,31 @@ const OrdersTableComponent = ({
   if (ordersData?.orders?.length === 0) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
-          <Button 
-            onClick={onCreateOrder}
-            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Создать заказ
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {filtersComponent}
-          <div className="mt-6">
-            <EmptyState
-              title={search ? 'Заказы не найдены' : 'Нет заказов'}
-              description={search ? 'Попробуйте изменить параметры поиска' : 'Создайте свой первый заказ'}
-              icon={<ShoppingCart className="h-12 w-12 text-gray-300" />}
-              action={!search ? (
-                <Button 
-                  onClick={onCreateOrder}
-                  className="mt-4"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Создать первый заказ
-                </Button>
-              ) : undefined}
-            />
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between mb-6">
+            {filtersComponent}
+            <Button 
+              onClick={onCreateOrder}
+              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Создать заказ
+            </Button>
           </div>
+          <EmptyState
+            title={search ? 'Заказы не найдены' : 'Нет заказов'}
+            description={search ? 'Попробуйте изменить параметры поиска' : 'Создайте свой первый заказ'}
+            icon={<ShoppingCart className="h-12 w-12 text-gray-300" />}
+            action={!search ? (
+              <Button 
+                onClick={onCreateOrder}
+                className="mt-4"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Создать первый заказ
+              </Button>
+            ) : undefined}
+          />
         </CardContent>
       </Card>
     );
@@ -118,18 +112,17 @@ const OrdersTableComponent = ({
 
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
-        <Button 
-          onClick={onCreateOrder}
-          className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Создать заказ
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between mb-6">
+          {filtersComponent}
+          <Button 
+            onClick={onCreateOrder}
+            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Создать заказ
+          </Button>
+        </div>
         {ordersData?.orders && ordersData.orders.length > 0 ? (
           <>
             <div className="overflow-x-auto w-full">

@@ -73,9 +73,9 @@ function OrdersContent() {
 
   return (
     <DashboardLayout variant={user?.role === 'admin' ? 'admin' : 'operator'}>
-      <div className="w-full py-6 px-4 bg-[#0f0f23] min-h-screen custom-scrollbar">
+      <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen custom-scrollbar">
         <div className="w-full">
-          <div className="space-y-6 w-full">
+          <div className="space-y-4 w-full">
             {/* Time Slots Table */}
             {ordersData?.orders && (
               <TimeSlotsTable orders={ordersData.orders} />

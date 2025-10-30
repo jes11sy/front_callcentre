@@ -104,13 +104,13 @@ class SocketManager {
     console.log('🔧 Setting up socket event handlers...');
     this.handlersSetup = true;
 
-    this.socket.on('connect', () => {
+    this.socket.on('connect', async () => {
       console.log('🟢 Socket connected:', this.socket?.connected);
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
       // 🔐 Отправляем токен для аутентификации
-      const token = tokenStorage.getAccessToken();
+      const token = await tokenStorage.getAccessToken();
       console.log('🔑 Token found:', token ? 'Yes' : 'No');
       if (token) {
         console.log('📤 Sending authenticate event with token');

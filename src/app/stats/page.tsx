@@ -170,47 +170,49 @@ export default function StatsPage() {
 
           {/* Date Filter */}
           <Card className="mb-8 border-2 border-[#FFD700]/30 bg-[#17212b]">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Calendar className="h-5 w-5 text-[#FFD700]" />
-                  Период анализа
-                </CardTitle>
-                <Button 
-                  onClick={resetToCurrentPeriod} 
-                  variant="outline" 
-                  size="sm"
-                  className="flex items-center gap-2 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Сбросить
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center gap-4">
-                <div className="flex-1 space-y-1">
-                  <Label htmlFor="startDate" className="text-sm text-gray-400">С</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
-                  />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-[#FFD700] shrink-0" />
+                  <span className="text-lg font-semibold text-white shrink-0">Период анализа</span>
                 </div>
-                <div className="pt-6">
-                  <span className="text-gray-400">—</span>
-                </div>
-                <div className="flex-1 space-y-1">
-                  <Label htmlFor="endDate" className="text-sm text-gray-400">По</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
-                  />
+                
+                <div className="flex items-center gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="startDate" className="text-xs text-gray-400">С</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-[160px] h-9 bg-[#0f0f23] border-gray-600 text-white text-sm placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                    />
+                  </div>
+                  
+                  <div className="pt-5">
+                    <span className="text-gray-400">—</span>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label htmlFor="endDate" className="text-xs text-gray-400">По</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-[160px] h-9 bg-[#0f0f23] border-gray-600 text-white text-sm placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={resetToCurrentPeriod} 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 mt-5 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Сбросить
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -223,25 +225,6 @@ export default function StatsPage() {
             />
           ) : stats ? (
             <div className="space-y-6">
-              {/* Period Info */}
-              <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">Период анализа</h3>
-                      <p className="text-gray-400">
-                        {formatDate(stats.period.startDate)} - {formatDate(stats.period.endDate)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <h3 className="text-lg font-semibold text-white">Оператор</h3>
-                      <p className="text-gray-400">{stats.operator.name}</p>
-                      <p className="text-sm text-gray-500">{stats.operator.city}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* Main Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">

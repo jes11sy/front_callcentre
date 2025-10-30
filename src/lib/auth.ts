@@ -57,11 +57,50 @@ api.interceptors.request.use(async (config) => {
 });
 
 // Handle token refresh
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((promise) => {
+    if (error) {
+      promise.reject(error);
+    } else {
+      promise.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config;
+    
     // Only handle 401 errors for authenticated requests, not login requests
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+    if (
+      error.response?.status === 401 && 
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(async (token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api.request(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
       const refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken) {
         try {
@@ -69,21 +108,34 @@ api.interceptors.response.use(
             refreshToken,
           });
           
-          const { accessToken } = response.data.data;
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+          
+          // Сохраняем НОВЫЕ токены
           await tokenStorage.setAccessToken(accessToken);
+          await tokenStorage.setRefreshToken(newRefreshToken);
+          
+          // Update default headers
+          api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          
+          processQueue(null, accessToken);
           
           // Retry original request
-          error.config.headers.Authorization = `Bearer ${accessToken}`;
-          return api.request(error.config);
-        } catch {
+          return api.request(originalRequest);
+        } catch (refreshError) {
           // Refresh failed, clear all tokens
+          processQueue(refreshError, null);
           await tokenStorage.clearAll();
           // Don't redirect automatically, let the component handle it
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
         }
       } else {
         // No refresh token, clear all tokens
         await tokenStorage.clearAll();
-        // Don't redirect automatically, let the component handle it
+        isRefreshing = false;
+        return Promise.reject(error);
       }
     }
     return Promise.reject(error);

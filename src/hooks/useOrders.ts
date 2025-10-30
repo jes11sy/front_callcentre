@@ -137,17 +137,43 @@ export const useOrders = () => {
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, orderData }: { id: number; orderData: Partial<Order> }) => {
       const token = await tokenStorage.getAccessToken();
+      
+      // Фильтруем только разрешенные для обновления поля (согласно UpdateOrderDto)
+      const allowedFields = [
+        // Основные поля
+        'rk', 'city', 'avitoName', 'phone', 'typeOrder', 'clientName', 'address',
+        'dateMeeting', 'typeEquipment', 'problem', 'avitoChatId', 'callId', 'operatorNameId',
+        // Статус и мастер
+        'statusOrder', 'masterId',
+        // Финансовые поля
+        'result', 'expenditure', 'clean', 'masterChange', 'prepayment',
+        // Документы
+        'bsoDoc', 'expenditureDoc', 'cashReceiptDoc',
+        // Даты
+        'closingData', 'dateClosmod',
+        // Дополнительные поля
+        'comment', 'cashSubmissionStatus', 'cashSubmissionAmount'
+      ];
+      
+      const filteredData: Record<string, unknown> = {};
+      for (const key of allowedFields) {
+        if (key in orderData) {
+          filteredData[key] = orderData[key as keyof Order];
+        }
+      }
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(filteredData)
       });
 
       if (!response.ok) {
-        throw new Error('Ошибка при обновлении заказа');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка при обновлении заказа');
       }
 
       return response.json();

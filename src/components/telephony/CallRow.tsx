@@ -85,29 +85,32 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
       
       <TableCell className="font-mono">
         <div className="flex items-center gap-3">
-          <span className={`font-semibold ${isMainRow ? 'text-[#FFD700]' : 'text-white'}`}>
-            {phoneClient}
-          </span>
-          {hasMultipleCalls && isMainRow && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">
-                +{groupCalls.length - 1}
-              </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onToggleGroup(phoneClient)}
-                className="h-7 w-7 p-0 hover:bg-[#FFD700]/10"
-              >
-                {isExpanded ? (
-                  <ChevronUp className="h-4 w-4 text-[#FFD700]" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-[#FFD700]" />
-                )}
-              </Button>
-            </div>
-          )}
-          {!isMainRow && (
+          {isMainRow ? (
+            <>
+              <span className="font-semibold text-[#FFD700]">
+                {phoneClient}
+              </span>
+              {hasMultipleCalls && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">
+                    +{groupCalls.length - 1}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onToggleGroup(phoneClient)}
+                    className="h-7 w-7 p-0 hover:bg-[#FFD700]/10"
+                  >
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-[#FFD700]" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-[#FFD700]" />
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
             <div className="flex items-center gap-3">
               <div className="w-0.5 h-6 bg-[#FFD700]"></div>
               <span className="text-gray-300">{phoneClient}</span>

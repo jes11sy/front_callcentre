@@ -14,10 +14,6 @@ const CreateOrderModal = dynamic(() => import('@/components/telephony/CreateOrde
   ssr: false
 });
 
-const TelephonyHeader = dynamic(() => import('@/components/telephony/TelephonyHeader').then(mod => ({ default: mod.TelephonyHeader })), {
-  ssr: false
-});
-
 const TelephonyFilters = dynamic(() => import('@/components/telephony/TelephonyFilters').then(mod => ({ default: mod.TelephonyFilters })), {
   ssr: false
 });
@@ -40,7 +36,6 @@ export default function TelephonyPage() {
     calls,
     loading,
     error,
-    searchTerm,
     currentPage,
     totalPages,
     totalCalls,
@@ -57,7 +52,6 @@ export default function TelephonyPage() {
     selectedCallForHistory,
     orderHistory,
     orderHistoryLoading,
-    newCallsCount,
     expandedGroups,
     socketConnected: _socketConnected,
     groupedCalls,
@@ -68,7 +62,6 @@ export default function TelephonyPage() {
     errors,
     
     // Functions
-    setSearchTerm,
     setShowFilters,
     setCurrentPage,
     setLimit,
@@ -76,17 +69,14 @@ export default function TelephonyPage() {
     setShowOrderHistoryModal,
     onFiltersSubmit,
     clearFilters,
-    handleSearch,
     handleSort,
     toggleGroup,
-    handleManualRefresh,
     loadOrderHistory,
     loadRecording,
     closePlayer,
     downloadRecording,
     createOrderFromCall,
-    handleOrderCreated,
-    resetNewCallsCount
+    handleOrderCreated
   } = useTelephony();
 
   // Редирект админов на админскую страницу телефонии
@@ -115,14 +105,6 @@ export default function TelephonyPage() {
   return (
     <DashboardLayout variant="operator">
       <div className="w-full py-4 px-4 space-y-4 bg-[#0f0f23] min-h-screen">
-        {/* Header */}
-        <TelephonyHeader
-          newCallsCount={newCallsCount}
-          onNewCallsCountReset={resetNewCallsCount}
-          onManualRefresh={handleManualRefresh}
-          loading={loading}
-        />
-
         {/* Calls Table с встроенными фильтрами и пагинацией */}
         <CallTable
           calls={calls}
@@ -150,9 +132,6 @@ export default function TelephonyPage() {
           onLimitChange={setLimit}
           filtersComponent={
             <TelephonyFilters
-              searchTerm={searchTerm}
-              onSearchTermChange={setSearchTerm}
-              onSearch={handleSearch}
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSortChange={handleSort}

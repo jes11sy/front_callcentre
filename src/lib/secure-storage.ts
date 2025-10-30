@@ -161,9 +161,9 @@ export const secureStorage = SecureStorage.getInstance();
 
 // Специализированные методы для токенов
 export const tokenStorage = {
-  // Access token
+  // Access token - без TTL, JWT сам управляет валидностью
   setAccessToken: (token: string) => 
-    secureStorage.setItem('accessToken', token, { encrypt: true, ttl: 15 * 60 * 1000 }), // 15 минут
+    secureStorage.setItem('accessToken', token, { encrypt: true, ttl: 24 * 60 * 60 * 1000 }), // 24 часа (только для хранения)
   
   getAccessToken: () => 
     secureStorage.getItem('accessToken'),

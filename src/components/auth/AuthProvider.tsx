@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
+import { TokenRefresher } from './TokenRefresher';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -39,5 +40,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initAuth();
   }, [setUser, setLoading]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <TokenRefresher />
+      {children}
+    </>
+  );
 }

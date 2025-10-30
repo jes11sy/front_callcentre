@@ -118,8 +118,8 @@ class SocketManager {
       this.emit('authenticated', data);
     });
 
-    this.socket.on('disconnect', (reason: string) => {
-      console.log('🔴 Socket disconnected:', reason);
+    this.socket.on('disconnect', (...args: unknown[]) => {
+      console.log('🔴 Socket disconnected:', args[0]);
       this.emit('connection', { status: 'disconnected' });
     });
 
@@ -294,19 +294,12 @@ export const useGlobalSocket = () => {
     }
   }, []);
 
-  const reAuthenticate = useCallback((token: string) => {
-    if (socketManager.current) {
-      socketManager.current.authenticate(token);
-    }
-  }, []);
-
   return {
     socket: socketManager.current?.getSocketInstance() || null,
     isConnected,
     isLoading,
     send,
     on,
-    off,
-    reAuthenticate
+    off
   };
 };

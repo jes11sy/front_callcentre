@@ -12,7 +12,7 @@ import { STATUS_COLORS, PAGE_SIZES } from '@/constants/orders';
 import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
-import React, { useCallback } from 'react';
+import React, { useCallback, ReactNode } from 'react';
 
 interface OrdersTableProps {
   ordersData: OrdersResponse | undefined;
@@ -24,6 +24,7 @@ interface OrdersTableProps {
   onCreateOrder: () => void;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
+  filtersComponent?: ReactNode; // Добавляем проп для фильтров
 }
 
 const OrdersTableComponent = ({
@@ -35,7 +36,8 @@ const OrdersTableComponent = ({
   onEditOrder,
   onCreateOrder,
   onPageChange,
-  onLimitChange
+  onLimitChange,
+  filtersComponent
 }: OrdersTableProps) => {
   // Мемоизированная функция форматирования даты (используется в цикле)
   const formatDate = useCallback((dateString: string) => {
@@ -54,15 +56,25 @@ const OrdersTableComponent = ({
   if (isLoading) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
+          <Button 
+            onClick={onCreateOrder}
+            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Создать заказ
+          </Button>
         </CardHeader>
         <CardContent>
-          <LoadingState 
-            message="Загрузка заказов..." 
-            size="lg"
-            className="py-12"
-          />
+          {filtersComponent}
+          <div className="mt-6">
+            <LoadingState 
+              message="Загрузка заказов..." 
+              size="lg"
+              className="py-12"
+            />
+          </div>
         </CardContent>
       </Card>
     );
@@ -71,24 +83,34 @@ const OrdersTableComponent = ({
   if (ordersData?.orders?.length === 0) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
+          <Button 
+            onClick={onCreateOrder}
+            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Создать заказ
+          </Button>
         </CardHeader>
         <CardContent>
-          <EmptyState
-            title={search ? 'Заказы не найдены' : 'Нет заказов'}
-            description={search ? 'Попробуйте изменить параметры поиска' : 'Создайте свой первый заказ'}
-            icon={<ShoppingCart className="h-12 w-12 text-gray-300" />}
-            action={!search ? (
-              <Button 
-                onClick={onCreateOrder}
-                className="mt-4"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Создать первый заказ
-              </Button>
-            ) : undefined}
-          />
+          {filtersComponent}
+          <div className="mt-6">
+            <EmptyState
+              title={search ? 'Заказы не найдены' : 'Нет заказов'}
+              description={search ? 'Попробуйте изменить параметры поиска' : 'Создайте свой первый заказ'}
+              icon={<ShoppingCart className="h-12 w-12 text-gray-300" />}
+              action={!search ? (
+                <Button 
+                  onClick={onCreateOrder}
+                  className="mt-4"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Создать первый заказ
+                </Button>
+              ) : undefined}
+            />
+          </div>
         </CardContent>
       </Card>
     );
@@ -96,10 +118,18 @@ const OrdersTableComponent = ({
 
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-[#FFD700]">Список заказов</CardTitle>
+        <Button 
+          onClick={onCreateOrder}
+          className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Создать заказ
+        </Button>
       </CardHeader>
       <CardContent>
+        {filtersComponent && <div className="mb-6">{filtersComponent}</div>}
         {ordersData?.orders && ordersData.orders.length > 0 ? (
           <>
             <div className="overflow-x-auto w-full">

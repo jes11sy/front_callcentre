@@ -16,7 +16,6 @@ import {
   PhoneOff, 
   ShoppingCart, 
   Calendar,
-  Filter,
   RefreshCw
 } from 'lucide-react';
 import React from 'react';
@@ -115,7 +114,7 @@ export default function StatsPage() {
   }, []);
 
   // Используем кастомный хук для статистики
-  const { stats, isLoading, error, refetch, handleDateChange, formatDate, processedDailyStats } = useStats(startDate, endDate);
+  const { stats, isLoading, error, refetch, formatDate, processedDailyStats } = useStats(startDate, endDate);
 
   const resetToCurrentPeriod = useCallback(() => {
     const end = new Date();
@@ -124,8 +123,7 @@ export default function StatsPage() {
     
     setEndDate(end.toISOString().split('T')[0]);
     setStartDate(start.toISOString().split('T')[0]);
-    refetch();
-  }, [refetch]);
+  }, []);
 
   // Редирект админов на админскую страницу статистики
   useEffect(() => {
@@ -172,16 +170,27 @@ export default function StatsPage() {
 
           {/* Date Filter */}
           <Card className="mb-8 border-2 border-[#FFD700]/30 bg-[#17212b]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Filter className="h-5 w-5 text-[#FFD700]" />
-                Фильтр по датам
-              </CardTitle>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Calendar className="h-5 w-5 text-[#FFD700]" />
+                  Период анализа
+                </CardTitle>
+                <Button 
+                  onClick={resetToCurrentPeriod} 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Сбросить
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate" className="text-gray-300">Начальная дата</Label>
+            <CardContent className="pt-0">
+              <div className="flex items-center gap-4">
+                <div className="flex-1 space-y-1">
+                  <Label htmlFor="startDate" className="text-sm text-gray-400">С</Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -190,8 +199,11 @@ export default function StatsPage() {
                     className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endDate" className="text-gray-300">Конечная дата</Label>
+                <div className="pt-6">
+                  <span className="text-gray-400">—</span>
+                </div>
+                <div className="flex-1 space-y-1">
+                  <Label htmlFor="endDate" className="text-sm text-gray-400">По</Label>
                   <Input
                     id="endDate"
                     type="date"
@@ -199,19 +211,6 @@ export default function StatsPage() {
                     onChange={(e) => setEndDate(e.target.value)}
                     className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label>&nbsp;</Label>
-                  <div className="flex gap-2">
-                    <Button onClick={handleDateChange} className="flex-1 bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Применить фильтр
-                    </Button>
-                    <Button onClick={resetToCurrentPeriod} variant="outline" className="flex items-center gap-2 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white">
-                      <RefreshCw className="h-4 w-4" />
-                      Сбросить
-                    </Button>
-                  </div>
                 </div>
               </div>
             </CardContent>

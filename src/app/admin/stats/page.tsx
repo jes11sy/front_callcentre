@@ -27,7 +27,6 @@ import {
   Target,
   XCircle,
   Loader2,
-  Filter,
   Users,
   RefreshCw
 } from 'lucide-react';
@@ -171,16 +170,6 @@ export default function AdminStatsPage() {
     enabled: !!selectedOperator && !!startDate && !!endDate && viewMode === 'operator'
   });
 
-  const handleDateChange = () => {
-    if (startDate && endDate) {
-      if (viewMode === 'overall') {
-        refetchOverall();
-      } else if (viewMode === 'operator' && selectedOperator) {
-        refetchOperator();
-      }
-    }
-  };
-
   const resetToCurrentPeriod = () => {
     const end = new Date();
     const start = new Date();
@@ -267,16 +256,27 @@ export default function AdminStatsPage() {
 
           {/* Controls */}
           <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Настройки отчета
-              </CardTitle>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Настройки отчета
+                </CardTitle>
+                <Button 
+                  onClick={resetToCurrentPeriod} 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Сбросить
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="viewMode">Режим просмотра</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="viewMode" className="text-sm">Режим просмотра</Label>
                   <Select value={viewMode} onValueChange={(value: 'overall' | 'operator') => setViewMode(value)}>
                     <SelectTrigger>
                       <SelectValue />
@@ -289,8 +289,8 @@ export default function AdminStatsPage() {
                 </div>
 
                 {viewMode === 'operator' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="operator">Оператор</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="operator" className="text-sm">Оператор</Label>
                     <Input
                       id="operator"
                       placeholder="ID оператора"
@@ -300,8 +300,8 @@ export default function AdminStatsPage() {
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Начальная дата</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="startDate" className="text-sm">С</Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -310,8 +310,8 @@ export default function AdminStatsPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">Конечная дата</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="endDate" className="text-sm">По</Label>
                   <Input
                     id="endDate"
                     type="date"
@@ -319,17 +319,6 @@ export default function AdminStatsPage() {
                     onChange={(e) => setEndDate(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <div className="mt-4 flex gap-2">
-                <Button onClick={handleDateChange}>
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Применить фильтр
-                </Button>
-                <Button onClick={resetToCurrentPeriod} variant="outline">
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Сбросить
-                </Button>
               </div>
             </CardContent>
           </Card>

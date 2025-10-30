@@ -18,27 +18,25 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="w-full">
       {/* Кнопка фильтров */}
-      <div className="flex justify-start">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          variant="outline"
-          className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700] min-w-[140px]"
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          Фильтры
-          {isOpen ? (
-            <ChevronUp className="ml-2 h-4 w-4" />
-          ) : (
-            <ChevronDown className="ml-2 h-4 w-4" />
-          )}
-        </Button>
-      </div>
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        variant="outline"
+        className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700] min-w-[140px]"
+      >
+        <Filter className="mr-2 h-4 w-4" />
+        Фильтры
+        {isOpen ? (
+          <ChevronUp className="ml-2 h-4 w-4" />
+        ) : (
+          <ChevronDown className="ml-2 h-4 w-4" />
+        )}
+      </Button>
 
       {/* Раскрывающиеся фильтры */}
       {isOpen && (
-        <div className="space-y-4 p-4 border border-[#FFD700]/20 rounded-lg bg-[#0f0f23]/50">
+        <div className="space-y-4 p-4 border border-[#FFD700]/20 rounded-lg bg-[#0f0f23]/50 mt-4">
           {/* Поиск */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFD700] h-4 w-4" />

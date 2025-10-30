@@ -56,12 +56,14 @@ const OrdersTableComponent = ({
   if (isLoading) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-6">
-            {filtersComponent}
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1">
+              {filtersComponent}
+            </div>
             <Button 
               onClick={onCreateOrder}
-              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"
             >
               <Plus className="mr-2 h-4 w-4" />
               Создать заказ
@@ -80,12 +82,14 @@ const OrdersTableComponent = ({
   if (ordersData?.orders?.length === 0) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-6">
-            {filtersComponent}
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1">
+              {filtersComponent}
+            </div>
             <Button 
               onClick={onCreateOrder}
-              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"
             >
               <Plus className="mr-2 h-4 w-4" />
               Создать заказ
@@ -112,12 +116,14 @@ const OrdersTableComponent = ({
 
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between mb-6">
-          {filtersComponent}
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            {filtersComponent}
+          </div>
           <Button 
             onClick={onCreateOrder}
-            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 ml-4"
+            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"
           >
             <Plus className="mr-2 h-4 w-4" />
             Создать заказ

@@ -7,6 +7,7 @@ export interface LoginCredentials {
   login: string;
   password: string;
   role: 'admin' | 'operator';
+  rememberMe?: boolean;
 }
 
 export interface User {
@@ -61,7 +62,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     // Only handle 401 errors for authenticated requests, not login requests
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/refresh')) {
       const refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken) {
         try {
@@ -69,21 +70,38 @@ api.interceptors.response.use(
             refreshToken,
           });
           
-          const { accessToken } = response.data.data;
-          await tokenStorage.setAccessToken(accessToken);
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+          const rememberMe = await tokenStorage.getRememberMe();
+          
+          await tokenStorage.setAccessToken(accessToken, rememberMe);
+          if (newRefreshToken) {
+            await tokenStorage.setRefreshToken(newRefreshToken, rememberMe);
+          }
           
           // Retry original request
           error.config.headers.Authorization = `Bearer ${accessToken}`;
           return api.request(error.config);
         } catch {
-          // Refresh failed, clear all tokens
+          // Refresh failed, clear all tokens and redirect to login
           await tokenStorage.clearAll();
-          // Don't redirect automatically, let the component handle it
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          // Throw special error to prevent showing error toast
+          const sessionError = new Error('SESSION_EXPIRED');
+          (sessionError as any).isSessionExpired = true;
+          return Promise.reject(sessionError);
         }
       } else {
-        // No refresh token, clear all tokens
+        // No refresh token, clear all tokens and redirect to login
         await tokenStorage.clearAll();
-        // Don't redirect automatically, let the component handle it
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        // Throw special error to prevent showing error toast
+        const sessionError = new Error('SESSION_EXPIRED');
+        (sessionError as any).isSessionExpired = true;
+        return Promise.reject(sessionError);
       }
     }
     return Promise.reject(error);
@@ -111,13 +129,14 @@ export const authApi = {
   },
 
   // Storage helpers
-  saveTokens: async (accessToken: string, refreshToken: string) => {
-    await tokenStorage.setAccessToken(accessToken);
-    await tokenStorage.setRefreshToken(refreshToken);
+  saveTokens: async (accessToken: string, refreshToken: string, rememberMe: boolean = false) => {
+    await tokenStorage.setAccessToken(accessToken, rememberMe);
+    await tokenStorage.setRefreshToken(refreshToken, rememberMe);
+    await tokenStorage.setRememberMe(rememberMe);
   },
 
-  saveUser: async (user: User) => {
-    await tokenStorage.setUser(user);
+  saveUser: async (user: User, rememberMe: boolean = false) => {
+    await tokenStorage.setUser(user, rememberMe);
   },
 
   getUser: async (): Promise<User | null> => {

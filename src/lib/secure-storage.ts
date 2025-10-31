@@ -223,8 +223,8 @@ export const secureStorage = SecureStorage.getInstance();
 // Специализированные методы для токенов
 export const tokenStorage = {
   // Access token - без TTL, JWT сам управляет валидностью
-  setAccessToken: async (token: string): Promise<boolean> => 
-    await secureStorage.setItem('accessToken', token, { encrypt: true, ttl: 24 * 60 * 60 * 1000 }), // 24 часа (только для хранения)
+  setAccessToken: async (token: string, rememberMe: boolean = false): Promise<boolean> => 
+    await secureStorage.setItem('accessToken', token, { encrypt: true, ttl: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 }), // 7 дней или 24 часа
   
   getAccessToken: async (): Promise<unknown> => 
     await secureStorage.getItem('accessToken'),
@@ -233,8 +233,8 @@ export const tokenStorage = {
     secureStorage.removeItem('accessToken'),
 
   // Refresh token
-  setRefreshToken: async (token: string): Promise<boolean> => 
-    await secureStorage.setItem('refreshToken', token, { encrypt: true, ttl: 7 * 24 * 60 * 60 * 1000 }), // 7 дней
+  setRefreshToken: async (token: string, rememberMe: boolean = false): Promise<boolean> => 
+    await secureStorage.setItem('refreshToken', token, { encrypt: true, ttl: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000 }), // 30 дней или 7 дней
   
   getRefreshToken: async (): Promise<unknown> => 
     await secureStorage.getItem('refreshToken'),
@@ -243,20 +243,30 @@ export const tokenStorage = {
     secureStorage.removeItem('refreshToken'),
 
   // User data (менее критично, можно не шифровать)
-  setUser: async (user: unknown): Promise<boolean> => 
-    await secureStorage.setItem('user', user, { encrypt: false, ttl: 24 * 60 * 60 * 1000 }), // 24 часа
+  setUser: async (user: unknown, rememberMe: boolean = false): Promise<boolean> => 
+    await secureStorage.setItem('user', user, { encrypt: false, ttl: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 }), // 7 дней или 24 часа
   
   getUser: async (): Promise<unknown> => 
     await secureStorage.getItem('user'),
   
   removeUser: (): boolean => 
     secureStorage.removeItem('user'),
+  
+  // Remember me preference
+  setRememberMe: async (remember: boolean): Promise<boolean> =>
+    await secureStorage.setItem('rememberMe', remember, { encrypt: false }),
+  
+  getRememberMe: async (): Promise<boolean> => {
+    const value = await secureStorage.getItem('rememberMe');
+    return value === true;
+  },
 
   // Очистка всех токенов
   clearAll: (): boolean => {
     secureStorage.removeItem('accessToken');
     secureStorage.removeItem('refreshToken');
     secureStorage.removeItem('user');
+    secureStorage.removeItem('rememberMe');
     return true;
   },
 

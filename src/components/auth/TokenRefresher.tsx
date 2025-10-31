@@ -6,7 +6,27 @@ import { tokenStorage } from '@/lib/secure-storage';
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
-const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 минут (обновляем до истечения 15-минутного токена)
+const CHECK_INTERVAL = 60 * 1000; // Проверяем каждую минуту
+
+// Декодирование JWT токена
+function decodeJWT(token: string): { exp?: number } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
 
 export function TokenRefresher() {
   const { isAuthenticated } = useAuthStore();
@@ -22,38 +42,52 @@ export function TokenRefresher() {
       return;
     }
 
-    // Функция обновления токена
-    const refreshToken = async () => {
+    // Функция проверки и обновления токена
+    const checkAndRefreshToken = async () => {
       try {
+        const accessToken = await tokenStorage.getAccessToken();
         const refresh = await tokenStorage.getRefreshToken();
-        if (!refresh) {
-          console.log('[TokenRefresher] No refresh token, skipping...');
+        
+        if (!accessToken || !refresh) {
+          console.log('[TokenRefresher] No tokens, skipping...');
           return;
         }
 
-        console.log('[TokenRefresher] Refreshing access token...');
-        
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken: refresh
-        });
+        // Декодируем токен и проверяем время истечения
+        const decoded = decodeJWT(accessToken as string);
+        if (decoded?.exp) {
+          const expiryTime = decoded.exp * 1000; // В миллисекунды
+          const currentTime = Date.now();
+          const timeUntilExpiry = expiryTime - currentTime;
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-        
-        await tokenStorage.setAccessToken(accessToken);
-        await tokenStorage.setRefreshToken(newRefreshToken);
-        
-        console.log('[TokenRefresher] Token refreshed successfully');
+          // Обновляем токен за 2 минуты до истечения
+          if (timeUntilExpiry > 0 && timeUntilExpiry < 2 * 60 * 1000) {
+            console.log('[TokenRefresher] Token expires soon, refreshing...');
+            
+            const response = await axios.post(`${API_URL}/auth/refresh`, {
+              refreshToken: refresh
+            });
+
+            const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.data;
+            const rememberMe = await tokenStorage.getRememberMe();
+            
+            await tokenStorage.setAccessToken(newAccessToken, rememberMe);
+            await tokenStorage.setRefreshToken(newRefreshToken, rememberMe);
+            
+            console.log('[TokenRefresher] Token refreshed successfully');
+          }
+        }
       } catch (error) {
         console.error('[TokenRefresher] Failed to refresh token:', error);
         // Не выкидываем пользователя - interceptor в api.ts сам обработает 401
       }
     };
 
-    // Обновляем токен сразу при монтировании (если нужно)
-    refreshToken();
+    // Проверяем токен сразу при монтировании
+    checkAndRefreshToken();
 
-    // Запускаем периодическое обновление
-    intervalRef.current = setInterval(refreshToken, REFRESH_INTERVAL);
+    // Запускаем периодическую проверку
+    intervalRef.current = setInterval(checkAndRefreshToken, CHECK_INTERVAL);
 
     return () => {
       if (intervalRef.current) {

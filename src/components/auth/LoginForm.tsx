@@ -54,15 +54,20 @@ export function LoginForm() {
       
       const response = await authApi.login(loginData);
       
-      // Save tokens and user data securely
-      await authApi.saveTokens(response.data.accessToken, response.data.refreshToken);
-      await authApi.saveUser(response.data.user);
+      // Save tokens and user data securely with rememberMe preference
+      await authApi.saveTokens(response.data.accessToken, response.data.refreshToken, rememberMe);
+      await authApi.saveUser(response.data.user, rememberMe);
       loginUser(response.data.user);
       
       // Redirect based on role
       router.push('/');
       
     } catch (error: unknown) {
+      // Don't show error if session expired (already redirecting to login)
+      if ((error as any)?.message === 'SESSION_EXPIRED' || (error as any)?.isSessionExpired) {
+        return;
+      }
+      
       if ((error as { response?: { status?: number; data?: { message?: string } } }).response) {
         const status = (error as { response: { status: number; data?: { message?: string } } }).response.status;
         const errorMessage = (error as { response: { data?: { message?: string } } }).response.data?.message || 'Ошибка авторизации';

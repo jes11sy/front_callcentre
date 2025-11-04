@@ -7,7 +7,7 @@ import authApi from '@/lib/auth';
 import { notifications } from '@/components/ui/notifications';
 
 export const useCallsData = () => {
-  const { socket, on, off, isConnected } = useGlobalSocket();
+  const { socket, isConnected } = useGlobalSocket();
   
   // States
   const [calls, setCalls] = useState<Call[]>([]);
@@ -78,17 +78,24 @@ export const useCallsData = () => {
 
   // Socket events
   useEffect(() => {
-    const unsubNewCall = on('call:new', (call: any) => {
-      console.log('📞 New call:', call);
+    if (!socket) {
+      console.warn('⚠️ Socket not available yet');
+      return;
+    }
+
+    console.log('✅ Registering call events listeners');
+
+    const handleNewCall = (call: any) => {
+      console.log('📞 New call received in useCallsData:', call);
       
       setCalls(prevCalls => [call, ...prevCalls]);
       setTotalCalls(prev => prev + 1);
       setNewCallsCount(prev => prev + 1);
       
       notifications.info('Новый звонок получен');
-    });
+    };
 
-    const unsubUpdatedCall = on('call:updated', (call: any) => {
+    const handleUpdatedCall = (call: any) => {
       console.log('📞 Call updated:', call);
       
       setCalls(prevCalls => 
@@ -96,9 +103,9 @@ export const useCallsData = () => {
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    });
+    };
 
-    const unsubEndedCall = on('call:ended', (call: any) => {
+    const handleEndedCall = (call: any) => {
       console.log('📞 Call ended:', call);
       
       setCalls(prevCalls => 
@@ -106,14 +113,18 @@ export const useCallsData = () => {
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    });
+    };
+
+    socket.on('call:new', handleNewCall);
+    socket.on('call:updated', handleUpdatedCall);
+    socket.on('call:ended', handleEndedCall);
 
     return () => {
-      unsubNewCall();
-      unsubUpdatedCall();
-      unsubEndedCall();
+      socket.off('call:new', handleNewCall);
+      socket.off('call:updated', handleUpdatedCall);
+      socket.off('call:ended', handleEndedCall);
     };
-  }, [on, off]);
+  }, [socket]);
 
   return {
     calls,

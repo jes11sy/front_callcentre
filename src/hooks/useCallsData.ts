@@ -87,29 +87,41 @@ export const useCallsData = () => {
       setSocketConnected(false);
     });
 
-    socket.on('mango-new-call', (data: { call: Call }) => {
-      console.log('📞 New call from Mango webhook:', data);
+    // Слушаем события от realtime-service
+    socket.on('call:new', (call: Call) => {
+      console.log('📞 New call:', call);
       
-      setCalls(prevCalls => [data.call, ...prevCalls]);
+      setCalls(prevCalls => [call, ...prevCalls]);
       setTotalCalls(prev => prev + 1);
       setNewCallsCount(prev => prev + 1);
       
       notifications.info('Новый звонок получен');
     });
 
-    socket.on('mango-call-updated', (data: { callId: number; call: Call }) => {
-      console.log('📞 Call updated from Mango webhook:', data);
+    socket.on('call:updated', (call: Call) => {
+      console.log('📞 Call updated:', call);
       
       setCalls(prevCalls => 
-        prevCalls.map(call => 
-          call.id === data.callId ? data.call : call
+        prevCalls.map(c => 
+          c.id === call.id ? { ...c, ...call } : c
+        )
+      );
+    });
+
+    socket.on('call:ended', (call: Call) => {
+      console.log('📞 Call ended:', call);
+      
+      setCalls(prevCalls => 
+        prevCalls.map(c => 
+          c.id === call.id ? { ...c, ...call } : c
         )
       );
     });
 
     return () => {
-      socket.off('mango-new-call');
-      socket.off('mango-call-updated');
+      socket.off('call:new');
+      socket.off('call:updated');
+      socket.off('call:ended');
     };
   }, [socket]);
 

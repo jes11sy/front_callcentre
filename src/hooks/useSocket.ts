@@ -1,10 +1,10 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
 export const useSocket = () => {
-  const socketRef = useRef<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     // Получаем токен из localStorage
@@ -33,31 +33,31 @@ export const useSocket = () => {
     };
 
     // Initialize socket connection
-    socketRef.current = io(SOCKET_URL, socketConfig);
+    const newSocket = io(SOCKET_URL, socketConfig);
 
     // Обработка подключения
-    socketRef.current.on('connect', () => {
+    newSocket.on('connect', () => {
       console.log('✅ WebSocket connected');
     });
 
-    socketRef.current.on('disconnect', (reason) => {
+    newSocket.on('disconnect', (reason) => {
       console.log('❌ WebSocket disconnected:', reason);
     });
 
-    socketRef.current.on('error', (error) => {
+    newSocket.on('error', (error) => {
       console.error('❌ WebSocket error:', error);
     });
 
+    // Устанавливаем socket в state чтобы вызвать ре-рендер
+    setSocket(newSocket);
+
     // Cleanup on unmount
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      newSocket.disconnect();
+      setSocket(null);
     };
   }, []);
 
-  // Мемоизируем возвращаемое значение
-  return useMemo(() => socketRef.current, []);
+  return socket;
 };
 

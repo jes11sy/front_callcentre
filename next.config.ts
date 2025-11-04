@@ -147,7 +147,7 @@ const nextConfig: NextConfig = {
               // Next.js 15+ не требует unsafe директив для нормальной работы
               isDevelopment
                 ? "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval' 'unsafe-inline'" // unsafe-eval для hot reload в dev
-                : "script-src 'self' 'unsafe-inline'", // Next.js требует только unsafe-inline для работы
+                : "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-eval нужен для Socket.IO
               // Для Tailwind и CSS-in-JS в production нужен hash или nonce
               // Временно разрешаем unsafe-inline только для стилей (lower risk чем для scripts)
               isDevelopment

@@ -146,8 +146,8 @@ const nextConfig: NextConfig = {
               // ✅ ИСПРАВЛЕНО: Убраны 'unsafe-eval' и 'unsafe-inline' для защиты от XSS
               // Next.js 15+ не требует unsafe директив для нормальной работы
               isDevelopment
-                ? "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'" // unsafe-eval только для hot reload в dev
-                : "script-src 'self' https://cdn.jsdelivr.net",
+                ? "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval' 'unsafe-inline'" // unsafe-eval для hot reload в dev
+                : "script-src 'self' 'unsafe-inline'", // Next.js требует только unsafe-inline для работы
               // Для Tailwind и CSS-in-JS в production нужен hash или nonce
               // Временно разрешаем unsafe-inline только для стилей (lower risk чем для scripts)
               isDevelopment
@@ -157,7 +157,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https:",
               isDevelopment 
                 ? "connect-src 'self' https: wss: ws: http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:*"
-                : "connect-src 'self' https: wss: ws:",
+                : "connect-src 'self' https://api.lead-schem.ru wss://api.lead-schem.ru https://s3.twcstorage.ru",
               "media-src 'self' blob: data: https://s3.twcstorage.ru",
               "object-src 'none'",
               "base-uri 'self'",

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSocket } from '@/hooks/useSocket';
+import { useGlobalSocket } from '@/hooks/useGlobalSocket';
 import { Call, CallsResponse } from '@/types/telephony';
 import authApi from '@/lib/auth';
 import { notifications } from '@/components/ui/notifications';
 
 export const useCallsData = () => {
-  const socket = useSocket();
+  const { socket, on, off, isConnected } = useGlobalSocket();
   
   // States
   const [calls, setCalls] = useState<Call[]>([]);
@@ -71,70 +71,49 @@ export const useCallsData = () => {
     setNewCallsCount(0);
   }, []);
 
-  // Socket setup
+  // Socket connection status
   useEffect(() => {
-    if (!socket) {
-      setSocketConnected(false);
-      return;
-    }
-    setSocketConnected(true);
+    setSocketConnected(isConnected);
+  }, [isConnected]);
 
-    socket.on('connect', () => {
-      setSocketConnected(true);
-    });
-
-    socket.on('disconnect', () => {
-      setSocketConnected(false);
-    });
-
-    return () => {
-      // Cleanup
-    };
-  }, [socket]);
-
-  // Слушаем custom events от useSocket
+  // Socket events
   useEffect(() => {
-    const handleNewCall = (event: any) => {
-      const call = event.detail as Call;
-      console.log('📞 Custom event: New call:', call);
+    const unsubNewCall = on('call:new', (call: any) => {
+      console.log('📞 New call:', call);
       
       setCalls(prevCalls => [call, ...prevCalls]);
       setTotalCalls(prev => prev + 1);
       setNewCallsCount(prev => prev + 1);
-    };
+      
+      notifications.info('Новый звонок получен');
+    });
 
-    const handleUpdatedCall = (event: any) => {
-      const call = event.detail as Call;
-      console.log('📞 Custom event: Call updated:', call);
+    const unsubUpdatedCall = on('call:updated', (call: any) => {
+      console.log('📞 Call updated:', call);
       
       setCalls(prevCalls => 
         prevCalls.map(c => 
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    };
+    });
 
-    const handleEndedCall = (event: any) => {
-      const call = event.detail as Call;
-      console.log('📞 Custom event: Call ended:', call);
+    const unsubEndedCall = on('call:ended', (call: any) => {
+      console.log('📞 Call ended:', call);
       
       setCalls(prevCalls => 
         prevCalls.map(c => 
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    };
-
-    window.addEventListener('socket:call:new', handleNewCall);
-    window.addEventListener('socket:call:updated', handleUpdatedCall);
-    window.addEventListener('socket:call:ended', handleEndedCall);
+    });
 
     return () => {
-      window.removeEventListener('socket:call:new', handleNewCall);
-      window.removeEventListener('socket:call:updated', handleUpdatedCall);
-      window.removeEventListener('socket:call:ended', handleEndedCall);
+      unsubNewCall();
+      unsubUpdatedCall();
+      unsubEndedCall();
     };
-  }, []);
+  }, [on, off]);
 
   return {
     calls,

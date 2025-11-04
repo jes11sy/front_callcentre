@@ -7,9 +7,11 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC
 let globalSocket: Socket | null = null;
 
 export const useSocket = () => {
+  console.log('🔧 useSocket called');
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
+    console.log('🔧 useSocket useEffect running');
     if (globalSocket) {
       socketRef.current = globalSocket;
       return;

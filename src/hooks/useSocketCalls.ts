@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { notifications } from '@/components/ui/notifications';
 import { Call } from '@/types/telephony';
 
 interface UseSocketCallsProps {
-  on: (event: string, callback: (...args: unknown[]) => void) => (() => void);
+  socket: { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string) => void } | null;
   isConnected: boolean;
   onNewCall: (call: Call) => void;
   onUpdatedCall: (call: Call) => void;
@@ -13,43 +13,43 @@ interface UseSocketCallsProps {
 }
 
 export function useSocketCalls({
-  on,
+  socket,
   isConnected,
   onNewCall,
   onUpdatedCall,
   onEndedCall
 }: UseSocketCallsProps) {
 
+  const handleNewCall = useCallback((...args: unknown[]) => {
+    const call = args[0] as Call;
+    onNewCall(call);
+    notifications.info('Новый звонок получен');
+  }, [onNewCall]);
+
+  const handleUpdatedCall = useCallback((...args: unknown[]) => {
+    const call = args[0] as Call;
+    onUpdatedCall(call);
+  }, [onUpdatedCall]);
+
+  const handleEndedCall = useCallback((...args: unknown[]) => {
+    const call = args[0] as Call;
+    onEndedCall(call);
+  }, [onEndedCall]);
+
   useEffect(() => {
-    if (!on) {
+    if (!socket) {
       return;
     }
 
-    const handleNewCall = (...args: unknown[]) => {
-      const call = args[0] as Call;
-      onNewCall(call);
-      notifications.info('Новый звонок получен');
-    };
-
-    const handleUpdatedCall = (...args: unknown[]) => {
-      const call = args[0] as Call;
-      onUpdatedCall(call);
-    };
-
-    const handleEndedCall = (...args: unknown[]) => {
-      const call = args[0] as Call;
-      onEndedCall(call);
-    };
-
-    const unsubNewCall = on('call:new', handleNewCall);
-    const unsubUpdatedCall = on('call:updated', handleUpdatedCall);
-    const unsubEndedCall = on('call:ended', handleEndedCall);
+    socket.on('call:new', handleNewCall);
+    socket.on('call:updated', handleUpdatedCall);
+    socket.on('call:ended', handleEndedCall);
 
     return () => {
-      unsubNewCall();
-      unsubUpdatedCall();
-      unsubEndedCall();
+      socket.off('call:new');
+      socket.off('call:updated');
+      socket.off('call:ended');
     };
-  }, [on, onNewCall, onUpdatedCall, onEndedCall]);
+  }, [socket, handleNewCall, handleUpdatedCall, handleEndedCall]);
 }
 

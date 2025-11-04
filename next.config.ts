@@ -143,8 +143,16 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+              // ✅ ИСПРАВЛЕНО: Убраны 'unsafe-eval' и 'unsafe-inline' для защиты от XSS
+              // Next.js 15+ не требует unsafe директив для нормальной работы
+              isDevelopment
+                ? "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'" // unsafe-eval только для hot reload в dev
+                : "script-src 'self' https://cdn.jsdelivr.net",
+              // Для Tailwind и CSS-in-JS в production нужен hash или nonce
+              // Временно разрешаем unsafe-inline только для стилей (lower risk чем для scripts)
+              isDevelopment
+                ? "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com"
+                : "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
               "img-src 'self' data: blob: https:",
               isDevelopment 
@@ -173,7 +181,35 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
+          },
+          // ✅ ДОБАВЛЕНО: Дополнительные security headers
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains'
           }
+        ],
+      },
+      // ✅ ДОБАВЛЕНО: HTTP кеширование для статики
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
         ],
       },
     ];

@@ -68,7 +68,7 @@ export const useOrders = () => {
       });
 
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -109,7 +109,7 @@ export const useOrders = () => {
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ export const useOrders = () => {
         }
       }
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

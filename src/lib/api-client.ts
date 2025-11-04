@@ -3,7 +3,7 @@ import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiR
 import { tokenStorage } from '@/lib/secure-storage';
 
 // Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
 // Получение токена авторизации
 async function getAuthToken(): Promise<string | null> {

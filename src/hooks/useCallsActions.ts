@@ -25,7 +25,7 @@ export const useCallsActions = () => {
       setSelectedCallForHistory(call);
       
       const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

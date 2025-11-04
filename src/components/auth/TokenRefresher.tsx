@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { tokenStorage } from '@/lib/secure-storage';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 const CHECK_INTERVAL = 60 * 1000; // Проверяем каждую минуту
 
 // Декодирование JWT токена

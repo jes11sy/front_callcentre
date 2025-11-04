@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { tokenStorage } from './secure-storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
 export interface LoginCredentials {
   login: string;

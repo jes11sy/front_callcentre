@@ -3,7 +3,7 @@ import { tokenStorage } from './secure-storage';
 
 // Создаем экземпляр axios с базовыми настройками
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ api.interceptors.response.use(
         
         // Обновляем токен
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/auth/refresh`,
           { refreshToken },
           {
             headers: {

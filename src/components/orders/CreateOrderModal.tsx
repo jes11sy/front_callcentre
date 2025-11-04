@@ -80,7 +80,7 @@ export default function CreateOrderModal({
       const token = await tokenStorage.getAccessToken();
       const user = await tokenStorage.getUser();
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.test-shem.ru/api/v1'}/orders`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

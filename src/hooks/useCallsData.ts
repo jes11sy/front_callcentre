@@ -87,43 +87,54 @@ export const useCallsData = () => {
       setSocketConnected(false);
     });
 
-    // Слушаем события от realtime-service
-    socket.on('call:new', (call: Call) => {
-      console.log('📞 New call:', call);
+    return () => {
+      // Cleanup
+    };
+  }, [socket]);
+
+  // Слушаем custom events от useSocket
+  useEffect(() => {
+    const handleNewCall = (event: any) => {
+      const call = event.detail as Call;
+      console.log('📞 Custom event: New call:', call);
       
       setCalls(prevCalls => [call, ...prevCalls]);
       setTotalCalls(prev => prev + 1);
       setNewCallsCount(prev => prev + 1);
-      
-      notifications.info('Новый звонок получен');
-    });
+    };
 
-    socket.on('call:updated', (call: Call) => {
-      console.log('📞 Call updated:', call);
+    const handleUpdatedCall = (event: any) => {
+      const call = event.detail as Call;
+      console.log('📞 Custom event: Call updated:', call);
       
       setCalls(prevCalls => 
         prevCalls.map(c => 
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    });
+    };
 
-    socket.on('call:ended', (call: Call) => {
-      console.log('📞 Call ended:', call);
+    const handleEndedCall = (event: any) => {
+      const call = event.detail as Call;
+      console.log('📞 Custom event: Call ended:', call);
       
       setCalls(prevCalls => 
         prevCalls.map(c => 
           c.id === call.id ? { ...c, ...call } : c
         )
       );
-    });
+    };
+
+    window.addEventListener('socket:call:new', handleNewCall);
+    window.addEventListener('socket:call:updated', handleUpdatedCall);
+    window.addEventListener('socket:call:ended', handleEndedCall);
 
     return () => {
-      socket.off('call:new');
-      socket.off('call:updated');
-      socket.off('call:ended');
+      window.removeEventListener('socket:call:new', handleNewCall);
+      window.removeEventListener('socket:call:updated', handleUpdatedCall);
+      window.removeEventListener('socket:call:ended', handleEndedCall);
     };
-  }, [socket]);
+  }, []);
 
   return {
     calls,

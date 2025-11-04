@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { notifications } from '@/components/ui/notifications';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
@@ -47,11 +48,33 @@ export const useSocket = () => {
       console.error('❌ WebSocket error:', error);
     });
 
+    // РЕГИСТРИРУЕМ LISTENERS ТУТ ЖЕ
+    newSocket.on('call:new', (call: any) => {
+      console.log('📞 NEW CALL EVENT RECEIVED:', call);
+      notifications.info('Новый звонок получен');
+      
+      // Dispatch custom event для useCallsData
+      window.dispatchEvent(new CustomEvent('socket:call:new', { detail: call }));
+    });
+
+    newSocket.on('call:updated', (call: any) => {
+      console.log('📞 CALL UPDATED EVENT RECEIVED:', call);
+      window.dispatchEvent(new CustomEvent('socket:call:updated', { detail: call }));
+    });
+
+    newSocket.on('call:ended', (call: any) => {
+      console.log('📞 CALL ENDED EVENT RECEIVED:', call);
+      window.dispatchEvent(new CustomEvent('socket:call:ended', { detail: call }));
+    });
+
     globalSocket = newSocket;
     socketRef.current = newSocket;
 
     return () => {
       if (globalSocket) {
+        globalSocket.off('call:new');
+        globalSocket.off('call:updated');
+        globalSocket.off('call:ended');
         globalSocket.disconnect();
         globalSocket = null;
       }

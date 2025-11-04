@@ -1,26 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
+let globalSocket: Socket | null = null;
+
 export const useSocket = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // Получаем токен из localStorage
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    
-    if (!token) {
-      console.warn('⚠️ No auth token found, WebSocket authentication will fail');
+    if (globalSocket) {
+      socketRef.current = globalSocket;
       return;
     }
 
-    // Конфигурация сокета с токеном
-    const socketConfig = {
-      auth: {
-        token: token,
-      },
-      transports: ['websocket'] as ('websocket')[],
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
+      console.warn('⚠️ No auth token found');
+      return;
+    }
+
+    const newSocket = io(SOCKET_URL, {
+      auth: { token },
+      transports: ['websocket'],
       withCredentials: true,
       reconnection: true,
       reconnectionDelay: 2000,
@@ -30,12 +33,8 @@ export const useSocket = () => {
       autoConnect: true,
       forceNew: false,
       path: '/socket.io/'
-    };
+    });
 
-    // Initialize socket connection
-    const newSocket = io(SOCKET_URL, socketConfig);
-
-    // Обработка подключения
     newSocket.on('connect', () => {
       console.log('✅ WebSocket connected');
     });
@@ -48,16 +47,16 @@ export const useSocket = () => {
       console.error('❌ WebSocket error:', error);
     });
 
-    // Устанавливаем socket в state чтобы вызвать ре-рендер
-    setSocket(newSocket);
+    globalSocket = newSocket;
+    socketRef.current = newSocket;
 
-    // Cleanup on unmount
     return () => {
-      newSocket.disconnect();
-      setSocket(null);
+      if (globalSocket) {
+        globalSocket.disconnect();
+        globalSocket = null;
+      }
     };
   }, []);
 
-  return socket;
+  return socketRef.current || globalSocket;
 };
-

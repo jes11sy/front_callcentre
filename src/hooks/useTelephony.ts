@@ -10,7 +10,7 @@ import { useSocketCalls } from './useSocketCalls';
 
 export const useTelephony = () => {
   // Socket
-  const { socket, isConnected } = useGlobalSocket();
+  const { on, isConnected } = useGlobalSocket();
   
   // Разделенные хуки
   const callsData = useCallsData();
@@ -19,7 +19,7 @@ export const useTelephony = () => {
   
   // Socket events
   useSocketCalls({
-    socket: socket as { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string) => void } | null,
+    on,
     isConnected,
     onNewCall: callsData.handleNewCall,
     onUpdatedCall: callsData.handleUpdatedCall,

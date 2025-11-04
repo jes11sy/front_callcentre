@@ -20,10 +20,17 @@ export function useSocketCalls({
   onEndedCall
 }: UseSocketCallsProps) {
 
+  console.log('🔧 useSocketCalls called, socket:', socket ? 'EXISTS' : 'NULL');
+
   useEffect(() => {
+    console.log('🔧 useSocketCalls useEffect, socket:', socket ? 'EXISTS' : 'NULL');
+    
     if (!socket) {
+      console.warn('⚠️ useSocketCalls: socket is NULL');
       return;
     }
+
+    console.log('✅ useSocketCalls: Registering listeners');
 
     const handleNewCall = (call: Call) => {
       console.log('📞 New call:', call);

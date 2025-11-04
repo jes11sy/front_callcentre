@@ -5,12 +5,26 @@ import { Call } from '@/types/telephony';
 import { useCallsData } from './useCallsData';
 import { useCallsFilters } from './useCallsFilters';
 import { useCallsActions } from './useCallsActions';
+import { useGlobalSocket } from './useGlobalSocket';
+import { useSocketCalls } from './useSocketCalls';
 
 export const useTelephony = () => {
+  // Socket
+  const { socket, isConnected } = useGlobalSocket();
+  
   // Разделенные хуки
   const callsData = useCallsData();
   const filters = useCallsFilters();
   const actions = useCallsActions();
+  
+  // Socket events
+  useSocketCalls({
+    socket: socket as { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string) => void } | null,
+    isConnected,
+    onNewCall: callsData.handleNewCall,
+    onUpdatedCall: callsData.handleUpdatedCall,
+    onEndedCall: callsData.handleEndedCall
+  });
 
   // Локальные состояния для группировки
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());

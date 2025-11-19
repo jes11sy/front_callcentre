@@ -146,12 +146,16 @@ export function CreateOrderModal({
     onOpenChange(false);
   };
 
-  // Автозаполнение формы при изменении звонка
+  // Автозаполнение формы при изменении звонка1
   useEffect(() => {
     if (call && open) {
       setValue('city', call.city || '');
       setValue('avitoName', call.avitoName || '');
       setValue('phone', call.phoneClient || '');
+      // Автозаполнение РК из данных звонка
+      if (call.rk && (call.rk === 'Авито' || call.rk === 'Листовка')) {
+        setValue('rk', call.rk);
+      }
     }
   }, [call, open, setValue]);
 

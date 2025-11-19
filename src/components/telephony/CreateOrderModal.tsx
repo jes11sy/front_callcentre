@@ -90,9 +90,15 @@ export function CreateOrderModal({
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: 'Авито',
+      rk: call?.rk && (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито',
+      city: call?.city || '',
+      avitoName: call?.avitoName || '',
       typeOrder: 'Впервые',
-      typeEquipment: 'КП'
+      typeEquipment: 'КП',
+      clientName: '',
+      address: '',
+      dateMeeting: '',
+      problem: ''
     }
   });
 
@@ -149,19 +155,10 @@ export function CreateOrderModal({
   // Автозаполнение формы при изменении звонка
   useEffect(() => {
     if (call && open) {
-      // Определяем РК из данных звонка
-      const rkValue = (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk : 'Авито';
+      const rkValue = (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито';
       
-      console.log('Автозаполнение формы:', {
-        callRk: call.rk,
-        rkValue: rkValue,
-        city: call.city,
-        avitoName: call.avitoName
-      });
-      
-      // Используем reset для надежного обновления всех полей формы
       reset({
-        rk: rkValue as 'Авито' | 'Листовка',
+        rk: rkValue,
         city: call.city || '',
         avitoName: call.avitoName || '',
         typeOrder: 'Впервые',
@@ -264,7 +261,7 @@ export function CreateOrderModal({
             </Card>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
+          <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
           {/* Основная информация */}
           <Card className="bg-[#17212b] border-[#FFD700]/30">
             <CardHeader className="pb-1">
@@ -281,7 +278,12 @@ export function CreateOrderModal({
                     name="rk"
                     control={form.control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select 
+                        key={`rk-${call?.id}-${field.value}`}
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
                         <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
@@ -330,32 +332,17 @@ export function CreateOrderModal({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="clientName" className="text-sm font-medium text-gray-300">Имя клиента *</Label>
-                <Input
-                  id="clientName"
-                  {...register('clientName')}
-                  placeholder="Введите имя клиента"
-                  className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                />
-                {errors.clientName && (
-                  <p className="text-sm text-red-400">{errors.clientName.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="phone" className="text-sm font-medium text-gray-300">Телефон *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register('phone')}
-                  placeholder="Введите номер телефона"
-                  className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                />
-                {errors.phone && (
-                  <p className="text-sm text-red-400">{errors.phone.message}</p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="clientName" className="text-sm font-medium text-gray-300">Имя клиента *</Label>
+              <Input
+                id="clientName"
+                {...register('clientName')}
+                placeholder="Введите имя клиента"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+              />
+              {errors.clientName && (
+                <p className="text-sm text-red-400">{errors.clientName.message}</p>
+              )}
             </div>
             <div>
                 <Label htmlFor="address" className="text-sm font-medium text-gray-300">Адрес *</Label>

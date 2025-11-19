@@ -146,18 +146,33 @@ export function CreateOrderModal({
     onOpenChange(false);
   };
 
-  // Автозаполнение формы при изменении звонка1
+  // Автозаполнение формы при изменении звонка
   useEffect(() => {
     if (call && open) {
-      setValue('city', call.city || '');
-      setValue('avitoName', call.avitoName || '');
-      setValue('phone', call.phoneClient || '');
-      // Автозаполнение РК из данных звонка
-      if (call.rk && (call.rk === 'Авито' || call.rk === 'Листовка')) {
-        setValue('rk', call.rk);
-      }
+      // Определяем РК из данных звонка
+      const rkValue = (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk : 'Авито';
+      
+      console.log('Автозаполнение формы:', {
+        callRk: call.rk,
+        rkValue: rkValue,
+        city: call.city,
+        avitoName: call.avitoName
+      });
+      
+      // Используем reset для надежного обновления всех полей формы
+      reset({
+        rk: rkValue as 'Авито' | 'Листовка',
+        city: call.city || '',
+        avitoName: call.avitoName || '',
+        typeOrder: 'Впервые',
+        typeEquipment: 'КП',
+        clientName: '',
+        address: '',
+        dateMeeting: '',
+        problem: ''
+      });
     }
-  }, [call, open, setValue]);
+  }, [call, open, reset]);
 
   // Форматирование даты для отображения
   const formatDate = (dateString: string) => {

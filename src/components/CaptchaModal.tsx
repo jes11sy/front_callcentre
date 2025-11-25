@@ -19,7 +19,7 @@ export default function CaptchaModal() {
   useEffect(() => {
     const checkForCaptcha = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parser/captcha/pending`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/captcha/pending`);
         const data = await response.json();
         
         if (data.success && data.data && data.data.length > 0) {
@@ -44,7 +44,7 @@ export default function CaptchaModal() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parser/captcha/submit`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/captcha/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

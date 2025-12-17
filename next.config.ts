@@ -157,7 +157,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https:",
               isDevelopment 
                 ? "connect-src 'self' https: wss: ws: http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:*"
-                : "connect-src 'self' https://api.lead-schem.ru wss://api.lead-schem.ru https://s3.twcstorage.ru",
+                : "connect-src 'self' https://api.lead-schem.ru wss://api.lead-schem.ru https://api.test-shem.ru wss://api.test-shem.ru https://s3.twcstorage.ru",
               "media-src 'self' blob: data: https://s3.twcstorage.ru",
               "object-src 'none'",
               "base-uri 'self'",

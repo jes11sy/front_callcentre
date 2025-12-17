@@ -6,7 +6,6 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
-import CaptchaModal from "@/components/CaptchaModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,7 +42,6 @@ export default function RootLayout({
           <AuthProvider>
             <SocketProviders />
             {children}
-            <CaptchaModal />
           </AuthProvider>
         </QueryProvider>
         <Toaster position="top-right" />

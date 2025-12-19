@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 
@@ -12,9 +13,15 @@ const CHECK_INTERVAL = 5 * 60 * 1000; // 🍪 Проверяем каждые 5 
  */
 export function TokenRefresher() {
   const { isAuthenticated, setUser } = useAuthStore();
+  const pathname = usePathname();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    // 🍪 Пропускаем на страницах логина
+    if (pathname === '/login' || pathname === '/admin/login') {
+      return;
+    }
+
     if (!isAuthenticated) {
       // Очищаем интервал если пользователь вышел
       if (intervalRef.current) {
@@ -55,7 +62,7 @@ export function TokenRefresher() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isAuthenticated, setUser]);
+  }, [isAuthenticated, setUser, pathname]);
 
   return null; // Компонент не рендерит ничего
 }

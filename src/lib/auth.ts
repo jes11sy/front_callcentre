@@ -59,10 +59,17 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Обрабатываем 401 ошибки (кроме login и refresh)
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/refresh')) {
+    const requestUrl = error.config?.url || '';
+    
+    // Пропускаем обработку для страниц логина
+    if (requestUrl.includes('/auth/login') || requestUrl.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+    
+    // Обрабатываем 401 ошибки (токен истек или отсутствует)
+    if (error.response?.status === 401) {
       try {
-        // Обновляем токен через httpOnly cookies
+        // Пробуем обновить токен через httpOnly cookies
         await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
           headers: {
             'Content-Type': 'application/json',
@@ -73,9 +80,9 @@ api.interceptors.response.use(
         
         // Повторяем исходный запрос с обновленными cookies
         return api.request(error.config);
-      } catch {
-        // Refresh failed, redirect to login
-        if (typeof window !== 'undefined') {
+      } catch (refreshError) {
+        // Refresh failed - редиректим на логин только если мы не на странице логина
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }
         // Throw special error to prevent showing error toast

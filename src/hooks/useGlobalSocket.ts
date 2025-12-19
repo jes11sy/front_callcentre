@@ -91,8 +91,12 @@ class SocketManager {
 
       this.setupEventHandlers();
       
+      console.log('🔌 Socket configured, calling connect()...');
+      
       // Явно подключаемся
       this.socket.connect();
+      
+      console.log('🔌 Connect() called, socket.connected:', this.socket.connected);
       
       this.reconnectAttempts = 0;
       
@@ -107,9 +111,16 @@ class SocketManager {
   }
 
   private setupEventHandlers() {
-    if (!this.socket || this.handlersSetup) {
-      console.log('⏭️ Handlers already setup, skipping...');
+    if (!this.socket) {
+      console.log('⏭️ No socket, skipping handler setup...');
       return;
+    }
+
+    // ⚠️ Удаляем старые обработчики если они были
+    if (this.handlersSetup) {
+      console.log('🔄 Removing old handlers before setup...');
+      this.socket.removeAllListeners();
+      this.handlersSetup = false;
     }
 
     console.log('🔧 Setting up socket event handlers...');
@@ -155,6 +166,7 @@ class SocketManager {
       console.log('📨 Socket event received:', event, args);
       this.emit(event, ...args);
     });
+  }
   }
 
   // Подписка на события

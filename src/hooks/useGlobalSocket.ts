@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { tokenStorage } from '@/lib/secure-storage';
+// 🍪 tokenStorage больше не нужен - используем httpOnly cookies
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
@@ -109,15 +109,9 @@ class SocketManager {
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
-      // 🔐 Отправляем токен для аутентификации
-      const token = await tokenStorage.getAccessToken();
-      console.log('🔑 Token found:', token ? 'Yes' : 'No');
-      if (token) {
-        console.log('📤 Sending authenticate event with token');
-        this.socket?.emit('authenticate', { token });
-      } else {
-        console.warn('⚠️ No token found in storage');
-      }
+      // 🍪 С httpOnly cookies токен автоматически отправляется в заголовках
+      // Socket.io сервер должен быть настроен на чтение cookies из заголовков
+      console.log('🍪 Authentication via httpOnly cookies');
     });
 
     this.socket.on('authenticated', (data: any) => {

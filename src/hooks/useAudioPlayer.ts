@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { AudioPlayerState, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 const initialAudioState: AudioPlayerState = {
   audio: null,
@@ -25,35 +25,21 @@ export const useAudioPlayer = () => {
     };
   }, [audioPlayer.audio]);
 
+  // 🍪 Загрузка записи через axios
   const loadRecording = useCallback(async (call: Call) => {
     try {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/recordings/call/${call.id}/download`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      // Пробуем получить JSON response (S3 URL)
+      const response = await api.get(`/recordings/call/${call.id}/download`, {
+        responseType: 'json',
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to load recording');
-      }
 
       let audioUrl: string;
       
-      // Проверяем, возвращает ли сервер JSON (S3) или аудио поток (локальный файл)
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        // S3 файл - получаем подписанный URL
-        const data = await response.json();
-        if (data.success && data.url) {
-          audioUrl = data.url;
-        } else {
-          throw new Error(data.message || 'Не удалось получить URL записи');
-        }
+      // Если получили JSON с URL - используем его
+      if (response.data.success && response.data.url) {
+        audioUrl = response.data.url;
       } else {
-        // Локальный файл - создаем blob URL
-        const audioBlob = await response.blob();
-        audioUrl = URL.createObjectURL(audioBlob);
+        throw new Error(response.data.message || 'Не удалось получить URL записи');
       }
       
       const audio = new Audio(audioUrl);

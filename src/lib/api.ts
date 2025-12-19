@@ -1,21 +1,22 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { tokenStorage } from './secure-storage';
 
-// Создаем экземпляр axios с базовыми настройками
+// 🍪 Создаем экземпляр axios с поддержкой httpOnly cookies
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
+    'X-Use-Cookies': 'true', // Указываем что используем cookies
   },
+  withCredentials: true, // Отправляем cookies с каждым запросом
 });
 
-// Request interceptor - добавляем токен в каждый запрос
+// 🍪 Request interceptor - добавляем X-Use-Cookies header
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = await tokenStorage.getAccessToken() as string | null;
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Токены теперь в httpOnly cookies - не нужно добавлять вручную
+    if (config.headers) {
+      config.headers['X-Use-Cookies'] = 'true';
     }
     return config;
   },
@@ -24,19 +25,19 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - автоматическое обновление токена при 401
+// 🍪 Response interceptor - автоматическое обновление токена при 401
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value?: any) => void;
   reject: (reason?: any) => void;
 }> = [];
 
-const processQueue = (error: AxiosError | null, token: string | null = null) => {
+const processQueue = (error: AxiosError | null) => {
   failedQueue.forEach((promise) => {
     if (error) {
       promise.reject(error);
     } else {
-      promise.resolve(token);
+      promise.resolve();
     }
   });
   failedQueue = [];
@@ -62,10 +63,8 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
+          .then(() => {
+            // Повторяем запрос с обновленными cookies
             return api(originalRequest);
           })
           .catch((err) => {
@@ -76,56 +75,35 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = await tokenStorage.getRefreshToken() as string | null;
-
-      if (!refreshToken) {
-        // Нет refresh токена - очищаем хранилище и редирект
-        tokenStorage.clearAll();
-        window.location.href = '/login';
-        return Promise.reject(error);
-      }
-
       try {
-        console.log('[API] Refreshing access token...');
+        console.log('[API] Refreshing access token via cookies...');
         
-        // Обновляем токен
-        const response = await axios.post(
+        // 🍪 Обновляем токен через httpOnly cookies
+        await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/auth/refresh`,
-          { refreshToken },
+          {}, // Пустое тело для cookie-режима
           {
             headers: {
               'Content-Type': 'application/json',
+              'X-Use-Cookies': 'true',
             },
+            withCredentials: true, // Отправляем cookies
           }
         );
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-
-        // Сохраняем новые токены
-        await tokenStorage.setAccessToken(accessToken);
-        await tokenStorage.setRefreshToken(newRefreshToken);
-
-        console.log('[API] Access token refreshed successfully');
-
-        // Обновляем заголовок в axios
-        if (api.defaults.headers.common) {
-          api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        }
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
+        console.log('[API] Access token refreshed successfully via cookies');
 
         // Обрабатываем очередь неудавшихся запросов
-        processQueue(null, accessToken);
+        processQueue(null);
 
-        // Повторяем исходный запрос
+        // Повторяем исходный запрос с обновленными cookies
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh токен невалиден - выходим
         console.error('[API] Failed to refresh token:', refreshError);
-        processQueue(refreshError as AxiosError, null);
+        processQueue(refreshError as AxiosError);
         
-        tokenStorage.clearAll();
+        // Очищаем локальные данные и перенаправляем на логин
         window.location.href = '/login';
         
         return Promise.reject(refreshError);
@@ -138,50 +116,59 @@ api.interceptors.response.use(
   }
 );
 
-// Вспомогательные функции для работы с токенами
+// 🍪 Вспомогательные функции для работы с httpOnly cookies
 export const authUtils = {
   /**
-   * Сохранить токены после логина
+   * 🍪 Сохранить токены после логина
+   * Токены устанавливаются сервером в httpOnly cookies - этот метод не нужен
+   * Оставляем для обратной совместимости
    */
   setTokens: async (accessToken: string, refreshToken: string): Promise<void> => {
-    await tokenStorage.setAccessToken(accessToken);
-    await tokenStorage.setRefreshToken(refreshToken);
+    console.log('[Auth] Tokens are now stored in httpOnly cookies by the server');
+    // Ничего не делаем - токены в cookies
   },
 
   /**
-   * Получить access токен
+   * 🍪 Получить access токен
+   * Нельзя прочитать httpOnly cookies на клиенте
    */
   getAccessToken: async (): Promise<string | null> => {
-    return await tokenStorage.getAccessToken() as string | null;
+    console.warn('[Auth] Cannot read httpOnly cookies on client');
+    return null;
   },
 
   /**
-   * Получить refresh токен
+   * 🍪 Получить refresh токен
+   * Нельзя прочитать httpOnly cookies на клиенте
    */
   getRefreshToken: async (): Promise<string | null> => {
-    return await tokenStorage.getRefreshToken() as string | null;
+    console.warn('[Auth] Cannot read httpOnly cookies on client');
+    return null;
   },
 
   /**
-   * Проверить наличие токенов
+   * 🍪 Проверить наличие токенов
+   * Проверяем через запрос к API
    */
   hasTokens: async (): Promise<boolean> => {
-    const [accessToken, refreshToken] = await Promise.all([
-      tokenStorage.getAccessToken(),
-      tokenStorage.getRefreshToken()
-    ]);
-    return !!(accessToken && refreshToken);
+    try {
+      await api.get('/auth/profile');
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   /**
-   * Очистить токены (logout)
+   * 🍪 Очистить токены (logout)
+   * Локально ничего не храним
    */
   clearTokens: (): void => {
-    tokenStorage.clearAll();
+    console.log('[Auth] No local tokens to clear - using httpOnly cookies');
   },
 
   /**
-   * Logout с вызовом API
+   * 🍪 Logout с вызовом API для очистки cookies
    */
   logout: async (): Promise<void> => {
     try {
@@ -189,7 +176,6 @@ export const authUtils = {
     } catch (error) {
       console.error('[API] Logout error:', error);
     } finally {
-      authUtils.clearTokens();
       window.location.href = '/login';
     }
   },

@@ -36,7 +36,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -116,67 +116,30 @@ export default function ProfilePage() {
     resolver: zodResolver(passwordSchema)
   });
 
-  // Получение профиля
+  // 🍪 Получение профиля через axios
   const { data: profile, isLoading, error } = useQuery<Profile>({
     queryKey: ['profile'],
     queryFn: async () => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки профиля');
-      }
-
-      const result = await response.json();
-      return result.data || result;
+      const response = await api.get('/auth/profile');
+      return response.data.data || response.data;
     }
   });
 
-  // Получение статистики профиля (только для операторов)
+  // 🍪 Получение статистики профиля (только для операторов) через axios
   const { data: profileStats } = useQuery<ProfileStats>({
     queryKey: ['profileStats'],
     queryFn: async () => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки статистики профиля');
-      }
-
-      const result = await response.json();
-      return result.data || result;
+      const response = await api.get('/auth/profile/stats');
+      return response.data.data || response.data;
     },
     enabled: profile?.role === 'operator'
   });
 
-  // Обновление профиля
+  // 🍪 Обновление профиля через axios
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || errorData.error?.message || 'Ошибка обновления профиля');
-      }
-
-      const result = await response.json();
-      return result.data || result;
+      const response = await api.put('/auth/profile', data);
+      return response.data.data || response.data;
     },
     onSuccess: () => {
       toast.success('Профиль успешно обновлен');
@@ -189,20 +152,12 @@ export default function ProfilePage() {
     }
   });
 
-  // Смена пароля
+  // 🍪 Смена пароля через axios
   const changePasswordMutation = useMutation({
     mutationFn: async (data: PasswordFormData) => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword
-        })
+      const response = await api.put('/auth/profile', {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword
       });
 
       if (!response.ok) {

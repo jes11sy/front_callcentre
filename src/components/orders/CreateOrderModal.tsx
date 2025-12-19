@@ -23,7 +23,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { tokenStorage } from '@/lib/secure-storage';
+import { useAuthStore } from '@/store/authStore'; // 🍪 Используем authStore для получения user
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 const orderSchema = z.object({
   rk: z.string().min(1, 'РК обязателен'),
@@ -57,6 +58,7 @@ export default function CreateOrderModal({
 }: CreateOrderModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  const { user } = useAuthStore(); // 🍪 Получаем user из store
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -73,32 +75,18 @@ export default function CreateOrderModal({
     reset
   } = form;
 
+  // 🍪 Отправка заказа через axios
   const onSubmit = async (data: OrderFormData) => {
     try {
       setIsSubmitting(true);
 
-      const token = await tokenStorage.getAccessToken();
-      const user = await tokenStorage.getUser();
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ...data,
-          operatorNameId: user?.id || 0
-        })
+      const response = await api.post('/orders', {
+        ...data,
+        operatorNameId: user?.id || 0
       });
 
-      if (!response.ok) {
-        throw new Error('Ошибка при создании заказа');
-      }
-
-      const result = await response.json();
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(result.message || 'Заказ успешно создан');
+      toast.success(response.data.message || 'Заказ успешно создан');
       handleClose();
       onOrderCreated?.();
     } catch (error) {

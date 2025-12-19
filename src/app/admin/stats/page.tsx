@@ -30,8 +30,7 @@ import {
   Users,
   RefreshCw
 } from 'lucide-react';
-import { tokenStorage } from '@/lib/secure-storage';
-// toast removed - not used
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 interface OverallStats {
   period: {
@@ -123,6 +122,7 @@ export default function AdminStatsPage() {
   }, []);
 
   // Получение общей статистики
+  // 🍪 Получение общей статистики через axios
   const { data: overallStats, isLoading: isLoadingOverall, error: overallError, refetch: refetchOverall } = useQuery<OverallStats>({
     queryKey: ['overallStats', startDate, endDate],
     queryFn: async () => {
@@ -130,23 +130,13 @@ export default function AdminStatsPage() {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/overall?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки общей статистики');
-      }
-
-      return response.json();
+      const response = await api.get(`/stats/overall?${params}`);
+      return response.data;
     },
     enabled: !!startDate && !!endDate && viewMode === 'overall'
   });
 
-  // Получение статистики оператора
+  // 🍪 Получение статистики оператора через axios
   const { data: operatorStats, isLoading: isLoadingOperator, error: operatorError, refetch: refetchOperator } = useQuery<OperatorStats>({
     queryKey: ['operatorStats', selectedOperator, startDate, endDate],
     queryFn: async () => {
@@ -154,18 +144,8 @@ export default function AdminStatsPage() {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/operator/${selectedOperator}?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки статистики оператора');
-      }
-
-      return response.json();
+      const response = await api.get(`/stats/operator/${selectedOperator}?${params}`);
+      return response.data;
     },
     enabled: !!selectedOperator && !!startDate && !!endDate && viewMode === 'operator'
   });

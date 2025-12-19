@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import CreateOrderModal from '@/components/orders/CreateOrderModal';
 import { Order, OrdersResponse, typeOrderLabels } from '@/types/orders';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 
 const statusLabels = {
@@ -65,7 +65,7 @@ export default function OrdersPage() {
 
   const queryClient = useQueryClient();
 
-  // Получение списка заказов
+  // 🍪 Получение списка заказов через axios
   const { data: ordersData, isLoading, error } = useQuery<OrdersResponse>({
     queryKey: ['orders', page, limit, search, statusFilter, cityFilter, rkFilter],
     queryFn: async () => {
@@ -79,39 +79,16 @@ export default function OrdersPage() {
         // Сортировка всегда по дате встречи и статусу "Ожидает" - не передаем параметры сортировки
       });
 
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`/api/orders?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при загрузке заказов');
-      }
-
-      return response.json();
+      const response = await api.get(`/orders?${params}`);
+      return response.data;
     }
   });
 
-  // Обновление статуса заказа - removed, not used
+  // 🍪 Обновление статуса заказа через axios - removed, not used
   const _updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`/api/orders/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при обновлении статуса');
-      }
-
-      return response.json();
+      const response = await api.put(`/orders/${id}/status`, { status });
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -122,22 +99,11 @@ export default function OrdersPage() {
     }
   });
 
-  // Удаление заказа
+  // 🍪 Удаление заказа через axios
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: number) => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`/api/orders/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при удалении заказа');
-      }
-
-      return response.json();
+      const response = await api.delete(`/orders/${id}`);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });

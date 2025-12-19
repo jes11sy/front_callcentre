@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Order, OrdersResponse, OrderFilters, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 export const useOrders = () => {
   const router = useRouter();
@@ -49,7 +49,7 @@ export const useOrders = () => {
     closingDate: filters.closingDate || undefined,
   }), [page, limit, filters]);
 
-  // Получение списка заказов
+  // 🍪 Получение списка заказов через axios
   const { data: ordersData, isLoading, error } = useQuery<OrdersResponse>({
     queryKey: ['orders', queryParams, user?.id, user?.role],
     queryFn: async () => {
@@ -67,21 +67,10 @@ export const useOrders = () => {
         ...(filters.closingDate && { closingDate: filters.closingDate }),
       });
 
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при загрузке заказов');
-      }
-
-      const result = await response.json();
+      const response = await api.get(`/orders?${params}`);
       
-      if (result.success && result.data) {
-        return result.data;
+      if (response.data.success && response.data.data) {
+        return response.data.data;
       }
       
       throw new Error('Неверный формат ответа API');
@@ -105,24 +94,11 @@ export const useOrders = () => {
     }
   }, [searchParams, ordersData?.orders]);
 
-  // Обновление статуса заказа
+  // 🍪 Обновление статуса заказа через axios
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при обновлении статуса');
-      }
-
-      return response.json();
+      const response = await api.put(`/orders/${id}/status`, { status });
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -133,11 +109,9 @@ export const useOrders = () => {
     }
   });
 
-  // Обновление заказа
+  // 🍪 Обновление заказа через axios
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, orderData }: { id: number; orderData: Partial<Order> }) => {
-      const token = await tokenStorage.getAccessToken();
-      
       // Фильтруем только разрешенные для обновления поля (согласно UpdateOrderDto)
       const allowedFields = [
         // Основные поля
@@ -162,21 +136,8 @@ export const useOrders = () => {
         }
       }
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(filteredData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Ошибка при обновлении заказа');
-      }
-
-      return response.json();
+      const response = await api.put(`/orders/${id}`, filteredData);
+      return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -188,26 +149,21 @@ export const useOrders = () => {
     }
   });
 
-  // Загрузка записей звонков
+  // 🍪 Загрузка записей звонков через axios
   const loadOrderCalls = useCallback(async (callIds: string) => {
     if (!callIds) return;
     
     setLoadingCalls(true);
     try {
-      const token = await tokenStorage.getAccessToken();
       const callIdArray = callIds.split(',');
       const calls = await Promise.all(
         callIdArray.map(async (callId) => {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/calls/${callId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (response.ok) {
-            const result = await response.json();
-            return result.data;
+          try {
+            const response = await api.get(`/calls/${callId}`);
+            return response.data.data;
+          } catch {
+            return null;
           }
-          return null;
         })
       );
       setOrderCalls(calls.filter(call => call !== null && call.recordingPath));

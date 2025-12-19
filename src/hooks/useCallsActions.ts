@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { Call } from '@/types/telephony';
 import { toast } from 'sonner';
 import { notifications } from '@/components/ui/notifications';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 export const useCallsActions = () => {
   // States
@@ -19,24 +19,14 @@ export const useCallsActions = () => {
   const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
 
   // Мемоизированные функции
+  // 🍪 Загрузка истории заказов через axios
   const loadOrderHistory = useCallback(async (call: Call) => {
     try {
       setOrderHistoryLoading(true);
       setSelectedCallForHistory(call);
       
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/orders?search=${encodeURIComponent(call.phoneClient)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при загрузке истории заказов');
-      }
-
-      const data = await response.json();
-      setOrderHistory(data.data?.orders || []);
+      const response = await api.get(`/orders?search=${encodeURIComponent(call.phoneClient)}`);
+      setOrderHistory(response.data.data?.orders || []);
       setShowOrderHistoryModal(true);
     } catch (error) {
       console.error('Error loading order history:', error);
@@ -46,6 +36,7 @@ export const useCallsActions = () => {
     }
   }, []);
 
+  // 🍪 Загрузка записи звонка через axios
   const loadRecording = useCallback(async (call: Call) => {
     if (!call.recordingPath) {
       toast.error('Запись не найдена');
@@ -55,30 +46,17 @@ export const useCallsActions = () => {
     try {
       setPlayingCall(call.id);
       
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/recordings/call/${call.id}/download`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      // axios автоматически определяет JSON response
+      const response = await api.get(`/recordings/call/${call.id}/download`, {
+        responseType: 'json', // Пробуем JSON сначала
       });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
       
       let audioUrl: string;
       
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        if (data.success && data.url) {
-          audioUrl = data.url;
-        } else {
-          throw new Error(data.message || 'Не удалось получить URL записи');
-        }
+      if (response.data.success && response.data.url) {
+        audioUrl = response.data.url;
       } else {
-        const audioBlob = await response.blob();
-        audioUrl = URL.createObjectURL(audioBlob);
+        throw new Error(response.data.message || 'Не удалось получить URL записи');
       }
       
       setCurrentAudioUrl(audioUrl);
@@ -96,6 +74,7 @@ export const useCallsActions = () => {
     setCurrentAudioUrl(null);
   }, []);
 
+  // 🍪 Скачивание записи звонка через axios
   const downloadRecording = useCallback(async (call: Call) => {
     if (!call.recordingPath) {
       notifications.error('Запись звонка недоступна');
@@ -103,19 +82,10 @@ export const useCallsActions = () => {
     }
 
     try {
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/recordings/call/${call.id}/download`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при загрузке записи');
-      }
+      const response = await api.get(`/recordings/call/${call.id}/download`);
 
       // Получаем JSON с URL
-      const data = await response.json();
+      const data = response.data;
       if (data.success && data.url) {
         // Открываем S3 URL напрямую для скачивания
         const a = document.createElement('a');

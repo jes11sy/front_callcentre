@@ -1,100 +1,50 @@
-// API клиент для устранения дублирования кода в запросах
+// 🍪 API клиент с httpOnly cookies поддержкой
 import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
-import { tokenStorage } from '@/lib/secure-storage';
-
-// Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
-
-// Получение токена авторизации
-async function getAuthToken(): Promise<string | null> {
-  if (typeof window === 'undefined') return null;
-  return await tokenStorage.getAccessToken();
-}
-
-// Базовые заголовки для запросов
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
-
-// Базовый fetch с обработкой ошибок
-async function apiRequest<T>(
-  endpoint: string, 
-  options: RequestInit = {}
-): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  const authHeaders = await getAuthHeaders();
-  
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...authHeaders,
-      ...options.headers
-    }
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
-}
+import api from '@/lib/api'; // Используем настроенный axios instance
 
 // API для заказов
 export const ordersApi = {
   // Создание заказа с нуля
   async create(data: CreateOrderData): Promise<ApiResponse> {
-    return apiRequest('/orders', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    const response = await api.post('/orders', data);
+    return response.data;
   },
 
   // Создание заказа из чата
   async createFromChat(data: CreateOrderFromChatData): Promise<ApiResponse> {
-    return apiRequest('/orders/from-chat', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    const response = await api.post('/orders/from-chat', data);
+    return response.data;
   },
 
   // Создание заказа из звонка
   async createFromCall(data: CreateOrderFromCallData): Promise<ApiResponse> {
-    return apiRequest('/orders/from-call', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    const response = await api.post('/orders/from-call', data);
+    return response.data;
   },
 
   // Получение заказов
   async getOrders(params?: URLSearchParams): Promise<ApiResponse> {
     const queryString = params ? `?${params.toString()}` : '';
-    return apiRequest(`/orders${queryString}`);
+    const response = await api.get(`/orders${queryString}`);
+    return response.data;
   },
 
   // Получение заказа по ID
   async getOrderById(id: number): Promise<ApiResponse> {
-    return apiRequest(`/orders/${id}`);
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
   },
 
   // Обновление заказа
   async updateOrder(id: number, data: Partial<CreateOrderData>): Promise<ApiResponse> {
-    return apiRequest(`/orders/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
+    const response = await api.put(`/orders/${id}`, data);
+    return response.data;
   },
 
   // Обновление статуса заказа
   async updateStatus(id: number, status: string): Promise<ApiResponse> {
-    return apiRequest(`/orders/${id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status })
-    });
+    const response = await api.patch(`/orders/${id}/status`, { status });
+    return response.data;
   }
 };
 
@@ -103,17 +53,20 @@ export const callsApi = {
   // Получение звонков
   async getCalls(params?: URLSearchParams): Promise<ApiResponse> {
     const queryString = params ? `?${params.toString()}` : '';
-    return apiRequest(`/calls${queryString}`);
+    const response = await api.get(`/calls${queryString}`);
+    return response.data;
   },
 
   // Получение звонка по ID
   async getCallById(id: number): Promise<ApiResponse> {
-    return apiRequest(`/calls/${id}`);
+    const response = await api.get(`/calls/${id}`);
+    return response.data;
   },
 
   // Получение истории заказов по телефону
   async getOrderHistory(phone: string): Promise<ApiResponse> {
-    return apiRequest(`/orders?search=${encodeURIComponent(phone)}`);
+    const response = await api.get(`/orders?search=${encodeURIComponent(phone)}`);
+    return response.data;
   }
 };
 
@@ -121,20 +74,20 @@ export const callsApi = {
 export const chatsApi = {
   // Получение чатов
   async getChats(): Promise<ApiResponse> {
-    return apiRequest('/chats');
+    const response = await api.get('/chats');
+    return response.data;
   },
 
   // Получение сообщений чата
   async getChatMessages(chatId: string): Promise<ApiResponse> {
-    return apiRequest(`/chats/${chatId}/messages`);
+    const response = await api.get(`/chats/${chatId}/messages`);
+    return response.data;
   },
 
   // Отправка сообщения
   async sendMessage(chatId: string, message: string): Promise<ApiResponse> {
-    return apiRequest(`/chats/${chatId}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({ message })
-    });
+    const response = await api.post(`/chats/${chatId}/messages`, { message });
+    return response.data;
   }
 };
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { tokenStorage } from '@/lib/secure-storage';
+import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
 interface OperatorStats {
   operator: {
@@ -40,6 +40,7 @@ interface OperatorStats {
 
 export const useStats = (startDate: string, endDate: string) => {
   // Получение статистики
+  // 🍪 Получение статистики через axios
   const { data: stats, isLoading, error, refetch } = useQuery<OperatorStats>({
     queryKey: ['operatorStats', startDate, endDate],
     queryFn: async () => {
@@ -47,18 +48,8 @@ export const useStats = (startDate: string, endDate: string) => {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const token = await tokenStorage.getAccessToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/stats/my?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки статистики');
-      }
-
-      return response.json();
+      const response = await api.get(`/stats/my?${params}`);
+      return response.data;
     },
     enabled: !!startDate && !!endDate
   });

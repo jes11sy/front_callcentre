@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { tokenStorage } from './secure-storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
@@ -22,8 +21,8 @@ export interface AuthResponse {
   message: string;
   data: {
     user: User;
-    accessToken: string;
-    refreshToken: string;
+    accessToken?: string; // Не используется с cookies
+    refreshToken?: string; // Не используется с cookies
   };
 }
 
@@ -39,62 +38,43 @@ export interface ProfileResponse {
   };
 }
 
-// Create axios instance
+// 🍪 Create axios instance with httpOnly cookies support
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // Important for CORS with credentials
+  withCredentials: true, // Отправляем cookies с каждым запросом
   headers: {
     'Content-Type': 'application/json',
+    'X-Use-Cookies': 'true', // Указываем что используем cookies
   },
 });
 
-// Add token to requests
+// 🍪 Request interceptor - добавляем X-Use-Cookies header
 api.interceptors.request.use(async (config) => {
-  const token = await tokenStorage.getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // Токены теперь в httpOnly cookies - не нужно добавлять вручную
+  config.headers['X-Use-Cookies'] = 'true';
   return config;
 });
 
-// Handle token refresh
+// 🍪 Response interceptor - автоматическое обновление токена при 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Only handle 401 errors for authenticated requests, not login requests
+    // Обрабатываем 401 ошибки (кроме login и refresh)
     if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/refresh')) {
-      const refreshToken = await tokenStorage.getRefreshToken();
-      if (refreshToken) {
-        try {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken,
-          });
-          
-          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-          const rememberMe = await tokenStorage.getRememberMe();
-          
-          await tokenStorage.setAccessToken(accessToken, rememberMe);
-          if (newRefreshToken) {
-            await tokenStorage.setRefreshToken(newRefreshToken, rememberMe);
-          }
-          
-          // Retry original request
-          error.config.headers.Authorization = `Bearer ${accessToken}`;
-          return api.request(error.config);
-        } catch {
-          // Refresh failed, clear all tokens and redirect to login
-          await tokenStorage.clearAll();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
-          // Throw special error to prevent showing error toast
-          const sessionError = new Error('SESSION_EXPIRED');
-          (sessionError as any).isSessionExpired = true;
-          return Promise.reject(sessionError);
-        }
-      } else {
-        // No refresh token, clear all tokens and redirect to login
-        await tokenStorage.clearAll();
+      try {
+        // Обновляем токен через httpOnly cookies
+        await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Use-Cookies': 'true',
+          },
+          withCredentials: true,
+        });
+        
+        // Повторяем исходный запрос с обновленными cookies
+        return api.request(error.config);
+      } catch {
+        // Refresh failed, redirect to login
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
@@ -108,7 +88,11 @@ api.interceptors.response.use(
   }
 );
 
+// 🍪 authApi methods for httpOnly cookies
 export const authApi = {
+  /**
+   * 🍪 Login - токены устанавливаются сервером в httpOnly cookies
+   */
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', {
       login: credentials.login,
@@ -118,33 +102,70 @@ export const authApi = {
     return response.data;
   },
 
+  /**
+   * 🍪 Logout - очищает httpOnly cookies на сервере
+   */
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
-    await tokenStorage.clearAll();
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('[Auth] Logout error:', error);
+    } finally {
+      // Очищаем только user из localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+      }
+    }
   },
 
+  /**
+   * 🍪 Get profile - проверяет валидность сессии
+   */
   getProfile: async (): Promise<ProfileResponse> => {
     const response = await api.get('/auth/profile');
     return response.data;
   },
 
-  // Storage helpers
+  /**
+   * 🍪 Save tokens - не нужно, токены в cookies
+   * Оставляем для обратной совместимости
+   */
   saveTokens: async (accessToken: string, refreshToken: string, rememberMe: boolean = false) => {
-    await tokenStorage.setAccessToken(accessToken, rememberMe);
-    await tokenStorage.setRefreshToken(refreshToken, rememberMe);
-    await tokenStorage.setRememberMe(rememberMe);
+    console.log('[Auth] Tokens are stored in httpOnly cookies by the server');
+    // Ничего не делаем
   },
 
+  /**
+   * 🍪 Save user - сохраняем только пользователя в localStorage
+   */
   saveUser: async (user: User, rememberMe: boolean = false) => {
-    await tokenStorage.setUser(user, rememberMe);
+    if (typeof window !== 'undefined') {
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('user', JSON.stringify(user));
+    }
   },
 
+  /**
+   * 🍪 Get user - получаем из localStorage
+   */
   getUser: async (): Promise<User | null> => {
-    return (await tokenStorage.getUser()) as User | null;
+    if (typeof window === 'undefined') return null;
+    
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   },
 
+  /**
+   * 🍪 Is authenticated - проверяем через API
+   */
   isAuthenticated: async (): Promise<boolean> => {
-    return await tokenStorage.isAuthenticated();
+    try {
+      await api.get('/auth/profile');
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   // Generic API methods for authenticated requests

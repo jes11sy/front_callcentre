@@ -65,10 +65,12 @@ class SocketManager {
       // Динамический импорт Socket.IO
       const { io } = await import('socket.io-client');
       
-      // 🍪 С httpOnly cookies нужно настроить extraHeaders или auth
+      console.log('🔌 Connecting to Socket.IO with cookies...');
+      
+      // 🍪 Настройка Socket.IO клиента для работы с httpOnly cookies
       this.socket = io(SOCKET_URL, {
-        transports: ['websocket', 'polling'], // polling поддерживает cookies лучше
-        withCredentials: true, // Отправляем cookies
+        transports: ['polling', 'websocket'], // ⚠️ polling ПЕРВЫМ - он поддерживает cookies!
+        withCredentials: true, // ✅ КРИТИЧНО: отправляем cookies
         reconnection: true,
         reconnectionDelay: 2000,
         reconnectionDelayMax: 10000,
@@ -77,14 +79,13 @@ class SocketManager {
         autoConnect: false,
         forceNew: false,
         path: '/socket.io/',
-        // 🍪 Добавляем заголовок для указания что используем cookies
+        // 🍪 Указываем серверу что используем cookies для auth
+        auth: {
+          useCookies: true
+        },
+        // 🍪 Дополнительные заголовки (только для HTTP запросов, не WebSocket)
         extraHeaders: {
           'X-Use-Cookies': 'true'
-        },
-        // 🍪 auth callback - сервер получит cookies автоматически
-        auth: (cb) => {
-          // Cookies отправляются автоматически через withCredentials
-          cb({ useCookies: true });
         }
       });
 

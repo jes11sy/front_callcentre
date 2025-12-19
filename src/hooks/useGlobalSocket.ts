@@ -65,9 +65,10 @@ class SocketManager {
       // Динамический импорт Socket.IO
       const { io } = await import('socket.io-client');
       
+      // 🍪 С httpOnly cookies нужно настроить extraHeaders или auth
       this.socket = io(SOCKET_URL, {
-        transports: ['websocket'],
-        withCredentials: true,
+        transports: ['websocket', 'polling'], // polling поддерживает cookies лучше
+        withCredentials: true, // Отправляем cookies
         reconnection: true,
         reconnectionDelay: 2000,
         reconnectionDelayMax: 10000,
@@ -75,7 +76,16 @@ class SocketManager {
         timeout: 10000,
         autoConnect: false,
         forceNew: false,
-        path: '/socket.io/'
+        path: '/socket.io/',
+        // 🍪 Добавляем заголовок для указания что используем cookies
+        extraHeaders: {
+          'X-Use-Cookies': 'true'
+        },
+        // 🍪 auth callback - сервер получит cookies автоматически
+        auth: (cb) => {
+          // Cookies отправляются автоматически через withCredentials
+          cb({ useCookies: true });
+        }
       });
 
       this.setupEventHandlers();
@@ -109,9 +119,10 @@ class SocketManager {
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
-      // 🍪 С httpOnly cookies токен автоматически отправляется в заголовках
-      // Socket.io сервер должен быть настроен на чтение cookies из заголовков
-      console.log('🍪 Authentication via httpOnly cookies');
+      // 🍪 С httpOnly cookies отправляем событие authenticate без токена
+      // Guard прочитает токен из cookies автоматически
+      console.log('🍪 Sending authenticate event (token in cookies)');
+      this.socket?.emit('authenticate', { useCookies: true });
     });
 
     this.socket.on('authenticated', (data: any) => {

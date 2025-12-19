@@ -116,11 +116,10 @@ class SocketManager {
       return;
     }
 
-    // ⚠️ Удаляем старые обработчики если они были
+    // Проверяем что обработчики еще не установлены
     if (this.handlersSetup) {
-      console.log('🔄 Removing old handlers before setup...');
-      this.socket.removeAllListeners();
-      this.handlersSetup = false;
+      console.log('⏭️ Handlers already setup, skipping...');
+      return;
     }
 
     console.log('🔧 Setting up socket event handlers...');
@@ -166,7 +165,6 @@ class SocketManager {
       console.log('📨 Socket event received:', event, args);
       this.emit(event, ...args);
     });
-  }
   }
 
   // Подписка на события

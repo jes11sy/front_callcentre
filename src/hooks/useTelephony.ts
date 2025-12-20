@@ -72,9 +72,10 @@ export const useTelephony = () => {
   // Начальная загрузка данных
   useEffect(() => {
     // Принудительно загружаем данные с базовыми параметрами
+    // Увеличиваем лимит до 100, т.к. звонки группируются и нужно больше данных для отображения ~20 групп
     const basicParams = new URLSearchParams({
       page: '1',
-      limit: '20',
+      limit: '100',
       sortBy: 'dateCreate',
       sortOrder: 'desc'
     });

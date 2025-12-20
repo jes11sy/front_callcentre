@@ -263,11 +263,11 @@ export const CallTable: React.FC<CallTableProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-400">
-                Показано {((currentPage - 1) * limit) + 1} - {Math.min(currentPage * limit, totalCalls)} из {totalCalls} звонков
+                Показано {Object.keys(groupedCalls).length} групп из {totalCalls} звонков
               </div>
               <div className="flex items-center gap-2">
                 <Label htmlFor="page-size" className="text-sm text-gray-400">
-                  На странице:
+                  Звонков на странице:
                 </Label>
                 <Select
                   value={limit.toString()}

@@ -24,43 +24,12 @@ export async function getSignedUrl(fileKey: string, expiresIn: number = 3600): P
   }
 
   console.log(`🔑 Getting signed URL for key: ${fileKey}`);
-
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/files/download/${encodeURIComponent(fileKey)}`,
-      {
-        credentials: 'include', // 🍪 Отправляем httpOnly cookies
-        headers: {
-          'X-Use-Cookies': 'true',
-        },
-      }
-    );
-
-    console.log(`📡 Files API response status: ${response.status}`);
-
-    if (!response.ok) {
-      // Если бэкенд не доступен, используем старый публичный URL как fallback
-      console.warn(`⚠️ Backend returned ${response.status}, using fallback public URL`);
-      const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || 'https://s3.twcstorage.ru/f7eead03-crmfiles';
-      const fallbackUrl = `${s3BaseUrl}/${fileKey}`;
-      console.log(`🔄 Fallback URL: ${fallbackUrl}`);
-      return fallbackUrl;
-    }
-
-    const result = await response.json();
-    const signedUrl = result.data?.url || result.signedUrl;
-    console.log(`✅ Got signed URL: ${signedUrl?.substring(0, 100)}...`);
-    
-    // API возвращает { success: true, data: { url: "...", cached: true/false } }
-    return signedUrl;
-  } catch (error) {
-    console.error('❌ Error getting signed URL, using fallback:', error);
-    // Fallback к публичному URL если бэкенд недоступен
-    const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || 'https://s3.twcstorage.ru/f7eead03-crmfiles';
-    const fallbackUrl = `${s3BaseUrl}/${fileKey}`;
-    console.log(`🔄 Fallback URL (after error): ${fallbackUrl}`);
-    return fallbackUrl;
-  }
+  
+  // Используем публичный URL напрямую как в директорском фронте
+  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || 'https://s3.twcstorage.ru/f7eead03-crmfiles';
+  const publicUrl = `${s3BaseUrl}/${fileKey}`;
+  console.log(`✅ Using public URL: ${publicUrl}`);
+  return publicUrl;
 }
 
 /**

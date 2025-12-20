@@ -289,21 +289,34 @@ export const useGlobalSocket = () => {
       setIsLoading(true);
       socketManager.current = SocketManager.getInstance();
       
+      // Подписываемся на изменения статуса ПЕРЕД connect()
+      // чтобы не пропустить асинхронное подключение
+      const unsubscribe = socketManager.current.on('connection', (data: any) => {
+        const connected = socketManager.current?.isConnected || false;
+        console.log('🔌 Connection status changed:', connected, data);
+        setIsConnected(connected);
+        setIsLoading(false);
+      });
+      
+      // Также подписываемся на authenticated для надёжности
+      const unsubAuth = socketManager.current.on('authenticated', () => {
+        console.log('✅ Authenticated - setting isConnected=true');
+        setIsConnected(true);
+        setIsLoading(false);
+      });
+      
       const socket = await socketManager.current.connect();
       
+      // Проверяем начальное состояние
       if (socket && (socket as any).connected) {
-        setIsConnected((socket as any).connected || false);
-        setIsLoading(false);
-        
-        const unsubscribe = socketManager.current.on('connection', () => {
-          setIsConnected(socketManager.current?.isConnected || false);
-        });
-
-        return unsubscribe;
-      } else {
-        setIsConnected(false);
+        setIsConnected(true);
         setIsLoading(false);
       }
+      
+      return () => {
+        unsubscribe();
+        unsubAuth();
+      };
     };
 
     const cleanup = initSocket();

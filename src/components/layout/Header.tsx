@@ -101,13 +101,13 @@ export function Header({ variant = 'operator' }: HeaderProps) {
       <header className="sticky top-0 z-50 w-full border-b border-[#FFD700] bg-[#02111B]/95 backdrop-blur supports-[backdrop-filter]:bg-[#02111B]/60 shadow-[0_0_20px_rgba(255,215,0,0.6)]">
         <div className="flex h-16 items-center justify-between px-0 w-full">
           {/* Logo and Brand - слева */}
-          <div className="flex items-center gap-0 -ml-12 -mt-4">
+          <div className="flex items-center pl-4">
             <Image 
               src="/logo.png" 
               alt="Lead Schem Logo" 
-              width={288}
-              height={224}
-              className="h-56 w-72 object-contain"
+              width={224}
+              height={48}
+              className="h-12 w-56 object-contain"
             />
           </div>
 

@@ -23,7 +23,7 @@ export const useCallsFilters = () => {
   const [sortBy, setSortBy] = useState('dateCreate');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
-  const [limit, setLimit] = useState(100); // Увеличен до 100 для корректной группировки звонков
+  const [limit, setLimit] = useState(200); // Увеличен до 200 для корректной группировки звонков
   const [totalCalls, setTotalCalls] = useState(0);
 
   // Form

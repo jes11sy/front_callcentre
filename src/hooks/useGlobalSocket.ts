@@ -162,15 +162,6 @@ class SocketManager {
 
     // Проксируем все события
     this.socket.onAny((event: string, ...args: unknown[]) => {
-      console.log('📨 Socket event received:', event, args);
-      
-      // 🔍 DEBUG: Визуальный debug для call:new
-      if (event === 'call:new') {
-        import('sonner').then(({ toast }) => {
-          toast.info('🔍 DEBUG: call:new получен в SocketManager', { duration: 5000 });
-        });
-      }
-      
       this.emit(event, ...args);
     });
   }
@@ -209,14 +200,6 @@ class SocketManager {
   // Эмит событий
   emit(event: string, ...args: unknown[]) {
     const eventListeners = this.listeners.get(event);
-    
-    // 🔍 DEBUG: Проверяем наличие listeners
-    if (event === 'call:new') {
-      import('sonner').then(({ toast }) => {
-        toast.info(`🔍 DEBUG: emit call:new, listeners: ${eventListeners?.size || 0}`, { duration: 5000 });
-      });
-    }
-    
     if (eventListeners) {
       eventListeners.forEach(callback => {
         try {
@@ -291,16 +274,14 @@ export const useGlobalSocket = () => {
       
       // Подписываемся на изменения статуса ПЕРЕД connect()
       // чтобы не пропустить асинхронное подключение
-      const unsubscribe = socketManager.current.on('connection', (data: any) => {
+      const unsubscribe = socketManager.current.on('connection', () => {
         const connected = socketManager.current?.isConnected || false;
-        console.log('🔌 Connection status changed:', connected, data);
         setIsConnected(connected);
         setIsLoading(false);
       });
       
       // Также подписываемся на authenticated для надёжности
       const unsubAuth = socketManager.current.on('authenticated', () => {
-        console.log('✅ Authenticated - setting isConnected=true');
         setIsConnected(true);
         setIsLoading(false);
       });

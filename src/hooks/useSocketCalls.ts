@@ -43,24 +43,15 @@ export function useSocketCalls({
 
   useEffect(() => {
     if (!on || !isConnected) {
-      console.log('⚠️ [useSocketCalls] No socket or not connected');
       return;
     }
 
-    console.log('✅ [useSocketCalls] Setting up call event listeners');
-    
-    // 🔍 DEBUG: Визуальное подтверждение что listeners установлены
-    import('sonner').then(({ toast }) => {
-      toast.success('🔍 DEBUG: Call listeners установлены!', { duration: 3000 });
-    });
-    
     // Используем on из SocketManager который работает через onAny proxy
     const unsubNew = on('call:new', handleNewCall);
     const unsubUpdated = on('call:updated', handleUpdatedCall);
     const unsubEnded = on('call:ended', handleEndedCall);
 
     return () => {
-      console.log('🧹 [useSocketCalls] Cleaning up call event listeners');
       unsubNew();
       unsubUpdated();
       unsubEnded();

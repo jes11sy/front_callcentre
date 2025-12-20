@@ -30,7 +30,7 @@ export const useTelephony = () => {
   // Локальные состояния для группировки
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  // Мемоизированная группировка звонков с оптимизацией и лимитом на количество групп
+  // Мемоизированная группировка звонков с оптимизацией
   const groupedCalls = useMemo(() => {
     if (!callsData.calls.length) return {};
     
@@ -48,14 +48,7 @@ export const useTelephony = () => {
       groups[key].sort((a, b) => new Date(b.dateCreate).getTime() - new Date(a.dateCreate).getTime());
     });
 
-    // Ограничиваем количество групп до 20
-    const limitedGroups: Record<string, Call[]> = {};
-    const groupKeys = Object.keys(groups).slice(0, 20);
-    groupKeys.forEach(key => {
-      limitedGroups[key] = groups[key];
-    });
-
-    return limitedGroups;
+    return groups;
   }, [callsData.calls]);
 
   // Мемоизированные функции
@@ -79,10 +72,9 @@ export const useTelephony = () => {
   // Начальная загрузка данных
   useEffect(() => {
     // Принудительно загружаем данные с базовыми параметрами
-    // Увеличиваем лимит до 200, т.к. звонки группируются и нужно больше данных для отображения достаточного количества групп
     const basicParams = new URLSearchParams({
       page: '1',
-      limit: '200',
+      limit: '100',
       sortBy: 'dateCreate',
       sortOrder: 'desc'
     });

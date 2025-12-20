@@ -49,6 +49,11 @@ export function useSocketCalls({
 
     console.log('✅ [useSocketCalls] Setting up call event listeners');
     
+    // 🔍 DEBUG: Визуальное подтверждение что listeners установлены
+    import('sonner').then(({ toast }) => {
+      toast.success('🔍 DEBUG: Call listeners установлены!', { duration: 3000 });
+    });
+    
     // Используем on из SocketManager который работает через onAny proxy
     const unsubNew = on('call:new', handleNewCall);
     const unsubUpdated = on('call:updated', handleUpdatedCall);

@@ -163,6 +163,14 @@ class SocketManager {
     // Проксируем все события
     this.socket.onAny((event: string, ...args: unknown[]) => {
       console.log('📨 Socket event received:', event, args);
+      
+      // 🔍 DEBUG: Визуальный debug для call:new
+      if (event === 'call:new') {
+        import('sonner').then(({ toast }) => {
+          toast.info('🔍 DEBUG: call:new получен в SocketManager', { duration: 5000 });
+        });
+      }
+      
       this.emit(event, ...args);
     });
   }
@@ -201,6 +209,14 @@ class SocketManager {
   // Эмит событий
   emit(event: string, ...args: unknown[]) {
     const eventListeners = this.listeners.get(event);
+    
+    // 🔍 DEBUG: Проверяем наличие listeners
+    if (event === 'call:new') {
+      import('sonner').then(({ toast }) => {
+        toast.info(`🔍 DEBUG: emit call:new, listeners: ${eventListeners?.size || 0}`, { duration: 5000 });
+      });
+    }
+    
     if (eventListeners) {
       eventListeners.forEach(callback => {
         try {

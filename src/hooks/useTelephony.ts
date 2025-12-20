@@ -9,17 +9,18 @@ import { useGlobalSocket } from './useGlobalSocket';
 import { useSocketCalls } from './useSocketCalls';
 
 export const useTelephony = () => {
-  // Socket
-  const { socket, isConnected } = useGlobalSocket();
+  // Socket - используем on/off из useGlobalSocket для подписки через SocketManager
+  const { on, off, isConnected } = useGlobalSocket();
   
   // Разделенные хуки
   const callsData = useCallsData();
   const filters = useCallsFilters();
   const actions = useCallsActions();
   
-  // Socket events
+  // Socket events - передаём on/off вместо socket
   useSocketCalls({
-    socket,
+    on,
+    off,
     isConnected,
     onNewCall: callsData.handleNewCall,
     onUpdatedCall: callsData.handleUpdatedCall,

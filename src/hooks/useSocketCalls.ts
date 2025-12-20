@@ -5,7 +5,9 @@ import { notifications } from '@/components/ui/notifications';
 import { Call } from '@/types/telephony';
 
 interface UseSocketCallsProps {
-  socket: { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string) => void } | null;
+  // Используем on/off из useGlobalSocket, а не raw socket
+  on?: (event: string, callback: (...args: unknown[]) => void) => () => void;
+  off?: (event: string, callback: (...args: unknown[]) => void) => void;
   isConnected: boolean;
   onNewCall: (call: Call) => void;
   onUpdatedCall: (call: Call) => void;
@@ -13,7 +15,8 @@ interface UseSocketCallsProps {
 }
 
 export function useSocketCalls({
-  socket,
+  on,
+  off,
   isConnected,
   onNewCall,
   onUpdatedCall,
@@ -39,23 +42,24 @@ export function useSocketCalls({
   }, [onEndedCall]);
 
   useEffect(() => {
-    if (!socket) {
-      console.log('⚠️ [useSocketCalls] No socket available');
+    if (!on || !isConnected) {
+      console.log('⚠️ [useSocketCalls] No socket or not connected');
       return;
     }
 
     console.log('✅ [useSocketCalls] Setting up call event listeners');
     
-    socket.on('call:new', handleNewCall);
-    socket.on('call:updated', handleUpdatedCall);
-    socket.on('call:ended', handleEndedCall);
+    // Используем on из SocketManager который работает через onAny proxy
+    const unsubNew = on('call:new', handleNewCall);
+    const unsubUpdated = on('call:updated', handleUpdatedCall);
+    const unsubEnded = on('call:ended', handleEndedCall);
 
     return () => {
       console.log('🧹 [useSocketCalls] Cleaning up call event listeners');
-      socket.off('call:new');
-      socket.off('call:updated');
-      socket.off('call:ended');
+      unsubNew();
+      unsubUpdated();
+      unsubEnded();
     };
-  }, [socket, handleNewCall, handleUpdatedCall, handleEndedCall]);
+  }, [on, isConnected, handleNewCall, handleUpdatedCall, handleEndedCall]);
 }
 

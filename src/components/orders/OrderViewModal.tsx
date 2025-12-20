@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { LoadingSpinner } from '@/components/ui/loading';
+import { useFileUrl } from '@/lib/s3-utils'; // 🍪 Импортируем хук для S3
 import { 
   FileText, 
   User, 
@@ -548,145 +549,178 @@ const OrderMasterTab = ({ order }: { order: Order }) => (
 );
 
 // Компонент для вкладки документов
-const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => (
-  <div className="space-y-6">
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <FileText className="h-5 w-5 text-[#FFD700]" />
-          Документы заказа
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* БСО документ */}
-          <div>
-            <Label className="text-sm font-medium text-gray-400 mb-2 block">БСО документ</Label>
-            {order.bsoDoc ? (
-              <div className="space-y-2">
-                <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-green-500/30 bg-green-900/10">
-                  <img 
-                    src={order.bsoDoc} 
-                    alt="БСО документ" 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      // Если изображение не загрузилось, показываем placeholder
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `
-                        <div class="flex items-center justify-center h-full">
-                          <div class="text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
-                          </div>
-                        </div>
-                      `;
-                    }}
-                  />
-                </div>
-                <a 
-                  href={order.bsoDoc} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 bg-green-900/30 border border-green-500/30 rounded-lg hover:bg-green-900/50 transition-colors"
-                >
-                  <FileText className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span className="text-green-300 text-xs truncate">Открыть в новой вкладке</span>
-                </a>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                <div className="text-center">
-                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <span className="text-gray-400">Документ не загружен</span>
-                </div>
-              </div>
-            )}
-          </div>
+const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => {
+  // 🍪 Используем хук для получения подписанных URL
+  const { url: bsoUrl, loading: bsoLoading } = useFileUrl(order.bsoDoc);
+  const { url: expenditureUrl, loading: expenditureLoading } = useFileUrl(order.expenditureDoc);
 
-          {/* Документ расходов */}
-          <div>
-            <Label className="text-sm font-medium text-gray-400 mb-2 block">Документ расходов</Label>
-            {order.expenditureDoc ? (
-              <div className="space-y-2">
-                <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-blue-500/30 bg-blue-900/10">
-                  <img 
-                    src={order.expenditureDoc} 
-                    alt="Документ расходов" 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `
-                        <div class="flex items-center justify-center h-full">
-                          <div class="text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
-                          </div>
-                        </div>
-                      `;
-                    }}
-                  />
+  return (
+    <div className="space-y-6">
+      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-white">
+            <FileText className="h-5 w-5 text-[#FFD700]" />
+            Документы заказа
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* БСО документ */}
+            <div>
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">БСО документ</Label>
+              {order.bsoDoc ? (
+                <div className="space-y-2">
+                  {bsoLoading ? (
+                    <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-green-500/30 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-2"></div>
+                        <span className="text-gray-400">Загрузка...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-green-500/30 bg-green-900/10">
+                        <img 
+                          src={bsoUrl || ''} 
+                          alt="БСО документ" 
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
+                                <div class="flex items-center justify-center h-full">
+                                  <div class="text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
+                                  </div>
+                                </div>
+                              `;
+                            }
+                          }}
+                        />
+                      </div>
+                      <a 
+                        href={bsoUrl || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-2 bg-green-900/30 border border-green-500/30 rounded-lg hover:bg-green-900/50 transition-colors"
+                      >
+                        <FileText className="h-4 w-4 text-green-400 flex-shrink-0" />
+                        <span className="text-green-300 text-xs truncate">Открыть в новой вкладке</span>
+                      </a>
+                    </>
+                  )}
                 </div>
-                <a 
-                  href={order.expenditureDoc} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 bg-blue-900/30 border border-blue-500/30 rounded-lg hover:bg-blue-900/50 transition-colors"
-                >
-                  <FileText className="h-4 w-4 text-blue-400 flex-shrink-0" />
-                  <span className="text-blue-300 text-xs truncate">Открыть в новой вкладке</span>
-                </a>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                <div className="text-center">
-                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <span className="text-gray-400">Документ не загружен</span>
+              ) : (
+                <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
+                  <div className="text-center">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                    <span className="text-gray-400">Документ не загружен</span>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+              )}
+            </div>
 
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <Info className="h-5 w-5 text-[#FFD700]" />
-          Системная информация
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Дата создания:</span>
-              <span className="font-medium text-white">{formatDate(order.createDate)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Последнее обновление:</span>
-              <span className="font-medium text-white">{order.updatedAt ? formatDate(order.updatedAt) : 'Не указано'}</span>
+            {/* Документ расходов */}
+            <div>
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">Документ расходов</Label>
+              {order.expenditureDoc ? (
+                <div className="space-y-2">
+                  {expenditureLoading ? (
+                    <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-blue-500/30 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-2"></div>
+                        <span className="text-gray-400">Загрузка...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-blue-500/30 bg-blue-900/10">
+                        <img 
+                          src={expenditureUrl || ''} 
+                          alt="Документ расходов" 
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
+                                <div class="flex items-center justify-center h-full">
+                                  <div class="text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
+                                  </div>
+                                </div>
+                              `;
+                            }
+                          }}
+                        />
+                      </div>
+                      <a 
+                        href={expenditureUrl || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-2 bg-blue-900/30 border border-blue-500/30 rounded-lg hover:bg-blue-900/50 transition-colors"
+                      >
+                        <FileText className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                        <span className="text-blue-300 text-xs truncate">Открыть в новой вкладке</span>
+                      </a>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
+                  <div className="text-center">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                    <span className="text-gray-400">Документ не загружен</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">ID заказа:</span>
-              <span className="font-medium text-white">#{order.id}</span>
+        </CardContent>
+      </Card>
+
+      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-white">
+            <Info className="h-5 w-5 text-[#FFD700]" />
+            Системная информация
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Дата создания:</span>
+                <span className="font-medium text-white">{formatDate(order.createDate)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Последнее обновление:</span>
+                <span className="font-medium text-white">{order.updatedAt ? formatDate(order.updatedAt) : 'Не указано'}</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">ID оператора:</span>
-              <span className="font-medium text-white">{order.operatorNameId}</span>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-400">ID заказа:</span>
+                <span className="font-medium text-white">#{order.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">ID оператора:</span>
+                <span className="font-medium text-white">{order.operatorNameId}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 // Export the component
 OrderViewModalComponent.displayName = 'OrderViewModal';

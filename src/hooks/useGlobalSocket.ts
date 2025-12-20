@@ -65,12 +65,12 @@ class SocketManager {
       // Динамический импорт Socket.IO
       const { io } = await import('socket.io-client');
       
-      console.log('🔌 Connecting to Socket.IO with cookies...');
+      console.log('🔌 Connecting to Socket.IO...');
       
-      // 🍪 Настройка Socket.IO клиента для работы с httpOnly cookies
+      // ⚠️ ВАЖНО: WebSocket НЕ МОЖЕТ использовать httpOnly cookies!
+      // Создаем соединение БЕЗ токена, токен отправим в событии authenticate
       this.socket = io(SOCKET_URL, {
-        transports: ['polling', 'websocket'], // ⚠️ polling ПЕРВЫМ - он поддерживает cookies!
-        withCredentials: true, // ✅ КРИТИЧНО: отправляем cookies
+        transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionDelay: 2000,
         reconnectionDelayMax: 10000,
@@ -78,15 +78,7 @@ class SocketManager {
         timeout: 10000,
         autoConnect: false,
         forceNew: false,
-        path: '/socket.io/',
-        // 🍪 Указываем серверу что используем cookies для auth
-        auth: {
-          useCookies: true
-        },
-        // 🍪 Дополнительные заголовки (только для HTTP запросов, не WebSocket)
-        extraHeaders: {
-          'X-Use-Cookies': 'true'
-        }
+        path: '/socket.io/'
       });
 
       this.setupEventHandlers();
@@ -130,10 +122,18 @@ class SocketManager {
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
-      // 🍪 С httpOnly cookies отправляем событие authenticate без токена
-      // Guard прочитает токен из cookies автоматически
-      console.log('🍪 Sending authenticate event (token in cookies)');
-      this.socket?.emit('authenticate', { useCookies: true });
+      // 🔌 Получаем SHORT-LIVED токен из httpOnly cookie для Socket.IO
+      try {
+        const { default: api } = await import('@/lib/api');
+        const response = await api.get('/auth/socket-token');
+        const token = response.data.data.token;
+        
+        console.log('🔑 Got socket token, authenticating...');
+        this.socket?.emit('authenticate', { token });
+      } catch (error) {
+        console.error('❌ Failed to get socket token:', error);
+        this.socket?.disconnect();
+      }
     });
 
     this.socket.on('authenticated', (data: any) => {

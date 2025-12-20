@@ -34,9 +34,22 @@ import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
 
+// Опции для выпадающих списков
+const RK_OPTIONS = ['Авито', 'Листовка'] as const;
+const SOURCE_OPTIONS = [
+  'Не указано',
+  'Владимир',
+  'Диспетчер МНЧ Расклейка',
+  'Сайт Водоканал',
+  'Сайт Поверка',
+  'Диспетчер Быт КП МНЧ',
+  'Газета',
+  'Поверка Счетчиков Партнер'
+] as const;
+
 const orderSchema = z.object({
-  rk: z.enum(['Авито', 'Листовка']),
-  avitoName: z.string().optional(),
+  rk: z.enum(RK_OPTIONS),
+  avitoName: z.enum(SOURCE_OPTIONS).optional(),
   city: z.string().min(1, 'Введите город'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']),
   clientName: z.string().min(1, 'Введите имя клиента'),
@@ -92,7 +105,9 @@ export function CreateOrderModal({
     defaultValues: {
       rk: call?.rk && (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито',
       city: call?.city || '',
-      avitoName: call?.avitoName || '',
+      avitoName: call?.avitoName && SOURCE_OPTIONS.includes(call.avitoName as typeof SOURCE_OPTIONS[number]) 
+        ? call.avitoName as typeof SOURCE_OPTIONS[number] 
+        : undefined,
       typeOrder: 'Впервые',
       typeEquipment: 'КП',
       clientName: '',
@@ -156,11 +171,14 @@ export function CreateOrderModal({
   useEffect(() => {
     if (call && open) {
       const rkValue = (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито';
+      const avitoNameValue = call.avitoName && SOURCE_OPTIONS.includes(call.avitoName as typeof SOURCE_OPTIONS[number])
+        ? call.avitoName as typeof SOURCE_OPTIONS[number]
+        : undefined;
       
       reset({
         rk: rkValue,
         city: call.city || '',
-        avitoName: call.avitoName || '',
+        avitoName: avitoNameValue,
         typeOrder: 'Впервые',
         typeEquipment: 'КП',
         clientName: '',
@@ -273,7 +291,7 @@ export function CreateOrderModal({
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="rk" className="text-sm font-medium text-gray-300">РК *</Label>
+                  <Label htmlFor="rk" className="text-sm font-medium text-gray-300">Рекламная Компания *</Label>
                   <Controller
                     name="rk"
                     control={form.control}
@@ -310,13 +328,28 @@ export function CreateOrderModal({
                   <p className="text-sm text-red-400">{errors.city.message}</p>
                 )}
               </div>
-              <div>
-                <Label htmlFor="avitoName" className="text-sm font-medium text-gray-300">Авито аккаунт</Label>
-                <Input
-                  id="avitoName"
-                  {...register('avitoName')}
-                  placeholder="Имя аккаунта"
-                  className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+              <div className="space-y-2">
+                <Label htmlFor="avitoName" className="text-sm font-medium text-gray-300">Источник</Label>
+                <Controller
+                  name="avitoName"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Select 
+                      onValueChange={field.onChange} 
+                      value={field.value}
+                    >
+                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectValue placeholder="Выберите источник" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
+                        {SOURCE_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </div>
             </div>

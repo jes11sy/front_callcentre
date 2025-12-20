@@ -26,10 +26,23 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore'; // 🍪 Используем authStore для получения user
 import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
+// Опции для выпадающих списков
+const RK_OPTIONS = ['Авито', 'Листовка'] as const;
+const SOURCE_OPTIONS = [
+  'Не указано',
+  'Владимир',
+  'Диспетчер МНЧ Расклейка',
+  'Сайт Водоканал',
+  'Сайт Поверка',
+  'Диспетчер Быт КП МНЧ',
+  'Газета',
+  'Поверка Счетчиков Партнер'
+] as const;
+
 const orderSchema = z.object({
-  rk: z.string().min(1, 'РК обязателен'),
+  rk: z.enum(RK_OPTIONS, { required_error: 'Рекламная Компания обязательна' }),
   city: z.string().min(1, 'Город обязателен'),
-  avitoName: z.string().optional(),
+  avitoName: z.enum(SOURCE_OPTIONS).optional(),
   phone: z.string().min(1, 'Телефон обязателен'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']).refine((val) => val !== undefined, {
     message: 'Тип заказа обязателен'
@@ -63,6 +76,7 @@ export default function CreateOrderModal({
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
+      rk: 'Авито',
       typeOrder: 'Впервые',
       typeEquipment: 'КП'
     }
@@ -135,12 +149,24 @@ export default function CreateOrderModal({
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="rk" className="text-sm font-medium text-gray-300">РК *</Label>
-                  <Input
-                    id="rk"
-                    {...register('rk')}
-                    placeholder="Введите РК"
-                    className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                  <Label htmlFor="rk" className="text-sm font-medium text-gray-300">Рекламная Компания *</Label>
+                  <Controller
+                    name="rk"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                          <SelectValue placeholder="Выберите РК" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
+                          {RK_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                   {errors.rk && (
                     <p className="text-sm text-red-400">{errors.rk.message}</p>
@@ -159,12 +185,24 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="avitoName" className="text-sm font-medium text-gray-300">Авито аккаунт</Label>
-                  <Input
-                    id="avitoName"
-                    {...register('avitoName')}
-                    placeholder="Имя аккаунта"
-                    className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                  <Label htmlFor="avitoName" className="text-sm font-medium text-gray-300">Источник</Label>
+                  <Controller
+                    name="avitoName"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                          <SelectValue placeholder="Выберите источник" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
+                          {SOURCE_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                 </div>
               </div>

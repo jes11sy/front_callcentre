@@ -107,7 +107,7 @@ export function LoginForm() {
       
       {/* Logo */}
       <div className="absolute top-32 left-1/2 transform -translate-x-1/2 z-10">
-        <Image src="/logo.png" alt="Logo" width={550} height={384} className="h-96 w-[550px]" />
+        <Image src="/logo.png" alt="Logo" width={224} height={48} className="h-12 w-56" />
       </div>
 
       {/* Login Card */}

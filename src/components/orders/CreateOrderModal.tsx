@@ -40,7 +40,7 @@ const SOURCE_OPTIONS = [
 ] as const;
 
 const orderSchema = z.object({
-  rk: z.enum(RK_OPTIONS, { required_error: 'Рекламная Компания обязательна' }),
+  rk: z.enum(RK_OPTIONS, { message: 'Рекламная Компания обязательна' }),
   city: z.string().min(1, 'Город обязателен'),
   avitoName: z.enum(SOURCE_OPTIONS).optional(),
   phone: z.string().min(1, 'Телефон обязателен'),
@@ -76,9 +76,16 @@ export default function CreateOrderModal({
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: 'Авито',
-      typeOrder: 'Впервые',
-      typeEquipment: 'КП'
+      rk: undefined,
+      city: '',
+      avitoName: undefined,
+      phone: '',
+      typeOrder: undefined,
+      clientName: '',
+      address: '',
+      dateMeeting: '',
+      typeEquipment: undefined,
+      problem: ''
     }
   });
 
@@ -155,7 +162,7 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -191,7 +198,7 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                           <SelectValue placeholder="Выберите источник" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -277,7 +284,7 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                           <SelectValue placeholder="Выберите тип заказа" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -299,7 +306,7 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                           <SelectValue placeholder="Выберите тип техники" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">

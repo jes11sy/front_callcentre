@@ -380,7 +380,7 @@ export const VirtualizedCallTable: React.FC<VirtualizedCallTableProps> = ({
             >
               Город {sortBy === 'city' && (sortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
-            <TableHead className="text-white">Авито аккаунт</TableHead>
+            <TableHead className="text-white">Источник</TableHead>
             <TableHead className="text-white">Кто звонил</TableHead>
             <TableHead className="text-white">Куда звонил</TableHead>
             <TableHead 

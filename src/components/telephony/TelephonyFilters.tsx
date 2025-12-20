@@ -146,7 +146,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                 />
               </div>
               <div>
-                <Label htmlFor="avitoName" className="text-gray-300">Авито аккаунт</Label>
+                <Label htmlFor="avitoName" className="text-gray-300">Источник</Label>
                 <Input
                   id="avitoName"
                   placeholder="Имя аккаунта"

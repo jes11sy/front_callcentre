@@ -175,19 +175,20 @@ export function CreateOrderModal({
         ? call.avitoName as typeof SOURCE_OPTIONS[number]
         : undefined;
       
-      reset({
-        rk: rkValue,
-        city: call.city || '',
-        avitoName: avitoNameValue,
-        typeOrder: 'Впервые',
-        typeEquipment: 'КП',
-        clientName: '',
-        address: '',
-        dateMeeting: '',
-        problem: ''
-      });
+      // Используем setTimeout чтобы дать форме инициализироваться
+      setTimeout(() => {
+        setValue('rk', rkValue);
+        setValue('city', call.city || '');
+        setValue('avitoName', avitoNameValue);
+        setValue('typeOrder', 'Впервые');
+        setValue('typeEquipment', 'КП');
+        setValue('clientName', '');
+        setValue('address', '');
+        setValue('dateMeeting', '');
+        setValue('problem', '');
+      }, 0);
     }
-  }, [call, open, reset]);
+  }, [call?.id, open, setValue]);
 
   // Форматирование даты для отображения
   const formatDate = (dateString: string) => {
@@ -302,7 +303,7 @@ export function CreateOrderModal({
                         value={field.value}
                         defaultValue={field.value}
                       >
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -338,7 +339,7 @@ export function CreateOrderModal({
                       onValueChange={field.onChange} 
                       value={field.value}
                     >
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                         <SelectValue placeholder="Выберите источник" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -409,7 +410,7 @@ export function CreateOrderModal({
                   control={form.control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                         <SelectValue placeholder="Выберите тип заказа" />
                       </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
@@ -431,7 +432,7 @@ export function CreateOrderModal({
                   control={form.control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20">
+                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                         <SelectValue placeholder="Выберите тип техники" />
                       </SelectTrigger>
                         <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">

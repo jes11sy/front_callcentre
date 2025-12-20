@@ -67,7 +67,7 @@ export function Header({ variant = 'operator' }: HeaderProps) {
 
   const operatorNavItems = [
     { name: 'Телефония', href: '/telephony', icon: PhoneCall },
-    { name: 'Центр сообщений', href: '/messages', icon: MessageSquare },
+    // { name: 'Центр сообщений', href: '/messages', icon: MessageSquare }, // Временно скрыто
     { name: 'Заказы', href: '/orders', icon: FileText },
     { name: 'Статистика', href: '/stats', icon: TrendingUp },
     { name: 'Справочник', href: '/reference', icon: BookOpen },

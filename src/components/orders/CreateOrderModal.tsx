@@ -44,14 +44,14 @@ const orderSchema = z.object({
   city: z.string().min(1, 'Город обязателен'),
   avitoName: z.enum(SOURCE_OPTIONS).optional(),
   phone: z.string().min(1, 'Телефон обязателен'),
-  typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']).refine((val) => val !== undefined, {
-    message: 'Тип заказа обязателен'
+  typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия'], { 
+    message: 'Тип заказа обязателен' 
   }),
   clientName: z.string().min(1, 'Имя клиента обязательно'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ']).refine((val) => val !== undefined, {
-    message: 'Тип техники обязателен'
+  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ'], { 
+    message: 'Тип техники обязателен' 
   }),
   problem: z.string().min(1, 'Описание проблемы обязательно'),
 });

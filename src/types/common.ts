@@ -36,8 +36,8 @@ export interface BaseOrder extends BaseOrderFields {
   result?: number;
   expenditure?: number;
   clean?: number;
-  bsoDoc?: string;
-  expenditureDoc?: string;
+  bsoDoc?: string[];
+  expenditureDoc?: string[];
   masterId?: number;
   operatorNameId: number;
   createDate: string;

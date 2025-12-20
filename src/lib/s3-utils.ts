@@ -82,7 +82,7 @@ export async function getSignedUrls(
     }, {} as Record<string, string>);
   } catch (error) {
     console.error('Error getting signed URLs:', error);
-    throw error;
+    return {};
   }
 }
 
@@ -125,6 +125,49 @@ export function useFileUrl(fileKey: string | null | undefined, expiresIn: number
       mounted = false;
     };
   }, [fileKey, expiresIn]);
+
+  return { url, loading, error };
+}
+
+/**
+ * Хук для загрузки подписанных URL для массива файлов
+ * @param fileKeys - массив ключей файлов в S3 или полных URL
+ * @param expiresIn - время жизни ссылки
+ * @returns Объект с URL файлов (key -> url) и состояние загрузки
+ */
+export function useFileUrls(fileKeys: string[], expiresIn: number = 3600) {
+  const [url, setUrl] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!fileKeys || fileKeys.length === 0) {
+      setUrl({});
+      return;
+    }
+
+    let mounted = true;
+    setLoading(true);
+    setError(null);
+
+    getSignedUrls(fileKeys, expiresIn)
+      .then(signedUrls => {
+        if (mounted) {
+          setUrl(signedUrls);
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        if (mounted) {
+          setError(err);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [JSON.stringify(fileKeys), expiresIn]);
 
   return { url, loading, error };
 }

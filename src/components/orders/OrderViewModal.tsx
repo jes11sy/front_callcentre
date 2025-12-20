@@ -548,12 +548,94 @@ const OrderMasterTab = ({ order }: { order: Order }) => (
   </div>
 );
 
+// Компонент для предпросмотра одного документа
+const DocumentPreview = ({ 
+  fileKey, 
+  label, 
+  color 
+}: { 
+  fileKey: string; 
+  label: string; 
+  color: 'green' | 'blue'; 
+}) => {
+  const { url, loading } = useFileUrl(fileKey);
+  
+  const colorClasses = {
+    green: {
+      border: 'border-green-500/30',
+      bg: 'bg-green-900/10',
+      buttonBg: 'bg-green-900/30',
+      buttonBorder: 'border-green-500/30',
+      buttonHover: 'hover:bg-green-900/50',
+      icon: 'text-green-400',
+      text: 'text-green-300',
+      spinner: 'border-green-400'
+    },
+    blue: {
+      border: 'border-blue-500/30',
+      bg: 'bg-blue-900/10',
+      buttonBg: 'bg-blue-900/30',
+      buttonBorder: 'border-blue-500/30',
+      buttonHover: 'hover:bg-blue-900/50',
+      icon: 'text-blue-400',
+      text: 'text-blue-300',
+      spinner: 'border-blue-400'
+    }
+  };
+  
+  const colors = colorClasses[color];
+  
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 ${colors.border} rounded-lg`}>
+        <div className="text-center">
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${colors.spinner} mx-auto mb-2`}></div>
+          <span className="text-gray-400">Загрузка...</span>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-2">
+      <div className={`relative aspect-video w-full rounded-lg overflow-hidden border-2 ${colors.border} ${colors.bg}`}>
+        <img 
+          src={url || ''} 
+          alt={label} 
+          className="w-full h-full object-contain"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            const parent = e.currentTarget.parentElement;
+            if (parent) {
+              parent.innerHTML = `
+                <div class="flex items-center justify-center h-full">
+                  <div class="text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
+                  </div>
+                </div>
+              `;
+            }
+          }}
+        />
+      </div>
+      <a 
+        href={url || '#'} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className={`flex items-center gap-2 p-2 ${colors.buttonBg} border ${colors.buttonBorder} rounded-lg ${colors.buttonHover} transition-colors`}
+      >
+        <FileText className={`h-4 w-4 ${colors.icon} flex-shrink-0`} />
+        <span className={`${colors.text} text-xs truncate`}>{label}</span>
+      </a>
+    </div>
+  );
+};
+
 // Компонент для вкладки документов
 const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => {
-  // 🍪 Используем хук для получения подписанных URL
-  const { url: bsoUrl, loading: bsoLoading } = useFileUrl(order.bsoDoc);
-  const { url: expenditureUrl, loading: expenditureLoading } = useFileUrl(order.expenditureDoc);
-
   return (
     <div className="space-y-6">
       <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
@@ -567,52 +649,19 @@ const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (d
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* БСО документ */}
             <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">БСО документ</Label>
-              {order.bsoDoc ? (
-                <div className="space-y-2">
-                  {bsoLoading ? (
-                    <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-green-500/30 rounded-lg">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-2"></div>
-                        <span className="text-gray-400">Загрузка...</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-green-500/30 bg-green-900/10">
-                        <img 
-                          src={bsoUrl || ''} 
-                          alt="БСО документ" 
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `
-                                <div class="flex items-center justify-center h-full">
-                                  <div class="text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                    <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
-                                  </div>
-                                </div>
-                              `;
-                            }
-                          }}
-                        />
-                      </div>
-                      <a 
-                        href={bsoUrl || '#'} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 bg-green-900/30 border border-green-500/30 rounded-lg hover:bg-green-900/50 transition-colors"
-                      >
-                        <FileText className="h-4 w-4 text-green-400 flex-shrink-0" />
-                        <span className="text-green-300 text-xs truncate">Открыть в новой вкладке</span>
-                      </a>
-                    </>
-                  )}
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">
+                БСО документ {order.bsoDoc && order.bsoDoc.length > 0 && `(${order.bsoDoc.length})`}
+              </Label>
+              {order.bsoDoc && order.bsoDoc.length > 0 ? (
+                <div className="space-y-3">
+                  {order.bsoDoc.map((doc, index) => (
+                    <DocumentPreview 
+                      key={index}
+                      fileKey={doc}
+                      label={`БСО документ ${order.bsoDoc!.length > 1 ? `#${index + 1}` : ''}`}
+                      color="green"
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
@@ -626,52 +675,19 @@ const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (d
 
             {/* Документ расходов */}
             <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">Документ расходов</Label>
-              {order.expenditureDoc ? (
-                <div className="space-y-2">
-                  {expenditureLoading ? (
-                    <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-blue-500/30 rounded-lg">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-2"></div>
-                        <span className="text-gray-400">Загрузка...</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-blue-500/30 bg-blue-900/10">
-                        <img 
-                          src={expenditureUrl || ''} 
-                          alt="Документ расходов" 
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `
-                                <div class="flex items-center justify-center h-full">
-                                  <div class="text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                    <p class="text-gray-400 text-sm mt-2">Ошибка загрузки изображения</p>
-                                  </div>
-                                </div>
-                              `;
-                            }
-                          }}
-                        />
-                      </div>
-                      <a 
-                        href={expenditureUrl || '#'} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 bg-blue-900/30 border border-blue-500/30 rounded-lg hover:bg-blue-900/50 transition-colors"
-                      >
-                        <FileText className="h-4 w-4 text-blue-400 flex-shrink-0" />
-                        <span className="text-blue-300 text-xs truncate">Открыть в новой вкладке</span>
-                      </a>
-                    </>
-                  )}
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">
+                Документ расходов {order.expenditureDoc && order.expenditureDoc.length > 0 && `(${order.expenditureDoc.length})`}
+              </Label>
+              {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
+                <div className="space-y-3">
+                  {order.expenditureDoc.map((doc, index) => (
+                    <DocumentPreview 
+                      key={index}
+                      fileKey={doc}
+                      label={`Документ расходов ${order.expenditureDoc!.length > 1 ? `#${index + 1}` : ''}`}
+                      color="blue"
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">

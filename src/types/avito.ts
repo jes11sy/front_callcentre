@@ -277,6 +277,8 @@ export interface LinkedOrder {
   result?: number;
   expenditure?: number;
   clean?: number;
+  bsoDoc?: string[];
+  expenditureDoc?: string[];
   operatorNameId: number; // Добавляем недостающее поле
   createDate: string; // Добавляем недостающее поле
   createdAt: string; // Добавляем недостающее поле

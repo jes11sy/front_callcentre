@@ -8,11 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingSpinner } from '@/components/ui/loading';
+import { useFileUrls } from '@/lib/s3-utils';
 import { 
   User, 
   Settings, 
   AlertCircle, 
-  XCircle 
+  XCircle,
+  FileText 
 } from 'lucide-react';
 import { Order, OrderTab } from '@/types/orders';
 import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS } from '@/constants/orders';
@@ -464,40 +466,113 @@ const OrderDocumentsEditTab = ({
   order: Order; 
   userRole?: string; 
   onOrderChange: (field: keyof Order, value: unknown) => void;
-}) => (
-  <div className="space-y-6">
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <Settings className="h-5 w-5 text-[#FFD700]" />
-          Документы заказа
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">БСО документ</Label>
-            <Input 
-              value={order.bsoDoc || ''} 
-              disabled={userRole === 'operator'}
-              onChange={(e) => onOrderChange('bsoDoc', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Название файла БСО..."
-            />
+}) => {
+  const { url: bsoUrls, loading: bsoLoading } = useFileUrls(order.bsoDoc || []);
+  const { url: expenditureUrls, loading: expenditureLoading } = useFileUrls(order.expenditureDoc || []);
+
+  return (
+    <div className="space-y-6">
+      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-white">
+            <Settings className="h-5 w-5 text-[#FFD700]" />
+            Документы заказа
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* БСО документ */}
+            <div>
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">
+                БСО документ {order.bsoDoc && order.bsoDoc.length > 0 && `(${order.bsoDoc.length})`}
+              </Label>
+              {order.bsoDoc && order.bsoDoc.length > 0 ? (
+                <div className="space-y-2">
+                  {bsoLoading ? (
+                    <div className="flex items-center justify-center p-4 bg-[#0f0f23] border-2 border-green-500/30 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-2"></div>
+                        <span className="text-gray-400 text-sm">Загрузка...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    order.bsoDoc.map((doc, index) => {
+                      const url = bsoUrls[doc];
+                      return (
+                        <a 
+                          key={index}
+                          href={url || '#'} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 p-3 bg-green-900/30 border border-green-500/30 rounded-lg hover:bg-green-900/50 transition-colors"
+                        >
+                          <FileText className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          <span className="text-green-300 text-sm truncate flex-1">
+                            {order.bsoDoc!.length > 1 ? `Документ БСО #${index + 1}` : 'Документ БСО'}
+                          </span>
+                          <span className="text-green-400 text-xs">↗</span>
+                        </a>
+                      );
+                    })
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <span className="text-gray-400 text-sm">Документ не загружен</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Документ расходов */}
+            <div>
+              <Label className="text-sm font-medium text-gray-400 mb-2 block">
+                Документ расходов {order.expenditureDoc && order.expenditureDoc.length > 0 && `(${order.expenditureDoc.length})`}
+              </Label>
+              {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
+                <div className="space-y-2">
+                  {expenditureLoading ? (
+                    <div className="flex items-center justify-center p-4 bg-[#0f0f23] border-2 border-blue-500/30 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-2"></div>
+                        <span className="text-gray-400 text-sm">Загрузка...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    order.expenditureDoc.map((doc, index) => {
+                      const url = expenditureUrls[doc];
+                      return (
+                        <a 
+                          key={index}
+                          href={url || '#'} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg hover:bg-blue-900/50 transition-colors"
+                        >
+                          <FileText className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                          <span className="text-blue-300 text-sm truncate flex-1">
+                            {order.expenditureDoc!.length > 1 ? `Документ расходов #${index + 1}` : 'Документ расходов'}
+                          </span>
+                          <span className="text-blue-400 text-xs">↗</span>
+                        </a>
+                      );
+                    })
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <span className="text-gray-400 text-sm">Документ не загружен</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Документ расходов</Label>
-            <Input 
-              value={order.expenditureDoc || ''} 
-              disabled={userRole === 'operator'}
-              onChange={(e) => onOrderChange('expenditureDoc', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Название файла расходов..."
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
 
     <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
       <CardHeader className="pb-3">

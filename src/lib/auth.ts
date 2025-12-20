@@ -56,39 +56,83 @@ api.interceptors.request.use(async (config) => {
 });
 
 // 🍪 Response interceptor - автоматическое обновление токена при 401
+// Флаг для предотвращения бесконечных циклов
+let isRefreshing = false;
+let refreshSubscribers: Array<(token?: string) => void> = [];
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const requestUrl = error.config?.url || '';
+    const originalRequest = error.config;
     
     // Пропускаем обработку для страниц логина
     if (requestUrl.includes('/auth/login') || requestUrl.includes('/auth/refresh')) {
       return Promise.reject(error);
     }
     
+    // Предотвращаем повторные попытки обновления токена
+    if (originalRequest._retry) {
+      // Уже пытались обновить токен, но не получилось - редирект на логин
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+      const sessionError = new Error('SESSION_EXPIRED');
+      (sessionError as any).isSessionExpired = true;
+      return Promise.reject(sessionError);
+    }
+    
     // Обрабатываем 401 ошибки (токен истек или отсутствует)
     if (error.response?.status === 401) {
-      try {
-        // Пробуем обновить токен через httpOnly cookies
-        await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Use-Cookies': 'true',
-          },
-          withCredentials: true,
-        });
+      if (!isRefreshing) {
+        isRefreshing = true;
         
-        // Повторяем исходный запрос с обновленными cookies
-        return api.request(error.config);
-      } catch (refreshError) {
-        // Refresh failed - редиректим на логин только если мы не на странице логина
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
+        try {
+          // Пробуем обновить токен через httpOnly cookies
+          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Use-Cookies': 'true',
+            },
+            withCredentials: true,
+          });
+          
+          // Проверяем что refresh успешен
+          if (!refreshResponse.data?.success) {
+            throw new Error('Refresh failed');
+          }
+          
+          isRefreshing = false;
+          
+          // Уведомляем всех подписчиков
+          refreshSubscribers.forEach(cb => cb());
+          refreshSubscribers = [];
+          
+          // Повторяем исходный запрос с обновленными cookies
+          originalRequest._retry = true;
+          return api.request(originalRequest);
+        } catch (refreshError) {
+          isRefreshing = false;
+          refreshSubscribers.forEach(cb => cb());
+          refreshSubscribers = [];
+          
+          // Refresh failed - редиректим на логин только если мы не на странице логина
+          if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+          // Throw special error to prevent showing error toast
+          const sessionError = new Error('SESSION_EXPIRED');
+          (sessionError as any).isSessionExpired = true;
+          return Promise.reject(sessionError);
         }
-        // Throw special error to prevent showing error toast
-        const sessionError = new Error('SESSION_EXPIRED');
-        (sessionError as any).isSessionExpired = true;
-        return Promise.reject(sessionError);
+      } else {
+        // Refresh уже идет - подписываемся на завершение
+        return new Promise((resolve, reject) => {
+          refreshSubscribers.push(() => {
+            originalRequest._retry = true;
+            api.request(originalRequest).then(resolve).catch(reject);
+          });
+        });
       }
     }
     return Promise.reject(error);

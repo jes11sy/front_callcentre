@@ -57,6 +57,11 @@ export const useCallsData = () => {
         throw new Error('Ошибка при получении данных');
       }
     } catch (err: unknown) {
+      // Игнорируем ошибки истекшей сессии (редирект уже произошел)
+      if ((err as Error)?.message === 'SESSION_EXPIRED' || (err as any)?.isSessionExpired) {
+        return;
+      }
+      
       console.error('Error fetching calls:', err);
       setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Ошибка при загрузке звонков');
       notifications.error('Ошибка при загрузке звонков');

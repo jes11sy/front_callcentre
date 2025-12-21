@@ -158,7 +158,7 @@ export const authApi = {
    */
   logout: async (): Promise<void> => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/auth/logout', {}); // Пустой объект для POST запроса
     } catch (error) {
       console.error('[Auth] Logout error:', error);
     } finally {

@@ -28,6 +28,7 @@ import api from '@/lib/api'; // 🍪 Используем настроенный
 
 // Опции для выпадающих списков
 const RK_OPTIONS = ['Авито', 'Листовка'] as const;
+const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск'] as const;
 const SOURCE_OPTIONS = [
   'Не указано',
   'Владимир',
@@ -41,7 +42,7 @@ const SOURCE_OPTIONS = [
 
 const orderSchema = z.object({
   rk: z.enum(RK_OPTIONS, { message: 'Рекламная Компания обязательна' }),
-  city: z.string().min(1, 'Город обязателен'),
+  city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
   avitoName: z.enum(SOURCE_OPTIONS).optional(),
   phone: z.string().min(1, 'Телефон обязателен'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия'], { 
@@ -77,7 +78,7 @@ export default function CreateOrderModal({
     resolver: zodResolver(orderSchema),
     defaultValues: {
       rk: undefined,
-      city: '',
+      city: undefined,
       avitoName: undefined,
       phone: '',
       typeOrder: undefined,
@@ -181,11 +182,23 @@ export default function CreateOrderModal({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city" className="text-sm font-medium text-gray-300">Город *</Label>
-                  <Input
-                    id="city"
-                    {...register('city')}
-                    placeholder="Введите город"
-                    className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                  <Controller
+                    name="city"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
+                          <SelectValue placeholder="Выберите город" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
+                          {CITY_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                   {errors.city && (
                     <p className="text-sm text-red-400">{errors.city.message}</p>

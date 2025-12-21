@@ -84,6 +84,7 @@ export function CreateOrderFromChatModal({
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
     reset
   } = form;

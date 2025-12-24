@@ -11,10 +11,10 @@ import React from 'react';
 export interface Penalty {
   id: number;
   city: string;
-  reason: string;
+  note: string; // Причина
   amount: number;
-  orderNumber?: string;
-  createdAt: string;
+  dateCreate: string;
+  nameCreate?: string; // Имя создателя
 }
 
 interface PenaltiesTableProps {
@@ -144,20 +144,13 @@ export const PenaltiesTable = ({
                     {penalty.city}
                   </TableCell>
                   <TableCell className="text-gray-300">
-                    <div>
-                      {penalty.reason}
-                      {penalty.orderNumber && (
-                        <span className="block text-xs text-gray-500 mt-1">
-                          Заказ: {penalty.orderNumber}
-                        </span>
-                      )}
-                    </div>
+                    {penalty.note}
                   </TableCell>
                   <TableCell className="text-red-400 font-semibold">
                     {formatCurrency(penalty.amount)}
                   </TableCell>
                   <TableCell className="text-gray-400 text-sm">
-                    {formatDate(penalty.createdAt)}
+                    {formatDate(penalty.dateCreate)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">

@@ -12,6 +12,7 @@ import { usePenalties } from '@/hooks/usePenalties';
 function PenaltiesContent() {
   const {
     penalties,
+    cities,
     isLoading,
     error,
     user,
@@ -69,6 +70,7 @@ function PenaltiesContent() {
               isOpen={isCreateModalOpen}
               onClose={() => setIsCreateModalOpen(false)}
               onSave={handleCreatePenalty}
+              cities={cities}
             />
 
             {/* Edit Modal */}
@@ -80,6 +82,7 @@ function PenaltiesContent() {
               }}
               penalty={selectedPenalty}
               onSave={handleSavePenalty}
+              cities={cities}
             />
           </div>
         </div>

@@ -14,27 +14,15 @@ interface EditPenaltyModalProps {
   onClose: () => void;
   penalty: Penalty | null;
   onSave: (id: number, data: { city: string; reason: string; amount: number; orderNumber?: string }) => Promise<void>;
+  cities: string[]; // Список городов из заказов
 }
-
-const CITIES = [
-  'Казань',
-  'Самара',
-  'Уфа',
-  'Пенза',
-  'Ульяновск',
-  'Чебоксары',
-  'Йошкар-Ола',
-  'Саранск',
-  'Оренбург',
-  'Ижевск',
-];
 
 const PENALTY_REASONS = [
   'Отмена из-за переноса',
   'Неактуальный статус заказов',
 ];
 
-export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenaltyModalProps) => {
+export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: EditPenaltyModalProps) => {
   const [city, setCity] = useState('');
   const [reason, setReason] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
@@ -45,9 +33,22 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
   useEffect(() => {
     if (penalty) {
       setCity(penalty.city);
-      setReason(penalty.reason);
-      setOrderNumber(penalty.orderNumber || '');
       setAmount(penalty.amount.toString());
+      
+      // Парсим note чтобы извлечь reason и orderNumber
+      // Формат: "Отмена из-за переноса заказ 12345" или "Неактуальный статус заказов"
+      const noteText = penalty.note || '';
+      
+      if (noteText.includes('заказ')) {
+        // Есть номер заказа
+        const parts = noteText.split(' заказ ');
+        setReason(parts[0]);
+        setOrderNumber(parts[1] || '');
+      } else {
+        // Нет номера заказа
+        setReason(noteText);
+        setOrderNumber('');
+      }
     }
   }, [penalty]);
 
@@ -125,20 +126,26 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger 
                 id="edit-city"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
               >
-                <SelectValue placeholder="Выберите город" className="text-gray-500" />
+                <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {CITIES.map((cityName) => (
-                  <SelectItem 
-                    key={cityName} 
-                    value={cityName}
-                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
-                  >
-                    {cityName}
+                {cities.length > 0 ? (
+                  cities.map((cityName) => (
+                    <SelectItem 
+                      key={cityName} 
+                      value={cityName}
+                      className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
+                    >
+                      {cityName}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="loading" disabled className="text-gray-500">
+                    Загрузка городов...
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             {errors.city && (
@@ -154,9 +161,9 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger 
                 id="edit-reason"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
               >
-                <SelectValue placeholder="Выберите причину" className="text-gray-500" />
+                <SelectValue placeholder="Выберите причину" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {PENALTY_REASONS.map((reasonText) => (

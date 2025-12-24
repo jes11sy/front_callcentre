@@ -12,27 +12,15 @@ interface CreatePenaltyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: { city: string; reason: string; amount: number; orderNumber?: string }) => Promise<void>;
+  cities: string[]; // Список городов из заказов
 }
-
-const CITIES = [
-  'Казань',
-  'Самара',
-  'Уфа',
-  'Пенза',
-  'Ульяновск',
-  'Чебоксары',
-  'Йошкар-Ола',
-  'Саранск',
-  'Оренбург',
-  'Ижевск',
-];
 
 const PENALTY_REASONS = [
   'Отмена из-за переноса',
   'Неактуальный статус заказов',
 ];
 
-export const CreatePenaltyModal = ({ isOpen, onClose, onSave }: CreatePenaltyModalProps) => {
+export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePenaltyModalProps) => {
   const [city, setCity] = useState('');
   const [reason, setReason] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
@@ -119,20 +107,26 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave }: CreatePenaltyMod
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger 
                 id="city"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
               >
-                <SelectValue placeholder="Выберите город" className="text-gray-500" />
+                <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {CITIES.map((cityName) => (
-                  <SelectItem 
-                    key={cityName} 
-                    value={cityName}
-                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
-                  >
-                    {cityName}
+                {cities.length > 0 ? (
+                  cities.map((cityName) => (
+                    <SelectItem 
+                      key={cityName} 
+                      value={cityName}
+                      className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
+                    >
+                      {cityName}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="loading" disabled className="text-gray-500">
+                    Загрузка городов...
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             {errors.city && (
@@ -148,9 +142,9 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave }: CreatePenaltyMod
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger 
                 id="reason"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
               >
-                <SelectValue placeholder="Выберите причину" className="text-gray-500" />
+                <SelectValue placeholder="Выберите причину" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {PENALTY_REASONS.map((reasonText) => (

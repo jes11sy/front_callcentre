@@ -1,47 +1,57 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Penalty } from '@/components/penalties/PenaltiesTable';
-
-// Mock data для демонстрации
-const MOCK_PENALTIES: Penalty[] = [
-  {
-    id: 1,
-    city: 'Казань',
-    reason: 'Отмена из-за переноса',
-    amount: 500,
-    orderNumber: '12345',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    city: 'Самара',
-    reason: 'Неактуальный статус заказов',
-    amount: 1000,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
+import { ordersApi, cashApi } from '@/lib/api-client';
 
 export const usePenalties = () => {
   const { user } = useAuthStore();
   const [penalties, setPenalties] = useState<Penalty[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPenalty, setSelectedPenalty] = useState<Penalty | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Загрузка штрафов
+  // Загрузка штрафов и городов
   useEffect(() => {
-    const loadPenalties = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
-        // TODO: Заменить на реальный API вызов
-        // const response = await apiClient.getPenalties();
-        // setPenalties(response.data);
         
-        // Временно используем mock data
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setPenalties(MOCK_PENALTIES);
+        // Загружаем штрафы из cash с payment_purpose = 'Штраф'
+        const penaltiesResponse = await cashApi.getCashTransactions({
+          name: 'приход',
+        });
+        
+        // Загружаем уникальные города из заказов
+        const filterOptions = await ordersApi.getFilterOptions();
+        
+        // Извлекаем уникальные города из заказов
+        const ordersResponse = await ordersApi.getOrders();
+        const uniqueCities = Array.from(
+          new Set(
+            (ordersResponse.data?.orders || [])
+              .map((order: any) => order.city)
+              .filter((city: string) => city)
+          )
+        ).sort();
+        
+        setCities(uniqueCities);
+        
+        // Фильтруем только штрафы (где paymentPurpose = 'Штраф')
+        const penaltyData = (penaltiesResponse.data?.items || penaltiesResponse.data || [])
+          .filter((item: any) => item.paymentPurpose === 'Штраф')
+          .map((item: any) => ({
+            id: item.id,
+            city: item.city,
+            note: item.note || '',
+            amount: Math.abs(item.amount),
+            dateCreate: item.dateCreate,
+            nameCreate: item.nameCreate,
+          }));
+        
+        setPenalties(penaltyData);
       } catch (err) {
         console.error('Error loading penalties:', err);
         setError(err instanceof Error ? err.message : 'Ошибка загрузки штрафов');
@@ -50,7 +60,7 @@ export const usePenalties = () => {
       }
     };
 
-    loadPenalties();
+    loadData();
   }, []);
 
   const handleEditPenalty = (penalty: Penalty) => {
@@ -60,10 +70,7 @@ export const usePenalties = () => {
 
   const handleDeletePenalty = async (id: number) => {
     try {
-      // TODO: Заменить на реальный API вызов
-      // await apiClient.deletePenalty(id);
-      
-      // Временно удаляем из локального состояния
+      await cashApi.deleteCashTransaction(id.toString());
       setPenalties(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error('Error deleting penalty:', err);
@@ -76,14 +83,23 @@ export const usePenalties = () => {
     data: { city: string; reason: string; amount: number; orderNumber?: string }
   ) => {
     try {
-      // TODO: Заменить на реальный API вызов
-      // await apiClient.updatePenalty(id, data);
+      // Формируем note из причины и номера заказа
+      const note = data.orderNumber 
+        ? `${data.reason} заказ ${data.orderNumber}`
+        : data.reason;
       
-      // Временно обновляем локальное состояние
+      await cashApi.updateCashTransaction(id.toString(), {
+        city: data.city,
+        note: note,
+        amount: Math.abs(data.amount), // Положительная сумма
+        paymentPurpose: 'Штраф',
+      });
+      
+      // Обновляем локальное состояние
       setPenalties(prev =>
         prev.map(p =>
           p.id === id
-            ? { ...p, ...data }
+            ? { ...p, city: data.city, note: note, amount: data.amount }
             : p
         )
       );
@@ -100,17 +116,33 @@ export const usePenalties = () => {
     orderNumber?: string;
   }) => {
     try {
-      // TODO: Заменить на реальный API вызов
-      // const response = await apiClient.createPenalty(data);
-      // setPenalties(prev => [...prev, response.data]);
+      // Формируем note из причины и номера заказа
+      const note = data.orderNumber 
+        ? `${data.reason} заказ ${data.orderNumber}`
+        : data.reason;
       
-      // Временно добавляем в локальное состояние
-      const newPenalty: Penalty = {
-        id: Math.max(...penalties.map(p => p.id), 0) + 1,
-        ...data,
-        createdAt: new Date().toISOString(),
-      };
-      setPenalties(prev => [newPenalty, ...prev]);
+      const response = await cashApi.createCashTransaction({
+        city: data.city,
+        note: note,
+        amount: Math.abs(data.amount), // Положительная сумма
+        name: 'приход',
+        paymentPurpose: 'Штраф',
+        nameCreate: user?.name || user?.login || 'Неизвестно',
+        dateCreate: new Date().toISOString(),
+      });
+      
+      // Добавляем в локальное состояние
+      if (response.data) {
+        const newPenalty: Penalty = {
+          id: response.data.id,
+          city: data.city,
+          note: note,
+          amount: data.amount,
+          dateCreate: response.data.dateCreate || new Date().toISOString(),
+          nameCreate: user?.name || user?.login,
+        };
+        setPenalties(prev => [newPenalty, ...prev]);
+      }
     } catch (err) {
       console.error('Error creating penalty:', err);
       throw err;
@@ -119,6 +151,7 @@ export const usePenalties = () => {
 
   return {
     penalties,
+    cities,
     isLoading,
     error,
     user,

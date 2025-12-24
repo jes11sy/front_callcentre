@@ -45,6 +45,12 @@ export const ordersApi = {
   async updateStatus(id: number, status: string): Promise<ApiResponse> {
     const response = await api.patch(`/orders/${id}/status`, { status });
     return response.data;
+  },
+
+  // Получение опций для фильтров (включая города)
+  async getFilterOptions(): Promise<ApiResponse> {
+    const response = await api.get('/orders/filter-options');
+    return response.data;
   }
 };
 
@@ -87,6 +93,35 @@ export const chatsApi = {
   // Отправка сообщения
   async sendMessage(chatId: string, message: string): Promise<ApiResponse> {
     const response = await api.post(`/chats/${chatId}/messages`, { message });
+    return response.data;
+  }
+};
+
+// API для cash (касса/штрафы)
+export const cashApi = {
+  // Получение транзакций
+  async getCashTransactions(params?: { name?: string; city?: string }): Promise<ApiResponse> {
+    const searchParams = params ? apiUtils.createSearchParams(params) : new URLSearchParams();
+    const queryString = searchParams.toString();
+    const response = await api.get(`/cash${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  // Создание транзакции
+  async createCashTransaction(data: any): Promise<ApiResponse> {
+    const response = await api.post('/cash', data);
+    return response.data;
+  },
+
+  // Обновление транзакции
+  async updateCashTransaction(id: string, data: any): Promise<ApiResponse> {
+    const response = await api.put(`/cash/${id}`, data);
+    return response.data;
+  },
+
+  // Удаление транзакции
+  async deleteCashTransaction(id: string): Promise<ApiResponse> {
+    const response = await api.delete(`/cash/${id}`);
     return response.data;
   }
 };

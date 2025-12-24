@@ -261,7 +261,10 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white pointer-events-none">7</span>
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                          <span className="text-gray-400 text-sm">+7</span>
+                          <span className="text-gray-600">|</span>
+                        </div>
                         <Input
                           id="phone"
                           type="tel"
@@ -277,9 +280,9 @@ export default function CreateOrderModal({
                               field.onChange('7');
                             }
                           }}
-                          placeholder="9179822678"
+                          placeholder="917 982 2678"
                           maxLength={10}
-                          className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20 pl-7"
+                          className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20 pl-14"
                         />
                       </div>
                     )}

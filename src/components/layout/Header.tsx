@@ -40,7 +40,8 @@ import {
   Wallet,
   // Mail removed - not used
   Bell,
-  BookOpen
+  BookOpen,
+  AlertTriangle
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -69,6 +70,7 @@ export function Header({ variant = 'operator' }: HeaderProps) {
     { name: 'Телефония', href: '/telephony', icon: PhoneCall },
     // { name: 'Центр сообщений', href: '/messages', icon: MessageSquare }, // Временно скрыто
     { name: 'Заказы', href: '/orders', icon: FileText },
+    { name: 'Штрафы', href: '/penalties', icon: AlertTriangle },
     { name: 'Статистика', href: '/stats', icon: TrendingUp },
     { name: 'Справочник', href: '/reference', icon: BookOpen },
   ];

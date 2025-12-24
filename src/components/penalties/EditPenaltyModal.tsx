@@ -136,7 +136,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
                     <SelectItem 
                       key={cityName} 
                       value={cityName}
-                      className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
+                      className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20 focus:text-white data-[state=checked]:text-white data-[highlighted]:text-white data-[highlighted]:bg-[#FFD700]/10"
                     >
                       {cityName}
                     </SelectItem>
@@ -170,7 +170,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
                   <SelectItem 
                     key={reasonText} 
                     value={reasonText}
-                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
+                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20 focus:text-white data-[state=checked]:text-white data-[highlighted]:text-white data-[highlighted]:bg-[#FFD700]/10"
                   >
                     {reasonText}
                   </SelectItem>

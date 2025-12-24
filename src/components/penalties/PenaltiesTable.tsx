@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Plus, AlertTriangle } from 'lucide-react';
 import { LoadingState } from '@/components/ui/loading';
-import { EmptyState } from '@/components/ui/error-boundary';
 import React from 'react';
 
 export interface Penalty {
@@ -96,11 +95,10 @@ export const PenaltiesTable = ({
               Создать
             </Button>
           </div>
-          <EmptyState
-            title="Нет штрафов"
-            description="Создайте первый штраф"
-            icon={<AlertTriangle className="h-12 w-12 text-gray-500" />}
-          />
+          <div className="flex flex-col items-center justify-center py-12">
+            <AlertTriangle className="h-12 w-12 text-gray-500 mb-4" />
+            <p className="text-lg text-white">Нет штрафов</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -114,13 +112,13 @@ export const PenaltiesTable = ({
             <AlertTriangle className="h-6 w-6 text-[#FFD700]" />
             <h2 className="text-2xl font-bold text-white">Штрафы</h2>
           </div>
-          <Button 
-            onClick={onCreatePenalty}
-            className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Создать штраф
-          </Button>
+            <Button 
+              onClick={onCreatePenalty}
+              className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Создать
+            </Button>
         </div>
 
         <div className="rounded-md border border-[#FFD700]/20 overflow-hidden">

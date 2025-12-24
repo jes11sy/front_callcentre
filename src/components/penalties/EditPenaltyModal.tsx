@@ -126,7 +126,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger 
                 id="edit-city"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span[data-placeholder]]:text-gray-500"
               >
                 <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
@@ -161,7 +161,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger 
                 id="edit-reason"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:text-gray-500 data-[placeholder]:text-gray-500"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span[data-placeholder]]:text-gray-500"
               >
                 <SelectValue placeholder="Выберите причину" />
               </SelectTrigger>

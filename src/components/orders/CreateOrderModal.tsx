@@ -260,31 +260,32 @@ export default function CreateOrderModal({
                     name="phone"
                     control={form.control}
                     render={({ field }) => (
-                      <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                          <span className="text-gray-400 text-sm">+7</span>
-                          <span className="text-gray-600">|</span>
-                        </div>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={field.value.startsWith('7') ? field.value.slice(1) : field.value}
-                          onChange={(e) => {
-                            // Разрешаем только цифры, максимум 10 (без первой 7)
-                            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                            field.onChange('7' + value);
-                          }}
-                          onFocus={(e) => {
-                            // При фокусе, если поле пустое, ставим 7
-                            if (!field.value || field.value === '') {
-                              field.onChange('7');
-                            }
-                          }}
-                          placeholder="917 982 2678"
-                          maxLength={10}
-                          className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20 pl-14"
-                        />
-                      </div>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={field.value.startsWith('7') && field.value.length > 1 ? '+7' + field.value.slice(1) : ''}
+                        onChange={(e) => {
+                          let input = e.target.value.replace(/\D/g, ''); // Только цифры
+                          
+                          // Если пользователь ввел 8 или 9 в начале
+                          if (input.startsWith('8')) {
+                            input = '7' + input.slice(1);
+                          } else if (input.startsWith('9')) {
+                            input = '7' + input;
+                          } else if (input.length > 0 && !input.startsWith('7')) {
+                            input = '7' + input;
+                          }
+                          
+                          // Ограничиваем 11 цифрами
+                          if (input.length > 11) {
+                            input = input.slice(0, 11);
+                          }
+                          
+                          field.onChange(input);
+                        }}
+                        placeholder="Введите номер телефона"
+                        className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                      />
                     )}
                   />
                   {errors.phone && (

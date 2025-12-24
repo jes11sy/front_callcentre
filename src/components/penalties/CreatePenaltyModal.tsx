@@ -107,7 +107,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger 
                 id="city"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&_span]:!text-white [&_span[data-placeholder]]:!text-gray-500"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 hover:bg-[#0f0f23] [&_span]:!text-white [&_span[data-placeholder]]:!text-gray-500"
               >
                 <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
@@ -117,7 +117,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
                     <SelectItem 
                       key={cityName} 
                       value={cityName}
-                      className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20 focus:text-white data-[state=checked]:text-white data-[highlighted]:text-white data-[highlighted]:bg-[#FFD700]/10"
+                      className="text-white data-[highlighted]:bg-[#FFD700]/10 data-[highlighted]:text-white data-[state=checked]:text-white"
                     >
                       {cityName}
                     </SelectItem>
@@ -142,7 +142,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger 
                 id="reason"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&_span]:!text-white [&_span[data-placeholder]]:!text-gray-500"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 hover:bg-[#0f0f23] [&_span]:!text-white [&_span[data-placeholder]]:!text-gray-500"
               >
                 <SelectValue placeholder="Выберите причину" />
               </SelectTrigger>
@@ -151,7 +151,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
                   <SelectItem 
                     key={reasonText} 
                     value={reasonText}
-                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20 focus:text-white data-[state=checked]:text-white data-[highlighted]:text-white data-[highlighted]:bg-[#FFD700]/10"
+                    className="text-white data-[highlighted]:bg-[#FFD700]/10 data-[highlighted]:text-white data-[state=checked]:text-white"
                   >
                     {reasonText}
                   </SelectItem>

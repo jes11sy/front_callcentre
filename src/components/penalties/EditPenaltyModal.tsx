@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { Penalty } from './PenaltiesTable';
@@ -14,7 +13,7 @@ interface EditPenaltyModalProps {
   isOpen: boolean;
   onClose: () => void;
   penalty: Penalty | null;
-  onSave: (id: number, data: { city: string; reason: string; amount: number }) => Promise<void>;
+  onSave: (id: number, data: { city: string; reason: string; amount: number; orderNumber?: string }) => Promise<void>;
 }
 
 const CITIES = [
@@ -30,17 +29,24 @@ const CITIES = [
   'Ижевск',
 ];
 
+const PENALTY_REASONS = [
+  'Отмена из-за переноса',
+  'Неактуальный статус заказов',
+];
+
 export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenaltyModalProps) => {
   const [city, setCity] = useState('');
   const [reason, setReason] = useState('');
+  const [orderNumber, setOrderNumber] = useState('');
   const [amount, setAmount] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [errors, setErrors] = useState<{ city?: string; reason?: string; amount?: string }>({});
+  const [errors, setErrors] = useState<{ city?: string; reason?: string; amount?: string; orderNumber?: string }>({});
 
   useEffect(() => {
     if (penalty) {
       setCity(penalty.city);
       setReason(penalty.reason);
+      setOrderNumber(penalty.orderNumber || '');
       setAmount(penalty.amount.toString());
     }
   }, [penalty]);
@@ -49,14 +55,19 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
     if (!penalty) return;
 
     // Валидация
-    const newErrors: { city?: string; reason?: string; amount?: string } = {};
+    const newErrors: { city?: string; reason?: string; amount?: string; orderNumber?: string } = {};
     
     if (!city) {
       newErrors.city = 'Выберите город';
     }
     
-    if (!reason.trim()) {
-      newErrors.reason = 'Укажите причину';
+    if (!reason) {
+      newErrors.reason = 'Выберите причину';
+    }
+    
+    // Если выбрана "Отмена из-за переноса", требуем номер заказа
+    if (reason === 'Отмена из-за переноса' && !orderNumber.trim()) {
+      newErrors.orderNumber = 'Укажите номер заказа';
     }
     
     const amountNum = parseFloat(amount);
@@ -73,8 +84,9 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
       setIsSaving(true);
       await onSave(penalty.id, {
         city,
-        reason: reason.trim(),
+        reason,
         amount: amountNum,
+        orderNumber: reason === 'Отмена из-за переноса' ? orderNumber.trim() : undefined,
       });
       
       setErrors({});
@@ -115,7 +127,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
                 id="edit-city"
                 className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
               >
-                <SelectValue placeholder="Выберите город" />
+                <SelectValue placeholder="Выберите город" className="text-gray-500" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                 {CITIES.map((cityName) => (
@@ -139,22 +151,54 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave }: EditPenal
             <Label htmlFor="edit-reason" className="text-sm font-medium text-gray-300">
               Причина *
             </Label>
-            <Textarea
-              id="edit-reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Опишите причину штрафа"
-              className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20 min-h-[100px]"
-            />
+            <Select value={reason} onValueChange={setReason}>
+              <SelectTrigger 
+                id="edit-reason"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+              >
+                <SelectValue placeholder="Выберите причину" className="text-gray-500" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {PENALTY_REASONS.map((reasonText) => (
+                  <SelectItem 
+                    key={reasonText} 
+                    value={reasonText}
+                    className="text-white hover:bg-[#FFD700]/10 focus:bg-[#FFD700]/20"
+                  >
+                    {reasonText}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.reason && (
               <p className="text-sm text-red-400">{errors.reason}</p>
             )}
           </div>
 
+          {/* Номер заказа (условное поле) */}
+          {reason === 'Отмена из-за переноса' && (
+            <div className="space-y-2">
+              <Label htmlFor="edit-orderNumber" className="text-sm font-medium text-gray-300">
+                Номер заказа *
+              </Label>
+              <Input
+                id="edit-orderNumber"
+                type="text"
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                placeholder="Введите номер заказа"
+                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+              />
+              {errors.orderNumber && (
+                <p className="text-sm text-red-400">{errors.orderNumber}</p>
+              )}
+            </div>
+          )}
+
           {/* Сумма */}
           <div className="space-y-2">
             <Label htmlFor="edit-amount" className="text-sm font-medium text-gray-300">
-              Сумма (₽) *
+              Сумма *
             </Label>
             <Input
               id="edit-amount"

@@ -13,6 +13,7 @@ export interface Penalty {
   city: string;
   reason: string;
   amount: number;
+  orderNumber?: string;
   createdAt: string;
 }
 
@@ -65,7 +66,7 @@ export const PenaltiesTable = ({
               className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Создать штраф
+              Создать
             </Button>
           </div>
           <LoadingState 
@@ -92,7 +93,7 @@ export const PenaltiesTable = ({
               className="bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Создать штраф
+              Создать
             </Button>
           </div>
           <EmptyState
@@ -143,7 +144,14 @@ export const PenaltiesTable = ({
                     {penalty.city}
                   </TableCell>
                   <TableCell className="text-gray-300">
-                    {penalty.reason}
+                    <div>
+                      {penalty.reason}
+                      {penalty.orderNumber && (
+                        <span className="block text-xs text-gray-500 mt-1">
+                          Заказ: {penalty.orderNumber}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-red-400 font-semibold">
                     {formatCurrency(penalty.amount)}
@@ -179,18 +187,6 @@ export const PenaltiesTable = ({
               ))}
             </TableBody>
           </Table>
-        </div>
-
-        {/* Summary */}
-        <div className="mt-4 flex items-center justify-between px-2">
-          <p className="text-sm text-gray-400">
-            Всего штрафов: <span className="font-semibold text-white">{penalties.length}</span>
-          </p>
-          <p className="text-sm text-gray-400">
-            Общая сумма: <span className="font-semibold text-red-400">
-              {formatCurrency(penalties.reduce((sum, p) => sum + p.amount, 0))}
-            </span>
-          </p>
         </div>
       </CardContent>
     </Card>

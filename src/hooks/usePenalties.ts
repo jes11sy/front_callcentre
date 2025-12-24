@@ -7,14 +7,15 @@ const MOCK_PENALTIES: Penalty[] = [
   {
     id: 1,
     city: 'Казань',
-    reason: 'Опоздание на встречу с клиентом',
+    reason: 'Отмена из-за переноса',
     amount: 500,
+    orderNumber: '12345',
     createdAt: new Date().toISOString(),
   },
   {
     id: 2,
     city: 'Самара',
-    reason: 'Невыполнение плана продаж',
+    reason: 'Неактуальный статус заказов',
     amount: 1000,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
   },
@@ -72,7 +73,7 @@ export const usePenalties = () => {
 
   const handleSavePenalty = async (
     id: number,
-    data: { city: string; reason: string; amount: number }
+    data: { city: string; reason: string; amount: number; orderNumber?: string }
   ) => {
     try {
       // TODO: Заменить на реальный API вызов
@@ -96,6 +97,7 @@ export const usePenalties = () => {
     city: string;
     reason: string;
     amount: number;
+    orderNumber?: string;
   }) => {
     try {
       // TODO: Заменить на реальный API вызов

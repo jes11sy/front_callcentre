@@ -127,8 +127,6 @@ export const usePenalties = () => {
         amount: Math.abs(data.amount), // Положительная сумма
         name: 'приход',
         paymentPurpose: 'Штраф',
-        nameCreate: user?.name || user?.login || 'Неизвестно',
-        dateCreate: new Date().toISOString(),
       });
       
       // Добавляем в локальное состояние

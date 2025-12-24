@@ -251,7 +251,7 @@ const OrderDescriptionTab = ({
             <p className="text-lg text-white">{order.city}</p>
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-400">Авито аккаунт</Label>
+            <Label className="text-sm font-medium text-gray-400">Источник</Label>
             <p className="text-lg text-white">{order.avitoName || <span className="text-gray-500">Не указан</span>}</p>
           </div>
         </CardContent>

@@ -214,12 +214,12 @@ const OrderDescriptionEditTab = ({
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-400">Авито аккаунт</Label>
+            <Label className="text-sm font-medium text-gray-400">Источник</Label>
             <Input 
               value={order.avitoName || ''} 
               onChange={(e) => onOrderChange('avitoName', e.target.value)}
               className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Название аккаунта Авито"
+              placeholder="Источник заказа"
             />
           </div>
         </CardContent>

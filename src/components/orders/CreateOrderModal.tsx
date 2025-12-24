@@ -44,7 +44,10 @@ const orderSchema = z.object({
   rk: z.enum(RK_OPTIONS, { message: 'Рекламная Компания обязательна' }),
   city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
   avitoName: z.enum(SOURCE_OPTIONS).optional(),
-  phone: z.string().min(1, 'Телефон обязателен'),
+  phone: z.string()
+    .min(11, 'Телефон должен содержать 11 цифр')
+    .max(11, 'Телефон должен содержать 11 цифр')
+    .regex(/^7\d{10}$/, 'Телефон должен начинаться с 7 и содержать 11 цифр'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия'], { 
     message: 'Тип заказа обязателен' 
   }),
@@ -253,12 +256,33 @@ export default function CreateOrderModal({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-sm font-medium text-gray-300">Телефон *</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    {...register('phone')}
-                    placeholder="Введите номер телефона"
-                    className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                  <Controller
+                    name="phone"
+                    control={form.control}
+                    render={({ field }) => (
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white pointer-events-none">7</span>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={field.value.startsWith('7') ? field.value.slice(1) : field.value}
+                          onChange={(e) => {
+                            // Разрешаем только цифры, максимум 10 (без первой 7)
+                            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                            field.onChange('7' + value);
+                          }}
+                          onFocus={(e) => {
+                            // При фокусе, если поле пустое, ставим 7
+                            if (!field.value || field.value === '') {
+                              field.onChange('7');
+                            }
+                          }}
+                          placeholder="9179822678"
+                          maxLength={10}
+                          className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20 pl-7"
+                        />
+                      </div>
+                    )}
                   />
                   {errors.phone && (
                     <p className="text-sm text-red-400">{errors.phone.message}</p>

@@ -112,7 +112,7 @@ export function CreateOrderModal({
         ? call.avitoName as typeof SOURCE_OPTIONS[number] 
         : undefined,
       typeOrder: 'Впервые',
-      typeEquipment: 'КП',
+      typeEquipment: undefined,
       clientName: '',
       address: '',
       dateMeeting: '',

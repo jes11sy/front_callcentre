@@ -8,15 +8,16 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Отключаем ESLint проверки во время сборки для Docker
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // Отключаем проверки TypeScript во время сборки для Docker
     ignoreBuildErrors: true,
   },
   output: 'standalone',
+  
+  // Генерируем уникальный build ID для cache busting
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
   
   // Оптимизации для уменьшения bundle size
   experimental: {

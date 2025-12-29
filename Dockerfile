@@ -1,5 +1,5 @@
-# Используем официальный Node.js образ как базовый
-FROM node:18-alpine AS base
+# Используем официальный Node.js образ как базовый (Node 20+ для Next.js 16)
+FROM node:20-alpine AS base
 
 # Устанавливаем зависимости только при необходимости
 FROM base AS deps

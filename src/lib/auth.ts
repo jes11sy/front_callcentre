@@ -48,6 +48,17 @@ const api = axios.create({
   },
 });
 
+// 🔒 Отдельный axios instance БЕЗ интерцепторов для refresh запросов
+// Это предотвращает рекурсивные вызовы refresh при ошибках
+const refreshApi = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Use-Cookies': 'true',
+  },
+});
+
 // 🍪 Request interceptor - добавляем X-Use-Cookies header
 api.interceptors.request.use(async (config) => {
   // Токены теперь в httpOnly cookies - не нужно добавлять вручную
@@ -89,13 +100,8 @@ api.interceptors.response.use(
         
         try {
           // Пробуем обновить токен через httpOnly cookies
-          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Use-Cookies': 'true',
-            },
-            withCredentials: true,
-          });
+          // ⚠️ Используем refreshApi БЕЗ интерцепторов для избежания рекурсии
+          const refreshResponse = await refreshApi.post('/auth/refresh', {});
           
           // Проверяем что refresh успешен
           if (!refreshResponse.data?.success) {

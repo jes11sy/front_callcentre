@@ -11,6 +11,18 @@ const api = axios.create({
   withCredentials: true, // Отправляем cookies с каждым запросом
 });
 
+// 🔒 Отдельный axios instance БЕЗ интерцепторов для refresh запросов
+// Это предотвращает рекурсивные вызовы refresh при ошибках
+const refreshApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1',
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Use-Cookies': 'true',
+  },
+  withCredentials: true,
+});
+
 // 🍪 Request interceptor - добавляем X-Use-Cookies header
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
@@ -79,17 +91,8 @@ api.interceptors.response.use(
         console.log('[API] Refreshing access token via cookies...');
         
         // 🍪 Обновляем токен через httpOnly cookies
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1'}/auth/refresh`,
-          {}, // Пустое тело для cookie-режима
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Use-Cookies': 'true',
-            },
-            withCredentials: true, // Отправляем cookies
-          }
-        );
+        // ⚠️ Используем refreshApi БЕЗ интерцепторов для избежания рекурсии
+        await refreshApi.post('/auth/refresh', {});
 
         console.log('[API] Access token refreshed successfully via cookies');
 

@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
 
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск'] as const;
+const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти'] as const;
 
 const orderSchema = z.object({
   city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),

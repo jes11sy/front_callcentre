@@ -36,7 +36,7 @@ import { useAuthStore } from '@/store/authStore';
 
 // Опции для выпадающих списков
 const RK_OPTIONS = ['Авито', 'Листовка'] as const;
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск'] as const;
+const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти'] as const;
 const SOURCE_OPTIONS = [
   'Не указано',
   'Владимир',

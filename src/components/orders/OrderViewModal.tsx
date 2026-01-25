@@ -368,7 +368,6 @@ const OrderDescriptionTab = ({
             ) : orderCalls.length > 0 ? (
               orderCalls.map((call: Call, index: number) => {
                 const isCurrentCall = (audioPlayer as { currentCallId?: string }).currentCallId === String(call.id);
-                const _hasRecording = !!call.recordingPath;
 
                 return (
                   <div key={call.id || index} className="p-3 bg-[#0f0f23] border border-[#FFD700]/30 rounded-lg">

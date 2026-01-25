@@ -2,6 +2,7 @@ import { useState } from 'react';
 import authApi from '@/lib/auth';
 import { toast } from 'sonner';
 import { AvitoAccount, OnlineStatuses, EternalOnlineSettings } from '@/types/avito';
+import { logger } from '@/lib/logger';
 
 export const useAvitoEternalOnline = () => {
   const [onlineStatuses, setOnlineStatuses] = useState<OnlineStatuses>({});
@@ -15,7 +16,7 @@ export const useAvitoEternalOnline = () => {
       setOnlineStatuses(response.data.onlineStatuses || {});
       setEternalOnlineSettings(response.data.eternalOnlineSettings || {});
     } catch (error: unknown) {
-      console.error('Failed to load online statuses:', error);
+      logger.error('Failed to load online statuses:', error);
       // Инициализируем пустыми объектами если нет данных
       const initialStatuses: {[key: number]: boolean} = {};
       const initialSettings: {[key: number]: boolean} = {};
@@ -32,7 +33,7 @@ export const useAvitoEternalOnline = () => {
     setUpdatingOnlineStatus(prev => new Set(prev).add(accountId));
     
     try {
-      const _response = await authApi.post(`/avito/${accountId}/eternal-online`, {
+      await authApi.post(`/avito/${accountId}/eternal-online`, {
         enabled
       });
       
@@ -53,7 +54,7 @@ export const useAvitoEternalOnline = () => {
         description: `Аккаунт будет ${enabled ? 'всегда онлайн' : 'управляться вручную'}`
       });
     } catch (error: unknown) {
-      console.error('Failed to toggle eternal online:', error);
+      logger.error('Failed to toggle eternal online:', error);
       toast.error('Ошибка изменения настройки', {
         description: (error as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error?.message || 'Произошла ошибка при изменении настройки вечного онлайна.',
       });

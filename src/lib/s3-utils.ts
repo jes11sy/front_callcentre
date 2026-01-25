@@ -3,8 +3,9 @@
  */
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
+const _API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
 /**
  * Получить подписанный URL для одного файла
@@ -19,16 +20,16 @@ export async function getSignedUrl(fileKey: string, expiresIn: number = 3600): P
 
   // Если fileKey уже является полным URL, возвращаем его как есть
   if (fileKey.startsWith('http://') || fileKey.startsWith('https://')) {
-    console.log('📎 File key is already a full URL, returning as is');
+    logger.log('File key is already a full URL, returning as is');
     return fileKey;
   }
 
-  console.log(`🔑 Getting signed URL for key: ${fileKey}`);
+  logger.log(`Getting signed URL for key: ${fileKey}`);
   
   // Используем публичный URL напрямую как в директорском фронте
   const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || 'https://s3.twcstorage.ru/f7eead03-crmfiles';
   const publicUrl = `${s3BaseUrl}/${fileKey}`;
-  console.log(`✅ Using public URL: ${publicUrl}`);
+  logger.log(`Using public URL: ${publicUrl}`);
   return publicUrl;
 }
 
@@ -61,7 +62,7 @@ export async function getSignedUrls(
       return acc;
     }, {} as Record<string, string>);
   } catch (error) {
-    console.error('Error getting signed URLs:', error);
+    logger.error('Error getting signed URLs:', error);
     return {};
   }
 }

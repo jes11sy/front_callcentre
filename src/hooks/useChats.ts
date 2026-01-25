@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { authApi } from '@/lib/auth';
 import { notifications } from '@/components/ui/notifications';
 import { AvitoAccount, AvitoChat, ChatFilter } from '@/types/avito';
+import { logger } from '@/lib/logger';
 
 export function useChats() {
   const [avitoAccounts, setAvitoAccounts] = useState<AvitoAccount[]>([]);
@@ -32,10 +33,10 @@ export function useChats() {
       setAccountsLoading(true);
       const response = await authApi.get('/avito-messenger/accounts');
       
-      console.log('Avito accounts response:', response.data);
+      logger.log('Avito accounts response:', response.data);
       
       if (response.data.success) {
-        console.log('Avito accounts data:', response.data.data);
+        logger.log('Avito accounts data:', response.data.data);
         setAvitoAccounts(response.data.data);
         if (response.data.data.length > 0 && !selectedAccount) {
           if (response.data.data.length > 1) {
@@ -44,13 +45,13 @@ export function useChats() {
             setSelectedAccount(response.data.data[0].name);
           }
         } else {
-          console.warn('No Avito accounts found or account already selected');
+          logger.warn('No Avito accounts found or account already selected');
         }
       } else {
         throw new Error(response.data.message || 'Ошибка при получении аккаунтов');
       }
     } catch (err: unknown) {
-      console.error('Error loading Avito accounts:', err);
+      logger.error('Error loading Avito accounts:', err);
       notifications.error('Ошибка при загрузке аккаунтов Авито: ' + ((err as { response?: { data?: { message?: string } } }).response?.data?.message || (err as { message?: string }).message || 'Неизвестная ошибка'));
     } finally {
       setAccountsLoading(false);
@@ -110,7 +111,7 @@ export function useChats() {
           }
           return [];
         } catch (error) {
-          console.error(`Error loading chats for account ${account.name}:`, error);
+          logger.error(`Error loading chats for account ${account.name}:`, error);
           return [];
         }
       });
@@ -138,11 +139,9 @@ export function useChats() {
       // Устанавливаем чаты с правильными флагами hasNewMessage
       setChats(uniqueChats);
       
-      // Подсчитываем статистику непрочитанных чатов
-      const _unreadCount = uniqueChats.filter(chat => chat.hasNewMessage).length;
       
     } catch (err: unknown) {
-      console.error('Error loading chats from all accounts:', err);
+      logger.error('Error loading chats from all accounts:', err);
       if (!silent) {
         notifications.error('Ошибка при загрузке чатов');
       }
@@ -195,7 +194,7 @@ export function useChats() {
         throw new Error(chatsResponse.data.message || 'Ошибка при получении чатов');
       }
     } catch (err: unknown) {
-      console.error('Error loading chats:', err);
+      logger.error('Error loading chats:', err);
       if (!silent) {
         notifications.error('Ошибка при загрузке чатов');
       }

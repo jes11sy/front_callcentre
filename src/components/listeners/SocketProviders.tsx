@@ -1,13 +1,18 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { AvitoNotificationListener } from './AvitoNotificationListener';
 import { SocketAuthListener } from './SocketAuthListener';
 
 export function SocketProviders() {
   const { isAuthenticated, isLoading } = useAuthStore();
+  const pathname = usePathname();
 
-  if (isLoading) {
+  // 🔧 FIX: Не инициализируем сокеты на страницах логина
+  const isLoginPage = pathname === '/login' || pathname === '/admin/login';
+
+  if (isLoading || isLoginPage) {
     return null;
   }
 

@@ -1,17 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { notifications } from '@/components/ui/notifications';
+import { socketLogger } from '@/lib/logger';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
 let globalSocket: Socket | null = null;
 
 export const useSocket = () => {
-  console.log('🔧 useSocket called');
+  socketLogger.log('useSocket called');
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    console.log('🔧 useSocket useEffect running');
+    socketLogger.log('useSocket useEffect running');
     if (globalSocket) {
       socketRef.current = globalSocket;
       return;
@@ -20,7 +21,7 @@ export const useSocket = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     
     if (!token) {
-      console.warn('⚠️ No auth token found');
+      socketLogger.warn('No auth token found');
       return;
     }
 
@@ -39,33 +40,33 @@ export const useSocket = () => {
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ WebSocket connected');
+      socketLogger.log('WebSocket connected');
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('❌ WebSocket disconnected:', reason);
+      socketLogger.log('WebSocket disconnected:', reason);
     });
 
     newSocket.on('error', (error) => {
-      console.error('❌ WebSocket error:', error);
+      socketLogger.error('WebSocket error:', error);
     });
 
     // РЕГИСТРИРУЕМ LISTENERS ТУТ ЖЕ
-    newSocket.on('call:new', (call: any) => {
-      console.log('📞 NEW CALL EVENT RECEIVED:', call);
+    newSocket.on('call:new', (call: unknown) => {
+      socketLogger.log('NEW CALL EVENT RECEIVED:', call);
       notifications.info('Новый звонок получен');
       
       // Dispatch custom event для useCallsData
       window.dispatchEvent(new CustomEvent('socket:call:new', { detail: call }));
     });
 
-    newSocket.on('call:updated', (call: any) => {
-      console.log('📞 CALL UPDATED EVENT RECEIVED:', call);
+    newSocket.on('call:updated', (call: unknown) => {
+      socketLogger.log('CALL UPDATED EVENT RECEIVED:', call);
       window.dispatchEvent(new CustomEvent('socket:call:updated', { detail: call }));
     });
 
-    newSocket.on('call:ended', (call: any) => {
-      console.log('📞 CALL ENDED EVENT RECEIVED:', call);
+    newSocket.on('call:ended', (call: unknown) => {
+      socketLogger.log('CALL ENDED EVENT RECEIVED:', call);
       window.dispatchEvent(new CustomEvent('socket:call:ended', { detail: call }));
     });
 

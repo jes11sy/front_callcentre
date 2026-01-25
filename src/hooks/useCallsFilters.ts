@@ -68,10 +68,6 @@ export const useCallsFilters = () => {
     search?.setSearchTerm?.('');
   }, [reset, search]);
 
-  const _handleSearch = useCallback(() => {
-    setCurrentPage(1);
-  }, []);
-
   const handleSort = useCallback((field: string) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');

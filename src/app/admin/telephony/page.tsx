@@ -39,6 +39,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import authApi from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Types
 interface PhoneNumber {
@@ -170,10 +171,10 @@ export default function TelephonyPage() {
     try {
       const response = await authApi.get(`/phones/${phone.id}/stats`);
       toast.success('Статистика загружена');
-      console.log('Phone stats:', response.data);
+      logger.log('Phone stats:', response.data);
       // TODO: Show stats in a modal or separate view
     } catch (error: unknown) {
-      console.error('Error getting phone stats:', error);
+      logger.error('Error getting phone stats:', error);
       toast.error('Ошибка получения статистики');
     }
   };

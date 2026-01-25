@@ -84,21 +84,6 @@ export default function OrdersPage() {
     }
   });
 
-  // 🍪 Обновление статуса заказа через axios - removed, not used
-  const _updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await api.put(`/orders/${id}/status`, { status });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Статус заказа обновлен');
-    },
-    onError: () => {
-      toast.error('Ошибка при обновлении статуса');
-    }
-  });
-
   // 🍪 Удаление заказа через axios
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: number) => {

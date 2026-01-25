@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { AvitoChat } from '@/types/avito';
+import { logger } from '@/lib/logger';
 
 export function useAutoRefresh() {
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<NodeJS.Timeout | null>(null);
@@ -28,18 +29,18 @@ export function useAutoRefresh() {
       clearInterval(autoRefreshInterval);
     }
 
-    // Start new interval - refresh every 60 seconds (увеличено с 30)
+    // Start new interval - refresh every 5 minutes as fallback
     const interval = setInterval(() => {
-      console.log('🔄 Auto refresh tick - checking conditions');
-      console.log('🔄 Page visible:', isPageVisible());
-      console.log('🔄 User active:', isUserActive());
+      logger.log('Auto refresh tick - checking conditions');
+      logger.log('Page visible:', isPageVisible());
+      logger.log('User active:', isUserActive());
       
       // Обновляем только если страница видима и пользователь активен
       if (isPageVisible() && isUserActive()) {
-        console.log('🔄 Auto refreshing messages for chat:', chat.id);
+        logger.log('Auto refreshing messages for chat:', chat.id);
         loadMessages(chat, true); // true = silent refresh
       } else {
-        console.log('🔄 Skipping auto refresh - page not visible or user inactive');
+        logger.log('Skipping auto refresh - page not visible or user inactive');
       }
     }, 300000); // 5 минут - только как fallback
 

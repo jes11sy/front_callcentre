@@ -76,8 +76,6 @@ export default function MangoSettingsPage() {
     defaultValues: settings
   });
 
-  const _watchedSettings = watch();
-
   const loadSettings = useCallback(async () => {
     try {
       setLoading(true);

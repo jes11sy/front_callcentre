@@ -1,6 +1,7 @@
 // Унифицированная система уведомлений - устраняет дублирование кода
 import { toast } from 'sonner';
 import { NotificationOptions } from '@/types/common';
+import { logger } from '@/lib/logger';
 
 // Базовые настройки для разных типов уведомлений
 const NOTIFICATION_CONFIG = {
@@ -29,9 +30,9 @@ function playNotificationSound(type: keyof typeof NOTIFICATION_CONFIG) {
   try {
     // Здесь можно добавить логику воспроизведения звуков
     // Например, через Web Audio API или HTML5 Audio
-    console.log(`Playing ${type} notification sound`);
+    logger.log(`Playing ${type} notification sound`);
   } catch (error) {
-    console.warn('Failed to play notification sound:', error);
+    logger.warn('Failed to play notification sound:', error);
   }
 }
 

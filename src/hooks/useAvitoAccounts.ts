@@ -5,6 +5,7 @@ import { z } from 'zod';
 import authApi from '@/lib/auth';
 import { toast } from 'sonner';
 import { AvitoAccount, AvitoFormData, AvitoStats } from '@/types/avito';
+import { logger } from '@/lib/logger';
 
 // Zod schemas for validation
 const avitoSchema = z.object({
@@ -290,8 +291,8 @@ export const useAvitoAccounts = () => {
         const successCount = response.data.data?.summary?.success || 0;
         const totalCount = response.data.data?.summary?.total || 0;
         
-        console.log('✅ Webhook registered:', webhookUrl);
-        console.log('📊 Results:', response.data.data);
+        logger.log('Webhook registered:', webhookUrl);
+        logger.log('Results:', response.data.data);
         
         toast.success('Webhook зарегистрирован', {
           description: `Успешно зарегистрировано для ${successCount} из ${totalCount} аккаунтов. URL: ${webhookUrl}`
@@ -300,7 +301,7 @@ export const useAvitoAccounts = () => {
         throw new Error(response.data.message || 'Ошибка регистрации webhook');
       }
     } catch (error: unknown) {
-      console.error('Webhook registration failed:', error);
+      logger.error('Webhook registration failed:', error);
       toast.error('Ошибка регистрации webhook', {
         description: (error as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error?.message || 'Не удалось зарегистрировать webhook',
       });

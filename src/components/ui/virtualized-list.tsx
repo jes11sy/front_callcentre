@@ -18,12 +18,13 @@ interface VirtualizedListProps<T> {
 export function VirtualizedList<T>({
   items,
   height,
-  itemHeight,
+  itemHeight: _itemHeight,
   renderItem,
   className,
   onScroll,
   overscanCount: _overscanCount = 5
 }: VirtualizedListProps<T>) {
+  // Note: itemHeight and overscanCount reserved for future virtualization implementation
   const listRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
@@ -69,10 +70,12 @@ export function VirtualizedTable<T>({
   columns,
   className
 }: VirtualizedTableProps<T>) {
+  // totalWidth reserved for future horizontal scroll implementation
   const _totalWidth = useMemo(() => 
     columns.reduce((sum, col) => sum + col.width, 0), 
     [columns]
   );
+  void _totalWidth;
 
   const RowRenderer = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
     const item = items[index];

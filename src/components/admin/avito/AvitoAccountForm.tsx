@@ -24,8 +24,8 @@ import {
 } from 'lucide-react';
 import { AvitoFormData } from '@/types/avito';
 
-// Zod schema for validation
-const _avitoSchema = z.object({
+// Zod schema for validation (used by parent component)
+export const avitoSchema = z.object({
   name: z.string().min(2, 'Название должно содержать минимум 2 символа'),
   clientId: z.string().min(1, 'Client ID обязателен'),
   clientSecret: z.string().min(1, 'Client Secret обязателен'),

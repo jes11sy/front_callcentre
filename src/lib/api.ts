@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { apiLogger, authLogger } from '@/lib/logger';
 
 // 🍪 Создаем экземпляр axios с поддержкой httpOnly cookies
 const api = axios.create({
@@ -88,13 +89,13 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log('[API] Refreshing access token via cookies...');
+        apiLogger.log('Refreshing access token via cookies...');
         
         // 🍪 Обновляем токен через httpOnly cookies
         // ⚠️ Используем refreshApi БЕЗ интерцепторов для избежания рекурсии
         await refreshApi.post('/auth/refresh', {});
 
-        console.log('[API] Access token refreshed successfully via cookies');
+        apiLogger.log('Access token refreshed successfully via cookies');
 
         // Обрабатываем очередь неудавшихся запросов
         processQueue(null);
@@ -103,7 +104,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh токен невалиден - выходим
-        console.error('[API] Failed to refresh token:', refreshError);
+        apiLogger.error('Failed to refresh token:', refreshError);
         processQueue(refreshError as AxiosError);
         
         // Очищаем локальные данные и перенаправляем на логин
@@ -126,8 +127,8 @@ export const authUtils = {
    * Токены устанавливаются сервером в httpOnly cookies - этот метод не нужен
    * Оставляем для обратной совместимости
    */
-  setTokens: async (accessToken: string, refreshToken: string): Promise<void> => {
-    console.log('[Auth] Tokens are now stored in httpOnly cookies by the server');
+  setTokens: async (_accessToken: string, _refreshToken: string): Promise<void> => {
+    authLogger.log('Tokens are now stored in httpOnly cookies by the server');
     // Ничего не делаем - токены в cookies
   },
 
@@ -136,7 +137,7 @@ export const authUtils = {
    * Нельзя прочитать httpOnly cookies на клиенте
    */
   getAccessToken: async (): Promise<string | null> => {
-    console.warn('[Auth] Cannot read httpOnly cookies on client');
+    authLogger.warn('Cannot read httpOnly cookies on client');
     return null;
   },
 
@@ -145,7 +146,7 @@ export const authUtils = {
    * Нельзя прочитать httpOnly cookies на клиенте
    */
   getRefreshToken: async (): Promise<string | null> => {
-    console.warn('[Auth] Cannot read httpOnly cookies on client');
+    authLogger.warn('Cannot read httpOnly cookies on client');
     return null;
   },
 
@@ -167,7 +168,7 @@ export const authUtils = {
    * Локально ничего не храним
    */
   clearTokens: (): void => {
-    console.log('[Auth] No local tokens to clear - using httpOnly cookies');
+    authLogger.log('No local tokens to clear - using httpOnly cookies');
   },
 
   /**
@@ -177,7 +178,7 @@ export const authUtils = {
     try {
       await api.post('/auth/logout', {}); // Пустой объект для POST запроса
     } catch (error) {
-      console.error('[API] Logout error:', error);
+      apiLogger.error('Logout error:', error);
     } finally {
       window.location.href = '/login';
     }

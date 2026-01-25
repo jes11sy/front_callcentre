@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authLogger } from '@/lib/logger';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
@@ -188,8 +189,8 @@ export const authApi = {
    * 🍪 Save tokens - не нужно, токены в cookies
    * Оставляем для обратной совместимости
    */
-  saveTokens: async (accessToken: string, refreshToken: string, rememberMe: boolean = false) => {
-    console.log('[Auth] Tokens are stored in httpOnly cookies by the server');
+  saveTokens: async (_accessToken: string, _refreshToken: string, _rememberMe: boolean = false) => {
+    authLogger.log('Tokens are stored in httpOnly cookies by the server');
     // Ничего не делаем
   },
 

@@ -3,6 +3,7 @@
 import { useEffect, useCallback } from 'react';
 import { notifications } from '@/components/ui/notifications';
 import { Call } from '@/types/telephony';
+import { socketLogger } from '@/lib/logger';
 
 interface UseSocketCallsProps {
   // Используем on/off из useGlobalSocket, а не raw socket
@@ -24,9 +25,9 @@ export function useSocketCalls({
 }: UseSocketCallsProps) {
 
   const handleNewCall = useCallback((...args: unknown[]) => {
-    console.log('📞 [useSocketCalls] handleNewCall triggered with args:', args);
+    socketLogger.log('handleNewCall triggered with args:', args);
     const call = args[0] as Call;
-    console.log('📞 [useSocketCalls] Parsed call:', call);
+    socketLogger.log('Parsed call:', call);
     onNewCall(call);
     notifications.info('Новый звонок получен');
   }, [onNewCall]);

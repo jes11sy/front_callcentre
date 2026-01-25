@@ -3,14 +3,12 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { socketLogger } from '@/lib/logger';
 // 🍪 tokenStorage больше не нужен - используем httpOnly cookies
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
 
-console.log('🔌 Socket URL:', SOCKET_URL, {
-  NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
-});
+socketLogger.log('Socket URL:', SOCKET_URL);
 
 class SocketManager {
   private static instance: SocketManager;
@@ -65,7 +63,7 @@ class SocketManager {
       // Динамический импорт Socket.IO
       const { io } = await import('socket.io-client');
       
-      console.log('🔌 Connecting to Socket.IO...');
+      socketLogger.log('Connecting to Socket.IO...');
       
       // ⚠️ ВАЖНО: WebSocket НЕ МОЖЕТ использовать httpOnly cookies!
       // Создаем соединение БЕЗ токена, токен отправим в событии authenticate
@@ -83,12 +81,12 @@ class SocketManager {
 
       this.setupEventHandlers();
       
-      console.log('🔌 Socket configured, calling connect()...');
+      socketLogger.log('Socket configured, calling connect()...');
       
       // Явно подключаемся
       this.socket.connect();
       
-      console.log('🔌 Connect() called, socket.connected:', this.socket.connected);
+      socketLogger.log('Connect() called, socket.connected:', this.socket.connected);
       
       this.reconnectAttempts = 0;
       
@@ -104,21 +102,21 @@ class SocketManager {
 
   private setupEventHandlers() {
     if (!this.socket) {
-      console.log('⏭️ No socket, skipping handler setup...');
+      socketLogger.log('No socket, skipping handler setup...');
       return;
     }
 
     // Проверяем что обработчики еще не установлены
     if (this.handlersSetup) {
-      console.log('⏭️ Handlers already setup, skipping...');
+      socketLogger.log('Handlers already setup, skipping...');
       return;
     }
 
-    console.log('🔧 Setting up socket event handlers...');
+    socketLogger.log('Setting up socket event handlers...');
     this.handlersSetup = true;
 
     this.socket.on('connect', async () => {
-      console.log('🟢 Socket connected:', this.socket?.connected);
+      socketLogger.log('Socket connected:', this.socket?.connected);
       this.reconnectAttempts = 0;
       this.emit('connection', { status: 'connected' });
       
@@ -128,36 +126,36 @@ class SocketManager {
         const response = await api.get('/auth/socket-token');
         const token = response.data.data.token;
         
-        console.log('🔑 Got socket token, authenticating...');
+        socketLogger.log('Got socket token, authenticating...');
         this.socket?.emit('authenticate', { token });
       } catch (error) {
-        console.error('❌ Failed to get socket token:', error);
+        socketLogger.error('Failed to get socket token:', error);
         this.socket?.disconnect();
       }
     });
 
-    this.socket.on('authenticated', (data: any) => {
-      console.log('✅ Socket authenticated successfully:', data);
+    this.socket.on('authenticated', (data: unknown) => {
+      socketLogger.log('Socket authenticated successfully:', data);
       this.emit('authenticated', data);
     });
 
     this.socket.on('disconnect', (...args: unknown[]) => {
-      console.log('🔴 Socket disconnected:', args[0]);
+      socketLogger.log('Socket disconnected:', args[0]);
       this.emit('connection', { status: 'disconnected' });
     });
 
     this.socket.on('connect_error', (error: unknown) => {
-      console.error('❌ Socket.IO connection error:', error);
+      socketLogger.error('Socket.IO connection error:', error);
       this.reconnectAttempts++;
       this.emit('connection', { status: 'error', error });
     });
 
-    this.socket.on('error', (error: any) => {
-      console.error('❌ Socket error:', error);
+    this.socket.on('error', (error: unknown) => {
+      socketLogger.error('Socket error:', error);
     });
 
-    this.socket.on('exception', (error: any) => {
-      console.error('❌ Socket exception:', error);
+    this.socket.on('exception', (error: unknown) => {
+      socketLogger.error('Socket exception:', error);
     });
 
     // Проксируем все события
@@ -205,7 +203,7 @@ class SocketManager {
         try {
           callback(...args);
         } catch (error) {
-          console.error(`Error in socket event listener for ${event}:`, error);
+          socketLogger.error(`Error in socket event listener for ${event}:`, error);
         }
       });
     }
@@ -216,7 +214,7 @@ class SocketManager {
     if (this.socket?.connected) {
       this.socket.emit(event, data);
     } else {
-      console.warn('Socket not connected, message not sent:', event, data);
+      socketLogger.warn('Socket not connected, message not sent:', event, data);
     }
   }
 
@@ -225,7 +223,7 @@ class SocketManager {
     if (this.socket?.connected) {
       this.socket.emit('authenticate', { token });
     } else {
-      console.warn('Socket not connected, cannot authenticate');
+      socketLogger.warn('Socket not connected, cannot authenticate');
     }
   }
 
@@ -258,8 +256,12 @@ export const useGlobalSocket = () => {
   const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      // Если пользователь не аутентифицирован, отключаем socket
+    // 🔧 FIX: Не подключаемся к сокету на страницах логина
+    const isLoginPage = typeof window !== 'undefined' && 
+      (window.location.pathname === '/login' || window.location.pathname === '/admin/login');
+
+    if (!isAuthenticated || isLoginPage) {
+      // Если пользователь не аутентифицирован или на странице логина, отключаем socket
       if (socketManager.current?.isConnected) {
         socketManager.current.disconnect();
       }

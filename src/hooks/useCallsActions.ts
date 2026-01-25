@@ -5,6 +5,7 @@ import { Call } from '@/types/telephony';
 import { toast } from 'sonner';
 import { notifications } from '@/components/ui/notifications';
 import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
+import { logger } from '@/lib/logger';
 
 export const useCallsActions = () => {
   // States
@@ -114,7 +115,7 @@ export const useCallsActions = () => {
 
   const handleOrderCreated = useCallback((order: { id?: string | number }) => {
     // Уведомление уже показывается в компоненте CreateOrderModal
-    console.log('Order created:', order);
+    logger.log('Order created:', order);
   }, []);
 
   return {

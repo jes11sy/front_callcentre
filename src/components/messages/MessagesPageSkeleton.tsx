@@ -2,18 +2,6 @@
 
 import { cn } from '@/lib/utils';
 
-// Улучшенная анимация скелетона с волновым эффектом
-const _shimmerAnimation = `
-  @keyframes shimmer {
-    0% {
-      background-position: -200px 0;
-    }
-    100% {
-      background-position: calc(200px + 100%) 0;
-    }
-  }
-`;
-
 // Стили для волновой анимации
 const shimmerClass = `
   relative overflow-hidden

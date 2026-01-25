@@ -14,10 +14,10 @@ interface MessageListProps {
   onMessageAction?: (action: string, message: AvitoMessage) => void;
 }
 
-// Константы для виртуализации
-const MESSAGE_HEIGHT = 80; // Высота одного сообщения в пикселях
-const CONTAINER_HEIGHT = 600; // Высота контейнера для виртуализации
-const _OVERSCAN_COUNT = 5; // Количество элементов для предзагрузки
+// Константы для виртуализации (reserved for future implementation)
+// const MESSAGE_HEIGHT = 80;
+// const CONTAINER_HEIGHT = 600;
+// const OVERSCAN_COUNT = 5;
 
 // Компонент отдельного сообщения для виртуализации
 interface MessageItemProps {

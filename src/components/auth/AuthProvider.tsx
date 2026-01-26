@@ -20,17 +20,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const isPublicPage = pathname === '/login' || pathname === '/admin/login';
 
-  // 🔧 FIX: При заходе на страницу логина - сбрасываем устаревшее состояние
+  // 🔧 FIX: При заходе на страницу логина - только сбрасываем loading
+  // НЕ вызываем logout() здесь, так как это мешает редиректу после успешного логина
   useEffect(() => {
     if (isPublicPage) {
-      // Очищаем устаревшее состояние аутентификации чтобы предотвратить циклические запросы
-      if (isAuthenticated) {
-        authLogger.log('Clearing stale auth state on login page');
-        logout();
-      }
       setLoading(false);
     }
-  }, [isPublicPage, isAuthenticated, logout, setLoading]);
+  }, [isPublicPage, setLoading]);
 
   useEffect(() => {
     // Предотвращаем повторную инициализацию

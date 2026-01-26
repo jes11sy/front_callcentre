@@ -20,8 +20,8 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   
-  const router = useRouter();
-  const { setUser: _setUser, login: loginUser } = useAuthStore();
+  const _router = useRouter(); // Оставляем для возможного использования
+  const _authStore = useAuthStore(); // Сохраняем для возможного использования
 
   const handleLogin = async () => {
     
@@ -57,10 +57,12 @@ export function LoginForm() {
       // Save tokens and user data securely with rememberMe preference
       await authApi.saveTokens(response.data.accessToken, response.data.refreshToken, rememberMe);
       await authApi.saveUser(response.data.user, rememberMe);
-      loginUser(response.data.user);
       
-      // Redirect based on role
-      router.push('/');
+      // Redirect BEFORE updating store to avoid AuthProvider logout on login page
+      const redirectPath = response.data.user.role === 'admin' ? '/admin/telephony' : '/telephony';
+      
+      // Use window.location for hard redirect to ensure cookies are sent
+      window.location.href = redirectPath;
       
     } catch (error: unknown) {
       // Don't show error if session expired (already redirecting to login)

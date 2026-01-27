@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru';
@@ -19,21 +19,27 @@ const socketConfig = {
 
 export const useSimpleSocket = () => {
   const socketRef = useRef<Socket | null>(null);
+  // ✅ FIX: Используем state вместо useMemo для реактивного обновления
+  // useMemo с [] всегда возвращал null, т.к. вычислялся только при первом рендере
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io(SOCKET_URL, socketConfig);
+    const newSocket = io(SOCKET_URL, socketConfig);
+    socketRef.current = newSocket;
+    setSocket(newSocket); // ✅ Обновляем state для ре-рендера
 
     // Cleanup on unmount
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocket(null);
       }
     };
   }, []);
 
-  // Мемоизируем возвращаемое значение
-  return useMemo(() => socketRef.current, []);
+  // ✅ FIX: Возвращаем state который корректно обновляется после подключения
+  return socket;
 };
 

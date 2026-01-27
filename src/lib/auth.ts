@@ -1,5 +1,7 @@
+// ✅ FIX #151: Добавлен axios retry logic
 import axios from 'axios';
 import { authLogger } from '@/lib/logger';
+import { setupAxiosRetry, classifyAxiosError, getUserFriendlyAxiosError } from './axios-retry';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
@@ -43,6 +45,7 @@ export interface ProfileResponse {
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // Отправляем cookies с каждым запросом
+  timeout: 15000, // ✅ FIX #151: 15 секунд таймаут
   headers: {
     'Content-Type': 'application/json',
     'X-Use-Cookies': 'true', // Указываем что используем cookies
@@ -54,10 +57,27 @@ const api = axios.create({
 const refreshApi = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: 15000, // 15 секунд таймаут
   headers: {
     'Content-Type': 'application/json',
     'X-Use-Cookies': 'true',
   },
+});
+
+// ✅ FIX #151: Настраиваем retry для основного API instance
+setupAxiosRetry(api, {
+  maxRetries: 3,
+  retryDelay: 1000,
+  backoff: true,
+  retryOnStatus: [502, 503, 504, 0], // 0 - сетевые ошибки
+});
+
+// ✅ FIX #151: Настраиваем retry для refresh API instance
+setupAxiosRetry(refreshApi, {
+  maxRetries: 2,
+  retryDelay: 500,
+  backoff: true,
+  retryOnStatus: [502, 503, 504, 0],
 });
 
 // 🍪 Request interceptor - добавляем X-Use-Cookies header
@@ -196,11 +216,14 @@ export const authApi = {
 
   /**
    * 🍪 Save user - сохраняем только пользователя в localStorage
+   * ✅ FIX #150: Санитизация данных перед сохранением
    */
   saveUser: async (user: User, rememberMe: boolean = false) => {
     if (typeof window !== 'undefined') {
+      const { sanitizeObject } = await import('./xss-protection');
+      const sanitizedUser = sanitizeObject(user as Record<string, unknown>);
       const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem('user', JSON.stringify(user));
+      storage.setItem('user', JSON.stringify(sanitizedUser));
     }
   },
 
@@ -232,6 +255,9 @@ export const authApi = {
   put: (url: string, data?: unknown, config?: unknown) => api.put(url, data, config as Record<string, unknown>),
   delete: (url: string, config?: unknown) => api.delete(url, config as Record<string, unknown>),
 };
+
+// ✅ FIX #151: Экспортируем утилиты для обработки ошибок
+export { classifyAxiosError, getUserFriendlyAxiosError } from './axios-retry';
 
 // Export the axios instance for direct API calls
 export default api;

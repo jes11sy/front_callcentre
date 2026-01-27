@@ -1,135 +1,19 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { apiLogger, authLogger } from '@/lib/logger';
-
-// 🍪 Создаем экземпляр axios с поддержкой httpOnly cookies
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1',
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Use-Cookies': 'true', // Указываем что используем cookies
-  },
-  withCredentials: true, // Отправляем cookies с каждым запросом
-});
-
-// 🔒 Отдельный axios instance БЕЗ интерцепторов для refresh запросов
-// Это предотвращает рекурсивные вызовы refresh при ошибках
-const refreshApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1',
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Use-Cookies': 'true',
-  },
-  withCredentials: true,
-});
-
-// 🍪 Request interceptor - добавляем X-Use-Cookies header
-api.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    // Токены теперь в httpOnly cookies - не нужно добавлять вручную
-    if (config.headers) {
-      config.headers['X-Use-Cookies'] = 'true';
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
-
-// 🍪 Response interceptor - автоматическое обновление токена при 401
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (value?: any) => void;
-  reject: (reason?: any) => void;
-}> = [];
-
-const processQueue = (error: AxiosError | null) => {
-  failedQueue.forEach((promise) => {
-    if (error) {
-      promise.reject(error);
-    } else {
-      promise.resolve();
-    }
-  });
-  failedQueue = [];
-};
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
-
-    // Проверяем условия для обновления токена
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/login') &&
-      !originalRequest.url?.includes('/auth/refresh')
-    ) {
-      if (isRefreshing) {
-        // Если токен уже обновляется, добавляем запрос в очередь
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => {
-            // Повторяем запрос с обновленными cookies
-            return api(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        apiLogger.log('Refreshing access token via cookies...');
-        
-        // 🍪 Обновляем токен через httpOnly cookies
-        // ⚠️ Используем refreshApi БЕЗ интерцепторов для избежания рекурсии
-        await refreshApi.post('/auth/refresh', {});
-
-        apiLogger.log('Access token refreshed successfully via cookies');
-
-        // Обрабатываем очередь неудавшихся запросов
-        processQueue(null);
-
-        // Повторяем исходный запрос с обновленными cookies
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh токен невалиден - выходим
-        apiLogger.error('Failed to refresh token:', refreshError);
-        processQueue(refreshError as AxiosError);
-        
-        // Очищаем локальные данные и перенаправляем на логин
-        window.location.href = '/login';
-        
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
+/**
+ * ✅ FIX: Объединенный API модуль - переиспользует axios instance из auth.ts
+ * Это устраняет дублирование axios instances и обеспечивает единую конфигурацию
+ */
+import api, { authApi } from '@/lib/auth';
+import { authLogger, apiLogger } from '@/lib/logger';
 
 // 🍪 Вспомогательные функции для работы с httpOnly cookies
+// Переиспользуем функции из authApi для обратной совместимости
 export const authUtils = {
   /**
    * 🍪 Сохранить токены после логина
    * Токены устанавливаются сервером в httpOnly cookies - этот метод не нужен
-   * Оставляем для обратной совместимости
    */
   setTokens: async (_accessToken: string, _refreshToken: string): Promise<void> => {
     authLogger.log('Tokens are now stored in httpOnly cookies by the server');
-    // Ничего не делаем - токены в cookies
   },
 
   /**
@@ -151,21 +35,14 @@ export const authUtils = {
   },
 
   /**
-   * 🍪 Проверить наличие токенов
-   * Проверяем через запрос к API
+   * 🍪 Проверить наличие токенов через API
    */
   hasTokens: async (): Promise<boolean> => {
-    try {
-      await api.get('/auth/profile');
-      return true;
-    } catch {
-      return false;
-    }
+    return authApi.isAuthenticated();
   },
 
   /**
    * 🍪 Очистить токены (logout)
-   * Локально ничего не храним
    */
   clearTokens: (): void => {
     authLogger.log('No local tokens to clear - using httpOnly cookies');
@@ -176,7 +53,7 @@ export const authUtils = {
    */
   logout: async (): Promise<void> => {
     try {
-      await api.post('/auth/logout', {}); // Пустой объект для POST запроса
+      await authApi.logout();
     } catch (error) {
       apiLogger.error('Logout error:', error);
     } finally {
@@ -185,5 +62,6 @@ export const authUtils = {
   },
 };
 
+// ✅ FIX: Экспортируем единый axios instance из auth.ts
 export default api;
 

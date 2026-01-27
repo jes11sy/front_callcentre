@@ -6,7 +6,8 @@ import { notifications } from '@/components/ui/notifications';
 import { AvitoMessage, AvitoChat } from '@/types/avito';
 
 interface UseSocketMessagesProps {
-  socket: { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string) => void } | null;
+  // ✅ FIX: Обновлён интерфейс off() - теперь принимает callback для удаления конкретного handler
+  socket: { on: (event: string, callback: (...args: unknown[]) => void) => void; off: (event: string, callback?: (...args: unknown[]) => void) => void } | null;
   isConnected: boolean;
   selectedChat: AvitoChat | null;
   selectedAccount: string;
@@ -111,10 +112,11 @@ export function useSocketMessages({
     socket.on('avito-new-message', newMessageHandler);
     socket.on('avito-chat-updated', chatUpdateHandler);
 
-    // Cleanup
+    // ✅ FIX: Передаём конкретный handler при отписке
+    // Иначе socket.off('event') удаляет ВСЕ listeners для этого события
     return () => {
-      socket.off('avito-new-message');
-      socket.off('avito-chat-updated');
+      socket.off('avito-new-message', newMessageHandler);
+      socket.off('avito-chat-updated', chatUpdateHandler);
     };
   }, [socket, newMessageHandler, chatUpdateHandler]);
 }

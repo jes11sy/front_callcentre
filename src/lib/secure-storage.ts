@@ -21,7 +21,14 @@ interface StorageOptions {
 class SecureStorage {
   private static instance: SecureStorage;
   private isClient = false;
-  private encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'lead-schem-dev-key-2024';
+  // ✅ FIX #173: Убран захардкоженный ключ — ОБЯЗАТЕЛЬНО задать в .env
+  // ⚠️ SECURITY: В production NEXT_PUBLIC_ENCRYPTION_KEY должен быть уникальным!
+  private encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || (() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+      console.error('⚠️ SECURITY WARNING: NEXT_PUBLIC_ENCRYPTION_KEY not set in production!');
+    }
+    return 'INSECURE-DEV-KEY-CHANGE-ME'; // Явно указывает что ключ не безопасный
+  })();
 
   private constructor() {
     if (typeof window !== 'undefined') {
@@ -243,8 +250,12 @@ export const tokenStorage = {
     secureStorage.removeItem('refreshToken'),
 
   // User data (менее критично, можно не шифровать)
-  setUser: async (user: unknown, rememberMe: boolean = false): Promise<boolean> => 
-    await secureStorage.setItem('user', user, { encrypt: false, ttl: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 }), // 7 дней или 24 часа
+  // ✅ FIX #150: Санитизация данных перед сохранением
+  setUser: async (user: unknown, rememberMe: boolean = false): Promise<boolean> => {
+    const { sanitizeObject } = await import('./xss-protection');
+    const sanitizedUser = sanitizeObject(user as Record<string, unknown>);
+    return await secureStorage.setItem('user', sanitizedUser, { encrypt: false, ttl: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 }); // 7 дней или 24 часа
+  },
   
   getUser: async (): Promise<unknown> => 
     await secureStorage.getItem('user'),

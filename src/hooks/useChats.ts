@@ -72,40 +72,28 @@ export function useChats() {
       
       const chatPromises = avitoAccounts.map(async (account) => {
         try {
-          // ВАЖНО: Делаем два запроса для каждого аккаунта
-          // 1. Получаем все чаты
-          const allChatsParams = new URLSearchParams({
+          // ✅ FIX: Делаем ОДИН запрос вместо двух
+          // Бэкенд уже добавляет unreadCount и hasNewMessage на основе last_message.is_read
+          const chatsParams = new URLSearchParams({
             avitoAccountName: account.name,
             limit: '50',
             offset: '0',
             unread_only: 'false'
           });
 
-          // 2. Получаем только непрочитанные чаты
-          const unreadChatsParams = new URLSearchParams({
-            avitoAccountName: account.name,
-            limit: '50',
-            offset: '0',
-            unread_only: 'true'
-          });
-
-          const [allChatsResponse, unreadChatsResponse] = await Promise.all([
-            authApi.get(`/avito-messenger/chats?${allChatsParams.toString()}`),
-            authApi.get(`/avito-messenger/chats?${unreadChatsParams.toString()}`)
-          ]);
+          const chatsResponse = await authApi.get(`/avito-messenger/chats?${chatsParams.toString()}`);
           
-          if (allChatsResponse.data.success && unreadChatsResponse.data.success) {
-            const allChats = allChatsResponse.data.data || [];
-            const unreadChats = unreadChatsResponse.data.data || [];
+          if (chatsResponse.data.success) {
+            const chats = chatsResponse.data.data || [];
             
-            // Создаем Set с ID непрочитанных чатов
-            const unreadChatIds = new Set(unreadChats.map((chat: AvitoChat) => chat.id));
-            
-            return allChats.map((chat: AvitoChat) => ({
+            // ✅ FIX: Бэкенд уже предоставляет hasNewMessage/unreadCount
+            // Нам нужно только добавить avitoAccountName для идентификации
+            return chats.map((chat: AvitoChat) => ({
               ...chat,
               avitoAccountName: account.name,
-              hasNewMessage: unreadChatIds.has(chat.id),
-              unreadCount: unreadChatIds.has(chat.id) ? (chat.unreadCount || 1) : undefined,
+              // Используем данные от бэкенда, либо проверяем last_message.is_read
+              hasNewMessage: chat.hasNewMessage || 
+                (chat.lastMessage?.direction === 'in' && chat.lastMessage?.isRead === false),
               updated: chat.updated || Date.now() / 1000
             }));
           }

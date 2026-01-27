@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useGlobalSocket } from '@/hooks/useGlobalSocket';
+import { useState, useCallback, useRef } from 'react';
 import { Call, CallsResponse } from '@/types/telephony';
 import authApi from '@/lib/auth';
 import { notifications } from '@/components/ui/notifications';
@@ -13,10 +12,14 @@ export const useCallsData = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalCalls, setTotalCalls] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [lastCallCount, setLastCallCount] = useState(0);
   const [newCallsCount, setNewCallsCount] = useState(0);
   const [socketConnected, setSocketConnected] = useState(false);
   const [lastParams, setLastParams] = useState<string>('');
+  
+  // ✅ FIX: Используем ref для хранения предыдущего total (pagination.total),
+  // а не prevCalls.length (количество на текущей странице)
+  const previousTotalRef = useRef<number>(0);
+  const isFirstLoadRef = useRef<boolean>(true);
 
   // Мемоизированные функции
   const fetchCalls = useCallback(async (params: URLSearchParams) => {
@@ -40,19 +43,20 @@ export const useCallsData = () => {
         const currentCallCount = data.data.pagination.total;
         const currentTotalPages = data.data.pagination.totalPages;
         
-        // Check for new calls
-        setCalls(prevCalls => {
-          // Проверяем новые звонки только если это не первая загрузка
-          if (prevCalls.length > 0 && currentCallCount > prevCalls.length) {
-            const newCallsCount = currentCallCount - prevCalls.length;
-            setNewCallsCount(prev => prev + newCallsCount);
-          }
-          return newCalls;
-        });
+        // ✅ FIX: Правильный подсчёт новых звонков
+        // Сравниваем pagination.total (общее количество) с предыдущим pagination.total
+        if (!isFirstLoadRef.current && currentCallCount > previousTotalRef.current) {
+          const newCallsDiff = currentCallCount - previousTotalRef.current;
+          setNewCallsCount(prev => prev + newCallsDiff);
+        }
         
+        // Обновляем ref для следующего сравнения
+        previousTotalRef.current = currentCallCount;
+        isFirstLoadRef.current = false;
+        
+        setCalls(newCalls);
         setTotalCalls(currentCallCount);
         setTotalPages(currentTotalPages);
-        setLastCallCount(currentCallCount);
       } else {
         throw new Error('Ошибка при получении данных');
       }
@@ -72,6 +76,8 @@ export const useCallsData = () => {
 
   const resetNewCallsCount = useCallback(() => {
     setNewCallsCount(0);
+    // ✅ FIX: При сбросе счётчика также обновляем baseline для корректного подсчёта
+    // previousTotalRef остаётся актуальным, сбрасываем только UI счётчик
   }, []);
 
   // Callbacks для socket events

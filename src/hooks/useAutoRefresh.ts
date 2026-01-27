@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { AvitoChat } from '@/types/avito';
 import { logger } from '@/lib/logger';
 
 export function useAutoRefresh() {
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<NodeJS.Timeout | null>(null);
   const [chatsRefreshInterval, setChatsRefreshInterval] = useState<NodeJS.Timeout | null>(null);
+  
+  // ✅ FIX: Используем refs для хранения актуальных значений, избегая stale closure
+  const currentChatRef = useRef<AvitoChat | null>(null);
+  const loadMessagesRef = useRef<((chat: AvitoChat, silent?: boolean) => Promise<void>) | null>(null);
+  const loadChatsRef = useRef<(() => void) | null>(null);
 
   // Проверка видимости страницы
   const isPageVisible = useCallback(() => {
@@ -24,6 +29,10 @@ export function useAutoRefresh() {
 
   // Auto-refresh messages for selected chat
   const startAutoRefresh = useCallback((chat: AvitoChat, loadMessages: (chat: AvitoChat, silent?: boolean) => Promise<void>) => {
+    // ✅ FIX: Сохраняем актуальные значения в refs
+    currentChatRef.current = chat;
+    loadMessagesRef.current = loadMessages;
+    
     // Clear existing interval
     if (autoRefreshInterval) {
       clearInterval(autoRefreshInterval);
@@ -35,10 +44,14 @@ export function useAutoRefresh() {
       logger.log('Page visible:', isPageVisible());
       logger.log('User active:', isUserActive());
       
+      // ✅ FIX: Используем актуальные значения из refs
+      const currentChat = currentChatRef.current;
+      const currentLoadMessages = loadMessagesRef.current;
+      
       // Обновляем только если страница видима и пользователь активен
-      if (isPageVisible() && isUserActive()) {
-        logger.log('Auto refreshing messages for chat:', chat.id);
-        loadMessages(chat, true); // true = silent refresh
+      if (isPageVisible() && isUserActive() && currentChat && currentLoadMessages) {
+        logger.log('Auto refreshing messages for chat:', currentChat.id);
+        currentLoadMessages(currentChat, true); // true = silent refresh
       } else {
         logger.log('Skipping auto refresh - page not visible or user inactive');
       }
@@ -56,6 +69,9 @@ export function useAutoRefresh() {
 
   // Auto-refresh chats list
   const startChatsAutoRefresh = useCallback((loadChats: () => void) => {
+    // ✅ FIX: Сохраняем актуальную функцию в ref
+    loadChatsRef.current = loadChats;
+    
     // Clear existing interval
     if (chatsRefreshInterval) {
       clearInterval(chatsRefreshInterval);
@@ -63,9 +79,12 @@ export function useAutoRefresh() {
 
     // Start new interval - refresh every 60 seconds (увеличено с 30)
     const interval = setInterval(() => {
+      // ✅ FIX: Используем актуальную функцию из ref
+      const currentLoadChats = loadChatsRef.current;
+      
       // Обновляем только если страница видима и пользователь активен
-      if (isPageVisible() && isUserActive()) {
-        loadChats();
+      if (isPageVisible() && isUserActive() && currentLoadChats) {
+        currentLoadChats();
       }
     }, 300000); // 5 минут - только как fallback
 
@@ -83,6 +102,10 @@ export function useAutoRefresh() {
   const cleanup = useCallback(() => {
     stopAutoRefresh();
     stopChatsAutoRefresh();
+    // ✅ FIX: Очищаем refs при cleanup
+    currentChatRef.current = null;
+    loadMessagesRef.current = null;
+    loadChatsRef.current = null;
   }, [stopAutoRefresh, stopChatsAutoRefresh]);
 
   return {

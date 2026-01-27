@@ -42,15 +42,25 @@ class SocketManager {
     }
 
     if (this.isConnecting) {
-      // Ждем завершения текущего подключения
+      // ✅ FIX: Добавлен таймаут для предотвращения бесконечного polling
       return new Promise((resolve) => {
+        const MAX_WAIT_MS = 10000; // 10 секунд максимум
+        const POLL_INTERVAL_MS = 100;
+        let elapsedMs = 0;
+        
         const checkConnection = () => {
           if (this.socket?.connected) {
             resolve(this.socket);
           } else if (!this.isConnecting) {
             resolve(null);
+          } else if (elapsedMs >= MAX_WAIT_MS) {
+            // ✅ FIX: Таймаут - сбрасываем isConnecting и возвращаем null
+            socketLogger.warn('Connection wait timeout, resetting isConnecting flag');
+            this.isConnecting = false;
+            resolve(null);
           } else {
-            setTimeout(checkConnection, 100);
+            elapsedMs += POLL_INTERVAL_MS;
+            setTimeout(checkConnection, POLL_INTERVAL_MS);
           }
         };
         checkConnection();
@@ -270,44 +280,48 @@ export const useGlobalSocket = () => {
       return;
     }
 
+    // ✅ FIX: Используем ref для хранения unsubscribe функций
+    // чтобы избежать проблем с async cleanup в useEffect
+    let unsubscribeConnection: (() => void) | null = null;
+    let unsubscribeAuth: (() => void) | null = null;
+    let isMounted = true;
+
     const initSocket = async () => {
       setIsLoading(true);
       socketManager.current = SocketManager.getInstance();
       
       // Подписываемся на изменения статуса ПЕРЕД connect()
       // чтобы не пропустить асинхронное подключение
-      const unsubscribe = socketManager.current.on('connection', () => {
+      unsubscribeConnection = socketManager.current.on('connection', () => {
+        if (!isMounted) return; // ✅ FIX: Проверяем что компонент mounted
         const connected = socketManager.current?.isConnected || false;
         setIsConnected(connected);
         setIsLoading(false);
       });
       
       // Также подписываемся на authenticated для надёжности
-      const unsubAuth = socketManager.current.on('authenticated', () => {
+      unsubscribeAuth = socketManager.current.on('authenticated', () => {
+        if (!isMounted) return; // ✅ FIX: Проверяем что компонент mounted
         setIsConnected(true);
         setIsLoading(false);
       });
       
       const socket = await socketManager.current.connect();
       
-      // Проверяем начальное состояние
-      if (socket && (socket as any).connected) {
+      // Проверяем начальное состояние (только если компонент ещё mounted)
+      if (isMounted && socket && (socket as any).connected) {
         setIsConnected(true);
         setIsLoading(false);
       }
-      
-      return () => {
-        unsubscribe();
-        unsubAuth();
-      };
     };
 
-    const cleanup = initSocket();
+    initSocket();
 
+    // ✅ FIX: Синхронный cleanup без async/await
     return () => {
-      cleanup.then(unsubscribe => {
-        if (unsubscribe) unsubscribe();
-      });
+      isMounted = false;
+      if (unsubscribeConnection) unsubscribeConnection();
+      if (unsubscribeAuth) unsubscribeAuth();
     };
   }, [isAuthenticated]);
 

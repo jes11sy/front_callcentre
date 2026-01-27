@@ -1,26 +1,32 @@
 // Утилиты для защиты от XSS атак
-// Экранирование и санитизация пользовательских данных
+// Использует DOMPurify для надежной санитизации
+import DOMPurify from 'dompurify';
+
+// Конфигурация DOMPurify для строгой санитизации
+const STRICT_CONFIG: DOMPurify.Config = {
+  ALLOWED_TAGS: [], // Не разрешаем никакие теги
+  ALLOWED_ATTR: [], // Не разрешаем никакие атрибуты
+  KEEP_CONTENT: true, // Сохраняем текстовое содержимое
+};
+
+// Конфигурация для HTML с ограниченным набором тегов
+const SAFE_HTML_CONFIG: DOMPurify.Config = {
+  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'p', 'span', 'a'],
+  ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
+  ADD_ATTR: ['target', 'rel'],
+  FORBID_ATTR: ['style', 'onclick', 'onerror', 'onload'],
+};
 
 /**
  * Экранирует HTML теги для предотвращения XSS
+ * Использует DOMPurify для надежной санитизации
  */
 export function escapeHtml(text: string): string {
   if (typeof text !== 'string') {
     return String(text);
   }
 
-  const map: { [key: string]: string } = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;',
-    '`': '&#x60;',
-    '=': '&#x3D;'
-  };
-
-  return text.replace(/[&<>"'`=\/]/g, (s) => map[s]);
+  return DOMPurify.sanitize(text, STRICT_CONFIG);
 }
 
 /**
@@ -52,7 +58,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
   if (typeof obj === 'object') {
     const sanitized: Record<string, unknown> = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         sanitized[key] = sanitizeObject(obj[key] as Record<string, unknown>);
       }
     }
@@ -68,26 +74,18 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
 export function setTextContent(element: HTMLElement, text: string): void {
   if (typeof window === 'undefined') return;
   
-  // Очищаем элемент
-  element.textContent = '';
-  
-  // Безопасно вставляем текст
-  element.textContent = escapeHtml(text);
+  // Используем textContent для безопасной вставки (не интерпретирует HTML)
+  element.textContent = text;
 }
 
 /**
- * Безопасно вставляет HTML в DOM элемент (только для доверенного контента)
+ * Безопасно вставляет HTML в DOM элемент с DOMPurify санитизацией
  */
 export function setInnerHTML(element: HTMLElement, html: string): void {
   if (typeof window === 'undefined') return;
   
-  // В production лучше использовать DOMPurify для более сложной санитизации
-  if (process.env.NODE_ENV === 'production') {
-    // Здесь можно добавить DOMPurify
-    element.innerHTML = html;
-  } else {
-    element.innerHTML = html;
-  }
+  // Используем DOMPurify для санитизации HTML
+  element.innerHTML = DOMPurify.sanitize(html, SAFE_HTML_CONFIG);
 }
 
 /**
@@ -109,7 +107,6 @@ export function sanitizeUrl(url: string): string {
     
     return urlObj.toString();
   } catch {
-    console.warn('Invalid URL:', url);
     return '#';
   }
 }
@@ -166,48 +163,34 @@ export function sanitizeJson<T>(jsonString: string): T | null {
   try {
     const parsed = JSON.parse(jsonString);
     return sanitizeObject(parsed) as T;
-  } catch (error) {
-    console.warn('Invalid JSON:', error);
+  } catch {
     return null;
   }
 }
 
 /**
  * Проверяет, содержит ли строка потенциально опасный контент
+ * Использует DOMPurify для проверки
  */
 export function containsXSS(text: string): boolean {
   if (typeof text !== 'string') {
     return false;
   }
 
-  const xssPatterns = [
-    /<script[^>]*>.*?<\/script>/gi,
-    /<iframe[^>]*>.*?<\/iframe>/gi,
-    /javascript:/gi,
-    /on\w+\s*=/gi,
-    /<object[^>]*>.*?<\/object>/gi,
-    /<embed[^>]*>.*?<\/embed>/gi,
-    /<link[^>]*>.*?<\/link>/gi,
-    /<meta[^>]*>.*?<\/meta>/gi,
-    /<style[^>]*>.*?<\/style>/gi
-  ];
-
-  return xssPatterns.some(pattern => pattern.test(text));
+  // Сравниваем оригинал с санитизированной версией
+  const sanitized = DOMPurify.sanitize(text, STRICT_CONFIG);
+  return text !== sanitized;
 }
 
 /**
  * React компонент для безопасного отображения текста
  */
 export function SafeText({ children, className }: { children: string; className?: string }) {
-  if (typeof window === 'undefined') {
-    return <span className={className}>{children}</span>;
-  }
-
+  // Используем textContent подход - безопаснее чем dangerouslySetInnerHTML
   return (
-    <span 
-      className={className}
-      dangerouslySetInnerHTML={{ __html: escapeHtml(children) }}
-    />
+    <span className={className}>
+      {escapeHtml(children)}
+    </span>
   );
 }
 

@@ -4,6 +4,7 @@ FROM node:20-alpine AS base
 # Устанавливаем зависимости только при необходимости
 FROM base AS deps
 # Проверяем https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine чтобы понять, почему может понадобиться libc6-compat.
+# hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -40,8 +41,8 @@ ENV NODE_ENV=production
 # https://nextjs.org/docs/advanced-features/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 

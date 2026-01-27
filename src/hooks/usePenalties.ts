@@ -24,18 +24,9 @@ export const usePenalties = () => {
           name: 'приход',
         });
         
-        // Загружаем уникальные города из заказов
+        // Загружаем уникальные города из filterOptions (без загрузки всех заказов)
         const filterOptions = await ordersApi.getFilterOptions();
-        
-        // Извлекаем уникальные города из заказов
-        const ordersResponse = await ordersApi.getOrders();
-        const uniqueCities = Array.from(
-          new Set(
-            (ordersResponse.data?.orders || [])
-              .map((order: any) => order.city)
-              .filter((city: string) => city)
-          )
-        ).sort();
+        const uniqueCities = (filterOptions.data?.cities || []).sort();
         
         setCities(uniqueCities);
         

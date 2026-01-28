@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import React from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-// useAuthStore removed - not used
 import { Loader2, AlertCircle } from 'lucide-react';
 import CreateOrderModal from '@/components/orders/CreateOrderModal';
 import { 
@@ -16,6 +16,10 @@ import {
 import { useOrders } from '@/hooks/useOrders';
 
 function OrdersContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const orderIdFromUrl = searchParams.get('orderId');
+  
   const {
     filters,
     page: _page,
@@ -46,8 +50,21 @@ function OrdersContent() {
     setIsEditModalOpen,
     setIsViewModalOpen: _setIsViewModalOpen,
     setIsCreateModalOpen,
-    setOrderCalls: _setOrderCalls
+    setOrderCalls: _setOrderCalls,
+    openOrderById
   } = useOrders();
+
+  // Открываем заказ по ID из URL
+  useEffect(() => {
+    if (orderIdFromUrl && !isLoading) {
+      const orderId = parseInt(orderIdFromUrl);
+      if (!isNaN(orderId)) {
+        openOrderById(orderId);
+        // Убираем orderId из URL после открытия
+        router.replace('/orders', { scroll: false });
+      }
+    }
+  }, [orderIdFromUrl, isLoading, openOrderById, router]);
 
   // Показываем загрузку, пока не получены данные пользователя
   if (isLoading && !user) {

@@ -257,6 +257,26 @@ export const useOrders = () => {
     setPage(1);
   }, []);
 
+  // Открыть заказ по ID (для ссылок типа /orders?orderId=123)
+  const openOrderById = useCallback(async (orderId: number) => {
+    try {
+      const response = await api.get(`/orders/${orderId}`);
+      if (response.data) {
+        const order = response.data;
+        setSelectedOrder(order);
+        setIsViewModalOpen(true);
+        if (order.callId) {
+          loadOrderCalls(order.callId);
+        } else {
+          setOrderCalls([]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load order:', error);
+      notifications.error('Не удалось загрузить заказ');
+    }
+  }, [loadOrderCalls]);
+
   return {
     // Состояние
     filters,
@@ -287,6 +307,7 @@ export const useOrders = () => {
     updateFilter,
     resetFilters,
     loadOrderCalls,
+    openOrderById,
     
     // Сеттеры
     setPage,

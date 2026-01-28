@@ -71,19 +71,9 @@ export const OrderEditModal = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-[#FFD700]/30 bg-[#17212b]">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-[#FFD700]">
-              Редактирование #{order.id}
-            </h2>
-            <Badge 
-              className={`text-xs ${STATUS_COLORS[order.statusOrder as keyof typeof STATUS_COLORS] || 'bg-gray-800 text-gray-300'}`}
-            >
-              {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
-            </Badge>
-            <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">
-              {order.typeEquipment}
-            </Badge>
-          </div>
+          <h2 className="text-lg font-bold text-[#FFD700]">
+            Редактирование #{order.id}
+          </h2>
           <Button
             variant="ghost"
             size="sm"
@@ -119,8 +109,8 @@ export const OrderEditModal = ({
 
               <Row label="Тип техники">
                 <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
-                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                    <SelectValue />
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white w-full">
+                    <span className="truncate">{EQUIPMENT_TYPES.find(t => t.value === order.typeEquipment)?.label || order.typeEquipment}</span>
                   </SelectTrigger>
                   <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                     {EQUIPMENT_TYPES.map((t) => (

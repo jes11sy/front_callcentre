@@ -37,8 +37,8 @@ export const OrderEditModal = ({
   useEffect(() => {
     if (isOpen) {
       api.get('/phones/sources').then(res => {
-        if (res.data.success && res.data.sources) {
-          setSources(res.data.sources);
+        if (res.data.success && res.data.data) {
+          setSources(res.data.data);
         }
       }).catch(() => {});
     }

@@ -261,7 +261,8 @@ export const useOrders = () => {
   const openOrderById = useCallback(async (orderId: number) => {
     try {
       const response = await api.get(`/orders/${orderId}`);
-      const order = response.data;
+      // ✅ FIX: API возвращает { success: true, data: order }
+      const order = response.data.data || response.data;
       if (order && order.id) {
         setSelectedOrder(order);
         setIsViewModalOpen(true);

@@ -1,31 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { 
-  FileText, 
   Phone, 
   MapPin, 
-  Calendar, 
-  User, 
-  Settings,
   Loader2,
   Plus,
-  Clock,
-  AlertCircle
+  X,
+  Clock
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -207,321 +195,251 @@ export function CreateOrderModal({
     });
   };
 
-  if (!call) return null;
+  if (!call || !open) return null;
 
-  if (!open) return null;
+  const statusColors = {
+    answered: 'bg-green-500/20 text-green-400 border-green-500/30',
+    missed: 'bg-red-500/20 text-red-400 border-red-500/30',
+    busy: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    no_answer: 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+  };
+
+  const statusLabels = {
+    answered: 'Отвечен',
+    missed: 'Пропущен',
+    busy: 'Занято',
+    no_answer: 'Нет ответа'
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg">
-        <div className="flex items-center justify-between p-4 border-b border-[#FFD700]/30">
-          <h2 className="text-xl font-bold flex items-center gap-2 text-[#FFD700]">
-            <Phone className="h-5 w-5 text-[#FFD700]" />
-            Создать заказ из звонка
-          </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)] w-full max-w-lg rounded-xl overflow-hidden">
+        {/* Header - компактный */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#0f0f23] border-b border-[#FFD700]/20">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center">
+              <Plus className="h-4 w-4 text-[#FFD700]" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-white">Новый заказ</h2>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Phone className="h-3 w-3" />
+                <span>{call.phoneClient}</span>
+                <span className="text-gray-600">•</span>
+                <MapPin className="h-3 w-3" />
+                <span>{call.city || '—'}</span>
+              </div>
+            </div>
+          </div>
           <button
             onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10 rounded flex items-center justify-center"
+            className="w-7 h-7 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* Информация о звонке */}
-          <div className="p-2">
-            <Card className="bg-[#17212b] border-[#FFD700]/30">
-              <CardHeader className="pb-1">
-                <CardTitle className="text-base font-semibold text-[#FFD700] flex items-center gap-2">
-                  <Phone className="h-5 w-5" />
-                  Информация о звонке
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-[#FFD700]" />
-                      Телефон
-                    </Label>
-                    <div className="text-white text-sm">{call.phoneClient}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-[#FFD700]" />
-                      Город
-                    </Label>
-                    <div className="text-white text-sm">{call.city}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-[#FFD700]" />
-                      Дата
-                    </Label>
-                    <div className="text-white text-sm">{formatDate(call.dateCreate)}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Settings className="h-4 w-4 text-[#FFD700]" />
-                      Статус
-                    </Label>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-                      call.status === 'answered' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
-                      call.status === 'missed' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
-                    }`}>
-                      {call.status === 'answered' ? 'Отвечен' :
-                       call.status === 'missed' ? 'Пропущен' :
-                       'Занято'}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Info bar */}
+        <div className="px-4 py-2 bg-[#0f0f23]/50 border-b border-[#FFD700]/10 flex items-center gap-3 text-xs">
+          <Badge variant="outline" className={statusColors[call.status]}>
+            {statusLabels[call.status]}
+          </Badge>
+          <div className="flex items-center gap-1 text-gray-400">
+            <Clock className="h-3 w-3" />
+            <span>{formatDate(call.dateCreate)}</span>
+          </div>
+          {callGroup.length > 1 && (
+            <Badge variant="outline" className="bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/30">
+              {callGroup.length} звонков
+            </Badge>
+          )}
+        </div>
+
+        {/* Form */}
+        <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+          {/* Row 1: РК + Город */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">РК *</Label>
+              <Controller
+                name="rk"
+                control={form.control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                      <SelectValue placeholder="РК" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                      <SelectItem value="Авито" className="text-white">Авито</SelectItem>
+                      <SelectItem value="Листовка" className="text-white">Листовка</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.rk && <p className="text-xs text-red-400 mt-1">{errors.rk.message}</p>}
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">Город *</Label>
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                      <SelectValue placeholder="Город" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                      {CITY_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city.message}</p>}
+            </div>
           </div>
 
-          <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
-          {/* Основная информация */}
-          <Card className="bg-[#17212b] border-[#FFD700]/30">
-            <CardHeader className="pb-1">
-              <CardTitle className="text-base font-semibold text-[#FFD700] flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Основная информация
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Label htmlFor="rk" className="text-sm font-medium text-gray-300">Рекламная Компания *</Label>
-                  <Controller
-                    name="rk"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Select 
-                        key={`rk-${call?.id}-${field.value}`}
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
-                          <SelectValue placeholder="Выберите РК" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                          <SelectItem value="Авито" className="text-white hover:bg-[#FFD700]/10">Авито</SelectItem>
-                          <SelectItem value="Листовка" className="text-white hover:bg-[#FFD700]/10">Листовка</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.rk && (
-                    <p className="text-sm text-red-400">{errors.rk.message}</p>
-                  )}
-                </div>
-              <div>
-                <Label htmlFor="city" className="text-sm font-medium text-gray-300">Город *</Label>
-                <Controller
-                  name="city"
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
-                        <SelectValue placeholder="Выберите город" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                        {CITY_OPTIONS.map((option) => (
-                          <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.city && (
-                  <p className="text-sm text-red-400">{errors.city.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="avitoName" className="text-sm font-medium text-gray-300">Источник</Label>
-                <Controller
-                  name="avitoName"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                    >
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
-                        <SelectValue placeholder="Выберите источник" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                        {SOURCE_OPTIONS.map((option) => (
-                          <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Row 2: Источник */}
+          <div>
+            <Label className="text-xs text-gray-400 mb-1 block">Источник</Label>
+            <Controller
+              name="avitoName"
+              control={form.control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                    <SelectValue placeholder="Выберите источник" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {SOURCE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
 
-        {/* Информация о клиенте */}
-        <Card className="bg-[#17212b] border-[#FFD700]/30">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-[#FFD700] flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Информация о клиенте
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          {/* Divider */}
+          <div className="border-t border-[#FFD700]/10 my-1" />
+
+          {/* Row 3: Клиент + Адрес */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="clientName" className="text-sm font-medium text-gray-300">Имя клиента *</Label>
+              <Label className="text-xs text-gray-400 mb-1 block">Имя клиента *</Label>
               <Input
-                id="clientName"
                 {...register('clientName')}
-                placeholder="Введите имя клиента"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                placeholder="Имя"
+                className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
               />
-              {errors.clientName && (
-                <p className="text-sm text-red-400">{errors.clientName.message}</p>
-              )}
+              {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
             </div>
             <div>
-                <Label htmlFor="address" className="text-sm font-medium text-gray-300">Адрес *</Label>
+              <Label className="text-xs text-gray-400 mb-1 block">Адрес *</Label>
               <Input
-                id="address"
                 {...register('address')}
-                placeholder="Введите адрес"
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
+                placeholder="Адрес"
+                className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
               />
-              {errors.address && (
-                <p className="text-sm text-red-400">{errors.address.message}</p>
-              )}
+              {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Детали заказа */}
-        <Card className="bg-[#17212b] border-[#FFD700]/30">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-[#FFD700] flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Детали заказа
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="typeOrder" className="text-sm font-medium text-gray-300">Тип заказа *</Label>
-                <Controller
-                  name="typeOrder"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
-                        <SelectValue placeholder="Выберите тип заказа" />
-                      </SelectTrigger>
-                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                          <SelectItem value="Впервые" className="text-white hover:bg-[#FFD700]/10">Впервые</SelectItem>
-                          <SelectItem value="Повтор" className="text-white hover:bg-[#FFD700]/10">Повтор</SelectItem>
-                          <SelectItem value="Гарантия" className="text-white hover:bg-[#FFD700]/10">Гарантия</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.typeOrder && (
-                  <p className="text-sm text-red-400">{errors.typeOrder.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-300">Тип техники *</Label>
-                <Controller
-                  name="typeEquipment"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
-                        <SelectValue placeholder="Выберите тип техники" />
-                      </SelectTrigger>
-                        <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                          <SelectItem value="КП" className="text-white hover:bg-[#FFD700]/10">КП</SelectItem>
-                          <SelectItem value="БТ" className="text-white hover:bg-[#FFD700]/10">БТ</SelectItem>
-                          <SelectItem value="МНЧ" className="text-white hover:bg-[#FFD700]/10">МНЧ</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.typeEquipment && (
-                  <p className="text-sm text-red-400">{errors.typeEquipment.message}</p>
-                )}
-              </div>
-            </div>
-            <div>
-                <Label htmlFor="dateMeeting" className="text-sm font-medium text-gray-300">Дата встречи *</Label>
-              <Input
-                id="dateMeeting"
-                type="datetime-local"
-                {...register('dateMeeting')}
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-              />
-              {errors.dateMeeting && (
-                <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
-              )}
-            </div>
-            <div>
-                <Label htmlFor="problem" className="text-sm font-medium text-gray-300">Описание проблемы *</Label>
-              <Textarea
-                id="problem"
-                {...register('problem')}
-                placeholder="Опишите проблему"
-                rows={2}
-                className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-              />
-              {errors.problem && (
-                <p className="text-sm text-red-400">{errors.problem.message}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-          {/* Кнопки внизу */}
-          <div className="flex justify-end gap-3 pt-1 pb-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-            >
-              Отмена
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold shadow-lg hover:shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-200"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Создание...
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Создать заказ
-                </>
-              )}
-            </Button>
           </div>
-          </form>
+
+          {/* Row 4: Тип заказа + Тип техники */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">Тип заказа *</Label>
+              <Controller
+                name="typeOrder"
+                control={form.control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                      <SelectValue placeholder="Тип" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                      <SelectItem value="Впервые" className="text-white">Впервые</SelectItem>
+                      <SelectItem value="Повтор" className="text-white">Повтор</SelectItem>
+                      <SelectItem value="Гарантия" className="text-white">Гарантия</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.typeOrder && <p className="text-xs text-red-400 mt-1">{errors.typeOrder.message}</p>}
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">Тип техники *</Label>
+              <Controller
+                name="typeEquipment"
+                control={form.control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                      <SelectValue placeholder="Техника" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                      <SelectItem value="КП" className="text-white">КП</SelectItem>
+                      <SelectItem value="БТ" className="text-white">БТ</SelectItem>
+                      <SelectItem value="МНЧ" className="text-white">МНЧ</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.typeEquipment && <p className="text-xs text-red-400 mt-1">{errors.typeEquipment.message}</p>}
+            </div>
+          </div>
+
+          {/* Row 5: Дата встречи */}
+          <div>
+            <Label className="text-xs text-gray-400 mb-1 block">Дата встречи *</Label>
+            <Input
+              type="datetime-local"
+              {...register('dateMeeting')}
+              className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm"
+            />
+            {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
+          </div>
+
+          {/* Row 6: Проблема */}
+          <div>
+            <Label className="text-xs text-gray-400 mb-1 block">Проблема *</Label>
+            <Textarea
+              {...register('problem')}
+              placeholder="Опишите проблему..."
+              rows={2}
+              className="bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500 resize-none"
+            />
+            {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div className="px-4 py-3 bg-[#0f0f23] border-t border-[#FFD700]/20 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className="h-9 px-4 text-gray-400 hover:text-white hover:bg-white/5"
+          >
+            Отмена
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            onClick={handleSubmit(onSubmit)}
+            className="h-9 px-5 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Создание...
+              </>
+            ) : (
+              'Создать заказ'
+            )}
+          </Button>
         </div>
       </div>
     </div>

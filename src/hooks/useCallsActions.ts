@@ -27,7 +27,11 @@ export const useCallsActions = () => {
       setSelectedCallForHistory(call);
       
       const response = await api.get(`/orders?search=${encodeURIComponent(call.phoneClient)}`);
-      setOrderHistory(response.data.data?.orders || []);
+      // API может возвращать data как массив напрямую или как объект с orders
+      const orders = Array.isArray(response.data.data) 
+        ? response.data.data 
+        : (response.data.data?.orders || []);
+      setOrderHistory(orders);
       setShowOrderHistoryModal(true);
     } catch (error) {
       console.error('Error loading order history:', error);

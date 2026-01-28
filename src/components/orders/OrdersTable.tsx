@@ -144,13 +144,10 @@ const OrdersTableComponent = ({
                     <TableHead className="w-32 text-gray-300">Клиент</TableHead>
                     <TableHead className="w-40 text-gray-300">Адрес</TableHead>
                     <TableHead className="w-28 text-gray-300">Дата встречи</TableHead>
-                    <TableHead className="w-28 text-gray-300">Дата закрытия</TableHead>
                     <TableHead className="w-28 text-gray-300">Тип техники</TableHead>
                     <TableHead className="w-40 text-gray-300">Проблема</TableHead>
                     <TableHead className="w-24 text-gray-300">Статус</TableHead>
                     <TableHead className="w-24 text-gray-300">Мастер</TableHead>
-                    <TableHead className="w-20 text-gray-300">Итог</TableHead>
-                    <TableHead className="w-24 text-gray-300">Оператор</TableHead>
                     <TableHead className="w-24 text-gray-300">Действия</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -191,11 +188,6 @@ const OrdersTableComponent = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm whitespace-nowrap text-gray-300">
-                          {order.closingData ? formatDate(order.closingData) : <span className="text-gray-500">Не закрыт</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
                         <div className="max-w-28 truncate" title={order.typeEquipment}>
                           <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">
                             {order.typeEquipment}
@@ -217,14 +209,6 @@ const OrdersTableComponent = ({
                       <TableCell>
                         <div className="max-w-24 truncate text-gray-300" title={order.master?.name || 'Не назначен'}>
                           {order.master?.name || <span className="text-gray-500">Не назначен</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center text-gray-300">
-                        {order.result ? `${order.result} ₽` : '-'}
-                      </TableCell>
-                      <TableCell>
-                        <div className="max-w-24 truncate text-gray-300" title={order.operator.name}>
-                          {order.operator.name}
                         </div>
                       </TableCell>
                       <TableCell>

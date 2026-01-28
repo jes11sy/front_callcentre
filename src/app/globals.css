@@ -264,6 +264,10 @@ th:hover {
     grid-template-columns: 80px repeat(25, 1fr);
   }
   
+  .grid-time-slots-with-total {
+    grid-template-columns: 50px repeat(25, minmax(40px, 1fr)) 60px;
+  }
+  
   .progress-bar {
     width: var(--progress-width, 0%);
     transition: width 0.1s ease;

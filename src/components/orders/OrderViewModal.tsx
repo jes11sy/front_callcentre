@@ -13,8 +13,7 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Volume2,
-  User
+  Volume2
 } from 'lucide-react';
 import { Order, Call } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS } from '@/constants/orders';
@@ -175,7 +174,7 @@ const InfoTab = ({
     {/* Две колонки: Заказ | Мастер и финансы */}
     <div className="grid grid-cols-2 divide-x divide-[#FFD700]/20">
       {/* Левая колонка — информация по заказу */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-2">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium text-[#FFD700]">Информация по заказу</h3>
           <div className="flex items-center gap-2">
@@ -190,76 +189,37 @@ const InfoTab = ({
           </div>
         </div>
         
-        <DataRow label="Клиент" value={order.clientName} />
-        <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} />
-        <DataRow label="Город" value={order.city} />
+        <DataRow label="Тип заявки" value={order.typeOrder} />
         <DataRow label="РК" value={order.rk} />
         <DataRow label="Источник" value={order.avitoName || '—'} muted={!order.avitoName} />
+        <DataRow label="Город" value={order.city} />
+        <DataRow label="Клиент" value={order.clientName} />
+        <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} />
         <DataRow label="Дата встречи" value={formatDate(order.dateMeeting)} />
-        <DataRow label="Тип заявки" value={order.typeOrder} />
-        
-        <div className="pt-2">
-          <span className="text-xs text-gray-500">Адрес</span>
-          <p className="text-sm text-white">{order.address}</p>
-        </div>
-        
-        <div className="pt-2">
-          <span className="text-xs text-gray-500">Проблема</span>
-          <p className="text-sm text-gray-300 whitespace-pre-wrap">{order.problem}</p>
-        </div>
+        <DataRow label="Адрес" value={order.address} />
+        <DataRow label="Проблема" value={order.problem} />
       </div>
 
       {/* Правая колонка — мастер и финансы */}
-      <div className="p-4 space-y-4">
-        <div>
-          <h3 className="text-sm font-medium text-[#FFD700] mb-3">Мастер</h3>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-[#FFD700]/20 flex items-center justify-center">
-              <User className="h-5 w-5 text-[#FFD700]" />
-            </div>
-            <div>
-              <p className="text-white font-medium">
-                {order.master?.name || <span className="text-gray-500">Не назначен</span>}
-              </p>
-              {order.masterId && (
-                <p className="text-xs text-gray-500">ID: {order.masterId}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-medium text-[#FFD700] mb-3">Финансы</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center p-2 bg-green-900/20 rounded border border-green-500/20">
-              <span className="text-sm text-gray-400">Итог</span>
-              <span className="text-lg font-bold text-green-400">
-                {order.result ? `${order.result.toLocaleString()} ₽` : '—'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-red-900/20 rounded border border-red-500/20">
-              <span className="text-sm text-gray-400">Расходы</span>
-              <span className="text-lg font-bold text-red-400">
-                {order.expenditure ? `${order.expenditure.toLocaleString()} ₽` : '—'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-blue-900/20 rounded border border-blue-500/20">
-              <span className="text-sm text-gray-400">Чистая</span>
-              <span className="text-lg font-bold text-blue-400">
-                {order.clean ? `${order.clean.toLocaleString()} ₽` : '—'}
-              </span>
-            </div>
-          </div>
-        </div>
+      <div className="p-4 space-y-2">
+        <h3 className="text-sm font-medium text-[#FFD700] mb-3">Мастер и финансы</h3>
+        
+        <DataRow label="Мастер" value={order.master?.name || 'Не назначен'} muted={!order.master?.name} />
+        {order.masterId && <DataRow label="ID мастера" value={String(order.masterId)} />}
+        
+        <div className="h-2" />
+        
+        <DataRow label="Итог" value={order.result ? `${order.result.toLocaleString()} ₽` : '—'} muted={!order.result} />
+        <DataRow label="Расходы" value={order.expenditure ? `${order.expenditure.toLocaleString()} ₽` : '—'} muted={!order.expenditure} />
+        <DataRow label="Чистая" value={order.clean ? `${order.clean.toLocaleString()} ₽` : '—'} muted={!order.clean} />
       </div>
     </div>
 
     {/* Оператор */}
     <div className="px-4 py-3 border-t border-[#FFD700]/20 bg-[#17212b]/30 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <User className="h-4 w-4 text-gray-500" />
         <span className="text-sm text-gray-400">Оператор:</span>
-        <span className="text-sm text-white font-medium">{order.operator.name}</span>
+        <span className="text-sm text-white">{order.operator.name}</span>
       </div>
       <span className="text-xs text-gray-500">ID: {order.operatorNameId}</span>
     </div>
@@ -306,13 +266,13 @@ const DocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: 
     {/* Документы в 2 колонки */}
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <h3 className="text-sm font-medium text-green-400 mb-3">
+        <h3 className="text-sm font-medium text-[#FFD700] mb-3">
           БСО документы {order.bsoDoc?.length ? `(${order.bsoDoc.length})` : ''}
         </h3>
         {order.bsoDoc && order.bsoDoc.length > 0 ? (
           <div className="space-y-2">
             {order.bsoDoc.map((doc, index) => (
-              <DocumentPreview key={index} fileKey={doc} color="green" index={index} />
+              <DocumentPreview key={index} fileKey={doc} index={index} />
             ))}
           </div>
         ) : (
@@ -323,13 +283,13 @@ const DocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: 
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-blue-400 mb-3">
+        <h3 className="text-sm font-medium text-[#FFD700] mb-3">
           Документы расходов {order.expenditureDoc?.length ? `(${order.expenditureDoc.length})` : ''}
         </h3>
         {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
           <div className="space-y-2">
             {order.expenditureDoc.map((doc, index) => (
-              <DocumentPreview key={index} fileKey={doc} color="blue" index={index} />
+              <DocumentPreview key={index} fileKey={doc} index={index} />
             ))}
           </div>
         ) : (
@@ -374,18 +334,12 @@ const DataRow = ({ label, value, muted = false }: { label: string; value: string
   </div>
 );
 
-const DocumentPreview = ({ fileKey, color, index }: { fileKey: string; color: 'green' | 'blue'; index: number }) => {
+const DocumentPreview = ({ fileKey, index }: { fileKey: string; index: number }) => {
   const { url, loading } = useFileUrl(fileKey);
-  
-  const colors = {
-    green: { border: 'border-green-500/30', bg: 'bg-green-900/20', text: 'text-green-300', hover: 'hover:bg-green-900/40' },
-    blue: { border: 'border-blue-500/30', bg: 'bg-blue-900/20', text: 'text-blue-300', hover: 'hover:bg-blue-900/40' },
-  };
-  const c = colors[color];
   
   if (loading) {
     return (
-      <div className={`flex items-center justify-center p-4 ${c.bg} rounded-lg border ${c.border}`}>
+      <div className="flex items-center justify-center p-4 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
         <LoadingSpinner size="sm" />
       </div>
     );
@@ -396,10 +350,10 @@ const DocumentPreview = ({ fileKey, color, index }: { fileKey: string; color: 'g
       href={url || '#'} 
       target="_blank" 
       rel="noopener noreferrer"
-      className={`flex items-center gap-3 p-3 ${c.bg} rounded-lg border ${c.border} ${c.hover} transition-colors`}
+      className="flex items-center gap-3 p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 hover:bg-[#FFD700]/10 transition-colors"
     >
-      <FileText className={`h-5 w-5 ${c.text}`} />
-      <span className={`${c.text} text-sm flex-1`}>Документ #{index + 1}</span>
+      <FileText className="h-5 w-5 text-[#FFD700]" />
+      <span className="text-white text-sm flex-1">Документ #{index + 1}</span>
       <span className="text-xs text-gray-500">↗</span>
     </a>
   );

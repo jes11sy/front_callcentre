@@ -27,15 +27,12 @@ interface GroupedCallsResponse {
   };
 }
 
-export const useCallsData = () => {
+export const useGroupedCalls = () => {
   // States
-  const [calls, setCalls] = useState<Call[]>([]);
   const [groupedCalls, setGroupedCalls] = useState<Record<string, Call[]>>({});
+  const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [totalCalls, setTotalCalls] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalGroups, setTotalGroups] = useState(0);
   const [stats, setStats] = useState({
     totalCalls: 0,
     totalGroups: 0,
@@ -43,15 +40,22 @@ export const useCallsData = () => {
     answeredCalls: 0,
     todayCalls: 0,
   });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    totalGroups: 0,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false,
+  });
   const [newCallsCount, setNewCallsCount] = useState(0);
-  const [socketConnected, setSocketConnected] = useState(false);
   const [lastParams, setLastParams] = useState<string>('');
   
   const previousTotalRef = useRef<number>(0);
   const isFirstLoadRef = useRef<boolean>(true);
 
-  // Загрузка сгруппированных звонков
-  const fetchCalls = useCallback(async (params: URLSearchParams) => {
+  // Fetch grouped calls
+  const fetchGroupedCalls = useCallback(async (params: URLSearchParams) => {
     const paramsString = params.toString();
     
     // Предотвращаем повторные запросы с одинаковыми параметрами
@@ -64,14 +68,13 @@ export const useCallsData = () => {
       setError(null);
       setLastParams(paramsString);
 
-      // Используем новый endpoint /calls/grouped
       const response = await authApi.get(`/calls/grouped?${paramsString}`);
       const data: GroupedCallsResponse = response.data;
 
       if (data.success) {
         const newGroupedCalls = data.data.groupedCalls;
         const newStats = data.data.stats;
-        const pagination = data.data.pagination;
+        const newPagination = data.data.pagination;
         
         // Подсчёт новых звонков
         if (!isFirstLoadRef.current && newStats.totalCalls > previousTotalRef.current) {
@@ -82,14 +85,11 @@ export const useCallsData = () => {
         previousTotalRef.current = newStats.totalCalls;
         isFirstLoadRef.current = false;
         
-        // Обновляем состояния
         setGroupedCalls(newGroupedCalls);
         setStats(newStats);
-        setTotalCalls(newStats.totalCalls);
-        setTotalGroups(newStats.totalGroups);
-        setTotalPages(pagination.totalPages);
+        setPagination(newPagination);
         
-        // Плоский список для совместимости
+        // Также сохраняем плоский список для совместимости
         const flatCalls = Object.values(newGroupedCalls).flat();
         setCalls(flatCalls);
       } else {
@@ -100,7 +100,7 @@ export const useCallsData = () => {
         return;
       }
       
-      console.error('Error fetching calls:', err);
+      console.error('Error fetching grouped calls:', err);
       setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Ошибка при загрузке звонков');
       notifications.error('Ошибка при загрузке звонков');
     } finally {
@@ -110,23 +110,22 @@ export const useCallsData = () => {
 
   const resetNewCallsCount = useCallback(() => {
     setNewCallsCount(0);
-    // ✅ FIX: При сбросе счётчика также обновляем baseline для корректного подсчёта
-    // previousTotalRef остаётся актуальным, сбрасываем только UI счётчик
   }, []);
 
   // Callbacks для socket events
   const handleNewCall = useCallback((call: Call) => {
-    // Обновляем groupedCalls
     setGroupedCalls(prev => {
       const phone = call.phoneClient;
-      const newGrouped = { [phone]: [call], ...prev }; // Новая группа в начало
-      if (prev[phone]) {
-        newGrouped[phone] = [call, ...prev[phone]];
+      const newGrouped = { ...prev };
+      if (newGrouped[phone]) {
+        newGrouped[phone] = [call, ...newGrouped[phone]];
+      } else {
+        // Добавляем новую группу в начало
+        newGrouped[phone] = [call];
       }
       return newGrouped;
     });
-    setCalls(prevCalls => [call, ...prevCalls]);
-    setTotalCalls(prev => prev + 1);
+    setCalls(prev => [call, ...prev]);
     setStats(prev => ({
       ...prev,
       totalCalls: prev.totalCalls + 1,
@@ -146,11 +145,7 @@ export const useCallsData = () => {
       }
       return newGrouped;
     });
-    setCalls(prevCalls => 
-      prevCalls.map(c => 
-        c.id === call.id ? { ...c, ...call } : c
-      )
-    );
+    setCalls(prev => prev.map(c => c.id === call.id ? { ...c, ...call } : c));
   }, []);
 
   const handleEndedCall = useCallback((call: Call) => {
@@ -158,20 +153,25 @@ export const useCallsData = () => {
   }, [handleUpdatedCall]);
 
   return {
-    calls,
+    // Data
     groupedCalls,
+    calls,
+    stats,
+    pagination,
     loading,
     error,
-    totalCalls,
-    totalPages,
-    totalGroups,
-    stats,
     newCallsCount,
-    socketConnected,
-    fetchCalls,
+    
+    // Computed (для совместимости)
+    totalCalls: stats.totalCalls,
+    totalPages: pagination.totalPages,
+    totalGroups: stats.totalGroups,
+    
+    // Functions
+    fetchGroupedCalls,
     resetNewCallsCount,
     handleNewCall,
     handleUpdatedCall,
-    handleEndedCall
+    handleEndedCall,
   };
 };

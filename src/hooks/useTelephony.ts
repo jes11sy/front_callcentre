@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Call } from '@/types/telephony';
+import { useState, useEffect, useCallback } from 'react';
 import { useCallsData } from './useCallsData';
 import { useCallsFilters } from './useCallsFilters';
 import { useCallsActions } from './useCallsActions';
@@ -30,26 +29,8 @@ export const useTelephony = () => {
   // Локальные состояния для группировки
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  // Мемоизированная группировка звонков с оптимизацией
-  const groupedCalls = useMemo(() => {
-    if (!callsData.calls.length) return {};
-    
-    const groups = callsData.calls.reduce((groups, call) => {
-      const key = call.phoneClient;
-      if (!groups[key]) {
-        groups[key] = [];
-      }
-      groups[key].push(call);
-      return groups;
-    }, {} as Record<string, Call[]>);
-
-    // Сортировка звонков в каждой группе по дате
-    Object.keys(groups).forEach(key => {
-      groups[key].sort((a, b) => new Date(b.dateCreate).getTime() - new Date(a.dateCreate).getTime());
-    });
-
-    return groups;
-  }, [callsData.calls]);
+  // Используем groupedCalls из callsData (уже сгруппированы на сервере)
+  const groupedCalls = callsData.groupedCalls;
 
   // Мемоизированные функции
   const toggleGroup = useCallback((phoneClient: string) => {
@@ -74,7 +55,7 @@ export const useTelephony = () => {
     // Принудительно загружаем данные с базовыми параметрами
     const basicParams = new URLSearchParams({
       page: '1',
-      limit: '100',
+      limit: '10',
       sortBy: 'dateCreate',
       sortOrder: 'desc'
     });
@@ -113,6 +94,8 @@ export const useTelephony = () => {
     loading: callsData.loading,
     error: callsData.error,
     totalCalls: callsData.totalCalls,
+    totalGroups: callsData.totalGroups,
+    stats: callsData.stats,
     newCallsCount: callsData.newCallsCount,
     socketConnected: callsData.socketConnected,
     

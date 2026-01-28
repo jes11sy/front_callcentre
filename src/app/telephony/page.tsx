@@ -59,6 +59,7 @@ export default function TelephonyPage() {
     currentPage,
     totalPages,
     totalCalls,
+    stats,
     limit,
     sortBy,
     sortOrder,
@@ -223,6 +224,7 @@ export default function TelephonyPage() {
             limit={limit}
             onPageChange={setCurrentPage}
             onLimitChange={setLimit}
+            stats={stats}
           />
         </div>
       ) : (

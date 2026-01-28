@@ -48,13 +48,21 @@ interface CallTableV4Props {
   playingCall: number | null;
   currentAudioUrl: string | null;
   onClosePlayer: () => void;
-  // Эти пропсы оставляем для совместимости, но не используем в v4
-  currentPage?: number;
-  totalPages?: number;
-  totalCalls?: number;
-  limit?: number;
-  onPageChange?: (page: number) => void;
-  onLimitChange?: (limit: number) => void;
+  // Серверная пагинация
+  currentPage: number;
+  totalPages: number;
+  totalCalls: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
+  // Статистика с сервера (опционально)
+  stats?: {
+    totalCalls: number;
+    totalGroups: number;
+    missedCalls: number;
+    answeredCalls: number;
+    todayCalls: number;
+  };
 }
 
 export const CallTableV4: React.FC<CallTableV4Props> = ({
@@ -74,22 +82,37 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLoadRecording,
   playingCall,
   currentAudioUrl,
-  onClosePlayer
+  onClosePlayer,
+  currentPage,
+  totalPages,
+  totalCalls,
+  limit,
+  onPageChange,
+  onLimitChange,
+  stats
 }) => {
   // Local state
   const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [stickyPlayerCall, setStickyPlayerCall] = useState<Call | null>(null);
-  const [localPage, setLocalPage] = useState(1);
-  const [groupsPerPage, setGroupsPerPage] = useState(10);
 
-  // Подсчёт для фильтров
+  // Подсчёт для фильтров - используем серверную статистику если есть
   const filterCounts = useMemo(() => {
+    if (stats) {
+      return {
+        all: stats.totalCalls,
+        missed: stats.missedCalls,
+        answered: stats.answeredCalls,
+        today: stats.todayCalls
+      };
+    }
+    
+    // Fallback на локальный подсчёт
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     return {
-      all: calls.length,
+      all: totalCalls,
       missed: calls.filter(c => c.status === 'missed').length,
       answered: calls.filter(c => c.status === 'answered').length,
       today: calls.filter(c => {
@@ -98,13 +121,14 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
         return callDate.getTime() === today.getTime();
       }).length
     };
-  }, [calls]);
+  }, [stats, calls, totalCalls]);
 
-  // Фильтрация
+  // Локальная фильтрация для поиска и быстрых фильтров
+  // Серверная пагинация уже применена, здесь только дополнительная фильтрация на клиенте
   const filteredGroupedCalls = useMemo(() => {
     let filtered = { ...groupedCalls };
     
-    // Поиск по номеру
+    // Поиск по номеру (локальный, в рамках загруженных данных)
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = Object.fromEntries(
@@ -114,7 +138,8 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
       );
     }
     
-    // Быстрые фильтры
+    // Быстрые фильтры (локальные, в рамках загруженных данных)
+    // TODO: В будущем можно передавать эти фильтры на сервер
     if (activeFilter !== 'all') {
       const now = new Date();
       const today = new Date(now);
@@ -122,8 +147,8 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
       const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
       
       filtered = Object.fromEntries(
-        Object.entries(filtered).filter(([_, calls]) => {
-          const latestCall = calls[0];
+        Object.entries(filtered).filter(([_, groupCalls]) => {
+          const latestCall = groupCalls[0];
           const callDate = new Date(latestCall.dateCreate);
           
           switch (activeFilter) {
@@ -147,21 +172,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     return filtered;
   }, [groupedCalls, searchTerm, activeFilter]);
 
-  // Локальная пагинация по группам
-  const totalFilteredGroups = Object.keys(filteredGroupedCalls).length;
-  const localTotalPages = Math.ceil(totalFilteredGroups / groupsPerPage);
-  
-  const paginatedGroupedCalls = useMemo(() => {
-    const entries = Object.entries(filteredGroupedCalls);
-    const startIndex = (localPage - 1) * groupsPerPage;
-    const endIndex = startIndex + groupsPerPage;
-    return Object.fromEntries(entries.slice(startIndex, endIndex));
-  }, [filteredGroupedCalls, localPage, groupsPerPage]);
-
-  // Сброс страницы при изменении фильтров
-  React.useEffect(() => {
-    setLocalPage(1);
-  }, [searchTerm, activeFilter]);
+  const displayedGroupsCount = Object.keys(filteredGroupedCalls).length;
 
   // Handlers
   const handlePlayRecording = useCallback((call: Call) => {
@@ -255,7 +266,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                       <LoadingState message="Загрузка звонков..." size="md" />
                     </td>
                   </TableRow>
-                ) : totalFilteredGroups === 0 ? (
+                ) : displayedGroupsCount === 0 ? (
                   <TableRow>
                     <td colSpan={5} className="text-center py-12">
                       <EmptyState
@@ -268,7 +279,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                     </td>
                   </TableRow>
                 ) : (
-                  Object.entries(paginatedGroupedCalls).map(([phoneClient, groupCalls]) => {
+                  Object.entries(filteredGroupedCalls).map(([phoneClient, groupCalls]) => {
                     const isExpanded = expandedGroups.has(phoneClient);
                     const latestCall = groupCalls[0];
                     const hasMultipleCalls = groupCalls.length > 1;
@@ -322,10 +333,10 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
             <div className="flex items-center gap-2">
               <Label className="text-sm text-gray-500">На странице:</Label>
               <Select
-                value={groupsPerPage.toString()}
+                value={limit.toString()}
                 onValueChange={(value) => {
-                  setGroupsPerPage(parseInt(value));
-                  setLocalPage(1);
+                  onLimitChange(parseInt(value));
+                  onPageChange(1);
                 }}
                 disabled={loading}
               >
@@ -346,11 +357,11 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
               </Select>
             </div>
             
-            {localTotalPages > 1 && (
+            {totalPages > 1 && (
               <OptimizedPagination
-                currentPage={localPage}
-                totalPages={localTotalPages}
-                onPageChange={setLocalPage}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
                 showFirstLast={true}
                 showPrevNext={true}
                 maxVisiblePages={5}

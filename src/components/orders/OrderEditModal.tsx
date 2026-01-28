@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,10 +10,10 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { useFileUrls } from '@/lib/s3-utils';
 import { 
   User, 
-  Settings, 
-  AlertCircle, 
-  XCircle,
-  FileText 
+  X,
+  FileText,
+  Briefcase,
+  Save
 } from 'lucide-react';
 import { Order, OrderTab } from '@/types/orders';
 import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS } from '@/constants/orders';
@@ -48,7 +47,6 @@ export const OrderEditModal = ({
 
   const handleDateChange = (field: 'dateMeeting', value: string) => {
     if (value) {
-      // Создаем дату из локального времени, но сохраняем как UTC
       const localDate = new Date(value);
       const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
       handleOrderChange(field, utcDate.toISOString());
@@ -57,70 +55,60 @@ export const OrderEditModal = ({
     }
   };
 
+  const tabs = [
+    { id: 'description' as OrderTab, label: 'Информация', icon: FileText },
+    { id: 'master' as OrderTab, label: 'Мастер', icon: Briefcase },
+    { id: 'documents' as OrderTab, label: 'Документы', icon: FileText },
+  ];
+
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div 
-        className="bg-[#0f0f23] rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[85vw] h-[80vh] max-w-none max-h-none flex flex-col border-2 border-[#FFD700]"
-        style={{ width: '85vw', height: '80vh' }}
+        className="bg-[#0f0f23] rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden border border-[#FFD700]/40 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Заголовок */}
-        <div className="flex items-center justify-between p-6 border-b border-[#FFD700]/30">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#FFD700]/20 bg-[#17212b]">
           <div>
-            <h2 className="text-2xl font-bold text-[#FFD700]">Редактирование заказа</h2>
-            <p className="text-gray-400">ID: #{order.id}</p>
+            <h2 className="text-lg font-semibold text-[#FFD700]">
+              Редактирование #{order.id}
+            </h2>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-full"
           >
-            <XCircle className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Навигация по вкладкам */}
-        <div className="flex border-b border-[#FFD700]/30">
-          <button
-            onClick={() => setActiveTab('description')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'description'
-                ? 'border-[#FFD700] text-[#FFD700]'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Описание
-          </button>
-          <button
-            onClick={() => setActiveTab('master')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'master'
-                ? 'border-[#FFD700] text-[#FFD700]'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Мастер
-          </button>
-          <button
-            onClick={() => setActiveTab('documents')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'documents'
-                ? 'border-[#FFD700] text-[#FFD700]'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Документы
-          </button>
+        {/* Tabs */}
+        <div className="flex border-b border-[#FFD700]/20 bg-[#17212b]/50">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
         </div>
-
-        {/* Содержимое вкладок */}
-        <div className="flex-1 overflow-y-auto p-6">
+      
+        {/* Content */}
+        <div className="flex-1 p-5 overflow-y-auto custom-scrollbar">
           {activeTab === 'description' && (
-            <OrderDescriptionEditTab 
+            <DescriptionEditTab 
               order={order} 
               userRole={userRole}
               onOrderChange={handleOrderChange}
@@ -129,7 +117,7 @@ export const OrderEditModal = ({
           )}
 
           {activeTab === 'master' && (
-            <OrderMasterEditTab 
+            <MasterEditTab 
               order={order} 
               userRole={userRole}
               onOrderChange={handleOrderChange}
@@ -137,27 +125,23 @@ export const OrderEditModal = ({
           )}
 
           {activeTab === 'documents' && (
-            <OrderDocumentsEditTab 
-              order={order} 
-              userRole={userRole}
-              onOrderChange={handleOrderChange}
-            />
+            <DocumentsEditTab order={order} />
           )}
         </div>
 
-        {/* Кнопки действий */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-[#FFD700]/30">
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-[#FFD700]/20 bg-[#17212b]">
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+            className="border-gray-600 text-gray-300 hover:bg-gray-800"
           >
             Отмена
           </Button>
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
+            className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
           >
             {isSaving ? (
               <>
@@ -165,7 +149,10 @@ export const OrderEditModal = ({
                 Сохранение...
               </>
             ) : (
-              'Сохранить изменения'
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Сохранить
+              </>
             )}
           </Button>
         </div>
@@ -174,8 +161,8 @@ export const OrderEditModal = ({
   );
 };
 
-// Компонент для редактирования описания
-const OrderDescriptionEditTab = ({ 
+// === Вкладка "Информация" ===
+const DescriptionEditTab = ({ 
   order, 
   userRole, 
   onOrderChange, 
@@ -186,198 +173,150 @@ const OrderDescriptionEditTab = ({
   onOrderChange: (field: keyof Order, value: unknown) => void;
   onDateChange: (field: 'dateMeeting', value: string) => void;
 }) => (
-  <div className="space-y-6">
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Основная информация */}
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <User className="h-5 w-5 text-[#FFD700]" />
-            Основная информация
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">РК</Label>
-            <Input 
-              value={order.rk} 
-              disabled={userRole === 'operator'}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Город</Label>
-            <Input 
-              value={order.city} 
-              onChange={(e) => onOrderChange('city', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Источник</Label>
-            <Input 
-              value={order.avitoName || ''} 
-              onChange={(e) => onOrderChange('avitoName', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Источник заказа"
-            />
-          </div>
-        </CardContent>
-      </Card>
+  <div className="space-y-4">
+    {/* Основные поля — сетка 2 колонки */}
+    <div className="grid grid-cols-2 gap-4">
+      <FormField label="Клиент" disabled={userRole === 'operator'}>
+        <Input 
+          value={order.clientName} 
+          disabled={userRole === 'operator'}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white"
+        />
+      </FormField>
+      
+      <FormField label="Телефон">
+        <Input 
+          value={order.phone || ''} 
+          onChange={(e) => onOrderChange('phone', e.target.value)}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white"
+          placeholder="Не указан"
+        />
+      </FormField>
 
-      {/* Детали заказа */}
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <Settings className="h-5 w-5 text-[#FFD700]" />
-            Детали заказа
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Клиент</Label>
-            <Input 
-              value={order.clientName} 
-              disabled={userRole === 'operator'}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Телефон</Label>
-            <Input 
-              value={order.phone || ''} 
-              onChange={(e) => onOrderChange('phone', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Тип заявки</Label>
-            <Select 
-              value={order.typeOrder} 
-              onValueChange={(value: string) => onOrderChange('typeOrder', value)}
-            >
-              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {ORDER_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Адрес</Label>
-            <Input 
-              value={order.address} 
-              onChange={(e) => onOrderChange('address', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Дата встречи</Label>
-            <Input 
-              type="datetime-local"
-              value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
-              onChange={(e) => onDateChange('dateMeeting', e.target.value)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Тип техники</Label>
-            <Select 
-              value={order.typeEquipment} 
-              onValueChange={(value: string) => onOrderChange('typeEquipment', value)}
-            >
-              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {EQUIPMENT_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Статус</Label>
-            <Select 
-              value={order.statusOrder} 
-              onValueChange={(value: string) => onOrderChange('statusOrder', value)}
-            >
-              <SelectTrigger className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {STATUS_OPTIONS.filter(option => option.value !== 'all').map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-white hover:bg-[#FFD700]/10">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <FormField label="РК" disabled={userRole === 'operator'}>
+        <Input 
+          value={order.rk} 
+          disabled={userRole === 'operator'}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white"
+        />
+      </FormField>
+
+      <FormField label="Город">
+        <Input 
+          value={order.city} 
+          onChange={(e) => onOrderChange('city', e.target.value)}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white"
+        />
+      </FormField>
+
+      <FormField label="Источник">
+        <Input 
+          value={order.avitoName || ''} 
+          onChange={(e) => onOrderChange('avitoName', e.target.value)}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white"
+          placeholder="Не указан"
+        />
+      </FormField>
+
+      <FormField label="Дата встречи">
+        <Input 
+          type="datetime-local"
+          value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
+          onChange={(e) => onDateChange('dateMeeting', e.target.value)}
+          className="bg-[#17212b] border-[#FFD700]/20 text-white [color-scheme:dark]"
+        />
+      </FormField>
     </div>
 
-    {/* Описание проблемы */}
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <AlertCircle className="h-5 w-5 text-[#FFD700]" />
-          Описание проблемы
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Textarea 
-          value={order.problem} 
-          onChange={(e) => onOrderChange('problem', e.target.value)}
-          className="min-h-[100px] bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-          placeholder="Опишите проблему..."
-        />
-      </CardContent>
-    </Card>
+    {/* Адрес — полная ширина */}
+    <FormField label="Адрес">
+      <Input 
+        value={order.address} 
+        onChange={(e) => onOrderChange('address', e.target.value)}
+        className="bg-[#17212b] border-[#FFD700]/20 text-white"
+      />
+    </FormField>
 
-    {/* Оператор */}
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <User className="h-5 w-5 text-[#FFD700]" />
-          Оператор
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Имя оператора</Label>
-            <p className="text-lg font-semibold text-white">{order.operator.name}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">ID оператора</Label>
-            <p className="text-lg font-mono text-white">{order.operatorNameId}</p>
-          </div>
-        </div>
-        <div>
-          <Label className="text-sm font-medium text-gray-400">Запись звонка</Label>
-          <Input 
-            value={order.callRecord || ''} 
-            disabled={userRole === 'operator'}
-            className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-            placeholder="Название файла записи..."
-          />
-        </div>
-      </CardContent>
-    </Card>
+    {/* Селекты в ряд */}
+    <div className="grid grid-cols-3 gap-4">
+      <FormField label="Тип заявки">
+        <Select 
+          value={order.typeOrder} 
+          onValueChange={(value) => onOrderChange('typeOrder', value)}
+        >
+          <SelectTrigger className="bg-[#17212b] border-[#FFD700]/20 text-white">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+            {ORDER_TYPES.map((type) => (
+              <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
+
+      <FormField label="Тип техники">
+        <Select 
+          value={order.typeEquipment} 
+          onValueChange={(value) => onOrderChange('typeEquipment', value)}
+        >
+          <SelectTrigger className="bg-[#17212b] border-[#FFD700]/20 text-white">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+            {EQUIPMENT_TYPES.map((type) => (
+              <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#FFD700]/10">
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
+
+      <FormField label="Статус">
+        <Select 
+          value={order.statusOrder} 
+          onValueChange={(value) => onOrderChange('statusOrder', value)}
+        >
+          <SelectTrigger className="bg-[#17212b] border-[#FFD700]/20 text-white">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+            {STATUS_OPTIONS.filter(opt => opt.value !== 'all').map((option) => (
+              <SelectItem key={option.value} value={option.value} className="text-white hover:bg-[#FFD700]/10">
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
+    </div>
+
+    {/* Проблема */}
+    <FormField label="Описание проблемы">
+      <Textarea 
+        value={order.problem} 
+        onChange={(e) => onOrderChange('problem', e.target.value)}
+        className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
+      />
+    </FormField>
+
+    {/* Оператор — только чтение */}
+    <div className="flex items-center justify-between p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <div className="flex items-center gap-2">
+        <User className="h-4 w-4 text-gray-500" />
+        <span className="text-sm text-gray-400">Оператор:</span>
+        <span className="text-sm text-white">{order.operator.name}</span>
+      </div>
+      <span className="text-xs text-gray-500">ID: {order.operatorNameId}</span>
+    </div>
   </div>
 );
 
-// Компонент для редактирования мастера
-const OrderMasterEditTab = ({ 
+// === Вкладка "Мастер" ===
+const MasterEditTab = ({ 
   order, 
   userRole, 
   onOrderChange 
@@ -386,226 +325,205 @@ const OrderMasterEditTab = ({
   userRole?: string; 
   onOrderChange: (field: keyof Order, value: unknown) => void;
 }) => (
-  <div className="space-y-6">
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
+  <div className="space-y-5">
+    {/* Мастер */}
+    <div className="p-4 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-[#FFD700]/20 flex items-center justify-center">
           <User className="h-5 w-5 text-[#FFD700]" />
-          Информация о мастере
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 gap-6">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Имя мастера</Label>
-            <Input 
-              value={order.master?.name || ''} 
-              disabled
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Не назначен"
-            />
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <Label className="text-xs text-gray-500">Мастер</Label>
+          <p className="text-white font-medium">
+            {order.master?.name || <span className="text-gray-500">Не назначен</span>}
+          </p>
+        </div>
+        {order.masterId && (
+          <span className="ml-auto text-xs text-gray-500">ID: {order.masterId}</span>
+        )}
+      </div>
+    </div>
 
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <Settings className="h-5 w-5 text-[#FFD700]" />
-          Финансовые результаты
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Итог</Label>
-            <Input 
-              type="number"
-              value={order.result || ''} 
-              disabled={userRole === 'operator'}
-              onChange={(e) => onOrderChange('result', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Сумма в рублях"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Расходы</Label>
-            <Input 
-              type="number"
-              value={order.expenditure || ''} 
-              disabled={userRole === 'operator'}
-              onChange={(e) => onOrderChange('expenditure', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Сумма в рублях"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Чистая прибыль</Label>
-            <Input 
-              type="number"
-              value={order.clean || ''} 
-              disabled={userRole === 'operator'}
-              onChange={(e) => onOrderChange('clean', e.target.value ? parseInt(e.target.value) : null)}
-              className="mt-1 bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
-              placeholder="Сумма в рублях"
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    {/* Финансы */}
+    <div>
+      <Label className="text-xs text-gray-400 mb-3 block">Финансовые результаты</Label>
+      <div className="grid grid-cols-3 gap-3">
+        <FormField label="Итог (₽)">
+          <Input 
+            type="number"
+            value={order.result || ''} 
+            disabled={userRole === 'operator'}
+            onChange={(e) => onOrderChange('result', e.target.value ? parseInt(e.target.value) : null)}
+            className="bg-[#17212b] border-green-500/30 text-green-400 placeholder:text-gray-600"
+            placeholder="0"
+          />
+        </FormField>
+        
+        <FormField label="Расходы (₽)">
+          <Input 
+            type="number"
+            value={order.expenditure || ''} 
+            disabled={userRole === 'operator'}
+            onChange={(e) => onOrderChange('expenditure', e.target.value ? parseInt(e.target.value) : null)}
+            className="bg-[#17212b] border-red-500/30 text-red-400 placeholder:text-gray-600"
+            placeholder="0"
+          />
+        </FormField>
+        
+        <FormField label="Чистая (₽)">
+          <Input 
+            type="number"
+            value={order.clean || ''} 
+            disabled={userRole === 'operator'}
+            onChange={(e) => onOrderChange('clean', e.target.value ? parseInt(e.target.value) : null)}
+            className="bg-[#17212b] border-blue-500/30 text-blue-400 placeholder:text-gray-600"
+            placeholder="0"
+          />
+        </FormField>
+      </div>
+    </div>
   </div>
 );
 
-// Компонент для редактирования документов
-const OrderDocumentsEditTab = ({ 
-  order, 
-  userRole, 
-  onOrderChange 
-}: { 
-  order: Order; 
-  userRole?: string; 
-  onOrderChange: (field: keyof Order, value: unknown) => void;
-}) => {
+// === Вкладка "Документы" ===
+const DocumentsEditTab = ({ order }: { order: Order }) => {
   const { url: bsoUrls, loading: bsoLoading } = useFileUrls(order.bsoDoc || []);
   const { url: expenditureUrls, loading: expenditureLoading } = useFileUrls(order.expenditureDoc || []);
 
   return (
-    <div className="space-y-6">
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <Settings className="h-5 w-5 text-[#FFD700]" />
-            Документы заказа
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* БСО документ */}
-            <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">
-                БСО документ {order.bsoDoc && order.bsoDoc.length > 0 && `(${order.bsoDoc.length})`}
-              </Label>
-              {order.bsoDoc && order.bsoDoc.length > 0 ? (
-                <div className="space-y-2">
-                  {bsoLoading ? (
-                    <div className="flex items-center justify-center p-4 bg-[#0f0f23] border-2 border-green-500/30 rounded-lg">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-2"></div>
-                        <span className="text-gray-400 text-sm">Загрузка...</span>
-                      </div>
-                    </div>
-                  ) : (
-                    order.bsoDoc.map((doc, index) => {
-                      const url = bsoUrls[doc];
-                      return (
-                        <a 
-                          key={index}
-                          href={url || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 p-3 bg-green-900/30 border border-green-500/30 rounded-lg hover:bg-green-900/50 transition-colors"
-                        >
-                          <FileText className="h-4 w-4 text-green-400 flex-shrink-0" />
-                          <span className="text-green-300 text-sm truncate flex-1">
-                            {order.bsoDoc!.length > 1 ? `Документ БСО #${index + 1}` : 'Документ БСО'}
-                          </span>
-                          <span className="text-green-400 text-xs">↗</span>
-                        </a>
-                      );
-                    })
-                  )}
-                </div>
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4">
+        {/* БСО */}
+        <div>
+          <Label className="text-xs text-gray-400 mb-2 block">
+            БСО документы {order.bsoDoc?.length ? `(${order.bsoDoc.length})` : ''}
+          </Label>
+          {order.bsoDoc && order.bsoDoc.length > 0 ? (
+            <div className="space-y-2">
+              {bsoLoading ? (
+                <LoadingPlaceholder color="green" />
               ) : (
-                <div className="flex items-center justify-center p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                  <div className="text-center">
-                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-400 text-sm">Документ не загружен</span>
-                  </div>
-                </div>
+                order.bsoDoc.map((doc, index) => (
+                  <DocumentLink 
+                    key={index}
+                    url={bsoUrls[doc]}
+                    label={`БСО #${index + 1}`}
+                    color="green"
+                  />
+                ))
               )}
             </div>
+          ) : (
+            <EmptyDocPlaceholder />
+          )}
+        </div>
 
-            {/* Документ расходов */}
-            <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">
-                Документ расходов {order.expenditureDoc && order.expenditureDoc.length > 0 && `(${order.expenditureDoc.length})`}
-              </Label>
-              {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
-                <div className="space-y-2">
-                  {expenditureLoading ? (
-                    <div className="flex items-center justify-center p-4 bg-[#0f0f23] border-2 border-blue-500/30 rounded-lg">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-2"></div>
-                        <span className="text-gray-400 text-sm">Загрузка...</span>
-                      </div>
-                    </div>
-                  ) : (
-                    order.expenditureDoc.map((doc, index) => {
-                      const url = expenditureUrls[doc];
-                      return (
-                        <a 
-                          key={index}
-                          href={url || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg hover:bg-blue-900/50 transition-colors"
-                        >
-                          <FileText className="h-4 w-4 text-blue-400 flex-shrink-0" />
-                          <span className="text-blue-300 text-sm truncate flex-1">
-                            {order.expenditureDoc!.length > 1 ? `Документ расходов #${index + 1}` : 'Документ расходов'}
-                          </span>
-                          <span className="text-blue-400 text-xs">↗</span>
-                        </a>
-                      );
-                    })
-                  )}
-                </div>
+        {/* Расходы */}
+        <div>
+          <Label className="text-xs text-gray-400 mb-2 block">
+            Документы расходов {order.expenditureDoc?.length ? `(${order.expenditureDoc.length})` : ''}
+          </Label>
+          {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
+            <div className="space-y-2">
+              {expenditureLoading ? (
+                <LoadingPlaceholder color="blue" />
               ) : (
-                <div className="flex items-center justify-center p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                  <div className="text-center">
-                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-400 text-sm">Документ не загружен</span>
-                  </div>
-                </div>
+                order.expenditureDoc.map((doc, index) => (
+                  <DocumentLink 
+                    key={index}
+                    url={expenditureUrls[doc]}
+                    label={`Расход #${index + 1}`}
+                    color="blue"
+                  />
+                ))
               )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          ) : (
+            <EmptyDocPlaceholder />
+          )}
+        </div>
+      </div>
 
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <Settings className="h-5 w-5 text-[#FFD700]" />
-          Системная информация
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Дата создания:</span>
-              <span className="font-medium text-white">{new Date(order.createDate).toLocaleString('ru-RU')}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Последнее обновление:</span>
-              <span className="font-medium text-white">{order.updatedAt ? new Date(order.updatedAt).toLocaleString('ru-RU') : 'Не указано'}</span>
-            </div>
+      {/* Системная информация */}
+      <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+        <Label className="text-xs text-gray-400 mb-2 block">Системная информация</Label>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Создан:</span>
+            <span className="text-gray-300">{new Date(order.createDate).toLocaleString('ru-RU')}</span>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">ID заказа:</span>
-              <span className="font-medium text-white">#{order.id}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">ID оператора:</span>
-              <span className="font-medium text-white">{order.operatorNameId}</span>
-            </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Обновлён:</span>
+            <span className="text-gray-300">{order.updatedAt ? new Date(order.updatedAt).toLocaleString('ru-RU') : '—'}</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  </div>
+      </div>
+    </div>
   );
 };
+
+// === Вспомогательные компоненты ===
+
+const FormField = ({ 
+  label, 
+  children, 
+  disabled = false 
+}: { 
+  label: string; 
+  children: React.ReactNode; 
+  disabled?: boolean;
+}) => (
+  <div className={disabled ? 'opacity-60' : ''}>
+    <Label className="text-xs text-gray-400 mb-1.5 block">{label}</Label>
+    {children}
+  </div>
+);
+
+const DocumentLink = ({ 
+  url, 
+  label, 
+  color 
+}: { 
+  url?: string; 
+  label: string; 
+  color: 'green' | 'blue';
+}) => {
+  const colors = {
+    green: 'bg-green-900/30 border-green-500/30 text-green-300 hover:bg-green-900/50',
+    blue: 'bg-blue-900/30 border-blue-500/30 text-blue-300 hover:bg-blue-900/50',
+  };
+  const iconColors = {
+    green: 'text-green-400',
+    blue: 'text-blue-400',
+  };
+
+  return (
+    <a 
+      href={url || '#'} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className={`flex items-center gap-2 p-2 border rounded-lg transition-colors ${colors[color]}`}
+    >
+      <FileText className={`h-4 w-4 ${iconColors[color]}`} />
+      <span className="text-sm truncate flex-1">{label}</span>
+      <span className="text-xs opacity-60">↗</span>
+    </a>
+  );
+};
+
+const LoadingPlaceholder = ({ color }: { color: 'green' | 'blue' }) => {
+  const borderColor = color === 'green' ? 'border-green-500/30' : 'border-blue-500/30';
+  const spinnerColor = color === 'green' ? 'border-green-400' : 'border-blue-400';
+  
+  return (
+    <div className={`flex items-center justify-center p-4 bg-[#17212b] border ${borderColor} rounded-lg`}>
+      <div className={`animate-spin rounded-full h-6 w-6 border-b-2 ${spinnerColor}`} />
+    </div>
+  );
+};
+
+const EmptyDocPlaceholder = () => (
+  <div className="flex items-center justify-center p-6 bg-[#17212b] border border-dashed border-gray-700 rounded-lg">
+    <span className="text-xs text-gray-500">Нет документов</span>
+  </div>
+);

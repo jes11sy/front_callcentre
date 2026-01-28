@@ -17,9 +17,13 @@ import {
   Clock,
   PhoneCall,
   PhoneMissed,
+  PhoneIncoming,
+  PhoneOutgoing,
   FileText,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Play,
+  User
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,6 +60,7 @@ interface Call {
   dateCreate: string;
   duration?: number;
   status: 'answered' | 'missed' | 'busy' | 'no_answer';
+  callDirection?: 'incoming' | 'outgoing';
   recordingPath?: string;
   operator?: {
     id: number;
@@ -97,10 +102,13 @@ export function CreateOrderModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderHistory, setOrderHistory] = useState<Order[]>([]);
   const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
+  const [callHistory, setCallHistory] = useState<Call[]>([]);
+  const [callHistoryLoading, setCallHistoryLoading] = useState(false);
   const [showCallHistory, setShowCallHistory] = useState(true);
   const [showOrderHistory, setShowOrderHistory] = useState(true);
   const [sources, setSources] = useState<string[]>([]);
   const [campaigns, setCampaigns] = useState<string[]>([]);
+  const [playingCallId, setPlayingCallId] = useState<number | null>(null);
   const { user } = useAuthStore();
 
   // Загрузка источников и РК из БД
@@ -190,6 +198,73 @@ export function CreateOrderModal({
 
     loadOrderHistory();
   }, [call?.phoneClient, open]);
+
+  // Загрузка истории звонков по номеру телефона (все операторы)
+  useEffect(() => {
+    const loadCallHistory = async () => {
+      if (!call?.phoneClient || !open) return;
+      
+      try {
+        setCallHistoryLoading(true);
+        const response = await authApi.get(`/calls/by-phone/${encodeURIComponent(call.phoneClient)}`);
+        if (response.data.success) {
+          setCallHistory(response.data.data || []);
+        }
+      } catch (error) {
+        console.error('Error loading call history:', error);
+        // Fallback на callGroup если API не работает
+        setCallHistory(callGroup.length > 0 ? callGroup : (call ? [call] : []));
+      } finally {
+        setCallHistoryLoading(false);
+      }
+    };
+
+    loadCallHistory();
+  }, [call?.phoneClient, open, call, callGroup]);
+
+  // Воспроизведение записи звонка
+  const handlePlayRecording = async (callItem: Call) => {
+    if (!callItem.recordingPath) return;
+    
+    if (playingCallId === callItem.id) {
+      setPlayingCallId(null);
+      return;
+    }
+    
+    try {
+      setPlayingCallId(callItem.id);
+      const response = await authApi.get(`/recordings/${callItem.id}/url`);
+      if (response.data.success && response.data.data?.url) {
+        const audio = new Audio(response.data.data.url);
+        audio.play();
+        audio.onended = () => setPlayingCallId(null);
+      }
+    } catch (error) {
+      console.error('Error playing recording:', error);
+      setPlayingCallId(null);
+    }
+  };
+
+  // Форматирование номера телефона
+  const formatPhoneDisplay = (phoneClient: string) => {
+    if (!phoneClient) return 'Неизвестно';
+    
+    // SIP-адрес
+    if (phoneClient.toLowerCase().includes('sip:')) {
+      const match = phoneClient.match(/sip:([^@]+)@/i);
+      if (match) {
+        return match[1].split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      }
+      return phoneClient;
+    }
+    
+    // Обычный номер
+    const digits = phoneClient.replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('7')) {
+      return `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`;
+    }
+    return phoneClient;
+  };
 
   const onSubmit = async (data: OrderFormData) => {
     if (!call) return;
@@ -334,43 +409,104 @@ export function CreateOrderModal({
         {/* Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left: History panels */}
-          <div className="w-80 border-r border-[#FFD700]/10 flex flex-col overflow-hidden bg-[#0f0f23]/30">
-            {/* История звонков */}
-            <div className="border-b border-[#FFD700]/10">
+          <div className="w-[420px] border-r border-[#FFD700]/10 flex flex-col overflow-hidden bg-[#0f0f23]/30">
+            {/* История звонков (все операторы) */}
+            <div className="border-b border-[#FFD700]/10 flex-1 flex flex-col overflow-hidden">
               <button 
                 onClick={() => setShowCallHistory(!showCallHistory)}
-                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors"
+                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors shrink-0"
               >
                 <div className="flex items-center gap-2">
                   <PhoneCall className="h-3.5 w-3.5" />
-                  <span>История звонков ({callsToShow.length})</span>
+                  <span>История звонков ({callHistoryLoading ? '...' : callHistory.length})</span>
                 </div>
                 {showCallHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               </button>
               {showCallHistory && (
-                <ScrollArea className="max-h-40">
-                  <div className="px-2 pb-2 space-y-1">
-                    {callsToShow.map((c) => (
-                      <div 
-                        key={c.id} 
-                        className={`p-2 rounded-lg text-xs ${c.id === call.id ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' : 'bg-[#17212b]/50'}`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-1.5">
-                            {c.status === 'answered' ? (
-                              <PhoneCall className="h-3 w-3 text-green-400" />
-                            ) : (
-                              <PhoneMissed className="h-3 w-3 text-red-400" />
-                            )}
-                            <span className="text-gray-300">{formatDate(c.dateCreate)}</span>
-                          </div>
-                          <span className="text-gray-500">{formatDuration(c.duration)}</span>
-                        </div>
-                        <div className="text-gray-500 truncate">
-                          {c.operator?.name || 'Без оператора'}
-                        </div>
+                <ScrollArea className="flex-1">
+                  <div className="px-2 pb-2 space-y-1.5">
+                    {callHistoryLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
                       </div>
-                    ))}
+                    ) : callHistory.length === 0 ? (
+                      <div className="text-xs text-gray-500 text-center py-4">
+                        Звонков не найдено
+                      </div>
+                    ) : (
+                      callHistory.map((c) => {
+                        const isOutgoing = c.callDirection === 'outgoing' || c.phoneClient?.toLowerCase().includes('sip:');
+                        const isCurrentCall = c.id === call?.id;
+                        
+                        return (
+                          <div 
+                            key={c.id} 
+                            className={`p-2.5 rounded-lg text-xs ${isCurrentCall ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' : 'bg-[#17212b]/50 hover:bg-[#17212b]'} transition-colors`}
+                          >
+                            {/* Строка 1: Дата/время + Направление + Статус */}
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-300 font-medium">{formatDate(c.dateCreate)}</span>
+                                {/* Направление */}
+                                <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
+                                  isOutgoing 
+                                    ? 'bg-blue-500/10 text-blue-400' 
+                                    : 'bg-emerald-500/10 text-emerald-400'
+                                }`}>
+                                  {isOutgoing ? <PhoneOutgoing className="h-2.5 w-2.5" /> : <PhoneIncoming className="h-2.5 w-2.5" />}
+                                  {isOutgoing ? 'Исход.' : 'Вход.'}
+                                </span>
+                              </div>
+                              {/* Статус */}
+                              <span className={`flex items-center gap-1 ${
+                                c.status === 'answered' ? 'text-green-400' : 'text-red-400'
+                              }`}>
+                                {c.status === 'answered' ? (
+                                  <PhoneCall className="h-3 w-3" />
+                                ) : (
+                                  <PhoneMissed className="h-3 w-3" />
+                                )}
+                                {formatDuration(c.duration)}
+                              </span>
+                            </div>
+                            
+                            {/* Строка 2: Оператор + РК + Город */}
+                            <div className="flex items-center gap-2 mb-1.5 text-gray-400">
+                              <div className="flex items-center gap-1 min-w-0 flex-1">
+                                <User className="h-3 w-3 shrink-0" />
+                                <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
+                              </div>
+                              <span className="text-gray-600">•</span>
+                              <span className="text-[#FFD700] shrink-0">{c.rk || '—'}</span>
+                              <span className="text-gray-600">•</span>
+                              <span className="shrink-0">{c.city || '—'}</span>
+                            </div>
+                            
+                            {/* Строка 3: Номер клиента + Запись */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1 text-gray-500">
+                                <Phone className="h-3 w-3" />
+                                <span className="font-mono text-[11px]">{formatPhoneDisplay(c.phoneClient)}</span>
+                              </div>
+                              {/* Кнопка воспроизведения */}
+                              {c.recordingPath && (
+                                <button
+                                  onClick={() => handlePlayRecording(c)}
+                                  className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-colors ${
+                                    playingCallId === c.id 
+                                      ? 'bg-[#FFD700]/20 text-[#FFD700]' 
+                                      : 'bg-gray-700/50 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10'
+                                  }`}
+                                >
+                                  <Play className="h-3 w-3" />
+                                  {playingCallId === c.id ? 'Играет...' : 'Запись'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </ScrollArea>
               )}

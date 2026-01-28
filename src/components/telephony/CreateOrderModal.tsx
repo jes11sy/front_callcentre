@@ -114,6 +114,10 @@ export function CreateOrderModal({
   const [playingCall, setPlayingCall] = useState<Call | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioLoading, setAudioLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { user } = useAuthStore();
 
   // Загрузка источников и РК из БД
@@ -261,6 +265,11 @@ export function CreateOrderModal({
 
   // Закрытие плеера
   const handleClosePlayer = () => {
+    // Останавливаем воспроизведение
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     // Очищаем blob URL для предотвращения утечки памяти
     if (audioUrl && audioUrl.startsWith('blob:')) {
       URL.revokeObjectURL(audioUrl);
@@ -268,6 +277,34 @@ export function CreateOrderModal({
     setPlayingCallId(null);
     setPlayingCall(null);
     setAudioUrl(null);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+  };
+
+  // Play/Pause
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+  };
+
+  // Перемотка
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!audioRef.current) return;
+    const time = parseFloat(e.target.value);
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  // Форматирование времени для плеера
+  const formatAudioTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Форматирование номера телефона
@@ -495,14 +532,20 @@ export function CreateOrderModal({
                               </span>
                             </div>
                             
-                            {/* Строка 2: Оператор + РК + Город */}
-                            <div className="flex items-center gap-2 mb-1.5 text-gray-400">
-                              <div className="flex items-center gap-1 min-w-0 flex-1">
+                            {/* Строка 2: Оператор + РК + Источник + Город */}
+                            <div className="flex items-center gap-2 mb-1.5 text-gray-400 text-[11px]">
+                              <div className="flex items-center gap-1 min-w-0">
                                 <User className="h-3 w-3 shrink-0" />
                                 <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
                               </div>
                               <span className="text-gray-600">•</span>
                               <span className="text-[#FFD700] shrink-0">{c.rk || '—'}</span>
+                              {c.avitoName && (
+                                <>
+                                  <span className="text-gray-600">•</span>
+                                  <span className="text-purple-400 shrink-0">{c.avitoName}</span>
+                                </>
+                              )}
                               <span className="text-gray-600">•</span>
                               <span className="shrink-0">{c.city || '—'}</span>
                             </div>
@@ -778,45 +821,85 @@ export function CreateOrderModal({
 
         {/* Audio Player - показывается снизу при воспроизведении */}
         {playingCall && (
-          <div className="border-t border-[#FFD700]/30 bg-[#0f0f23] px-4 py-3 shrink-0">
+          <div className="border-t-2 border-[#FFD700]/40 bg-gradient-to-r from-[#0f0f23] to-[#17212b] px-4 py-3 shrink-0">
+            {/* Скрытый audio элемент */}
+            {audioUrl && (
+              <audio
+                ref={audioRef}
+                src={audioUrl}
+                autoPlay
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+                onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
+                onEnded={handleClosePlayer}
+              />
+            )}
+            
             <div className="flex items-center gap-4">
-              {/* Иконка и информация о звонке */}
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-10 h-10 rounded-full bg-[#FFD700]/10 flex items-center justify-center shrink-0">
-                  <Volume2 className="w-5 h-5 text-[#FFD700]" />
+              {/* Кнопка Play/Pause */}
+              <button
+                onClick={togglePlayPause}
+                disabled={audioLoading || !audioUrl}
+                className="w-10 h-10 rounded-full bg-[#FFD700] hover:bg-[#FFD700]/90 flex items-center justify-center shrink-0 transition-colors disabled:opacity-50"
+              >
+                {audioLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-[#0f0f23]" />
+                ) : isPlaying ? (
+                  <Pause className="w-5 h-5 text-[#0f0f23]" />
+                ) : (
+                  <Play className="w-5 h-5 text-[#0f0f23] ml-0.5" />
+                )}
+              </button>
+
+              {/* Информация о звонке */}
+              <div className="min-w-0 w-48">
+                <div className="text-sm text-white font-medium truncate">
+                  {playingCall.operator?.name || 'Оператор'}
                 </div>
-                <div className="min-w-0">
-                  <div className="text-sm text-white font-medium truncate">
-                    {playingCall.operator?.name || 'Оператор'}
-                  </div>
-                  <div className="text-xs text-gray-400 flex items-center gap-2">
-                    <span>{formatDate(playingCall.dateCreate)}</span>
-                    <span className="text-gray-600">•</span>
-                    <span>{playingCall.rk || '—'}</span>
-                    <span className="text-gray-600">•</span>
-                    <span className={playingCall.callDirection === 'outgoing' ? 'text-blue-400' : 'text-emerald-400'}>
-                      {playingCall.callDirection === 'outgoing' ? 'Исходящий' : 'Входящий'}
-                    </span>
-                  </div>
+                <div className="text-xs text-gray-400 flex items-center gap-1.5 truncate">
+                  <span>{formatDate(playingCall.dateCreate)}</span>
+                  <span className="text-gray-600">•</span>
+                  <span className={playingCall.callDirection === 'outgoing' ? 'text-blue-400' : 'text-emerald-400'}>
+                    {playingCall.callDirection === 'outgoing' ? 'Исход.' : 'Вход.'}
+                  </span>
                 </div>
               </div>
 
-              {/* Audio элемент */}
-              <div className="flex-1 max-w-md">
-                {audioLoading ? (
-                  <div className="flex items-center justify-center py-2">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#FFD700]" />
-                    <span className="ml-2 text-sm text-gray-400">Загрузка...</span>
-                  </div>
-                ) : audioUrl ? (
-                  <audio
-                    src={audioUrl}
-                    controls
-                    autoPlay
-                    className="w-full h-8 [&::-webkit-media-controls-panel]:bg-[#17212b] [&::-webkit-media-controls-current-time-display]:text-white [&::-webkit-media-controls-time-remaining-display]:text-white"
-                    onEnded={handleClosePlayer}
+              {/* Прогресс-бар */}
+              <div className="flex-1 flex items-center gap-3">
+                <span className="text-xs text-gray-400 w-10 text-right font-mono">
+                  {formatAudioTime(currentTime)}
+                </span>
+                <div className="flex-1 relative">
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration || 100}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    className="w-full h-1.5 bg-gray-700 rounded-full appearance-none cursor-pointer
+                      [&::-webkit-slider-thumb]:appearance-none
+                      [&::-webkit-slider-thumb]:w-3
+                      [&::-webkit-slider-thumb]:h-3
+                      [&::-webkit-slider-thumb]:rounded-full
+                      [&::-webkit-slider-thumb]:bg-[#FFD700]
+                      [&::-webkit-slider-thumb]:cursor-pointer
+                      [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(255,215,0,0.5)]
+                      [&::-moz-range-thumb]:w-3
+                      [&::-moz-range-thumb]:h-3
+                      [&::-moz-range-thumb]:rounded-full
+                      [&::-moz-range-thumb]:bg-[#FFD700]
+                      [&::-moz-range-thumb]:border-0
+                      [&::-moz-range-thumb]:cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${(currentTime / (duration || 1)) * 100}%, #374151 ${(currentTime / (duration || 1)) * 100}%, #374151 100%)`
+                    }}
                   />
-                ) : null}
+                </div>
+                <span className="text-xs text-gray-400 w-10 font-mono">
+                  {formatAudioTime(duration)}
+                </span>
               </div>
 
               {/* Кнопка закрытия */}

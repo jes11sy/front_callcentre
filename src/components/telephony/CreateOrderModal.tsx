@@ -621,7 +621,7 @@ export function CreateOrderModal({
                               )}
                             </div>
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-blue-500/10 text-blue-400 border-blue-500/30">
-                              {order.statusOrder}
+                              {(order as any).status || order.statusOrder || 'Нет статуса'}
                             </Badge>
                           </div>
                           

@@ -142,8 +142,8 @@ export const OrderEditModal = ({
 
               <Row label="Источник">
                 <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
-                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                    <SelectValue placeholder="Выберите" />
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white w-full">
+                    <span className="truncate">{order.avitoName || 'Выберите'}</span>
                   </SelectTrigger>
                   <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                     {sources.map((s) => (
@@ -286,8 +286,8 @@ export const OrderEditModal = ({
 // === Вспомогательные компоненты ===
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="flex items-center gap-4">
-    <Label className="text-sm text-gray-400 shrink-0 w-28 text-right">{label}</Label>
-    <div className="flex-1">{children}</div>
+  <div className="flex items-center gap-3">
+    <Label className="text-sm text-gray-400 shrink-0 w-24">{label}</Label>
+    <div className="flex-1 min-w-0">{children}</div>
   </div>
 );

@@ -80,16 +80,15 @@ const OrderViewModalComponent = ({
           <h2 className="text-lg font-bold text-[#FFD700]">
             Заказ #{order.id}
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {onEdit && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={onEdit}
-                className="h-8 px-3 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                className="h-8 px-2 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
               >
-                <Edit className="h-4 w-4 mr-1.5" />
-                Редактировать
+                <Edit className="h-4 w-4" />
               </Button>
             )}
             <Button

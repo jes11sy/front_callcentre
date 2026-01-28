@@ -95,134 +95,145 @@ export const OrderEditModal = ({
         </div>
       
         {/* Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-3">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <EditRow label="Тип заявки">
-              <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
-                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {ORDER_TYPES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </EditRow>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+          <Row label="Тип заявки">
+            <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
+              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {ORDER_TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
 
-            <EditRow label="Тип техники">
-              <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
-                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {EQUIPMENT_TYPES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </EditRow>
+          <Row label="РК">
+            <Input 
+              value={order.rk} 
+              onChange={(e) => handleOrderChange('rk', e.target.value)}
+              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
+            />
+          </Row>
 
-            <EditRow label="РК">
-              <Input 
-                value={order.rk} 
-                onChange={(e) => handleOrderChange('rk', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
-              />
-            </EditRow>
+          <Row label="Источник">
+            <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
+              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                <SelectValue placeholder="Выберите" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {sources.map((s) => (
+                  <SelectItem key={s} value={s} className="text-white hover:bg-[#FFD700]/10">
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
 
-            <EditRow label="Источник">
-              <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
-                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
-                  <SelectValue placeholder="Выберите источник" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {sources.map((s) => (
-                    <SelectItem key={s} value={s} className="text-white hover:bg-[#FFD700]/10">
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </EditRow>
+          <Row label="Город">
+            <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
+              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {CITIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value} className="text-white hover:bg-[#FFD700]/10">
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
 
-            <EditRow label="Город">
-              <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
-                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {CITIES.map((c) => (
-                    <SelectItem key={c.value} value={c.value} className="text-white hover:bg-[#FFD700]/10">
-                      {c.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </EditRow>
+          <Row label="Клиент">
+            <Input 
+              value={order.clientName} 
+              onChange={(e) => handleOrderChange('clientName', e.target.value)}
+              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
+            />
+          </Row>
 
-            <EditRow label="Статус">
-              <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
-                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {STATUS_OPTIONS.filter(o => o.value !== 'all').map((o) => (
-                    <SelectItem key={o.value} value={o.value} className="text-white hover:bg-[#FFD700]/10">
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </EditRow>
+          <Row label="Телефон">
+            <Input 
+              value={order.phone || ''} 
+              onChange={(e) => {
+                // Оставляем только цифры, начинаем с 7
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.startsWith('8')) {
+                  value = '7' + value.slice(1);
+                }
+                if (!value.startsWith('7') && value.length > 0) {
+                  value = '7' + value;
+                }
+                if (value.length > 11) {
+                  value = value.slice(0, 11);
+                }
+                handleOrderChange('phone', value);
+              }}
+              maxLength={11}
+              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white placeholder:text-gray-500"
+              placeholder="79991234567"
+            />
+          </Row>
 
-            <EditRow label="Клиент">
-              <Input 
-                value={order.clientName} 
-                onChange={(e) => handleOrderChange('clientName', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
-              />
-            </EditRow>
+          <Row label="Дата встречи">
+            <Input 
+              type="datetime-local"
+              value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
+              onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
+              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white [color-scheme:dark]"
+            />
+          </Row>
 
-            <EditRow label="Телефон">
-              <Input 
-                value={order.phone || ''} 
-                onChange={(e) => handleOrderChange('phone', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
-                placeholder="—"
-              />
-            </EditRow>
-
-            <EditRow label="Дата встречи">
-              <Input 
-                type="datetime-local"
-                value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
-                onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm [color-scheme:dark]"
-              />
-            </EditRow>
-          </div>
-
-          <EditRow label="Адрес" fullWidth>
+          <Row label="Адрес">
             <Input 
               value={order.address} 
               onChange={(e) => handleOrderChange('address', e.target.value)}
-              className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
+              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
             />
-          </EditRow>
+          </Row>
 
-          <div className="pt-1">
-            <Label className="text-xs text-gray-500 mb-1.5 block">Проблема</Label>
+          <Row label="Проблема">
             <Textarea 
               value={order.problem} 
               onChange={(e) => handleOrderChange('problem', e.target.value)}
-              className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white text-sm resize-none"
+              className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
             />
-          </div>
+          </Row>
+
+          <Row label="Тип техники">
+            <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
+              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {EQUIPMENT_TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+
+          <Row label="Статус">
+            <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
+              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                {STATUS_OPTIONS.filter(o => o.value !== 'all').map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-white hover:bg-[#FFD700]/10">
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
         </div>
 
         {/* Footer */}
@@ -259,9 +270,9 @@ export const OrderEditModal = ({
 
 // === Вспомогательные компоненты ===
 
-const EditRow = ({ label, children, fullWidth = false }: { label: string; children: React.ReactNode; fullWidth?: boolean }) => (
-  <div className={`flex items-center gap-3 ${fullWidth ? 'col-span-2' : ''}`}>
-    <Label className="text-xs text-gray-500 shrink-0 w-24">{label}</Label>
+const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="flex items-center gap-4">
+    <Label className="text-sm text-gray-400 shrink-0 w-28 text-right">{label}</Label>
     <div className="flex-1">{children}</div>
   </div>
 );

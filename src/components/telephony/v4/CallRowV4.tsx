@@ -34,6 +34,50 @@ function pluralize(count: number, one: string, few: string, many: string): strin
   return many;
 }
 
+/**
+ * Форматирует phoneClient для красивого отображения
+ * SIP: sip:kovalenko_oksana@vpbx400349703.mangosip.ru → "Kovalenko Oksana"
+ * Обычный номер: +79001234567 → "+7 900 123-45-67"
+ */
+function formatPhoneClient(phoneClient: string): { display: string; isSip: boolean; sipName?: string } {
+  if (!phoneClient) return { display: 'Неизвестно', isSip: false };
+  
+  // Проверяем SIP-адрес
+  if (phoneClient.toLowerCase().includes('sip:')) {
+    // Извлекаем имя пользователя: sip:kovalenko_oksana@vpbx... → kovalenko_oksana
+    const match = phoneClient.match(/sip:([^@]+)@/i);
+    if (match) {
+      const username = match[1];
+      // Преобразуем snake_case в красивое имя: kovalenko_oksana → Kovalenko Oksana
+      const displayName = username
+        .split('_')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(' ');
+      return { display: displayName, isSip: true, sipName: username };
+    }
+    return { display: phoneClient, isSip: true };
+  }
+  
+  // Форматируем обычный номер телефона
+  const digits = phoneClient.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('7')) {
+    // +7 900 123-45-67
+    return { 
+      display: `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`,
+      isSip: false 
+    };
+  }
+  if (digits.length === 10) {
+    // 900 123-45-67
+    return { 
+      display: `${digits.slice(0, 3)} ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8)}`,
+      isSip: false 
+    };
+  }
+  
+  return { display: phoneClient, isSip: false };
+}
+
 interface CallRowV4Props {
   call: Call;
   phoneClient: string;
@@ -159,6 +203,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   const duration = formatDuration(call.duration);
   const directionConfig = getDirectionConfig(call.callDirection);
   const DirectionIcon = directionConfig.icon;
+  const formattedPhone = formatPhoneClient(call.phoneClient);
 
   return (
     <TableRow 
@@ -175,14 +220,31 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             <>
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                statusConfig.bgColor
+                formattedPhone.isSip ? directionConfig.bgColor : statusConfig.bgColor
               )}>
-                <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
+                {formattedPhone.isSip ? (
+                  <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
+                ) : (
+                  <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
+                )}
               </div>
               <div>
-                <div className="font-semibold text-[#FFD700] font-mono">
-                  {phoneClient}
-                </div>
+                {formattedPhone.isSip ? (
+                  // Исходящий звонок - показываем имя сотрудника
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-blue-400">
+                      {formattedPhone.display}
+                    </span>
+                    <span className="text-xs text-gray-500" title={call.phoneClient}>
+                      Исходящий звонок
+                    </span>
+                  </div>
+                ) : (
+                  // Входящий звонок - показываем номер телефона
+                  <div className="font-semibold text-[#FFD700] font-mono">
+                    {formattedPhone.display}
+                  </div>
+                )}
                 {hasMultipleCalls && (
                   <button
                     onClick={(e) => {
@@ -204,8 +266,17 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           ) : (
             <div className="flex items-center gap-2 pl-8">
               <div className="w-0.5 h-5 bg-[#FFD700]/30 rounded" />
-              <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
-              <span className="text-gray-400 text-sm font-mono">{phoneClient}</span>
+              {formattedPhone.isSip ? (
+                <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
+              ) : (
+                <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
+              )}
+              <span className={cn(
+                "text-sm",
+                formattedPhone.isSip ? "text-blue-400" : "text-gray-400 font-mono"
+              )}>
+                {formattedPhone.display}
+              </span>
             </div>
           )}
         </div>

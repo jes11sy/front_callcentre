@@ -7,13 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Phone, 
   MapPin, 
   Loader2,
   Plus,
   X,
-  Clock
+  Clock,
+  PhoneCall,
+  PhoneMissed,
+  FileText,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,29 +28,19 @@ import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
 
-// Опции для выпадающих списков
-const RK_OPTIONS = ['Авито', 'Листовка'] as const;
+// Статические опции
 const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
-const SOURCE_OPTIONS = [
-  'Не указано',
-  'Владимир',
-  'Диспетчер МНЧ Расклейка',
-  'Сайт Водоканал',
-  'Сайт Поверка',
-  'Диспетчер Быт КП МНЧ',
-  'Газета',
-  'Поверка Счетчиков Партнер'
-] as const;
+const DIRECTION_OPTIONS = ['Не указано', 'КП', 'БТ', 'МНЧ'] as const;
 
 const orderSchema = z.object({
-  rk: z.enum(RK_OPTIONS),
-  avitoName: z.enum(SOURCE_OPTIONS).optional(),
+  rk: z.string().optional(),
+  avitoName: z.string().optional(),
   city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']),
   clientName: z.string().min(1, 'Введите имя клиента'),
   address: z.string().min(1, 'Введите адрес'),
   dateMeeting: z.string().min(1, 'Выберите дату встречи'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ']),
+  typeEquipment: z.string().optional(),
   problem: z.string().min(1, 'Опишите проблему'),
 });
 
@@ -58,9 +54,10 @@ interface Call {
   phoneClient: string;
   phoneAts: string;
   dateCreate: string;
+  duration?: number;
   status: 'answered' | 'missed' | 'busy' | 'no_answer';
   recordingPath?: string;
-  operator: {
+  operator?: {
     id: number;
     name: string;
     login: string;
@@ -69,6 +66,17 @@ interface Call {
     id: number;
     name: string;
   };
+}
+
+interface Order {
+  id: number;
+  clientName: string;
+  city: string;
+  status: string;
+  dateMeeting: string;
+  typeEquipment: string;
+  problem?: string;
+  createdAt: string;
 }
 
 interface CreateOrderModalProps {
@@ -87,20 +95,64 @@ export function CreateOrderModal({
   onOrderCreated 
 }: CreateOrderModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderHistory, setOrderHistory] = useState<Order[]>([]);
+  const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
+  const [showCallHistory, setShowCallHistory] = useState(true);
+  const [showOrderHistory, setShowOrderHistory] = useState(true);
+  const [sources, setSources] = useState<string[]>([]);
+  const [campaigns, setCampaigns] = useState<string[]>([]);
   const { user } = useAuthStore();
+
+  // Загрузка источников и РК из БД
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [sourcesRes, campaignsRes] = await Promise.all([
+          authApi.get('/phones/sources'),
+          authApi.get('/phones/campaigns')
+        ]);
+        
+        if (sourcesRes.data.success) {
+          setSources(sourcesRes.data.data || []);
+        }
+        if (campaignsRes.data.success) {
+          setCampaigns(campaignsRes.data.data || []);
+        }
+      } catch (error) {
+        console.error('Error loading options:', error);
+      }
+    };
+
+    if (open) {
+      loadOptions();
+    }
+  }, [open]);
+
+  // Проверяем, есть ли значение в списке
+  const getDefaultRk = (rkValue?: string) => {
+    if (rkValue && campaigns.includes(rkValue)) {
+      return rkValue;
+    }
+    return 'Не указано';
+  };
+
+  const getDefaultSource = (sourceValue?: string) => {
+    if (sourceValue && sources.includes(sourceValue)) {
+      return sourceValue;
+    }
+    return 'Не указано';
+  };
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: call?.rk && (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито',
+      rk: getDefaultRk(call?.rk),
       city: call?.city && CITY_OPTIONS.includes(call.city as typeof CITY_OPTIONS[number]) 
         ? call.city as typeof CITY_OPTIONS[number] 
         : undefined,
-      avitoName: call?.avitoName && SOURCE_OPTIONS.includes(call.avitoName as typeof SOURCE_OPTIONS[number]) 
-        ? call.avitoName as typeof SOURCE_OPTIONS[number] 
-        : undefined,
+      avitoName: getDefaultSource(call?.avitoName),
       typeOrder: 'Впервые',
-      typeEquipment: undefined,
+      typeEquipment: 'Не указано',
       clientName: '',
       address: '',
       dateMeeting: '',
@@ -117,6 +169,28 @@ export function CreateOrderModal({
     reset
   } = form;
 
+  // Загрузка истории заказов по номеру телефона
+  useEffect(() => {
+    const loadOrderHistory = async () => {
+      if (!call?.phoneClient || !open) return;
+      
+      try {
+        setOrderHistoryLoading(true);
+        const response = await authApi.get(`/orders/by-phone/${encodeURIComponent(call.phoneClient)}`);
+        if (response.data.success) {
+          setOrderHistory(response.data.data || []);
+        }
+      } catch (error) {
+        console.error('Error loading order history:', error);
+        setOrderHistory([]);
+      } finally {
+        setOrderHistoryLoading(false);
+      }
+    };
+
+    loadOrderHistory();
+  }, [call?.phoneClient, open]);
+
   const onSubmit = async (data: OrderFormData) => {
     if (!call) return;
 
@@ -124,15 +198,15 @@ export function CreateOrderModal({
       setIsSubmitting(true);
 
       const orderData = {
-        callIds: callGroup.map(c => c.id),
-        rk: data.rk,
-        avitoName: data.avitoName,
+        callIds: callGroup.length > 0 ? callGroup.map(c => c.id) : [call.id],
+        rk: data.rk === 'Не указано' ? '' : data.rk,
+        avitoName: data.avitoName === 'Не указано' ? '' : data.avitoName,
         city: data.city,
         typeOrder: data.typeOrder,
         clientName: data.clientName,
         address: data.address,
         dateMeeting: data.dateMeeting,
-        typeEquipment: data.typeEquipment,
+        typeEquipment: data.typeEquipment === 'Не указано' ? '' : data.typeEquipment,
         problem: data.problem,
         operatorNameId: user?.id || 0
       };
@@ -156,43 +230,54 @@ export function CreateOrderModal({
 
   const handleClose = () => {
     reset();
+    setOrderHistory([]);
     onOpenChange(false);
   };
 
-  // Автозаполнение формы при изменении звонка
+  // Автозаполнение формы при изменении звонка или загрузке списков
   useEffect(() => {
     if (call && open) {
-      const rkValue = (call.rk === 'Авито' || call.rk === 'Листовка') ? call.rk as 'Авито' | 'Листовка' : 'Авито';
-      const avitoNameValue = call.avitoName && SOURCE_OPTIONS.includes(call.avitoName as typeof SOURCE_OPTIONS[number])
-        ? call.avitoName as typeof SOURCE_OPTIONS[number]
-        : undefined;
-      
-      // Используем setTimeout чтобы дать форме инициализироваться
       setTimeout(() => {
+        // РК: если есть в списке campaigns - берём, иначе "Не указано"
+        const rkValue = call.rk && campaigns.includes(call.rk) ? call.rk : 'Не указано';
         setValue('rk', rkValue);
-        setValue('city', call.city || '');
-        setValue('avitoName', avitoNameValue);
+        
+        // Город
+        setValue('city', call.city && CITY_OPTIONS.includes(call.city as typeof CITY_OPTIONS[number]) 
+          ? call.city as typeof CITY_OPTIONS[number] 
+          : '' as any);
+        
+        // Источник: если есть в списке sources - берём, иначе "Не указано"
+        const sourceValue = call.avitoName && sources.includes(call.avitoName) ? call.avitoName : 'Не указано';
+        setValue('avitoName', sourceValue);
+        
         setValue('typeOrder', 'Впервые');
-        setValue('typeEquipment', 'КП');
+        setValue('typeEquipment', 'Не указано');
         setValue('clientName', '');
         setValue('address', '');
         setValue('dateMeeting', '');
         setValue('problem', '');
       }, 0);
     }
-  }, [call?.id, open, setValue]);
+  }, [call?.id, open, setValue, campaigns, sources]);
 
   // Форматирование даты для отображения
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('ru-RU', {
-      year: 'numeric',
-      month: '2-digit',
       day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
       hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC'
+      minute: '2-digit'
     });
+  };
+
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return '—';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (!call || !open) return null;
@@ -211,11 +296,14 @@ export function CreateOrderModal({
     no_answer: 'Нет ответа'
   };
 
+  // Используем callGroup если есть, иначе только текущий звонок
+  const callsToShow = callGroup.length > 0 ? callGroup : [call];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)] w-full max-w-lg rounded-xl overflow-hidden">
-        {/* Header - компактный */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#0f0f23] border-b border-[#FFD700]/20">
+      <div className="bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)] w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#0f0f23] border-b border-[#FFD700]/20 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center">
               <Plus className="h-4 w-4 text-[#FFD700]" />
@@ -224,10 +312,14 @@ export function CreateOrderModal({
               <h2 className="text-base font-semibold text-white">Новый заказ</h2>
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <Phone className="h-3 w-3" />
-                <span>{call.phoneClient}</span>
-                <span className="text-gray-600">•</span>
-                <MapPin className="h-3 w-3" />
-                <span>{call.city || '—'}</span>
+                <span className="font-medium text-white">{call.phoneClient}</span>
+                {call.city && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <MapPin className="h-3 w-3" />
+                    <span>{call.city}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -239,207 +331,288 @@ export function CreateOrderModal({
           </button>
         </div>
 
-        {/* Info bar */}
-        <div className="px-4 py-2 bg-[#0f0f23]/50 border-b border-[#FFD700]/10 flex items-center gap-3 text-xs">
-          <Badge variant="outline" className={statusColors[call.status]}>
-            {statusLabels[call.status]}
-          </Badge>
-          <div className="flex items-center gap-1 text-gray-400">
-            <Clock className="h-3 w-3" />
-            <span>{formatDate(call.dateCreate)}</span>
-          </div>
-          {callGroup.length > 1 && (
-            <Badge variant="outline" className="bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/30">
-              {callGroup.length} звонков
-            </Badge>
-          )}
-        </div>
-
-        {/* Form */}
-        <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
-          {/* Row 1: РК + Город */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">РК *</Label>
-              <Controller
-                name="rk"
-                control={form.control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
-                      <SelectValue placeholder="РК" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                      <SelectItem value="Авито" className="text-white">Авито</SelectItem>
-                      <SelectItem value="Листовка" className="text-white">Листовка</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.rk && <p className="text-xs text-red-400 mt-1">{errors.rk.message}</p>}
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Город *</Label>
-              <Controller
-                name="city"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
-                      <SelectValue placeholder="Город" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                      {CITY_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city.message}</p>}
-            </div>
-          </div>
-
-          {/* Row 2: Источник */}
-          <div>
-            <Label className="text-xs text-gray-400 mb-1 block">Источник</Label>
-            <Controller
-              name="avitoName"
-              control={form.control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
-                    <SelectValue placeholder="Выберите источник" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                    {SOURCE_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+        {/* Content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left: History panels */}
+          <div className="w-80 border-r border-[#FFD700]/10 flex flex-col overflow-hidden bg-[#0f0f23]/30">
+            {/* История звонков */}
+            <div className="border-b border-[#FFD700]/10">
+              <button 
+                onClick={() => setShowCallHistory(!showCallHistory)}
+                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <PhoneCall className="h-3.5 w-3.5" />
+                  <span>История звонков ({callsToShow.length})</span>
+                </div>
+                {showCallHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </button>
+              {showCallHistory && (
+                <ScrollArea className="max-h-40">
+                  <div className="px-2 pb-2 space-y-1">
+                    {callsToShow.map((c) => (
+                      <div 
+                        key={c.id} 
+                        className={`p-2 rounded-lg text-xs ${c.id === call.id ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' : 'bg-[#17212b]/50'}`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-1.5">
+                            {c.status === 'answered' ? (
+                              <PhoneCall className="h-3 w-3 text-green-400" />
+                            ) : (
+                              <PhoneMissed className="h-3 w-3 text-red-400" />
+                            )}
+                            <span className="text-gray-300">{formatDate(c.dateCreate)}</span>
+                          </div>
+                          <span className="text-gray-500">{formatDuration(c.duration)}</span>
+                        </div>
+                        <div className="text-gray-500 truncate">
+                          {c.operator?.name || 'Без оператора'}
+                        </div>
+                      </div>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </ScrollArea>
               )}
-            />
+            </div>
+
+            {/* История заказов */}
+            <div className="flex-1 overflow-hidden flex flex-col">
+              <button 
+                onClick={() => setShowOrderHistory(!showOrderHistory)}
+                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors shrink-0"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>История заказов ({orderHistory.length})</span>
+                </div>
+                {showOrderHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </button>
+              {showOrderHistory && (
+                <ScrollArea className="flex-1">
+                  <div className="px-2 pb-2 space-y-1">
+                    {orderHistoryLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                      </div>
+                    ) : orderHistory.length === 0 ? (
+                      <div className="text-xs text-gray-500 text-center py-4">
+                        Заказов не найдено
+                      </div>
+                    ) : (
+                      orderHistory.map((order) => (
+                        <div key={order.id} className="p-2 rounded-lg bg-[#17212b]/50 text-xs">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-gray-300 font-medium">#{order.id}</span>
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-blue-500/10 text-blue-400 border-blue-500/30">
+                              {order.status}
+                            </Badge>
+                          </div>
+                          <div className="text-gray-400 truncate">{order.clientName}</div>
+                          <div className="flex items-center gap-2 mt-1 text-gray-500">
+                            <Clock className="h-3 w-3" />
+                            <span>{formatDate(order.createdAt)}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-[#FFD700]/10 my-1" />
+          {/* Right: Form */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <ScrollArea className="flex-1">
+              <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-3">
+                {/* Row 1: РК + Город */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">РК</Label>
+                    <Controller
+                      name="rk"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
+                            <SelectValue placeholder="Не указано" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                            <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
+                            {campaigns.map((option) => (
+                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Город *</Label>
+                    <Controller
+                      name="city"
+                      control={control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm [&>span]:text-gray-400 [&>span]:data-[state=open]:text-white">
+                            <SelectValue placeholder="Выберите город" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                            {CITY_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city.message}</p>}
+                  </div>
+                </div>
 
-          {/* Row 3: Клиент + Адрес */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Имя клиента *</Label>
-              <Input
-                {...register('clientName')}
-                placeholder="Имя"
-                className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
-              />
-              {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Адрес *</Label>
-              <Input
-                {...register('address')}
-                placeholder="Адрес"
-                className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
-              />
-              {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
-            </div>
-          </div>
+                {/* Row 2: Источник + Направление */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Источник</Label>
+                    <Controller
+                      name="avitoName"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
+                            <SelectValue placeholder="Не указано" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30 max-h-60">
+                            <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
+                            {sources.map((option) => (
+                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Направление</Label>
+                    <Controller
+                      name="typeEquipment"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
+                            <SelectValue placeholder="Не указано" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                            {DIRECTION_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option} className={option === 'Не указано' ? 'text-gray-400' : 'text-white'}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                </div>
 
-          {/* Row 4: Тип заказа + Тип техники */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Тип заказа *</Label>
-              <Controller
-                name="typeOrder"
-                control={form.control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
-                      <SelectValue placeholder="Тип" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                      <SelectItem value="Впервые" className="text-white">Впервые</SelectItem>
-                      <SelectItem value="Повтор" className="text-white">Повтор</SelectItem>
-                      <SelectItem value="Гарантия" className="text-white">Гарантия</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* Divider */}
+                <div className="border-t border-[#FFD700]/10" />
+
+                {/* Row 3: Клиент + Адрес */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Имя клиента *</Label>
+                    <Input
+                      {...register('clientName')}
+                      placeholder="Введите имя"
+                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
+                    />
+                    {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Адрес *</Label>
+                    <Input
+                      {...register('address')}
+                      placeholder="Введите адрес"
+                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
+                    />
+                    {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
+                  </div>
+                </div>
+
+                {/* Row 4: Тип заказа + Дата встречи */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Тип заказа *</Label>
+                    <Controller
+                      name="typeOrder"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                            <SelectValue placeholder="Выберите тип" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                            <SelectItem value="Впервые" className="text-white">Впервые</SelectItem>
+                            <SelectItem value="Повтор" className="text-white">Повтор</SelectItem>
+                            <SelectItem value="Гарантия" className="text-white">Гарантия</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.typeOrder && <p className="text-xs text-red-400 mt-1">{errors.typeOrder.message}</p>}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-400 mb-1 block">Дата встречи *</Label>
+                    <Input
+                      type="datetime-local"
+                      {...register('dateMeeting')}
+                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm [&::-webkit-calendar-picker-indicator]:invert"
+                    />
+                    {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
+                  </div>
+                </div>
+
+                {/* Row 5: Проблема */}
+                <div>
+                  <Label className="text-xs text-gray-400 mb-1 block">Проблема *</Label>
+                  <Textarea
+                    {...register('problem')}
+                    placeholder="Опишите проблему клиента..."
+                    rows={3}
+                    className="bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500 resize-none"
+                  />
+                  {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
+                </div>
+              </form>
+            </ScrollArea>
+
+            {/* Footer */}
+            <div className="px-4 py-3 bg-[#0f0f23] border-t border-[#FFD700]/20 flex justify-end gap-2 shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleClose}
+                disabled={isSubmitting}
+                className="h-9 px-4 text-gray-400 hover:text-white hover:bg-white/5"
+              >
+                Отмена
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                onClick={handleSubmit(onSubmit)}
+                className="h-9 px-5 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Создание...
+                  </>
+                ) : (
+                  'Создать заказ'
                 )}
-              />
-              {errors.typeOrder && <p className="text-xs text-red-400 mt-1">{errors.typeOrder.message}</p>}
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Тип техники *</Label>
-              <Controller
-                name="typeEquipment"
-                control={form.control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
-                      <SelectValue placeholder="Техника" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                      <SelectItem value="КП" className="text-white">КП</SelectItem>
-                      <SelectItem value="БТ" className="text-white">БТ</SelectItem>
-                      <SelectItem value="МНЧ" className="text-white">МНЧ</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.typeEquipment && <p className="text-xs text-red-400 mt-1">{errors.typeEquipment.message}</p>}
+              </Button>
             </div>
           </div>
-
-          {/* Row 5: Дата встречи */}
-          <div>
-            <Label className="text-xs text-gray-400 mb-1 block">Дата встречи *</Label>
-            <Input
-              type="datetime-local"
-              {...register('dateMeeting')}
-              className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm"
-            />
-            {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
-          </div>
-
-          {/* Row 6: Проблема */}
-          <div>
-            <Label className="text-xs text-gray-400 mb-1 block">Проблема *</Label>
-            <Textarea
-              {...register('problem')}
-              placeholder="Опишите проблему..."
-              rows={2}
-              className="bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500 resize-none"
-            />
-            {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
-          </div>
-        </form>
-
-        {/* Footer */}
-        <div className="px-4 py-3 bg-[#0f0f23] border-t border-[#FFD700]/20 flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleClose}
-            disabled={isSubmitting}
-            className="h-9 px-4 text-gray-400 hover:text-white hover:bg-white/5"
-          >
-            Отмена
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            onClick={handleSubmit(onSubmit)}
-            className="h-9 px-5 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Создание...
-              </>
-            ) : (
-              'Создать заказ'
-            )}
-          </Button>
         </div>
       </div>
     </div>

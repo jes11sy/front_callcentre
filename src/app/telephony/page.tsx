@@ -7,7 +7,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTelephony } from '@/hooks/useTelephony';
 import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
 import { Button } from '@/components/ui/button';
-import { LayoutGrid, Table } from 'lucide-react';
+import { LayoutGrid, Table, TableProperties } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Динамические импорты для тяжелых компонентов (без fallback'ов)
@@ -27,22 +27,28 @@ const OrderHistoryModal = dynamic(() => import('@/components/telephony/OrderHist
   ssr: false
 });
 
-// Новый интерфейс v2
+// Новый интерфейс v2 - карточки
 const TelephonyPageV2 = dynamic(() => import('@/components/telephony/v2/TelephonyPageV2').then(mod => ({ default: mod.TelephonyPageV2 })), {
   ssr: false
 });
 
+// Новый интерфейс v4 - улучшенная таблица
+const CallTableV4 = dynamic(() => import('@/components/telephony/v4/CallTableV4').then(mod => ({ default: mod.CallTableV4 })), {
+  ssr: false
+});
+
+type ViewMode = 'cards' | 'table-new' | 'table-old';
 
 export default function TelephonyPage() {
   const router = useRouter();
   const { user } = useAuthStore();
   
-  // Переключатель между старым и новым интерфейсом
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>(() => {
+  // Переключатель между интерфейсами
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('telephony-view-mode') as 'table' | 'cards') || 'cards';
+      return (localStorage.getItem('telephony-view-mode') as ViewMode) || 'table-new';
     }
-    return 'cards';
+    return 'table-new';
   });
 
   // Сохраняем выбор в localStorage
@@ -128,6 +134,7 @@ export default function TelephonyPage() {
         size="sm"
         onClick={() => setViewMode('cards')}
         className={`h-8 px-3 ${viewMode === 'cards' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+        title="Карточки с боковой панелью"
       >
         <LayoutGrid className="w-4 h-4 mr-1.5" />
         Карточки
@@ -135,11 +142,22 @@ export default function TelephonyPage() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setViewMode('table')}
-        className={`h-8 px-3 ${viewMode === 'table' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+        onClick={() => setViewMode('table-new')}
+        className={`h-8 px-3 ${viewMode === 'table-new' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+        title="Улучшенная таблица"
+      >
+        <TableProperties className="w-4 h-4 mr-1.5" />
+        Таблица v2
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setViewMode('table-old')}
+        className={`h-8 px-3 ${viewMode === 'table-old' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+        title="Классическая таблица"
       >
         <Table className="w-4 h-4 mr-1.5" />
-        Таблица
+        Классика
       </Button>
     </div>
   );
@@ -152,7 +170,7 @@ export default function TelephonyPage() {
       </div>
 
       {viewMode === 'cards' ? (
-        // Новый интерфейс v2 - карточки с боковой панелью
+        // Вариант 1: Карточки с боковой панелью
         <TelephonyPageV2
           calls={calls}
           groupedCalls={groupedCalls}
@@ -183,8 +201,37 @@ export default function TelephonyPage() {
           setShowCreateOrderModal={setShowCreateOrderModal}
           setShowOrderHistoryModal={setShowOrderHistoryModal}
         />
+      ) : viewMode === 'table-new' ? (
+        // Вариант 4: Улучшенная таблица
+        <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen">
+          <CallTableV4
+            calls={calls}
+            groupedCalls={groupedCalls}
+            expandedGroups={expandedGroups}
+            loading={loading}
+            error={error}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            orderHistoryLoading={orderHistoryLoading}
+            onToggleGroup={toggleGroup}
+            onSort={handleSort}
+            onCreateOrder={createOrderFromCall}
+            onLoadOrderHistory={loadOrderHistory}
+            onDownloadRecording={downloadRecording}
+            onLoadRecording={loadRecording}
+            playingCall={playingCall}
+            currentAudioUrl={currentAudioUrl}
+            onClosePlayer={closePlayer}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCalls={totalCalls}
+            limit={limit}
+            onPageChange={setCurrentPage}
+            onLimitChange={setLimit}
+          />
+        </div>
       ) : (
-        // Старый интерфейс - таблица
+        // Классическая таблица (старый интерфейс)
         <div className="w-full py-4 px-4 space-y-4 bg-[#0f0f23] min-h-screen">
           <CallTable
             calls={calls}

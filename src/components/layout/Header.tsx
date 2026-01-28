@@ -107,9 +107,10 @@ export function Header({ variant = 'operator' }: HeaderProps) {
             <Image 
               src="/logo.png" 
               alt="Lead Schem Logo" 
-              width={224}
-              height={48}
-              className="h-12 w-56 object-contain"
+              width={180}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
             />
           </div>
 

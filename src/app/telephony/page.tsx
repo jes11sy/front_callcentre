@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-// LoadingSpinner removed - not used
 import { useTelephony } from '@/hooks/useTelephony';
 import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
+import { Button } from '@/components/ui/button';
+import { LayoutGrid, Table } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Динамические импорты для тяжелых компонентов (без fallback'ов)
@@ -26,10 +27,28 @@ const OrderHistoryModal = dynamic(() => import('@/components/telephony/OrderHist
   ssr: false
 });
 
+// Новый интерфейс v2
+const TelephonyPageV2 = dynamic(() => import('@/components/telephony/v2/TelephonyPageV2').then(mod => ({ default: mod.TelephonyPageV2 })), {
+  ssr: false
+});
+
 
 export default function TelephonyPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  
+  // Переключатель между старым и новым интерфейсом
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('telephony-view-mode') as 'table' | 'cards') || 'cards';
+    }
+    return 'cards';
+  });
+
+  // Сохраняем выбор в localStorage
+  useEffect(() => {
+    localStorage.setItem('telephony-view-mode', viewMode);
+  }, [viewMode]);
 
   const {
     // States
@@ -92,8 +111,8 @@ export default function TelephonyPage() {
     return null;
   }
 
-  // Показываем скелетон при загрузке
-  if (loading) {
+  // Показываем скелетон при загрузке (только для первой загрузки)
+  if (loading && calls.length === 0) {
     return (
       <DashboardLayout variant="operator">
         <TelephonyPageSkeleton />
@@ -101,72 +120,134 @@ export default function TelephonyPage() {
     );
   }
 
+  // Переключатель вида
+  const ViewToggle = () => (
+    <div className="flex items-center gap-1 p-1 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setViewMode('cards')}
+        className={`h-8 px-3 ${viewMode === 'cards' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+      >
+        <LayoutGrid className="w-4 h-4 mr-1.5" />
+        Карточки
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setViewMode('table')}
+        className={`h-8 px-3 ${viewMode === 'table' ? 'bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFD700]' : 'text-gray-400 hover:text-white'}`}
+      >
+        <Table className="w-4 h-4 mr-1.5" />
+        Таблица
+      </Button>
+    </div>
+  );
 
   return (
     <DashboardLayout variant="operator">
-      <div className="w-full py-4 px-4 space-y-4 bg-[#0f0f23] min-h-screen">
-        {/* Calls Table с встроенными фильтрами и пагинацией */}
-        <CallTable
+      {/* Переключатель вида в правом верхнем углу */}
+      <div className="absolute top-4 right-4 z-10">
+        <ViewToggle />
+      </div>
+
+      {viewMode === 'cards' ? (
+        // Новый интерфейс v2 - карточки с боковой панелью
+        <TelephonyPageV2
           calls={calls}
           groupedCalls={groupedCalls}
-          expandedGroups={expandedGroups}
           loading={loading}
           error={error}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          orderHistoryLoading={orderHistoryLoading}
-          onToggleGroup={toggleGroup}
-          onSort={handleSort}
-          onCreateOrder={createOrderFromCall}
-          onLoadOrderHistory={loadOrderHistory}
-          onDownloadRecording={downloadRecording}
-          onLoadRecording={loadRecording}
-          playingCall={playingCall}
-          currentAudioUrl={currentAudioUrl}
-          onClosePlayer={closePlayer}
+          totalCalls={totalCalls}
           currentPage={currentPage}
           totalPages={totalPages}
-          totalCalls={totalCalls}
           limit={limit}
-          onPageChange={setCurrentPage}
-          onLimitChange={setLimit}
-          filtersComponent={
-            <TelephonyFilters
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onSortChange={handleSort}
-              showFilters={showFilters}
-              onToggleFilters={() => setShowFilters(!showFilters)}
-              onFiltersSubmit={onFiltersSubmit}
-              onClearFilters={clearFilters}
-              loading={loading}
-              groupedCallsCount={Object.keys(groupedCalls).length}
-              totalCalls={totalCalls}
-              register={register}
-              handleSubmit={handleSubmit}
-              errors={errors}
-            />
-          }
-        />
-
-        {/* Create Order Modal */}
-        <CreateOrderModal
-          call={selectedCallForOrder}
-          callGroup={selectedCallGroup}
-          open={showCreateOrderModal}
-          onOpenChange={setShowCreateOrderModal}
-          onOrderCreated={handleOrderCreated}
-        />
-
-        {/* Order History Modal */}
-        <OrderHistoryModal
-          open={showOrderHistoryModal}
-          onOpenChange={setShowOrderHistoryModal}
-          selectedCall={selectedCallForHistory}
-          orderHistory={orderHistory}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          register={register}
+          handleSubmit={handleSubmit}
+          errors={errors}
+          setCurrentPage={setCurrentPage}
+          setLimit={setLimit}
+          onFiltersSubmit={onFiltersSubmit}
+          clearFilters={clearFilters}
+          handleSort={handleSort}
+          loadRecording={loadRecording}
+          closePlayer={closePlayer}
+          downloadRecording={downloadRecording}
+          createOrderFromCall={createOrderFromCall}
+          loadOrderHistory={loadOrderHistory}
+          playingCall={playingCall}
+          currentAudioUrl={currentAudioUrl}
           orderHistoryLoading={orderHistoryLoading}
+          setShowCreateOrderModal={setShowCreateOrderModal}
+          setShowOrderHistoryModal={setShowOrderHistoryModal}
         />
-      </div>
+      ) : (
+        // Старый интерфейс - таблица
+        <div className="w-full py-4 px-4 space-y-4 bg-[#0f0f23] min-h-screen">
+          <CallTable
+            calls={calls}
+            groupedCalls={groupedCalls}
+            expandedGroups={expandedGroups}
+            loading={loading}
+            error={error}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            orderHistoryLoading={orderHistoryLoading}
+            onToggleGroup={toggleGroup}
+            onSort={handleSort}
+            onCreateOrder={createOrderFromCall}
+            onLoadOrderHistory={loadOrderHistory}
+            onDownloadRecording={downloadRecording}
+            onLoadRecording={loadRecording}
+            playingCall={playingCall}
+            currentAudioUrl={currentAudioUrl}
+            onClosePlayer={closePlayer}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCalls={totalCalls}
+            limit={limit}
+            onPageChange={setCurrentPage}
+            onLimitChange={setLimit}
+            filtersComponent={
+              <TelephonyFilters
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={handleSort}
+                showFilters={showFilters}
+                onToggleFilters={() => setShowFilters(!showFilters)}
+                onFiltersSubmit={onFiltersSubmit}
+                onClearFilters={clearFilters}
+                loading={loading}
+                groupedCallsCount={Object.keys(groupedCalls).length}
+                totalCalls={totalCalls}
+                register={register}
+                handleSubmit={handleSubmit}
+                errors={errors}
+              />
+            }
+          />
+        </div>
+      )}
+
+      {/* Create Order Modal */}
+      <CreateOrderModal
+        call={selectedCallForOrder}
+        callGroup={selectedCallGroup}
+        open={showCreateOrderModal}
+        onOpenChange={setShowCreateOrderModal}
+        onOrderCreated={handleOrderCreated}
+      />
+
+      {/* Order History Modal */}
+      <OrderHistoryModal
+        open={showOrderHistoryModal}
+        onOpenChange={setShowOrderHistoryModal}
+        selectedCall={selectedCallForHistory}
+        orderHistory={orderHistory}
+        orderHistoryLoading={orderHistoryLoading}
+      />
     </DashboardLayout>
   );
 }

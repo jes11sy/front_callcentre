@@ -25,7 +25,8 @@ import {
   Play,
   Pause,
   User,
-  Volume2
+  Volume2,
+  ExternalLink
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -660,6 +661,17 @@ export function CreateOrderModal({
                               <span className="text-green-400 font-medium">{order.result.toLocaleString('ru-RU')} ₽</span>
                             )}
                           </div>
+                          
+                          {/* Кнопка перехода к заказу */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(`/orders?orderId=${order.id}`, '_blank')}
+                            className="w-full mt-2 h-6 text-[10px] text-[#FFD700] border-[#FFD700]/30 hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Открыть заказ
+                          </Button>
                         </div>
                       ))
                     )}

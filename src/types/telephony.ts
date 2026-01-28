@@ -7,6 +7,8 @@ export interface Call {
   phoneAts: string;
   dateCreate: string;
   status: 'answered' | 'missed' | 'busy' | 'no_answer';
+  /** Направление звонка: incoming - входящий, outgoing - исходящий */
+  callDirection?: 'incoming' | 'outgoing';
   recordingPath?: string;
   recordingEmailSent?: boolean;
   recordingProcessedAt?: string;

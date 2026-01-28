@@ -13,6 +13,7 @@ import {
   Download,
   Phone,
   PhoneIncoming,
+  PhoneOutgoing,
   PhoneMissed,
   MapPin,
   User,
@@ -133,9 +134,31 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
     return configs[status as keyof typeof configs] || configs.no_answer;
   };
 
+  // Конфигурация направления звонка
+  const getDirectionConfig = (direction?: 'incoming' | 'outgoing') => {
+    if (direction === 'outgoing') {
+      return {
+        icon: PhoneOutgoing,
+        label: 'Исходящий',
+        color: 'text-blue-400',
+        bgColor: 'bg-blue-500/10',
+        borderColor: 'border-blue-500/30',
+      };
+    }
+    return {
+      icon: PhoneIncoming,
+      label: 'Входящий',
+      color: 'text-emerald-400',
+      bgColor: 'bg-emerald-500/10',
+      borderColor: 'border-emerald-500/30',
+    };
+  };
+
   const statusConfig = getStatusConfig(call.status);
   const StatusIcon = statusConfig.icon;
   const duration = formatDuration(call.duration);
+  const directionConfig = getDirectionConfig(call.callDirection);
+  const DirectionIcon = directionConfig.icon;
 
   return (
     <TableRow 
@@ -231,12 +254,23 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             <User className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
             <span className="text-white">{call.operator.name}</span>
           </div>
-          <Badge 
-            variant="outline" 
-            className={cn("text-xs", statusConfig.borderColor, statusConfig.color)}
-          >
-            {statusConfig.label}
-          </Badge>
+          <div className="flex items-center gap-1">
+            {/* Направление звонка */}
+            <Badge 
+              variant="outline" 
+              className={cn("text-xs flex items-center gap-1", directionConfig.borderColor, directionConfig.color)}
+            >
+              <DirectionIcon className="w-3 h-3" />
+              {directionConfig.label}
+            </Badge>
+            {/* Статус звонка */}
+            <Badge 
+              variant="outline" 
+              className={cn("text-xs", statusConfig.borderColor, statusConfig.color)}
+            >
+              {statusConfig.label}
+            </Badge>
+          </div>
         </div>
       </TableCell>
 

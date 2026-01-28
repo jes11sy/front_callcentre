@@ -94,7 +94,8 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
                 {orderHistory.map((order: unknown, _index: number) => {
-                  const orderData = order as { id: string; statusOrder: string; clientName: string; phone: string; city: string; typeEquipment: string; dateMeeting: string; operator?: { name?: string }; problem: string };
+                  const orderData = order as { id: string; status?: string; statusOrder?: string; clientName: string; phone: string; city: string; typeEquipment: string; dateMeeting: string; operator?: { name?: string }; problem: string; address?: string; rk?: string };
+                  const orderStatus = orderData.status || orderData.statusOrder || '';
                   return (
                   <Card key={orderData.id} className="border-2 border-[#FFD700]/30 hover:border-[#FFD700]/50 transition-colors bg-[#17212b]">
                     <CardContent className="p-4">
@@ -105,9 +106,9 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                             #{orderData.id}
                           </Badge>
                           <Badge 
-                            className={`text-xs font-medium ${getStatusBadge(orderData.statusOrder || '')}`}
+                            className={`text-xs font-medium ${getStatusBadge(orderStatus)}`}
                           >
-                            {orderData.statusOrder || 'Нет статуса'}
+                            {orderStatus || 'Нет статуса'}
                           </Badge>
                         </div>
                         <Button

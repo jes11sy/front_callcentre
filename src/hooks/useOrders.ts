@@ -261,8 +261,8 @@ export const useOrders = () => {
   const openOrderById = useCallback(async (orderId: number) => {
     try {
       const response = await api.get(`/orders/${orderId}`);
-      if (response.data) {
-        const order = response.data;
+      const order = response.data;
+      if (order && order.id) {
         setSelectedOrder(order);
         setIsViewModalOpen(true);
         if (order.callId) {
@@ -270,6 +270,8 @@ export const useOrders = () => {
         } else {
           setOrderCalls([]);
         }
+      } else {
+        notifications.error('Заказ не найден');
       }
     } catch (error) {
       console.error('Failed to load order:', error);

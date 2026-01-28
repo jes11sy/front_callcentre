@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import React from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Loader2, AlertCircle } from 'lucide-react';
 import CreateOrderModal from '@/components/orders/CreateOrderModal';
@@ -17,8 +17,8 @@ import { useOrders } from '@/hooks/useOrders';
 
 function OrdersContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const orderIdFromUrl = searchParams.get('orderId');
+  const openedRef = useRef(false);
   
   const {
     filters,
@@ -54,17 +54,16 @@ function OrdersContent() {
     openOrderById
   } = useOrders();
 
-  // Открываем заказ по ID из URL
+  // Открываем заказ по ID из URL (только один раз)
   useEffect(() => {
-    if (orderIdFromUrl && !isLoading) {
+    if (orderIdFromUrl && !isLoading && !openedRef.current) {
       const orderId = parseInt(orderIdFromUrl);
       if (!isNaN(orderId)) {
+        openedRef.current = true;
         openOrderById(orderId);
-        // Убираем orderId из URL после открытия
-        router.replace('/orders', { scroll: false });
       }
     }
-  }, [orderIdFromUrl, isLoading, openOrderById, router]);
+  }, [orderIdFromUrl, isLoading, openOrderById]);
 
   // Показываем загрузку, пока не получены данные пользователя
   if (isLoading && !user) {

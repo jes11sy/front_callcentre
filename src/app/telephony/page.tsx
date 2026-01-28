@@ -43,13 +43,8 @@ export default function TelephonyPage() {
   const router = useRouter();
   const { user } = useAuthStore();
   
-  // Переключатель между интерфейсами
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('telephony-view-mode') as ViewMode) || 'table-new';
-    }
-    return 'table-new';
-  });
+  // Переключатель между интерфейсами (table-new = вариант 4 по умолчанию)
+  const [viewMode, setViewMode] = useState<ViewMode>('table-new');
 
   // Сохраняем выбор в localStorage
   useEffect(() => {

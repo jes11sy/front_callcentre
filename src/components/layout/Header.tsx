@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -102,17 +101,8 @@ export function Header({ variant = 'operator' }: HeaderProps) {
       {/* Modern Header with shadcn/ui + reui */}
       <header className="sticky top-0 z-50 w-full border-b border-[#FFD700] bg-[#02111B]/95 backdrop-blur supports-[backdrop-filter]:bg-[#02111B]/60 shadow-[0_0_20px_rgba(255,215,0,0.6)]">
         <div className="flex h-16 items-center justify-between px-0 w-full">
-          {/* Logo and Brand - слева */}
-          <div className="flex items-center pl-4">
-            <Image 
-              src="/logo.png" 
-              alt="Lead Schem Logo" 
-              width={180}
-              height={40}
-              className="h-10 w-auto object-contain"
-              priority
-            />
-          </div>
+          {/* Пустой блок слева для баланса */}
+          <div className="w-4" />
 
           {/* Desktop Navigation - по центру */}
           <NavigationMenu className="hidden md:flex">

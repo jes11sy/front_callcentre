@@ -161,21 +161,7 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
               className="flex items-center justify-center gap-2 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-semibold transition-colors duration-200"
             >
               <Plus className="h-4 w-4" />
-              Создать заказ
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onLoadOrderHistory(call)}
-              disabled={orderHistoryLoading}
-              className="flex items-center justify-center gap-2 border border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {orderHistoryLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <History className="h-4 w-4" />
-              )}
-              История заказов
+              Новый заказ
             </Button>
           </div>
         ) : (

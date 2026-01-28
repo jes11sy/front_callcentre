@@ -172,21 +172,7 @@ const GroupHeader = React.memo(({
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
           >
             <FileText className="h-4 w-4" />
-            Создать заказ
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onLoadOrderHistory(latestCall)}
-            disabled={orderHistoryLoading}
-            className="flex items-center justify-center gap-2 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-          >
-            {orderHistoryLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Calendar className="h-4 w-4" />
-            )}
-            История заказов
+            Новый заказ
           </Button>
         </div>
       </TableCell>

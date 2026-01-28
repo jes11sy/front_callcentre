@@ -79,11 +79,20 @@ interface Order {
   id: number;
   clientName: string;
   city: string;
-  status: string;
+  statusOrder: string;
   dateMeeting: string;
   typeEquipment: string;
+  typeOrder?: string;
   problem?: string;
   createdAt: string;
+  rk?: string;
+  avitoName?: string;
+  address?: string;
+  result?: number;
+  master?: {
+    id: number;
+    name: string;
+  };
 }
 
 interface CreateOrderModalProps {
@@ -600,17 +609,56 @@ export function CreateOrderModal({
                       </div>
                     ) : (
                       orderHistory.map((order) => (
-                        <div key={order.id} className="p-2 rounded-lg bg-[#17212b]/50 text-xs">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-gray-300 font-medium">#{order.id}</span>
+                        <div key={order.id} className="p-2.5 rounded-lg bg-[#17212b]/50 text-xs space-y-1.5">
+                          {/* Строка 1: ID + Тип заказа + Статус */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-white font-semibold">#{order.id}</span>
+                              {order.typeOrder && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-purple-500/10 text-purple-400 border-purple-500/30">
+                                  {order.typeOrder}
+                                </Badge>
+                              )}
+                            </div>
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-blue-500/10 text-blue-400 border-blue-500/30">
-                              {order.status}
+                              {order.statusOrder}
                             </Badge>
                           </div>
-                          <div className="text-gray-400 truncate">{order.clientName}</div>
-                          <div className="flex items-center gap-2 mt-1 text-gray-500">
-                            <Clock className="h-3 w-3" />
-                            <span>{formatDate(order.createdAt)}</span>
+                          
+                          {/* Строка 2: РК + Источник */}
+                          <div className="flex items-center gap-2 text-gray-400">
+                            {order.rk && (
+                              <span className="text-[#FFD700]">{order.rk}</span>
+                            )}
+                            {order.rk && order.avitoName && <span className="text-gray-600">•</span>}
+                            {order.avitoName && (
+                              <span className="text-purple-400">{order.avitoName}</span>
+                            )}
+                          </div>
+                          
+                          {/* Строка 3: Имя клиента */}
+                          <div className="flex items-center gap-1.5">
+                            <User className="h-3 w-3 text-gray-500" />
+                            <span className="text-gray-300 truncate">{order.clientName}</span>
+                          </div>
+                          
+                          {/* Строка 4: Адрес */}
+                          {order.address && (
+                            <div className="flex items-center gap-1.5">
+                              <MapPin className="h-3 w-3 text-gray-500" />
+                              <span className="text-gray-400 truncate">{order.address}</span>
+                            </div>
+                          )}
+                          
+                          {/* Строка 5: Мастер + Итог */}
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-700/50">
+                            <div className="flex items-center gap-1.5 text-gray-400">
+                              <span>Мастер:</span>
+                              <span className="text-gray-300">{order.master?.name || '—'}</span>
+                            </div>
+                            {order.result !== undefined && order.result !== null && (
+                              <span className="text-green-400 font-medium">{order.result.toLocaleString('ru-RU')} ₽</span>
+                            )}
                           </div>
                         </div>
                       ))

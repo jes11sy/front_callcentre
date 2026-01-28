@@ -305,27 +305,13 @@ export const CallDetailPanel: React.FC<CallDetailPanelProps> = ({
       </div>
 
       {/* Footer с действиями */}
-      <div className="p-4 border-t border-[#FFD700]/20 space-y-2">
+      <div className="p-4 border-t border-[#FFD700]/20">
         <Button
           onClick={() => onCreateOrder(call, callGroup)}
           className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-semibold"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Создать заказ
-        </Button>
-        
-        <Button
-          variant="outline"
-          onClick={() => onLoadOrderHistory(call)}
-          disabled={orderHistoryLoading}
-          className="w-full border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-        >
-          {orderHistoryLoading ? (
-            <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-[#FFD700] border-t-transparent" />
-          ) : (
-            <History className="w-4 h-4 mr-2" />
-          )}
-          История заказов
+          Новый заказ
         </Button>
       </div>
     </div>

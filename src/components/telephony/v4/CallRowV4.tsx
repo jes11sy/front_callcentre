@@ -8,7 +8,6 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  History,
   Play,
   Download,
   Phone,
@@ -17,8 +16,7 @@ import {
   PhoneMissed,
   MapPin,
   User,
-  Clock,
-  Loader2
+  Clock
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
@@ -35,47 +33,28 @@ function pluralize(count: number, one: string, few: string, many: string): strin
 }
 
 /**
- * Форматирует phoneClient для красивого отображения
- * SIP: sip:kovalenko_oksana@vpbx400349703.mangosip.ru → "Kovalenko Oksana"
- * Обычный номер: +79001234567 → "+7 900 123-45-67"
+ * Форматирует номер телефона для красивого отображения
+ * +79001234567 → "+7 900 123-45-67"
  */
-function formatPhoneClient(phoneClient: string): { display: string; isSip: boolean; sipName?: string } {
-  if (!phoneClient) return { display: 'Неизвестно', isSip: false };
+function formatPhoneNumber(phone: string): string {
+  if (!phone) return 'Неизвестно';
   
-  // Проверяем SIP-адрес
-  if (phoneClient.toLowerCase().includes('sip:')) {
-    // Извлекаем имя пользователя: sip:kovalenko_oksana@vpbx... → kovalenko_oksana
-    const match = phoneClient.match(/sip:([^@]+)@/i);
-    if (match) {
-      const username = match[1];
-      // Преобразуем snake_case в красивое имя: kovalenko_oksana → Kovalenko Oksana
-      const displayName = username
-        .split('_')
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-        .join(' ');
-      return { display: displayName, isSip: true, sipName: username };
-    }
-    return { display: phoneClient, isSip: true };
-  }
-  
-  // Форматируем обычный номер телефона
-  const digits = phoneClient.replace(/\D/g, '');
+  const digits = phone.replace(/\D/g, '');
   if (digits.length === 11 && digits.startsWith('7')) {
-    // +7 900 123-45-67
-    return { 
-      display: `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`,
-      isSip: false 
-    };
+    return `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`;
   }
   if (digits.length === 10) {
-    // 900 123-45-67
-    return { 
-      display: `${digits.slice(0, 3)} ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8)}`,
-      isSip: false 
-    };
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8)}`;
   }
   
-  return { display: phoneClient, isSip: false };
+  return phone;
+}
+
+/**
+ * Проверяет, является ли phoneClient SIP-адресом (исходящий звонок)
+ */
+function isSipCall(phoneClient: string): boolean {
+  return phoneClient?.toLowerCase().includes('sip:') || false;
 }
 
 interface CallRowV4Props {
@@ -103,11 +82,11 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   isMainRow,
   onToggleGroup,
   onCreateOrder,
-  onLoadOrderHistory,
+  onLoadOrderHistory: _onLoadOrderHistory,
   onPlayRecording,
   onDownloadRecording,
   isPlaying,
-  orderHistoryLoading
+  orderHistoryLoading: _orderHistoryLoading
 }) => {
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU', {
@@ -203,7 +182,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   const duration = formatDuration(call.duration);
   const directionConfig = getDirectionConfig(call.callDirection);
   const DirectionIcon = directionConfig.icon;
-  const formattedPhone = formatPhoneClient(call.phoneClient);
+  const isOutgoing = isSipCall(call.phoneClient);
+  
+  // Для исходящих звонков показываем phoneAts (номер клиента), для входящих — phoneClient
+  const displayPhone = isOutgoing 
+    ? formatPhoneNumber(call.phoneAts) 
+    : formatPhoneNumber(call.phoneClient);
 
   return (
     <TableRow 
@@ -220,29 +204,29 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             <>
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                formattedPhone.isSip ? directionConfig.bgColor : statusConfig.bgColor
+                isOutgoing ? directionConfig.bgColor : statusConfig.bgColor
               )}>
-                {formattedPhone.isSip ? (
+                {isOutgoing ? (
                   <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
                 ) : (
                   <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
                 )}
               </div>
               <div>
-                {formattedPhone.isSip ? (
-                  // Исходящий звонок - показываем имя сотрудника
+                {isOutgoing ? (
+                  // Исходящий звонок - показываем номер клиента (куда звонили)
                   <div className="flex flex-col">
-                    <span className="font-semibold text-blue-400">
-                      {formattedPhone.display}
+                    <span className="font-semibold text-blue-400 font-mono">
+                      {displayPhone}
                     </span>
-                    <span className="text-xs text-gray-500" title={call.phoneClient}>
+                    <span className="text-xs text-gray-500">
                       Исходящий звонок
                     </span>
                   </div>
                 ) : (
-                  // Входящий звонок - показываем номер телефона
+                  // Входящий звонок - показываем номер телефона клиента
                   <div className="font-semibold text-[#FFD700] font-mono">
-                    {formattedPhone.display}
+                    {displayPhone}
                   </div>
                 )}
                 {hasMultipleCalls && (
@@ -266,16 +250,16 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           ) : (
             <div className="flex items-center gap-2 pl-8">
               <div className="w-0.5 h-5 bg-[#FFD700]/30 rounded" />
-              {formattedPhone.isSip ? (
+              {isOutgoing ? (
                 <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
               ) : (
                 <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
               )}
               <span className={cn(
-                "text-sm",
-                formattedPhone.isSip ? "text-blue-400" : "text-gray-400 font-mono"
+                "text-sm font-mono",
+                isOutgoing ? "text-blue-400" : "text-gray-400"
               )}>
-                {formattedPhone.display}
+                {displayPhone}
               </span>
             </div>
           )}
@@ -284,22 +268,28 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
 
       {/* Колонка 2: Источник */}
       <TableCell className="py-3 px-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-sm">
-            <MapPin className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-            <span className="text-white">{call.city}</span>
-            <span className="text-gray-600">•</span>
-            <span className="text-gray-400">{call.rk}</span>
+        {isOutgoing ? (
+          // Для исходящих звонков показываем "Не указано"
+          <span className="text-sm text-gray-500">Не указано</span>
+        ) : (
+          // Для входящих звонков показываем город, РК и источник
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 text-sm">
+              <MapPin className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+              <span className="text-white">{call.city}</span>
+              <span className="text-gray-600">•</span>
+              <span className="text-gray-400">{call.rk}</span>
+            </div>
+            {call.avitoName && (
+              <Badge 
+                variant="outline" 
+                className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
+              >
+                {call.avitoName}
+              </Badge>
+            )}
           </div>
-          {call.avitoName && (
-            <Badge 
-              variant="outline" 
-              className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
-            >
-              {call.avitoName}
-            </Badge>
-          )}
-        </div>
+        )}
       </TableCell>
 
       {/* Колонка 3: Дата и время */}
@@ -384,22 +374,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 className="h-8 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-medium px-3"
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />
-                Заказ
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onLoadOrderHistory(call)}
-                disabled={orderHistoryLoading}
-                className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-                title="История заказов"
-              >
-                {orderHistoryLoading ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <History className="w-3.5 h-3.5" />
-                )}
+                Новый заказ
               </Button>
             </>
           ) : (

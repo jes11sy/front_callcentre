@@ -29,6 +29,7 @@ interface SiteOrder {
   phone: string;
   status: string;
   comment: string | null;
+  commentOperator: string | null;
   createdAt: string;
   orderId: number | null;
 }
@@ -43,11 +44,11 @@ interface SiteOrdersResponse {
   };
 }
 
-const STATUS_OPTIONS = ['Создан', 'Не отвечает', 'Отказ', 'Заказ создан'] as const;
+const STATUS_OPTIONS = ['Новый', 'Не отвечает', 'Отказ', 'Заказ создан'] as const;
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'Создан':
+    case 'Новый':
       return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     case 'Не отвечает':
       return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
@@ -100,10 +101,10 @@ export default function SiteOrdersPage() {
     },
   });
 
-  // Update comment mutation
+  // Update operator comment mutation
   const updateCommentMutation = useMutation({
-    mutationFn: async ({ id, comment }: { id: number; comment: string }) => {
-      const response = await api.patch(`/site-orders/${id}`, { comment });
+    mutationFn: async ({ id, commentOperator }: { id: number; commentOperator: string }) => {
+      const response = await api.patch(`/site-orders/${id}`, { commentOperator });
       return response.data;
     },
     onSuccess: () => {
@@ -127,7 +128,7 @@ export default function SiteOrdersPage() {
 
   const handleSaveComment = (id: number) => {
     if (editingComment && editingComment.id === id) {
-      updateCommentMutation.mutate({ id, comment: editingComment.value });
+      updateCommentMutation.mutate({ id, commentOperator: editingComment.value });
     }
   };
 
@@ -233,7 +234,13 @@ export default function SiteOrdersPage() {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
                       <div className="flex items-center gap-2">
                         <MessageSquare className="h-4 w-4" />
-                        Комментарий
+                        Инфо с сайта
+                      </div>
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Комментарий КЦ
                       </div>
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">Действия</th>
@@ -276,6 +283,11 @@ export default function SiteOrdersPage() {
                           </Select>
                         </td>
                         <td className="px-4 py-3">
+                          <div className="text-sm text-gray-400 max-w-[200px] whitespace-pre-line">
+                            {order.comment || <span className="text-gray-600 italic">—</span>}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
                           {editingComment?.id === order.id ? (
                             <div className="flex items-center gap-2">
                               <Input
@@ -299,9 +311,9 @@ export default function SiteOrdersPage() {
                           ) : (
                             <div 
                               className="text-sm text-gray-400 cursor-pointer hover:text-white min-h-[32px] flex items-center"
-                              onClick={() => setEditingComment({ id: order.id, value: order.comment || '' })}
+                              onClick={() => setEditingComment({ id: order.id, value: order.commentOperator || '' })}
                             >
-                              {order.comment || <span className="text-gray-600 italic">Добавить комментарий...</span>}
+                              {order.commentOperator || <span className="text-gray-600 italic">Добавить...</span>}
                             </div>
                           )}
                         </td>
@@ -325,7 +337,7 @@ export default function SiteOrdersPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
+                      <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
                         Заявки не найдены
                       </td>
                     </tr>

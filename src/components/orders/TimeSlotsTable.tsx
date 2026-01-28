@@ -10,15 +10,23 @@ interface TimeSlotsTableProps {
   orders: Order[];
 }
 
+// Статусы, которые учитываются во временной шкале
+const ACTIVE_STATUSES = ['Ожидает', 'Принял', 'В пути'];
+
 const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
   const [activeCity, setActiveCity] = useState<string>('all');
+
+  // Фильтруем заказы только с активными статусами
+  const activeOrders = useMemo(() => {
+    return orders.filter(order => ACTIVE_STATUSES.includes(order.statusOrder));
+  }, [orders]);
 
   // Получаем уникальные города из заказов на сегодня
   const cities = useMemo(() => {
     const today = new Date();
     const citySet = new Set<string>();
     
-    orders.forEach(order => {
+    activeOrders.forEach(order => {
       if (!order.dateMeeting || !order.city) return;
       const orderTime = new Date(order.dateMeeting);
       
@@ -32,14 +40,14 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
     });
     
     return Array.from(citySet).sort();
-  }, [orders]);
+  }, [activeOrders]);
 
   // Подсчёт заказов на сегодня по городам
   const cityCounts = useMemo(() => {
     const today = new Date();
     const counts: Record<string, number> = { all: 0 };
     
-    orders.forEach(order => {
+    activeOrders.forEach(order => {
       if (!order.dateMeeting) return;
       const orderTime = new Date(order.dateMeeting);
       
@@ -56,13 +64,13 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
     });
     
     return counts;
-  }, [orders]);
+  }, [activeOrders]);
 
   // Фильтрованные заказы по выбранному городу
   const filteredOrders = useMemo(() => {
-    if (activeCity === 'all') return orders;
-    return orders.filter(order => order.city === activeCity);
-  }, [orders, activeCity]);
+    if (activeCity === 'all') return activeOrders;
+    return activeOrders.filter(order => order.city === activeCity);
+  }, [activeOrders, activeCity]);
 
   // Мемоизированная функция для подсчета заказов в временном слоте
   const getOrdersForTimeSlot = useCallback((hour: number, minute: number, typeEquipment: string) => {
@@ -131,7 +139,10 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-[#FFD700]">
           <Clock className="h-5 w-5" />
-          Заявки на сегодня по времени
+          Активные заявки на сегодня
+          <span className="text-sm font-normal text-gray-400 ml-2">
+            (Ожидает, Принял, В пути)
+          </span>
         </CardTitle>
         
         {/* Табы городов */}

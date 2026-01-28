@@ -3,25 +3,24 @@
 import { useState } from 'react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { LoadingSpinner } from '@/components/ui/loading';
-import { useFileUrl } from '@/lib/s3-utils'; // 🍪 Импортируем хук для S3
+import { useFileUrl } from '@/lib/s3-utils';
 import { 
   FileText, 
   User, 
   Phone, 
   MapPin, 
   Calendar, 
-  Settings, 
-  CheckCircle, 
-  Info,
+  X,
   Play,
   Pause,
   SkipBack,
   SkipForward,
-  Volume2
+  Volume2,
+  Briefcase,
+  DollarSign
 } from 'lucide-react';
 import { Order, OrderTab, Call } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS } from '@/constants/orders';
@@ -64,144 +63,101 @@ const OrderViewModalComponent = ({
 
   if (!isOpen || !order) return null;
 
-
   const handleClose = () => {
     stopPlayback();
     onClose();
   };
 
+  const tabs = [
+    { id: 'description' as OrderTab, label: 'Информация', icon: FileText },
+    { id: 'master' as OrderTab, label: 'Мастер', icon: Briefcase },
+    { id: 'documents' as OrderTab, label: 'Документы', icon: FileText },
+  ];
+
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={handleClose}
     >
       <div 
-        className="bg-[#0f0f23] rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[85vw] h-[80vh] overflow-y-auto border-2 border-[#FFD700]"
-        style={{ 
-          width: '85vw', 
-          height: '80vh'
-        }}
+        className="bg-[#0f0f23] rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden border border-[#FFD700]/40"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-[#FFD700]/30">
-          <div>
-            <h2 className="text-2xl font-bold flex items-center gap-3 text-[#FFD700]">
-              <FileText className="h-6 w-6 text-[#FFD700]" />
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#FFD700]/20 bg-[#17212b]">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-[#FFD700]">
               Заказ #{order.id}
             </h2>
-            <p className="text-gray-400 mt-1">
-              Подробная информация о заказе
-            </p>
+            <Badge 
+              className={`text-xs ${STATUS_COLORS[order.statusOrder as keyof typeof STATUS_COLORS] || 'bg-gray-800 text-gray-300'}`}
+            >
+              {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
+            </Badge>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-full"
           >
-            <span className="sr-only">Закрыть</span>
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-[#FFD700]/20 bg-[#17212b]/50">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
       
-        <div className="space-y-6 p-6">
-          {/* Статус и основные бейджи */}
-          <div className="flex items-center justify-between p-4 bg-[#17212b] rounded-lg border border-[#FFD700]/30">
-            <div className="flex items-center gap-4">
-              <Badge 
-                className={`text-sm px-3 py-1 ${STATUS_COLORS[order.statusOrder as keyof typeof STATUS_COLORS] || 'bg-gray-900/30 text-gray-300 border-gray-700'}`}
-              >
-                {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
-              </Badge>
-              <Badge variant="outline" className="text-sm px-3 py-1 border-[#FFD700]/30 text-[#FFD700]">
-                {order.typeOrder}
-              </Badge>
-              <Badge variant="outline" className="text-sm px-3 py-1 border-[#FFD700]/30 text-[#FFD700]">
-                {order.typeEquipment}
-              </Badge>
-            </div>
-            <div className="text-sm text-gray-400">
-              Создан: {new Date(order.createDate).toLocaleDateString('ru-RU')}
-            </div>
-          </div>
+        {/* Content */}
+        <div className="p-5 overflow-y-auto max-h-[calc(85vh-120px)] custom-scrollbar">
+          {activeTab === 'description' && (
+            <DescriptionTab 
+              order={order}
+              orderCalls={orderCalls}
+              loadingCalls={loadingCalls}
+              loadRecording={loadRecording}
+              skipBackward={skipBackward}
+              skipForward={skipForward}
+              seekTo={seekTo}
+              setVolume={setVolume}
+              formatDate={formatDate}
+              audioPlayer={audioPlayer}
+              stopPlayback={stopPlayback}
+              formatTime={formatTime}
+              togglePlayPause={togglePlayPause}
+            />
+          )}
 
-          {/* Вкладки */}
-          <div className="border-b border-[#FFD700]/30">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('description')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'description'
-                    ? 'border-[#FFD700] text-[#FFD700]'
-                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
-                }`}
-              >
-                <FileText className="h-4 w-4 inline mr-2" />
-                Описание
-              </button>
-              <button
-                onClick={() => setActiveTab('master')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'master'
-                    ? 'border-[#FFD700] text-[#FFD700]'
-                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
-                }`}
-              >
-                <User className="h-4 w-4 inline mr-2" />
-                Мастер
-              </button>
-              <button
-                onClick={() => setActiveTab('documents')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'documents'
-                    ? 'border-[#FFD700] text-[#FFD700]'
-                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
-                }`}
-              >
-                <Settings className="h-4 w-4 inline mr-2" />
-                Документы
-              </button>
-            </nav>
-          </div>
+          {activeTab === 'master' && (
+            <MasterTab order={order} />
+          )}
 
-          {/* Содержимое вкладок */}
-          <div className="mt-6">
-            {activeTab === 'description' && (
-              <OrderDescriptionTab 
-                order={order}
-                orderCalls={orderCalls}
-                loadingCalls={loadingCalls}
-                loadRecording={loadRecording}
-                skipBackward={skipBackward}
-                skipForward={skipForward}
-                seekTo={seekTo}
-                setVolume={setVolume}
-                formatDate={formatDate}
-                audioPlayer={audioPlayer}
-                stopPlayback={stopPlayback}
-                formatTime={formatTime}
-                togglePlayPause={togglePlayPause}
-              />
-            )}
-
-            {activeTab === 'master' && (
-              <OrderMasterTab order={order} />
-            )}
-
-            {activeTab === 'documents' && (
-              <OrderDocumentsTab order={order} formatDate={formatDate} />
-            )}
-          </div>
+          {activeTab === 'documents' && (
+            <DocumentsTab order={order} formatDate={formatDate} />
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// Компонент для вкладки описания
-const OrderDescriptionTab = ({ 
+// Вкладка "Информация"
+const DescriptionTab = ({ 
   order,
   orderCalls,
   loadingCalls,
@@ -230,532 +186,369 @@ const OrderDescriptionTab = ({
   formatTime: (time: number) => string;
   togglePlayPause: () => void;
 }) => (
-  <div className="space-y-6">
-    {/* Основная информация в 2 колонки */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Левая колонка */}
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <User className="h-5 w-5 text-[#FFD700]" />
-            Основная информация
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">РК</Label>
-            <p className="text-lg font-semibold text-white">{order.rk}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Город</Label>
-            <p className="text-lg text-white">{order.city}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Источник</Label>
-            <p className="text-lg text-white">{order.avitoName || <span className="text-gray-500">Не указан</span>}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Правая колонка */}
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <Settings className="h-5 w-5 text-[#FFD700]" />
-            Детали заказа
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Клиент</Label>
-            <p className="text-lg font-semibold text-white">{order.clientName}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Телефон</Label>
-            <p className="text-lg flex items-center gap-2 text-white">
-              <Phone className="h-4 w-4 text-gray-400" />
-              {order.phone || <span className="text-gray-500">Не указан</span>}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Тип заказа</Label>
-            <p className="text-lg">
-              <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-                {order.typeOrder}
-              </Badge>
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Адрес</Label>
-            <p className="text-lg flex items-center gap-2 text-white">
-              <MapPin className="h-4 w-4 text-gray-400" />
-              {order.address}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Дата встречи</Label>
-            <p className="text-lg flex items-center gap-2 text-white">
-              <Calendar className="h-4 w-4 text-gray-400" />
-              {formatDate(order.dateMeeting)}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Тип техники</Label>
-            <p className="text-lg">
-              <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-                {order.typeEquipment}
-              </Badge>
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Статус</Label>
-            <p className="text-lg">
-              <Badge 
-                className={`${STATUS_COLORS[order.statusOrder as keyof typeof STATUS_COLORS] || 'bg-gray-900/30 text-gray-300 border-gray-700'}`}
-              >
-                {order.statusOrder}
-              </Badge>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+  <div className="space-y-5">
+    {/* Основная информация — компактная сетка */}
+    <div className="grid grid-cols-2 gap-4">
+      <InfoRow icon={User} label="Клиент" value={order.clientName} />
+      <InfoRow icon={Phone} label="Телефон" value={order.phone || 'Не указан'} muted={!order.phone} />
+      <InfoRow icon={MapPin} label="Город" value={order.city} />
+      <InfoRow icon={Calendar} label="Дата встречи" value={formatDate(order.dateMeeting)} />
+      <InfoRow label="РК" value={order.rk} />
+      <InfoRow label="Источник" value={order.avitoName || 'Не указан'} muted={!order.avitoName} />
     </div>
 
-    {/* Описание проблемы */}
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <FileText className="h-5 w-5 text-[#FFD700]" />
-          Описание проблемы
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="bg-[#0f0f23] p-4 rounded-lg border border-[#FFD700]/20">
-          <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-            {order.problem}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    {/* Адрес */}
+    <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <Label className="text-xs text-gray-400">Адрес</Label>
+      <p className="text-sm text-white mt-1">{order.address}</p>
+    </div>
+
+    {/* Бейджи */}
+    <div className="flex flex-wrap gap-2">
+      <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
+        {order.typeOrder}
+      </Badge>
+      <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
+        {order.typeEquipment}
+      </Badge>
+    </div>
+
+    {/* Проблема */}
+    <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <Label className="text-xs text-gray-400">Описание проблемы</Label>
+      <p className="text-sm text-gray-200 mt-1 whitespace-pre-wrap">{order.problem}</p>
+    </div>
 
     {/* Оператор */}
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
+    <div className="flex items-center justify-between p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <div>
+        <Label className="text-xs text-gray-400">Оператор</Label>
+        <p className="text-sm text-white">{order.operator.name}</p>
+      </div>
+      <span className="text-xs text-gray-500">ID: {order.operatorNameId}</span>
+    </div>
+
+    {/* Записи звонков */}
+    <div>
+      <Label className="text-xs text-gray-400 mb-2 block">Записи звонков</Label>
+      {loadingCalls ? (
+        <div className="flex items-center gap-2 p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+          <LoadingSpinner size="sm" />
+          <span className="text-sm text-gray-400">Загрузка...</span>
+        </div>
+      ) : orderCalls.length > 0 ? (
+        <div className="space-y-2">
+          {orderCalls.map((call, index) => (
+            <CallPlayer
+              key={call.id || index}
+              call={call}
+              audioPlayer={audioPlayer}
+              loadRecording={loadRecording}
+              togglePlayPause={togglePlayPause}
+              skipBackward={skipBackward}
+              skipForward={skipForward}
+              seekTo={seekTo}
+              setVolume={setVolume}
+              stopPlayback={stopPlayback}
+              formatTime={formatTime}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 text-center">
+          <span className="text-sm text-gray-500">Записи не найдены</span>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// Вкладка "Мастер"
+const MasterTab = ({ order }: { order: Order }) => (
+  <div className="space-y-5">
+    {/* Информация о мастере */}
+    <div className="p-4 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="h-10 w-10 rounded-full bg-[#FFD700]/20 flex items-center justify-center">
           <User className="h-5 w-5 text-[#FFD700]" />
-          Оператор
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Имя оператора</Label>
-            <p className="text-lg font-semibold text-white">{order.operator.name}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">ID оператора</Label>
-            <p className="text-lg font-mono text-white">{order.operatorNameId}</p>
-          </div>
         </div>
         <div>
-          <Label className="text-sm font-medium text-gray-400">Записи звонков</Label>
-          <div className="mt-2 space-y-2">
-            {loadingCalls ? (
-              <div className="flex items-center gap-2 p-3 bg-[#0f0f23] border border-[#FFD700]/30 rounded-lg">
-                <LoadingSpinner size="sm" className="text-gray-400" />
-                <span className="text-gray-400">Загрузка записей...</span>
-              </div>
-            ) : orderCalls.length > 0 ? (
-              orderCalls.map((call: Call, index: number) => {
-                const isCurrentCall = (audioPlayer as { currentCallId?: string }).currentCallId === String(call.id);
-
-                return (
-                  <div key={call.id || index} className="p-3 bg-[#0f0f23] border border-[#FFD700]/30 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-[#FFD700]" />
-                        <div>
-                          <span className="text-white font-medium">Звонок #{call.id}</span>
-                          <div className="text-xs text-gray-400">
-                            {new Date(call.dateCreate).toLocaleString('ru-RU')}
-                          </div>
-                        </div>
-                      </div>
-                      {!isCurrentCall && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => loadRecording(call)}
-                          className="h-8 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-                        >
-                          <Play className="h-4 w-4 mr-1" />
-                          Загрузить
-                        </Button>
-                      )}
-                    </div>
-
-                    {isCurrentCall && (
-                      <div className="flex items-center gap-2 p-2 bg-[#17212b] rounded border border-[#FFD700]/30">
-                        {/* Кнопки управления */}
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={skipBackward}
-                            className="h-6 w-6 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-                          >
-                            <SkipBack className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={togglePlayPause}
-                            className="h-6 w-6 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-                          >
-                            {(audioPlayer as { isPlaying?: boolean }).isPlaying ? (
-                              <Pause className="h-3 w-3" />
-                            ) : (
-                              <Play className="h-3 w-3" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={skipForward}
-                            className="h-6 w-6 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-                          >
-                            <SkipForward className="h-3 w-3" />
-                          </Button>
-                        </div>
-
-                        {/* Прогресс бар */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <span>{formatTime((audioPlayer as { currentTime?: number }).currentTime || 0)}</span>
-                            <div className="flex-1 bg-gray-600 rounded-full h-1 cursor-pointer"
-                                 onClick={(e) => {
-                                   const rect = e.currentTarget.getBoundingClientRect();
-                                   const clickX = e.clientX - rect.left;
-                                   const percentage = clickX / rect.width;
-                                   const newTime = percentage * ((audioPlayer as { duration?: number }).duration || 0);
-                                   seekTo(newTime);
-                                 }}>
-                              <div
-                                className="bg-[#FFD700] h-1 rounded-full transition-all duration-100 progress-bar"
-                                style={{ '--progress-width': `${((audioPlayer as { duration?: number }).duration || 0) > 0 ? (((audioPlayer as { currentTime?: number }).currentTime || 0) / ((audioPlayer as { duration?: number }).duration || 1)) * 100 : 0}%` } as React.CSSProperties}
-                              />
-                            </div>
-                            <span>{formatTime((audioPlayer as { duration?: number }).duration || 0)}</span>
-                          </div>
-                        </div>
-
-                        {/* Громкость */}
-                        <div className="flex items-center gap-1">
-                          <Volume2 className="h-3 w-3 text-gray-500" />
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={(audioPlayer as { volume?: number }).volume || 1}
-                            onChange={(e) => setVolume(parseFloat(e.target.value))}
-                            className="w-12 h-1"
-                          />
-                        </div>
-
-                        {/* Кнопка остановки */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={stopPlayback}
-                          className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex items-center gap-2 p-3 bg-[#0f0f23] border border-[#FFD700]/30 rounded-lg">
-                <FileText className="h-5 w-5 text-gray-400" />
-                <span className="text-gray-400">Записи не найдены</span>
-              </div>
-            )}
-          </div>
+          <p className="text-white font-medium">
+            {order.master?.name || <span className="text-gray-500">Не назначен</span>}
+          </p>
+          {order.masterId && (
+            <p className="text-xs text-gray-500">ID: {order.masterId}</p>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+
+    {/* Финансы */}
+    <div>
+      <Label className="text-xs text-gray-400 mb-3 block">Финансовые результаты</Label>
+      <div className="grid grid-cols-3 gap-3">
+        <FinanceCard 
+          label="Итог" 
+          value={order.result} 
+          color="green"
+        />
+        <FinanceCard 
+          label="Расходы" 
+          value={order.expenditure} 
+          color="red"
+        />
+        <FinanceCard 
+          label="Чистая" 
+          value={order.clean} 
+          color="blue"
+        />
+      </div>
+    </div>
   </div>
 );
 
-// Компонент для вкладки мастера
-const OrderMasterTab = ({ order }: { order: Order }) => (
-  <div className="space-y-6">
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <User className="h-5 w-5 text-[#FFD700]" />
-          Информация о мастере
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Имя мастера</Label>
-            <p className="text-lg font-semibold text-white">{order.master?.name || <span className="text-gray-500">Не назначен</span>}</p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Мастер ID</Label>
-            <p className="text-lg font-mono text-white">{order.masterId || <span className="text-gray-500">-</span>}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+// Вкладка "Документы"
+const DocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => (
+  <div className="space-y-5">
+    {/* Документы */}
+    <div className="grid grid-cols-2 gap-4">
+      <DocumentSection
+        label="БСО документы"
+        docs={order.bsoDoc}
+        color="green"
+      />
+      <DocumentSection
+        label="Документы расходов"
+        docs={order.expenditureDoc}
+        color="blue"
+      />
+    </div>
 
-    <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <CheckCircle className="h-5 w-5 text-[#FFD700]" />
-          Финансовые результаты
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Итог</Label>
-            <p className="text-2xl font-bold text-green-400">
-              {order.result ? `${order.result} ₽` : <span className="text-gray-500">Не указан</span>}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Расходы</Label>
-            <p className="text-2xl font-bold text-red-400">
-              {order.expenditure ? `${order.expenditure} ₽` : <span className="text-gray-500">Не указаны</span>}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-gray-400">Чистая прибыль</Label>
-            <p className="text-2xl font-bold text-blue-400">
-              {order.clean ? `${order.clean} ₽` : <span className="text-gray-500">Не указана</span>}
-            </p>
-          </div>
+    {/* Системная информация */}
+    <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <Label className="text-xs text-gray-400 mb-2 block">Системная информация</Label>
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="flex justify-between">
+          <span className="text-gray-500">Создан:</span>
+          <span className="text-gray-300">{formatDate(order.createDate)}</span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex justify-between">
+          <span className="text-gray-500">Обновлён:</span>
+          <span className="text-gray-300">{order.updatedAt ? formatDate(order.updatedAt) : '—'}</span>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
-// Компонент для предпросмотра одного документа
-const DocumentPreview = ({ 
-  fileKey, 
+// === Вспомогательные компоненты ===
+
+const InfoRow = ({ 
+  icon: Icon, 
   label, 
+  value, 
+  muted = false 
+}: { 
+  icon?: React.ComponentType<{ className?: string }>; 
+  label: string; 
+  value: string; 
+  muted?: boolean;
+}) => (
+  <div className="flex items-start gap-2">
+    {Icon && <Icon className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />}
+    <div className="min-w-0">
+      <Label className="text-xs text-gray-500">{label}</Label>
+      <p className={`text-sm truncate ${muted ? 'text-gray-500' : 'text-white'}`}>{value}</p>
+    </div>
+  </div>
+);
+
+const FinanceCard = ({ 
+  label, 
+  value, 
   color 
 }: { 
-  fileKey: string; 
   label: string; 
-  color: 'green' | 'blue'; 
+  value?: number; 
+  color: 'green' | 'red' | 'blue';
 }) => {
-  const { url, loading } = useFileUrl(fileKey);
-  
-  const colorClasses = {
-    green: {
-      border: 'border-green-500/30',
-      bg: 'bg-green-900/10',
-      buttonBg: 'bg-green-900/30',
-      buttonBorder: 'border-green-500/30',
-      buttonHover: 'hover:bg-green-900/50',
-      icon: 'text-green-400',
-      text: 'text-green-300',
-      spinner: 'border-green-400'
-    },
-    blue: {
-      border: 'border-blue-500/30',
-      bg: 'bg-blue-900/10',
-      buttonBg: 'bg-blue-900/30',
-      buttonBorder: 'border-blue-500/30',
-      buttonHover: 'hover:bg-blue-900/50',
-      icon: 'text-blue-400',
-      text: 'text-blue-300',
-      spinner: 'border-blue-400'
-    }
+  const colors = {
+    green: 'text-green-400',
+    red: 'text-red-400',
+    blue: 'text-blue-400',
   };
   
-  const colors = colorClasses[color];
+  return (
+    <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 text-center">
+      <Label className="text-xs text-gray-500">{label}</Label>
+      <p className={`text-lg font-bold ${value ? colors[color] : 'text-gray-600'}`}>
+        {value ? `${value.toLocaleString()} ₽` : '—'}
+      </p>
+    </div>
+  );
+};
+
+const DocumentSection = ({ 
+  label, 
+  docs, 
+  color 
+}: { 
+  label: string; 
+  docs?: string[]; 
+  color: 'green' | 'blue';
+}) => (
+  <div>
+    <Label className="text-xs text-gray-400 mb-2 block">
+      {label} {docs && docs.length > 0 && `(${docs.length})`}
+    </Label>
+    {docs && docs.length > 0 ? (
+      <div className="space-y-2">
+        {docs.map((doc, index) => (
+          <DocumentPreview key={index} fileKey={doc} color={color} />
+        ))}
+      </div>
+    ) : (
+      <div className="aspect-video flex items-center justify-center bg-[#17212b] rounded-lg border border-dashed border-gray-700">
+        <span className="text-xs text-gray-500">Нет документов</span>
+      </div>
+    )}
+  </div>
+);
+
+const DocumentPreview = ({ fileKey, color }: { fileKey: string; color: 'green' | 'blue' }) => {
+  const { url, loading } = useFileUrl(fileKey);
+  
+  const borderColor = color === 'green' ? 'border-green-500/30' : 'border-blue-500/30';
   
   if (loading) {
     return (
-      <div className={`flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 ${colors.border} rounded-lg`}>
-        <div className="text-center">
-          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${colors.spinner} mx-auto mb-2`}></div>
-          <span className="text-gray-400">Загрузка...</span>
-        </div>
+      <div className={`aspect-video flex items-center justify-center bg-[#17212b] rounded-lg border ${borderColor}`}>
+        <LoadingSpinner size="sm" />
       </div>
     );
   }
   
   return (
-    <div className="space-y-2">
-      <div className={`relative aspect-video w-full rounded-lg overflow-hidden border-2 ${colors.border} ${colors.bg}`}>
-        <img 
-          src={url || ''} 
-          alt={label} 
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            // ✅ FIX: Используем React DOM API вместо innerHTML для предотвращения XSS
-            e.currentTarget.style.display = 'none';
-            const parent = e.currentTarget.parentElement;
-            if (parent) {
-              const errorDiv = document.createElement('div');
-              errorDiv.className = 'flex items-center justify-center h-full';
-              
-              const contentDiv = document.createElement('div');
-              contentDiv.className = 'text-center';
-              
-              const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-              svg.setAttribute('class', 'mx-auto h-12 w-12 text-gray-400');
-              svg.setAttribute('fill', 'none');
-              svg.setAttribute('stroke', 'currentColor');
-              svg.setAttribute('viewBox', '0 0 24 24');
-              
-              const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-              path.setAttribute('stroke-linecap', 'round');
-              path.setAttribute('stroke-linejoin', 'round');
-              path.setAttribute('stroke-width', '2');
-              path.setAttribute('d', 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z');
-              
-              svg.appendChild(path);
-              
-              const text = document.createElement('p');
-              text.className = 'text-gray-400 text-sm mt-2';
-              text.textContent = 'Ошибка загрузки изображения';
-              
-              contentDiv.appendChild(svg);
-              contentDiv.appendChild(text);
-              errorDiv.appendChild(contentDiv);
-              parent.appendChild(errorDiv);
-            }
-          }}
-        />
-      </div>
-      <a 
-        href={url || '#'} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className={`flex items-center gap-2 p-2 ${colors.buttonBg} border ${colors.buttonBorder} rounded-lg ${colors.buttonHover} transition-colors`}
-      >
-        <FileText className={`h-4 w-4 ${colors.icon} flex-shrink-0`} />
-        <span className={`${colors.text} text-xs truncate`}>{label}</span>
-      </a>
-    </div>
+    <a 
+      href={url || '#'} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className={`block aspect-video rounded-lg overflow-hidden border ${borderColor} hover:border-opacity-60 transition-colors`}
+    >
+      <img 
+        src={url || ''} 
+        alt="Document" 
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+    </a>
   );
 };
 
-// Компонент для вкладки документов
-const OrderDocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => {
+const CallPlayer = ({
+  call,
+  audioPlayer,
+  loadRecording,
+  togglePlayPause,
+  skipBackward,
+  skipForward,
+  seekTo,
+  setVolume,
+  stopPlayback,
+  formatTime,
+}: {
+  call: Call;
+  audioPlayer: unknown;
+  loadRecording: (call: Call) => void;
+  togglePlayPause: () => void;
+  skipBackward: () => void;
+  skipForward: () => void;
+  seekTo: (time: number) => void;
+  setVolume: (volume: number) => void;
+  stopPlayback: () => void;
+  formatTime: (time: number) => string;
+}) => {
+  const isCurrentCall = (audioPlayer as { currentCallId?: string }).currentCallId === String(call.id);
+  const player = audioPlayer as { isPlaying?: boolean; currentTime?: number; duration?: number; volume?: number };
+
   return (
-    <div className="space-y-6">
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <FileText className="h-5 w-5 text-[#FFD700]" />
-            Документы заказа
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* БСО документ */}
-            <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">
-                БСО документ {order.bsoDoc && order.bsoDoc.length > 0 && `(${order.bsoDoc.length})`}
-              </Label>
-              {order.bsoDoc && order.bsoDoc.length > 0 ? (
-                <div className="space-y-3">
-                  {order.bsoDoc.map((doc, index) => (
-                    <DocumentPreview 
-                      key={index}
-                      fileKey={doc}
-                      label={`БСО документ ${order.bsoDoc!.length > 1 ? `#${index + 1}` : ''}`}
-                      color="green"
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                  <div className="text-center">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-400">Документ не загружен</span>
-                  </div>
-                </div>
-              )}
-            </div>
+    <div className="p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-[#FFD700]" />
+          <span className="text-sm text-white">Звонок #{call.id}</span>
+          <span className="text-xs text-gray-500">
+            {new Date(call.dateCreate).toLocaleString('ru-RU')}
+          </span>
+        </div>
+        {!isCurrentCall && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => loadRecording(call)}
+            className="h-7 px-2 text-[#FFD700] hover:bg-[#FFD700]/10"
+          >
+            <Play className="h-3 w-3 mr-1" />
+            Воспроизвести
+          </Button>
+        )}
+      </div>
 
-            {/* Документ расходов */}
-            <div>
-              <Label className="text-sm font-medium text-gray-400 mb-2 block">
-                Документ расходов {order.expenditureDoc && order.expenditureDoc.length > 0 && `(${order.expenditureDoc.length})`}
-              </Label>
-              {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
-                <div className="space-y-3">
-                  {order.expenditureDoc.map((doc, index) => (
-                    <DocumentPreview 
-                      key={index}
-                      fileKey={doc}
-                      label={`Документ расходов ${order.expenditureDoc!.length > 1 ? `#${index + 1}` : ''}`}
-                      color="blue"
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center aspect-video w-full p-6 bg-[#0f0f23] border-2 border-[#FFD700]/30 rounded-lg">
-                  <div className="text-center">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-400">Документ не загружен</span>
-                  </div>
-                </div>
-              )}
-            </div>
+      {isCurrentCall && (
+        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-[#FFD700]/10">
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={skipBackward} className="h-6 w-6 p-0 text-[#FFD700]">
+              <SkipBack className="h-3 w-3" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={togglePlayPause} className="h-6 w-6 p-0 text-[#FFD700]">
+              {player.isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={skipForward} className="h-6 w-6 p-0 text-[#FFD700]">
+              <SkipForward className="h-3 w-3" />
+            </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2 text-white">
-            <Info className="h-5 w-5 text-[#FFD700]" />
-            Системная информация
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Дата создания:</span>
-                <span className="font-medium text-white">{formatDate(order.createDate)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Последнее обновление:</span>
-                <span className="font-medium text-white">{order.updatedAt ? formatDate(order.updatedAt) : 'Не указано'}</span>
-              </div>
+          <div className="flex-1 flex items-center gap-2 text-xs text-gray-400">
+            <span className="w-10 text-right">{formatTime(player.currentTime || 0)}</span>
+            <div 
+              className="flex-1 bg-gray-700 rounded-full h-1.5 cursor-pointer"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const percentage = (e.clientX - rect.left) / rect.width;
+                seekTo(percentage * (player.duration || 0));
+              }}
+            >
+              <div
+                className="bg-[#FFD700] h-1.5 rounded-full transition-all"
+                style={{ width: `${(player.duration || 0) > 0 ? ((player.currentTime || 0) / (player.duration || 1)) * 100 : 0}%` }}
+              />
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-400">ID заказа:</span>
-                <span className="font-medium text-white">#{order.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">ID оператора:</span>
-                <span className="font-medium text-white">{order.operatorNameId}</span>
-              </div>
-            </div>
+            <span className="w-10">{formatTime(player.duration || 0)}</span>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="flex items-center gap-1">
+            <Volume2 className="h-3 w-3 text-gray-500" />
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={player.volume || 1}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              className="w-12 h-1 accent-[#FFD700]"
+            />
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={stopPlayback} className="h-6 w-6 p-0 text-red-400 hover:text-red-300">
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
 
-// Export the component
 OrderViewModalComponent.displayName = 'OrderViewModal';
 export const OrderViewModal = React.memo(OrderViewModalComponent);

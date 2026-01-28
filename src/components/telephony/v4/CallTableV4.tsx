@@ -255,7 +255,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                     <span className="text-white font-medium">Оператор</span>
                   </TableHead>
                   <TableHead className="w-[22%] py-3 px-4 text-right">
-                    <span className="text-white font-medium">Действия</span>
+                    <span className="text-white font-medium"></span>
                   </TableHead>
                 </TableRow>
               </TableHeader>

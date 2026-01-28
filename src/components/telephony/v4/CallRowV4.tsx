@@ -275,7 +275,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           // Для входящих звонков показываем город, РК и источник
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-sm">
-              <MapPin className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
               <span className="text-white">{call.city}</span>
               <span className="text-gray-600">•</span>
               <span className="text-gray-400">{call.rk}</span>

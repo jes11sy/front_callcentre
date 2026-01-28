@@ -105,9 +105,9 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                             #{orderData.id}
                           </Badge>
                           <Badge 
-                            className={`text-xs font-medium ${getStatusBadge(orderData.statusOrder)}`}
+                            className={`text-xs font-medium ${getStatusBadge(orderData.statusOrder || '')}`}
                           >
-                            {orderData.statusOrder}
+                            {orderData.statusOrder || 'Нет статуса'}
                           </Badge>
                         </div>
                         <Button

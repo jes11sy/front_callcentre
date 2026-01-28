@@ -87,7 +87,6 @@ function OrdersContent() {
               search={filters.search}
               limit={limit}
               onViewOrder={handleViewOrder}
-              onEditOrder={handleEditOrder}
               onCreateOrder={() => setIsCreateModalOpen(true)}
               onPageChange={setPage}
               onLimitChange={setLimit}
@@ -112,6 +111,9 @@ function OrdersContent() {
               seekTo={() => {}}
               setVolume={() => {}}
               formatDate={(date) => new Date(date).toLocaleString('ru-RU')}
+              onEdit={() => {
+                setIsEditModalOpen(true);
+              }}
             />
 
             {/* Edit Modal */}

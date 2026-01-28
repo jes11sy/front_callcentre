@@ -13,7 +13,8 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Volume2
+  Volume2,
+  Edit
 } from 'lucide-react';
 import { Order, Call } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS } from '@/constants/orders';
@@ -33,6 +34,7 @@ interface OrderViewModalProps {
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   formatDate: (date: string | number) => string;
+  onEdit?: () => void;
 }
 
 const OrderViewModalComponent = ({ 
@@ -46,7 +48,8 @@ const OrderViewModalComponent = ({
   skipForward,
   seekTo,
   setVolume,
-  formatDate
+  formatDate,
+  onEdit
 }: OrderViewModalProps) => {
   const [activeTab, setActiveTab] = useState<ViewTab>('info');
   const { 
@@ -77,14 +80,27 @@ const OrderViewModalComponent = ({
           <h2 className="text-lg font-bold text-[#FFD700]">
             Заказ #{order.id}
           </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onEdit}
+                className="h-8 px-3 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+              >
+                <Edit className="h-4 w-4 mr-1.5" />
+                Редактировать
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}

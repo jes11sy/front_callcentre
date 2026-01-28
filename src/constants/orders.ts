@@ -32,6 +32,17 @@ export const EQUIPMENT_TYPES = [
   { value: 'МНЧ', label: 'МНЧ (Муж на час)' }
 ] as const;
 
+export const CITIES = [
+  { value: 'Саратов', label: 'Саратов' },
+  { value: 'Энгельс', label: 'Энгельс' },
+  { value: 'Ульяновск', label: 'Ульяновск' },
+  { value: 'Тольятти', label: 'Тольятти' },
+  { value: 'Пенза', label: 'Пенза' },
+  { value: 'Ярославль', label: 'Ярославль' },
+  { value: 'Омск', label: 'Омск' }
+] as const;
+
+
 export const STATUS_OPTIONS = [
   { value: 'all', label: 'Все статусы' },
   { value: 'Ожидает', label: 'Ожидает' },

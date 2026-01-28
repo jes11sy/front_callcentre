@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LoadingSpinner } from '@/components/ui/loading';
 import { X, Save } from 'lucide-react';
 import { Order } from '@/types/orders';
-import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS, STATUS_COLORS, STATUS_LABELS } from '@/constants/orders';
+import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS, STATUS_COLORS, STATUS_LABELS, CITIES } from '@/constants/orders';
+import { authApi } from '@/lib/api';
 
 interface OrderEditModalProps {
   isOpen: boolean;
@@ -31,6 +32,18 @@ export const OrderEditModal = ({
   isSaving, 
   onOrderChange 
 }: OrderEditModalProps) => {
+  const [sources, setSources] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      authApi.get('/phones/sources').then(res => {
+        if (res.data.success && res.data.sources) {
+          setSources(res.data.sources);
+        }
+      }).catch(() => {});
+    }
+  }, [isOpen]);
+
   if (!isOpen || !order) return null;
 
   const handleOrderChange = (field: keyof Order, value: unknown) => {
@@ -117,26 +130,39 @@ export const OrderEditModal = ({
             <EditRow label="РК">
               <Input 
                 value={order.rk} 
-                disabled={userRole === 'operator'}
+                onChange={(e) => handleOrderChange('rk', e.target.value)}
                 className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
               />
             </EditRow>
 
             <EditRow label="Источник">
-              <Input 
-                value={order.avitoName || ''} 
-                onChange={(e) => handleOrderChange('avitoName', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
-                placeholder="—"
-              />
+              <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
+                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
+                  <SelectValue placeholder="Выберите источник" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                  {sources.map((s) => (
+                    <SelectItem key={s} value={s} className="text-white hover:bg-[#FFD700]/10">
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </EditRow>
 
             <EditRow label="Город">
-              <Input 
-                value={order.city} 
-                onChange={(e) => handleOrderChange('city', e.target.value)}
-                className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
-              />
+              <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
+                <SelectTrigger className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                  {CITIES.map((c) => (
+                    <SelectItem key={c.value} value={c.value} className="text-white hover:bg-[#FFD700]/10">
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </EditRow>
 
             <EditRow label="Статус">
@@ -158,7 +184,6 @@ export const OrderEditModal = ({
               <Input 
                 value={order.clientName} 
                 onChange={(e) => handleOrderChange('clientName', e.target.value)}
-                disabled={userRole === 'operator'}
                 className="h-8 bg-[#17212b] border-[#FFD700]/20 text-white text-sm"
               />
             </EditRow>
@@ -197,15 +222,6 @@ export const OrderEditModal = ({
               onChange={(e) => handleOrderChange('problem', e.target.value)}
               className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white text-sm resize-none"
             />
-          </div>
-
-          {/* Оператор */}
-          <div className="flex items-center justify-between pt-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500">Оператор:</span>
-              <span className="text-white">{order.operator.name}</span>
-            </div>
-            <span className="text-xs text-gray-500">ID: {order.operatorNameId}</span>
           </div>
         </div>
 

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, Edit, ShoppingCart, Plus } from 'lucide-react';
+import { ShoppingCart, Plus } from 'lucide-react';
 import { Order, OrdersResponse } from '@/types/orders';
 import { STATUS_COLORS, PAGE_SIZES } from '@/constants/orders';
 import { LoadingState } from '@/components/ui/loading';
@@ -20,11 +20,10 @@ interface OrdersTableProps {
   search: string;
   limit: number;
   onViewOrder: (order: Order) => void;
-  onEditOrder: (order: Order) => void;
   onCreateOrder: () => void;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
-  filtersComponent?: ReactNode; // Добавляем проп для фильтров
+  filtersComponent?: ReactNode;
 }
 
 const OrdersTableComponent = ({
@@ -33,7 +32,6 @@ const OrdersTableComponent = ({
   search,
   limit,
   onViewOrder,
-  onEditOrder,
   onCreateOrder,
   onPageChange,
   onLimitChange,
@@ -148,12 +146,15 @@ const OrdersTableComponent = ({
                     <TableHead className="w-40 text-gray-300">Проблема</TableHead>
                     <TableHead className="w-24 text-gray-300">Статус</TableHead>
                     <TableHead className="w-24 text-gray-300">Мастер</TableHead>
-                    <TableHead className="w-24 text-gray-300">Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {ordersData.orders.map((order) => (
-                    <TableRow key={order.id} className="border-b border-gray-700 hover:bg-[#FFD700]/5">
+                    <TableRow 
+                      key={order.id} 
+                      className="border-b border-gray-700 hover:bg-[#FFD700]/10 cursor-pointer transition-colors"
+                      onClick={() => onViewOrder(order)}
+                    >
                       <TableCell className="font-medium text-white">{order.id}</TableCell>
                       <TableCell className="text-gray-300">{order.rk}</TableCell>
                       <TableCell className="text-gray-300">{order.city}</TableCell>
@@ -209,28 +210,6 @@ const OrdersTableComponent = ({
                       <TableCell>
                         <div className="max-w-24 truncate text-gray-300" title={order.master?.name || 'Не назначен'}>
                           {order.master?.name || <span className="text-gray-500">Не назначен</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 whitespace-nowrap">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onViewOrder(order)}
-                            title="Просмотр"
-                            className="text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEditOrder(order)}
-                            title="Редактировать"
-                            className="text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

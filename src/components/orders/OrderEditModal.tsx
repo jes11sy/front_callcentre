@@ -95,145 +95,160 @@ export const OrderEditModal = ({
         </div>
       
         {/* Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
-          <Row label="Тип заявки">
-            <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
-              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {ORDER_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
+          {/* Две колонки */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Левая колонка — Информация по заказу */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-[#FFD700] pb-2 border-b border-[#FFD700]/20">Информация по заказу</h3>
+              
+              <Row label="Тип заявки">
+                <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {ORDER_TYPES.map((t) => (
+                      <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
 
-          <Row label="РК">
-            <Input 
-              value={order.rk} 
-              onChange={(e) => handleOrderChange('rk', e.target.value)}
-              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
-            />
-          </Row>
+              <Row label="Тип техники">
+                <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {EQUIPMENT_TYPES.map((t) => (
+                      <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
 
-          <Row label="Источник">
-            <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
-              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                <SelectValue placeholder="Выберите" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {sources.map((s) => (
-                  <SelectItem key={s} value={s} className="text-white hover:bg-[#FFD700]/10">
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+              <Row label="РК">
+                <Input 
+                  value={order.rk} 
+                  onChange={(e) => handleOrderChange('rk', e.target.value)}
+                  className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
+                />
+              </Row>
 
-          <Row label="Город">
-            <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
-              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {CITIES.map((c) => (
-                  <SelectItem key={c.value} value={c.value} className="text-white hover:bg-[#FFD700]/10">
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+              <Row label="Источник">
+                <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                    <SelectValue placeholder="Выберите" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {sources.map((s) => (
+                      <SelectItem key={s} value={s} className="text-white hover:bg-[#FFD700]/10">
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
 
-          <Row label="Клиент">
-            <Input 
-              value={order.clientName} 
-              onChange={(e) => handleOrderChange('clientName', e.target.value)}
-              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
-            />
-          </Row>
+              <Row label="Город">
+                <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {CITIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value} className="text-white hover:bg-[#FFD700]/10">
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
+            </div>
 
-          <Row label="Телефон">
-            <Input 
-              value={order.phone || ''} 
-              onChange={(e) => {
-                // Оставляем только цифры, начинаем с 7
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.startsWith('8')) {
-                  value = '7' + value.slice(1);
-                }
-                if (!value.startsWith('7') && value.length > 0) {
-                  value = '7' + value;
-                }
-                if (value.length > 11) {
-                  value = value.slice(0, 11);
-                }
-                handleOrderChange('phone', value);
-              }}
-              maxLength={11}
-              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white placeholder:text-gray-500"
-              placeholder="79991234567"
-            />
-          </Row>
+            {/* Правая колонка — Контакты и время */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-[#FFD700] pb-2 border-b border-[#FFD700]/20">Контакты и время</h3>
+              
+              <Row label="Клиент">
+                <Input 
+                  value={order.clientName} 
+                  onChange={(e) => handleOrderChange('clientName', e.target.value)}
+                  className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
+                />
+              </Row>
 
-          <Row label="Дата встречи">
-            <Input 
-              type="datetime-local"
-              value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
-              onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
-              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white [color-scheme:dark]"
-            />
-          </Row>
+              <Row label="Телефон">
+                <Input 
+                  value={order.phone || ''} 
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.startsWith('8')) {
+                      value = '7' + value.slice(1);
+                    }
+                    if (!value.startsWith('7') && value.length > 0) {
+                      value = '7' + value;
+                    }
+                    if (value.length > 11) {
+                      value = value.slice(0, 11);
+                    }
+                    handleOrderChange('phone', value);
+                  }}
+                  maxLength={11}
+                  className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white placeholder:text-gray-500"
+                  placeholder="79991234567"
+                />
+              </Row>
 
-          <Row label="Адрес">
-            <Input 
-              value={order.address} 
-              onChange={(e) => handleOrderChange('address', e.target.value)}
-              className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
-            />
-          </Row>
+              <Row label="Дата">
+                <Input 
+                  type="datetime-local"
+                  value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
+                  onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
+                  className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white [color-scheme:dark]"
+                />
+              </Row>
 
-          <Row label="Проблема">
-            <Textarea 
-              value={order.problem} 
-              onChange={(e) => handleOrderChange('problem', e.target.value)}
-              className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
-            />
-          </Row>
+              <Row label="Статус">
+                <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
+                  <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                    {STATUS_OPTIONS.filter(o => o.value !== 'all').map((o) => (
+                      <SelectItem key={o.value} value={o.value} className="text-white hover:bg-[#FFD700]/10">
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
+            </div>
+          </div>
 
-          <Row label="Тип техники">
-            <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
-              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {EQUIPMENT_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#FFD700]/10">
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+          {/* Нижняя часть — на всю ширину */}
+          <div className="mt-5 pt-5 border-t border-[#FFD700]/20 space-y-3">
+            <Row label="Адрес">
+              <Input 
+                value={order.address} 
+                onChange={(e) => handleOrderChange('address', e.target.value)}
+                className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white"
+              />
+            </Row>
 
-          <Row label="Статус">
-            <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
-              <SelectTrigger className="h-9 bg-[#17212b] border-[#FFD700]/20 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                {STATUS_OPTIONS.filter(o => o.value !== 'all').map((o) => (
-                  <SelectItem key={o.value} value={o.value} className="text-white hover:bg-[#FFD700]/10">
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+            <Row label="Проблема">
+              <Textarea 
+                value={order.problem} 
+                onChange={(e) => handleOrderChange('problem', e.target.value)}
+                className="min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
+              />
+            </Row>
+          </div>
         </div>
 
         {/* Footer */}

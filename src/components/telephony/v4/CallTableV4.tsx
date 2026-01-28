@@ -16,7 +16,14 @@ import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { Call } from '@/types/telephony';
-import { PAGE_SIZES } from '@/constants/orders';
+
+// Размеры для пагинации по группам
+const GROUP_SIZES = [
+  { value: '10', label: '10' },
+  { value: '20', label: '20' },
+  { value: '30', label: '30' },
+  { value: '50', label: '50' },
+];
 import { CallRowV4 } from './CallRowV4';
 import { QuickFilterChips, QuickFilter } from './QuickFilterChips';
 import { StickyAudioPlayer } from '../v2/StickyAudioPlayer';
@@ -41,12 +48,13 @@ interface CallTableV4Props {
   playingCall: number | null;
   currentAudioUrl: string | null;
   onClosePlayer: () => void;
-  currentPage: number;
-  totalPages: number;
-  totalCalls: number;
-  limit: number;
-  onPageChange: (page: number) => void;
-  onLimitChange: (limit: number) => void;
+  // Эти пропсы оставляем для совместимости, но не используем в v4
+  currentPage?: number;
+  totalPages?: number;
+  totalCalls?: number;
+  limit?: number;
+  onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 }
 
 export const CallTableV4: React.FC<CallTableV4Props> = ({
@@ -66,18 +74,14 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLoadRecording,
   playingCall,
   currentAudioUrl,
-  onClosePlayer,
-  currentPage,
-  totalPages,
-  totalCalls,
-  limit,
-  onPageChange,
-  onLimitChange
+  onClosePlayer
 }) => {
   // Local state
   const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [stickyPlayerCall, setStickyPlayerCall] = useState<Call | null>(null);
+  const [localPage, setLocalPage] = useState(1);
+  const [groupsPerPage, setGroupsPerPage] = useState(10);
 
   // Подсчёт для фильтров
   const filterCounts = useMemo(() => {
@@ -142,6 +146,22 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     
     return filtered;
   }, [groupedCalls, searchTerm, activeFilter]);
+
+  // Локальная пагинация по группам
+  const totalFilteredGroups = Object.keys(filteredGroupedCalls).length;
+  const localTotalPages = Math.ceil(totalFilteredGroups / groupsPerPage);
+  
+  const paginatedGroupedCalls = useMemo(() => {
+    const entries = Object.entries(filteredGroupedCalls);
+    const startIndex = (localPage - 1) * groupsPerPage;
+    const endIndex = startIndex + groupsPerPage;
+    return Object.fromEntries(entries.slice(startIndex, endIndex));
+  }, [filteredGroupedCalls, localPage, groupsPerPage]);
+
+  // Сброс страницы при изменении фильтров
+  React.useEffect(() => {
+    setLocalPage(1);
+  }, [searchTerm, activeFilter]);
 
   // Handlers
   const handlePlayRecording = useCallback((call: Call) => {
@@ -235,7 +255,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                       <LoadingState message="Загрузка звонков..." size="md" />
                     </td>
                   </TableRow>
-                ) : Object.keys(filteredGroupedCalls).length === 0 ? (
+                ) : totalFilteredGroups === 0 ? (
                   <TableRow>
                     <td colSpan={5} className="text-center py-12">
                       <EmptyState
@@ -248,7 +268,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                     </td>
                   </TableRow>
                 ) : (
-                  Object.entries(filteredGroupedCalls).map(([phoneClient, groupCalls]) => {
+                  Object.entries(paginatedGroupedCalls).map(([phoneClient, groupCalls]) => {
                     const isExpanded = expandedGroups.has(phoneClient);
                     const latestCall = groupCalls[0];
                     const hasMultipleCalls = groupCalls.length > 1;
@@ -298,47 +318,39 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
           </div>
 
           {/* Пагинация */}
-          <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-400">
-                {Object.keys(filteredGroupedCalls).length} групп из {totalCalls} звонков
-                {(searchTerm || activeFilter !== 'all') && (
-                  <span className="text-[#FFD700] ml-1">(отфильтровано)</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Label className="text-sm text-gray-500">На странице:</Label>
-                <Select
-                  value={limit.toString()}
-                  onValueChange={(value) => {
-                    onLimitChange(parseInt(value));
-                    onPageChange(1);
-                  }}
-                  disabled={loading}
-                >
-                  <SelectTrigger className="w-20 h-8 bg-[#0f0f23] border-[#FFD700]/20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                    {PAGE_SIZES.map((size) => (
-                      <SelectItem 
-                        key={size.value} 
-                        value={size.value}
-                        className="text-white focus:bg-[#FFD700]/20"
-                      >
-                        {size.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-gray-500">На странице:</Label>
+              <Select
+                value={groupsPerPage.toString()}
+                onValueChange={(value) => {
+                  setGroupsPerPage(parseInt(value));
+                  setLocalPage(1);
+                }}
+                disabled={loading}
+              >
+                <SelectTrigger className="w-16 h-8 bg-[#0f0f23] border-[#FFD700]/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                  {GROUP_SIZES.map((size) => (
+                    <SelectItem 
+                      key={size.value} 
+                      value={size.value}
+                      className="text-white focus:bg-[#FFD700]/20"
+                    >
+                      {size.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
-            {totalPages > 1 && (
+            {localTotalPages > 1 && (
               <OptimizedPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
+                currentPage={localPage}
+                totalPages={localTotalPages}
+                onPageChange={setLocalPage}
                 showFirstLast={true}
                 showPrevNext={true}
                 maxVisiblePages={5}

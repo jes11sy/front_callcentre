@@ -42,8 +42,9 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       label: 'Все', 
       icon: Phone, 
       count: counts.all,
-      color: 'text-gray-400',
-      activeColor: 'bg-[#FFD700] text-[#0f0f23]'
+      color: 'text-gray-300',
+      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
+      activeBorder: 'border-[#FFD700]'
     },
     { 
       id: 'missed' as const, 
@@ -51,7 +52,8 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       icon: PhoneMissed, 
       count: counts.missed,
       color: 'text-red-400',
-      activeColor: 'bg-red-500 text-white',
+      activeColor: 'bg-red-500/90 text-white',
+      activeBorder: 'border-red-500',
       highlight: counts.missed > 0
     },
     { 
@@ -59,24 +61,27 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       label: 'Отвеченные', 
       icon: PhoneIncoming, 
       count: counts.answered,
-      color: 'text-green-400',
-      activeColor: 'bg-green-500 text-white'
+      color: 'text-gray-300',
+      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
+      activeBorder: 'border-[#FFD700]'
     },
     { 
       id: 'today' as const, 
       label: 'Сегодня', 
       icon: Calendar, 
       count: counts.today,
-      color: 'text-blue-400',
-      activeColor: 'bg-blue-500 text-white'
+      color: 'text-gray-300',
+      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
+      activeBorder: 'border-[#FFD700]'
     },
     { 
       id: 'last_hour' as const, 
       label: 'Последний час', 
       icon: Clock, 
       count: null,
-      color: 'text-purple-400',
-      activeColor: 'bg-purple-500 text-white'
+      color: 'text-gray-300',
+      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
+      activeBorder: 'border-[#FFD700]'
     },
   ];
 
@@ -119,12 +124,12 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
                 "border",
                 isActive
-                  ? filter.activeColor + " border-transparent shadow-lg"
+                  ? cn(filter.activeColor, filter.activeBorder, "shadow-lg shadow-[#FFD700]/20")
                   : cn(
                       "bg-[#17212b] border-[#FFD700]/20",
                       filter.color,
-                      "hover:border-[#FFD700]/40 hover:bg-[#1a1a2e]",
-                      filter.highlight && "animate-pulse border-red-500/50"
+                      "hover:border-[#FFD700]/50 hover:bg-[#1a1a2e]",
+                      filter.highlight && "border-red-500/50 animate-pulse"
                     )
               )}
             >
@@ -136,10 +141,12 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                   className={cn(
                     "ml-0.5 h-5 min-w-[20px] text-xs font-bold",
                     isActive 
-                      ? "bg-white/20 text-current" 
+                      ? filter.id === 'missed' 
+                        ? "bg-white/30 text-white" 
+                        : "bg-[#0f0f23]/30 text-[#0f0f23]"
                       : filter.id === 'missed' && filter.count > 0
                         ? "bg-red-500/20 text-red-400"
-                        : "bg-gray-700 text-gray-300"
+                        : "bg-[#FFD700]/10 text-[#FFD700]/70"
                   )}
                 >
                   {filter.count}

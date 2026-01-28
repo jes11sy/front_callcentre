@@ -22,6 +22,17 @@ import {
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
 
+// Склонение слов
+function pluralize(count: number, one: string, few: string, many: string): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  
+  if (mod100 >= 11 && mod100 <= 19) return many;
+  if (mod10 === 1) return one;
+  if (mod10 >= 2 && mod10 <= 4) return few;
+  return many;
+}
+
 interface CallRowV4Props {
   call: Call;
   phoneClient: string;
@@ -157,7 +168,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     }}
                     className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#FFD700] transition-colors mt-0.5"
                   >
-                    <span>+{groupCalls.length - 1} звонков</span>
+                    <span>+{groupCalls.length - 1} {pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span>
                     {isExpanded ? (
                       <ChevronUp className="w-3 h-3" />
                     ) : (

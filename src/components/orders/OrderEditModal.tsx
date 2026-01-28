@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { X, Save } from 'lucide-react';
 import { Order } from '@/types/orders';
 import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS, STATUS_COLORS, STATUS_LABELS, CITIES } from '@/constants/orders';
-import { authApi } from '@/lib/api';
+import api from '@/lib/api';
 
 interface OrderEditModalProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export const OrderEditModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      authApi.get('/phones/sources').then(res => {
+      api.get('/phones/sources').then(res => {
         if (res.data.success && res.data.sources) {
           setSources(res.data.sources);
         }

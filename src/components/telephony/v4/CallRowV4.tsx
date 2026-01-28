@@ -282,7 +282,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             {call.avitoName && (
               <Badge 
                 variant="outline" 
-                className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
+                className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5 max-w-[150px] truncate"
+                title={call.avitoName}
               >
                 {call.avitoName}
               </Badge>

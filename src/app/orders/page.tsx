@@ -78,9 +78,7 @@ function OrdersContent() {
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}
-            {todayOrders.length > 0 && (
-              <TimeSlotsTable orders={todayOrders} />
-            )}
+            <TimeSlotsTable orders={todayOrders} />
 
             {/* Orders Table с встроенными фильтрами */}
             <OrdersTable

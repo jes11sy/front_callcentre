@@ -93,7 +93,7 @@ export const useOrders = () => {
       
       const params = new URLSearchParams({
         page: '1',
-        limit: '1000', // Загружаем все заказы на сегодня
+        limit: '300', // Все заказы на сегодня
         dateType: 'meeting',
         dateFrom,
         dateTo,

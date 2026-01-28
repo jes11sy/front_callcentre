@@ -27,6 +27,7 @@ function OrdersContent() {
     orderCalls,
     loadingCalls,
     ordersData,
+    todayOrders,
     isLoading,
     error,
     user,
@@ -77,8 +78,8 @@ function OrdersContent() {
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}
-            {ordersData?.orders && (
-              <TimeSlotsTable orders={ordersData.orders} />
+            {todayOrders.length > 0 && (
+              <TimeSlotsTable orders={todayOrders} />
             )}
 
             {/* Orders Table с встроенными фильтрами */}

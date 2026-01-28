@@ -78,6 +78,39 @@ export const useOrders = () => {
     enabled: !!user
   });
 
+  // 🕐 Получение всех активных заказов на сегодня для временной шкалы
+  const { data: todayOrdersData } = useQuery<OrdersResponse>({
+    queryKey: ['orders-today', user?.id, user?.role],
+    queryFn: async () => {
+      if (!user) {
+        throw new Error('Данные пользователя не загружены');
+      }
+      
+      // Получаем сегодняшнюю дату в формате YYYY-MM-DD
+      const today = new Date();
+      const dateFrom = today.toISOString().split('T')[0];
+      const dateTo = dateFrom;
+      
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '1000', // Загружаем все заказы на сегодня
+        dateType: 'meeting',
+        dateFrom,
+        dateTo,
+      });
+
+      const response = await api.get(`/orders?${params}`);
+      
+      if (response.data.success && response.data.data) {
+        return response.data.data;
+      }
+      
+      throw new Error('Неверный формат ответа API');
+    },
+    enabled: !!user,
+    staleTime: 30000, // Кэшируем на 30 секунд
+  });
+
   // Обработка параметра orderId из URL
   useEffect(() => {
     const orderId = searchParams.get('orderId');
@@ -236,6 +269,7 @@ export const useOrders = () => {
     orderCalls,
     loadingCalls,
     ordersData,
+    todayOrders: todayOrdersData?.orders || [],
     isLoading,
     error,
     user,

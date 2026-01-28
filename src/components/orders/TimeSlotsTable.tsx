@@ -140,9 +140,6 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
         <CardTitle className="flex items-center gap-2 text-[#FFD700]">
           <Clock className="h-5 w-5" />
           Активные заявки на сегодня
-          <span className="text-sm font-normal text-gray-400 ml-2">
-            (Ожидает, Принял, В пути)
-          </span>
         </CardTitle>
         
         {/* Табы городов */}

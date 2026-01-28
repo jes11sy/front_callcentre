@@ -196,13 +196,13 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
 
           {/* Таблица */}
           <div className="overflow-x-auto rounded-lg border border-[#FFD700]/20">
-            <Table>
+            <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow className="bg-[#0f0f23] border-[#FFD700]/20 hover:bg-[#0f0f23]">
-                  <TableHead className="w-[200px]">
+                  <TableHead className="w-[18%] py-3 px-4">
                     <span className="text-white font-medium">Клиент</span>
                   </TableHead>
-                  <TableHead className="w-[200px]">
+                  <TableHead className="w-[22%] py-3 px-4">
                     <button 
                       onClick={() => onSort('city')}
                       className="flex items-center text-white font-medium hover:text-[#FFD700] transition-colors"
@@ -211,7 +211,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                       <SortIcon field="city" />
                     </button>
                   </TableHead>
-                  <TableHead className="w-[180px]">
+                  <TableHead className="w-[18%] py-3 px-4">
                     <button 
                       onClick={() => onSort('dateCreate')}
                       className="flex items-center text-white font-medium hover:text-[#FFD700] transition-colors"
@@ -220,10 +220,10 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                       <SortIcon field="dateCreate" />
                     </button>
                   </TableHead>
-                  <TableHead className="w-[150px]">
+                  <TableHead className="w-[20%] py-3 px-4">
                     <span className="text-white font-medium">Оператор</span>
                   </TableHead>
-                  <TableHead className="w-[200px] text-right">
+                  <TableHead className="w-[22%] py-3 px-4 text-right">
                     <span className="text-white font-medium">Действия</span>
                   </TableHead>
                 </TableRow>

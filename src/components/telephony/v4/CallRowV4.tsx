@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,8 +53,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   isPlaying,
   orderHistoryLoading
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU', {
       hour: '2-digit',
@@ -102,7 +100,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         color: 'text-red-400',
         bgColor: 'bg-red-500/10',
         borderColor: 'border-red-500/30',
-        rowBg: 'bg-red-500/5 border-l-2 border-l-red-500'
+        rowBg: 'bg-red-950/30'
       },
       busy: { 
         icon: Phone, 
@@ -118,7 +116,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         color: 'text-orange-400',
         bgColor: 'bg-orange-500/10',
         borderColor: 'border-orange-500/30',
-        rowBg: 'bg-orange-500/5'
+        rowBg: 'bg-orange-950/20'
       }
     };
     return configs[status as keyof typeof configs] || configs.no_answer;
@@ -128,22 +126,17 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   const StatusIcon = statusConfig.icon;
   const duration = formatDuration(call.duration);
 
-  const rowClassName = cn(
-    "transition-all duration-200",
-    isMainRow ? "hover:bg-[#FFD700]/5" : "hover:bg-gray-700/20 bg-gray-800/20",
-    statusConfig.rowBg,
-    isHovered && "bg-[#FFD700]/10"
-  );
-
   return (
     <TableRow 
-      className={rowClassName}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={cn(
+        "border-b border-[#FFD700]/10",
+        isMainRow ? "hover:bg-[#1a1a2e]" : "hover:bg-[#1a1a2e]/50 bg-[#0f0f23]/50",
+        statusConfig.rowBg
+      )}
     >
-      {/* Колонка 1: Клиент (телефон + группа) */}
-      <TableCell className="font-mono">
-        <div className="flex items-center gap-2">
+      {/* Колонка 1: Клиент */}
+      <TableCell className="py-3 px-4">
+        <div className="flex items-center gap-3">
           {isMainRow ? (
             <>
               <div className={cn(
@@ -152,14 +145,17 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               )}>
                 <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
               </div>
-              <div className="min-w-0">
-                <div className="font-semibold text-[#FFD700] truncate">
+              <div>
+                <div className="font-semibold text-[#FFD700] font-mono">
                   {phoneClient}
                 </div>
                 {hasMultipleCalls && (
                   <button
-                    onClick={() => onToggleGroup(phoneClient)}
-                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#FFD700] transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleGroup(phoneClient);
+                    }}
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#FFD700] transition-colors mt-0.5"
                   >
                     <span>+{groupCalls.length - 1} звонков</span>
                     {isExpanded ? (
@@ -172,28 +168,28 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               </div>
             </>
           ) : (
-            <div className="flex items-center gap-2 pl-10">
-              <div className="w-0.5 h-6 bg-[#FFD700]/30 rounded" />
-              <StatusIcon className={cn("w-3 h-3", statusConfig.color)} />
-              <span className="text-gray-400 text-sm">{phoneClient}</span>
+            <div className="flex items-center gap-2 pl-8">
+              <div className="w-0.5 h-5 bg-[#FFD700]/30 rounded" />
+              <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
+              <span className="text-gray-400 text-sm font-mono">{phoneClient}</span>
             </div>
           )}
         </div>
       </TableCell>
 
-      {/* Колонка 2: Источник (Город + РК + Avito) */}
-      <TableCell>
-        <div className="flex flex-col gap-0.5">
+      {/* Колонка 2: Источник */}
+      <TableCell className="py-3 px-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-sm">
-            <MapPin className="w-3 h-3 text-gray-500 flex-shrink-0" />
-            <span className="text-white truncate">{call.city}</span>
+            <MapPin className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+            <span className="text-white">{call.city}</span>
             <span className="text-gray-600">•</span>
-            <span className="text-gray-400 truncate">{call.rk}</span>
+            <span className="text-gray-400">{call.rk}</span>
           </div>
           {call.avitoName && (
             <Badge 
               variant="outline" 
-              className="w-fit text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
+              className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
             >
               {call.avitoName}
             </Badge>
@@ -202,31 +198,31 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       </TableCell>
 
       {/* Колонка 3: Дата и время */}
-      <TableCell>
-        <div className="flex flex-col gap-0.5">
+      <TableCell className="py-3 px-4">
+        <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 text-sm">
-            <Clock className="w-3 h-3 text-gray-500" />
+            <Clock className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
             <span className="text-gray-400">{formatDate(call.dateCreate)}</span>
             <span className="font-medium text-white">{formatTime(call.dateCreate)}</span>
           </div>
           {duration && (
-            <span className="text-xs text-gray-500 font-mono pl-4">
+            <div className="text-xs text-gray-500 font-mono pl-5">
               Длительность: {duration}
-            </span>
+            </div>
           )}
         </div>
       </TableCell>
 
-      {/* Колонка 4: Оператор + Статус */}
-      <TableCell>
-        <div className="flex flex-col gap-1">
+      {/* Колонка 4: Оператор */}
+      <TableCell className="py-3 px-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-sm">
-            <User className="w-3 h-3 text-gray-500" />
-            <span className="text-white truncate">{call.operator.name}</span>
+            <User className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+            <span className="text-white">{call.operator.name}</span>
           </div>
           <Badge 
             variant="outline" 
-            className={cn("w-fit text-xs", statusConfig.borderColor, statusConfig.color)}
+            className={cn("text-xs", statusConfig.borderColor, statusConfig.color)}
           >
             {statusConfig.label}
           </Badge>
@@ -234,66 +230,64 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       </TableCell>
 
       {/* Колонка 5: Действия */}
-      <TableCell>
-        {isMainRow ? (
-          <div className="flex items-center gap-1.5">
-            {/* Запись */}
-            {call.recordingPath && (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onPlayRecording(call)}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    isPlaying 
-                      ? "text-[#FFD700] bg-[#FFD700]/20" 
-                      : "text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
-                  )}
-                  title="Прослушать"
-                >
-                  <Play className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDownloadRecording(call)}
-                  className="h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
-                  title="Скачать"
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-            
-            {/* Создать заказ */}
-            <Button
-              size="sm"
-              onClick={() => onCreateOrder(call, groupCalls)}
-              className="h-8 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-medium"
-            >
-              <Plus className="w-3.5 h-3.5 mr-1" />
-              Заказ
-            </Button>
-            
-            {/* История */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onLoadOrderHistory(call)}
-              disabled={orderHistoryLoading}
-              className="h-8 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-            >
-              {orderHistoryLoading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <History className="w-3.5 h-3.5" />
+      <TableCell className="py-3 px-4">
+        <div className="flex items-center justify-end gap-1">
+          {isMainRow ? (
+            <>
+              {call.recordingPath && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onPlayRecording(call)}
+                    className={cn(
+                      "h-8 w-8 p-0",
+                      isPlaying 
+                        ? "text-[#FFD700] bg-[#FFD700]/20" 
+                        : "text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                    )}
+                    title="Прослушать"
+                  >
+                    <Play className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDownloadRecording(call)}
+                    className="h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                    title="Скачать"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </>
               )}
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5 opacity-60">
-            {call.recordingPath && (
+              
+              <Button
+                size="sm"
+                onClick={() => onCreateOrder(call, groupCalls)}
+                className="h-8 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-medium px-3"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Заказ
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onLoadOrderHistory(call)}
+                disabled={orderHistoryLoading}
+                className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                title="История заказов"
+              >
+                {orderHistoryLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <History className="w-3.5 h-3.5" />
+                )}
+              </Button>
+            </>
+          ) : (
+            call.recordingPath && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -302,17 +296,10 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               >
                 <Play className="w-3.5 h-3.5" />
               </Button>
-            )}
-          </div>
-        )}
-      </TableCell>
-
-      {/* Hover Preview Tooltip */}
-      {isHovered && isMainRow && (
-        <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 z-50 pointer-events-none">
-          {/* Можно добавить tooltip с превью */}
+            )
+          )}
         </div>
-      )}
+      </TableCell>
     </TableRow>
   );
 }, (prevProps, nextProps) => {

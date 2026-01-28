@@ -246,15 +246,14 @@ export function CreateOrderModal({
       setPlayingCallId(callItem.id);
       setPlayingCall(callItem);
       
-      // Получаем URL для скачивания/воспроизведения записи
-      const response = await authApi.get(`/recordings/call/${callItem.id}/download`, {
-        responseType: 'blob'
-      });
+      // Получаем JSON с URL записи
+      const response = await authApi.get(`/recordings/call/${callItem.id}/download`);
       
-      // Создаём blob URL для воспроизведения
-      const blob = new Blob([response.data], { type: 'audio/mpeg' });
-      const blobUrl = URL.createObjectURL(blob);
-      setAudioUrl(blobUrl);
+      if (response.data.success && response.data.url) {
+        setAudioUrl(response.data.url);
+      } else {
+        throw new Error(response.data.message || 'Не удалось получить URL записи');
+      }
     } catch (error) {
       console.error('Error loading recording:', error);
       handleClosePlayer();
@@ -269,10 +268,6 @@ export function CreateOrderModal({
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
-    }
-    // Очищаем blob URL для предотвращения утечки памяти
-    if (audioUrl && audioUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(audioUrl);
     }
     setPlayingCallId(null);
     setPlayingCall(null);
@@ -639,8 +634,8 @@ export function CreateOrderModal({
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
-                            <SelectValue placeholder="Не указано" />
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                            <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
                           <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                             <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
@@ -659,8 +654,8 @@ export function CreateOrderModal({
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm [&>span]:text-gray-400 [&>span]:data-[state=open]:text-white">
-                            <SelectValue placeholder="Выберите город" />
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                            <SelectValue placeholder={<span className="text-gray-500">Выберите город</span>} />
                           </SelectTrigger>
                           <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                             {CITY_OPTIONS.map((option) => (
@@ -683,8 +678,8 @@ export function CreateOrderModal({
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
-                            <SelectValue placeholder="Не указано" />
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                            <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
                           <SelectContent className="bg-[#17212b] border-[#FFD700]/30 max-h-60">
                             <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
@@ -703,12 +698,12 @@ export function CreateOrderModal({
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm [&>span]:text-gray-500 data-[state=open]:[&>span]:text-white [&[data-state=closed]]:text-white">
-                            <SelectValue placeholder="Не указано" />
+                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                            <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
                           <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
                             {DIRECTION_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={option === 'Не указано' ? 'text-gray-400' : 'text-white'}>{option}</SelectItem>
+                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>

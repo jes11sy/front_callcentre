@@ -307,4 +307,24 @@ th:hover {
     background-size: 200px 100%;
     animation: shimmer 2s infinite;
   }
+
+  /* Анимация для loading-bar */
+  @keyframes loading-bar {
+    0% {
+      width: 0%;
+      margin-left: 0%;
+    }
+    50% {
+      width: 60%;
+      margin-left: 20%;
+    }
+    100% {
+      width: 0%;
+      margin-left: 100%;
+    }
+  }
+
+  .animate-loading-bar {
+    animation: loading-bar 1.5s ease-in-out infinite;
+  }
 }

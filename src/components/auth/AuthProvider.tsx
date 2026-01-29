@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { TokenRefresher } from './TokenRefresher';
-import { Loader2 } from 'lucide-react';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 import { authLogger } from '@/lib/logger';
 
 interface AuthProviderProps {
@@ -116,14 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Показываем loading для защищенных страниц до завершения проверки
   if (isLoading && !isPublicPage) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Проверка авторизации..." />;
   }
 
   return (

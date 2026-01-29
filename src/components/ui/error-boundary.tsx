@@ -137,16 +137,5 @@ export function EmptyState({ title, description, icon, action }: EmptyStateProps
   );
 }
 
-interface LoadingStateProps {
-  message?: string;
-  className?: string;
-}
-
-export function LoadingState({ message = "Загрузка...", className }: LoadingStateProps) {
-  return (
-    <div className={`flex flex-col items-center justify-center py-8 ${className || ''}`}>
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <p className="mt-4 text-sm text-muted-foreground">{message}</p>
-    </div>
-  );
-}
+// Re-export LoadingState из loading-screen для совместимости
+export { LoadingState } from './loading-screen';

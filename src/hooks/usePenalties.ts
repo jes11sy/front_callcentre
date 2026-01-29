@@ -19,9 +19,11 @@ export const usePenalties = () => {
       try {
         setIsLoading(true);
         
-        // Загружаем штрафы из cash с payment_purpose = 'Штраф'
+        // Загружаем штрафы напрямую с фильтром paymentPurpose на бэкенде
         const penaltiesResponse = await cashApi.getCashTransactions({
           name: 'приход',
+          paymentPurpose: 'Штраф',
+          limit: 500, // Достаточно для всех штрафов
         });
         
         // Загружаем уникальные города из filterOptions (без загрузки всех заказов)
@@ -30,9 +32,8 @@ export const usePenalties = () => {
         
         setCities(uniqueCities);
         
-        // Фильтруем только штрафы (где paymentPurpose = 'Штраф')
-        const penaltyData = (penaltiesResponse.data?.items || penaltiesResponse.data || [])
-          .filter((item: any) => item.paymentPurpose === 'Штраф')
+        // Маппим данные (фильтрация уже на бэкенде)
+        const penaltyData = (penaltiesResponse.data || [])
           .map((item: any) => ({
             id: item.id,
             city: item.city,

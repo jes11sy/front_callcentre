@@ -52,7 +52,7 @@ function PenaltiesContent() {
   }
 
   return (
-    <DashboardLayout variant={user?.role === 'admin' ? 'admin' : 'operator'}>
+    <DashboardLayout>
       <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen custom-scrollbar">
         <div className="w-full">
           <div className="space-y-4 w-full">

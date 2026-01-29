@@ -6,21 +6,13 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  variant?: 'operator' | 'admin';
-  requiredRole?: 'admin' | 'operator';
 }
 
-export function DashboardLayout({ 
-  children, 
-  variant = 'operator', 
-  requiredRole 
-}: DashboardLayoutProps) {
-  const allowedRoles: ('admin' | 'operator')[] = requiredRole ? [requiredRole] : ['admin', 'operator'];
-  
+export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <ProtectedRoute allowedRoles={allowedRoles}>
+    <ProtectedRoute>
       <div className="min-h-screen bg-[#0f0f23] flex flex-col">
-        <Header variant={variant} />
+        <Header />
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>

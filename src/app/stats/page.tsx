@@ -125,18 +125,6 @@ export default function StatsPage() {
     setStartDate(start.toISOString().split('T')[0]);
   }, []);
 
-  // Редирект админов на админскую страницу статистики
-  useEffect(() => {
-    if (user && user.role === 'admin') {
-      router.push('/admin/stats');
-    }
-  }, [user, router]);
-
-  // Не показываем контент для админов
-  if (user && user.role === 'admin') {
-    return null;
-  }
-
   if (error) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">

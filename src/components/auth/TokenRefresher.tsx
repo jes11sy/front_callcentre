@@ -16,7 +16,7 @@ export function TokenRefresher() {
   const { isAuthenticated, setUser, logout } = useAuthStore();
   const pathname = usePathname();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isLoginPage = pathname === '/login' || pathname === '/admin/login';
+  const isLoginPage = pathname === '/login';
 
   // 🔧 FIX: Сбрасываем состояние аутентификации при переходе на страницу логина
   // Это предотвращает циклические запросы когда zustand хранит устаревший isAuthenticated: true

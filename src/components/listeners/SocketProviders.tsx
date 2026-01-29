@@ -10,7 +10,7 @@ export function SocketProviders() {
   const pathname = usePathname();
 
   // 🔧 FIX: Не инициализируем сокеты на страницах логина
-  const isLoginPage = pathname === '/login' || pathname === '/admin/login';
+  const isLoginPage = pathname === '/login';
 
   if (isLoading || isLoginPage) {
     return null;

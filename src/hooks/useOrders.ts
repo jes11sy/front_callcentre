@@ -30,14 +30,6 @@ export const useOrders = () => {
   const [orderCalls, setOrderCalls] = useState<Call[]>([]);
   const [loadingCalls, setLoadingCalls] = useState(false);
 
-  // Редирект админов на админскую страницу заказов
-  useEffect(() => {
-    if (user && user.role === 'admin') {
-      router.push('/admin/orders');
-      return;
-    }
-  }, [user, router]);
-
   // Мемоизированные параметры запроса для оптимизации
   const queryParams = useMemo(() => ({
     page,

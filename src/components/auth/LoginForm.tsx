@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Eye, EyeOff, Loader2, User, Lock, ArrowRight } from 'lucide-react';
@@ -20,28 +20,31 @@ export function LoginForm() {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   
+  // Ref для предотвращения повторной проверки авторизации
+  const hasCheckedAuth = useRef(false);
+  
   const _router = useRouter(); // Оставляем для возможного использования
   const _authStore = useAuthStore(); // Сохраняем для возможного использования
 
-  // Проверяем авторизацию при загрузке
+  // Проверяем авторизацию при загрузке (ОДИН РАЗ)
   useEffect(() => {
+    // Предотвращаем повторную проверку
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+    
     const checkAuth = async () => {
       try {
         // 1. Проверяем активную сессию через cookies
         const isAuthenticated = await authApi.isAuthenticated();
         if (isAuthenticated) {
-          const user = await authApi.getUser();
-          const redirectPath = user?.role === 'admin' ? '/admin/telephony' : '/telephony';
-          window.location.href = redirectPath;
+          window.location.href = '/telephony';
           return;
         }
         
         // 2. Cookies не работают — пробуем восстановить через IndexedDB
         const restored = await authApi.restoreSessionFromIndexedDB();
         if (restored) {
-          const user = await authApi.getUser();
-          const redirectPath = user?.role === 'admin' ? '/admin/telephony' : '/telephony';
-          window.location.href = redirectPath;
+          window.location.href = '/telephony';
           return;
         }
       } catch {
@@ -88,11 +91,8 @@ export function LoginForm() {
       await authApi.saveTokens(response.data.accessToken || '', response.data.refreshToken || '', true);
       await authApi.saveUser(response.data.user, true);
       
-      // Redirect BEFORE updating store to avoid AuthProvider logout on login page
-      const redirectPath = response.data.user.role === 'admin' ? '/admin/telephony' : '/telephony';
-      
       // Use window.location for hard redirect to ensure cookies are sent
-      window.location.href = redirectPath;
+      window.location.href = '/telephony';
       
     } catch (error: unknown) {
       // Don't show error if session expired (already redirecting to login)

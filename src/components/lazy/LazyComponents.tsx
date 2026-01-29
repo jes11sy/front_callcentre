@@ -28,44 +28,6 @@ export const LazySoundSettingsModal = lazy(() =>
   }))
 );
 
-// ===== СТРАНИЦЫ АДМИНКИ =====
-export const LazyAdminStatsPage = lazy(() => 
-  import('@/app/admin/stats/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
-export const LazyAdminOrdersPage = lazy(() => 
-  import('@/app/admin/orders/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
-export const LazyAdminAvitoPage = lazy(() => 
-  import('@/app/admin/avito/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
-export const LazyAdminEmployeesPage = lazy(() => 
-  import('@/app/admin/employees/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
-export const LazyAdminTelephonyPage = lazy(() => 
-  import('@/app/admin/telephony/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
-
-export const LazyAdminMangoSettingsPage = lazy(() => 
-  import('@/app/admin/mango-settings/page').then(module => ({ 
-    default: module.default 
-  }))
-);
-
 // ===== ОСНОВНЫЕ СТРАНИЦЫ =====
 export const LazyOrdersPage = lazy(() => 
   import('@/app/orders/page').then(module => ({ 

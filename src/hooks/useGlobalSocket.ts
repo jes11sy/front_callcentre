@@ -268,7 +268,7 @@ export const useGlobalSocket = () => {
   useEffect(() => {
     // 🔧 FIX: Не подключаемся к сокету на страницах логина
     const isLoginPage = typeof window !== 'undefined' && 
-      (window.location.pathname === '/login' || window.location.pathname === '/admin/login');
+      window.location.pathname === '/login';
 
     if (!isAuthenticated || isLoginPage) {
       // Если пользователь не аутентифицирован или на странице логина, отключаем socket

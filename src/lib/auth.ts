@@ -211,10 +211,13 @@ export const authApi = {
     } catch (error) {
       console.error('[Auth] Logout error:', error);
     } finally {
-      // Очищаем только user из localStorage
+      // Очищаем все данные авторизации из storage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('user');
         sessionStorage.removeItem('user');
+        // Очищаем Zustand persist storage
+        sessionStorage.removeItem('auth-storage');
+        localStorage.removeItem('auth-storage');
       }
     }
   },

@@ -18,7 +18,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const initRef = useRef(false);
 
-  const isPublicPage = pathname === '/login' || pathname === '/admin/login';
+  const isPublicPage = pathname === '/login';
 
   // 🔧 FIX: При заходе на страницу логина - только сбрасываем loading
   // НЕ вызываем logout() здесь, так как это мешает редиректу после успешного логина

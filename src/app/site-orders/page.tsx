@@ -132,7 +132,7 @@ export default function SiteOrdersPage() {
 
   if (isLoading && !data) {
     return (
-      <DashboardLayout variant={user?.role === 'admin' ? 'admin' : 'operator'}>
+      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
@@ -145,7 +145,7 @@ export default function SiteOrdersPage() {
 
   if (error) {
     return (
-      <DashboardLayout variant={user?.role === 'admin' ? 'admin' : 'operator'}>
+      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -157,7 +157,7 @@ export default function SiteOrdersPage() {
   }
 
   return (
-    <DashboardLayout variant={user?.role === 'admin' ? 'admin' : 'operator'}>
+    <DashboardLayout>
       <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen">
         <div className="w-full">
           {/* Header */}

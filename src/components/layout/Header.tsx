@@ -24,31 +24,22 @@ import {
 } from '@/components/ui/navigation-menu';
 // Оптимизированные импорты иконок
 import { 
-  Phone, 
-  MessageSquare, 
   FileText, 
-  BarChart3, 
   User, 
   LogOut, 
   Settings,
   Menu,
   X,
-  Users,
   PhoneCall,
   TrendingUp,
   Wallet,
-  // Mail removed - not used
   Bell,
   BookOpen,
   AlertTriangle,
   Globe
 } from 'lucide-react';
 
-interface HeaderProps {
-  variant?: 'operator' | 'admin';
-}
-
-export function Header({ variant = 'operator' }: HeaderProps) {
+export function Header() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -66,7 +57,7 @@ export function Header({ variant = 'operator' }: HeaderProps) {
     }
   };
 
-  const operatorNavItems = [
+  const navItems = [
     { name: 'Телефония', href: '/telephony', icon: PhoneCall },
     // { name: 'Центр сообщений', href: '/messages', icon: MessageSquare }, // Временно скрыто
     { name: 'Заказы', href: '/orders', icon: FileText },
@@ -75,17 +66,6 @@ export function Header({ variant = 'operator' }: HeaderProps) {
     { name: 'Статистика', href: '/stats', icon: TrendingUp },
     { name: 'Справочник', href: '/reference', icon: BookOpen },
   ];
-
-
-  const adminNavItems = [
-    { name: 'Сотрудники', href: '/admin/employees', icon: Users },
-    { name: 'Авито', href: '/admin/avito', icon: MessageSquare },
-    { name: 'Телефония', href: '/admin/telephony', icon: Phone },
-    { name: 'Статистика', href: '/admin/stats', icon: BarChart3 },
-  ];
-
-  const navItems = variant === 'admin' ? adminNavItems : operatorNavItems;
-  const basePath = variant === 'admin' ? '/admin' : '';
 
   const isActive = (href: string) => pathname === href;
 
@@ -160,13 +140,13 @@ export function Header({ variant = 'operator' }: HeaderProps) {
                       {user?.name || user?.login}
                     </p>
                     <p className="text-xs leading-none text-[#F8F7F9]/80">
-                      {variant === 'admin' ? 'Администратор' : 'Оператор'}
+                      Оператор
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#FFD700]/30" />
                 <DropdownMenuItem asChild className="text-[#F8F7F9] hover:bg-[#FFD700]/20 focus:bg-[#FFD700]/20 hover:text-[#FFD700] focus:text-[#FFD700] transition-colors">
-                  <a href={`${basePath}/profile`} className="cursor-pointer">
+                  <a href="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4 text-[#FFD700]" />
                     <span>Профиль</span>
                   </a>
@@ -177,14 +157,12 @@ export function Header({ variant = 'operator' }: HeaderProps) {
                     <span>Настройки</span>
                   </a>
                 </DropdownMenuItem>
-                {variant === 'operator' && (
-                  <DropdownMenuItem asChild className="text-[#F8F7F9] hover:bg-[#FFD700]/20 focus:bg-[#FFD700]/20 hover:text-[#FFD700] focus:text-[#FFD700] transition-colors">
-                    <a href="/salary" className="cursor-pointer">
-                      <Wallet className="mr-2 h-4 w-4 text-[#FFD700]" />
-                      <span>Зарплата</span>
-                    </a>
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem asChild className="text-[#F8F7F9] hover:bg-[#FFD700]/20 focus:bg-[#FFD700]/20 hover:text-[#FFD700] focus:text-[#FFD700] transition-colors">
+                  <a href="/salary" className="cursor-pointer">
+                    <Wallet className="mr-2 h-4 w-4 text-[#FFD700]" />
+                    <span>Зарплата</span>
+                  </a>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-[#FFD700]/30" />
                 <DropdownMenuItem 
                   onClick={handleLogout}

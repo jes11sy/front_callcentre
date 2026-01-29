@@ -57,19 +57,6 @@ export default function TelephonyPage() {
     handleOrderCreated
   } = useTelephony();
 
-  // Редирект админов на админскую страницу телефонии
-  useEffect(() => {
-    if (user && user.role === 'admin') {
-      router.push('/admin/telephony');
-      return;
-    }
-  }, [user, router]);
-
-  // Не показываем контент для админов
-  if (user && user.role === 'admin') {
-    return null;
-  }
-
   // Показываем скелетон при загрузке (только для первой загрузки)
   if (loading && calls.length === 0) {
     return (

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Loader2, User, Lock, ArrowRight, Check } from 'lucide-react';
+import { Eye, EyeOff, Loader2, User, Lock, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,13 +15,44 @@ import { useAuthStore } from '@/store/authStore';
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   
   const _router = useRouter(); // Оставляем для возможного использования
   const _authStore = useAuthStore(); // Сохраняем для возможного использования
+
+  // Проверяем авторизацию при загрузке
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // 1. Проверяем активную сессию через cookies
+        const isAuthenticated = await authApi.isAuthenticated();
+        if (isAuthenticated) {
+          const user = await authApi.getUser();
+          const redirectPath = user?.role === 'admin' ? '/admin/telephony' : '/telephony';
+          window.location.href = redirectPath;
+          return;
+        }
+        
+        // 2. Cookies не работают — пробуем восстановить через IndexedDB
+        const restored = await authApi.restoreSessionFromIndexedDB();
+        if (restored) {
+          const user = await authApi.getUser();
+          const redirectPath = user?.role === 'admin' ? '/admin/telephony' : '/telephony';
+          window.location.href = redirectPath;
+          return;
+        }
+      } catch {
+        // Показываем форму логина
+      }
+      
+      setIsCheckingAuth(false);
+    };
+    
+    checkAuth();
+  }, []);
 
   const handleLogin = async () => {
     
@@ -48,15 +79,14 @@ export function LoginForm() {
       const loginData = {
         login,
         password,
-        rememberMe,
         role: 'operator' as const
       };
       
       const response = await authApi.login(loginData);
       
-      // Save tokens and user data securely with rememberMe preference
-      await authApi.saveTokens(response.data.accessToken, response.data.refreshToken, rememberMe);
-      await authApi.saveUser(response.data.user, rememberMe);
+      // Save user data (tokens in cookies + IndexedDB)
+      await authApi.saveTokens(response.data.accessToken || '', response.data.refreshToken || '', true);
+      await authApi.saveUser(response.data.user, true);
       
       // Redirect BEFORE updating store to avoid AuthProvider logout on login page
       const redirectPath = response.data.user.role === 'admin' ? '/admin/telephony' : '/telephony';
@@ -99,6 +129,18 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
+
+  // Показываем загрузку пока проверяем авторизацию
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
+          <p className="text-gray-400">Проверка авторизации...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center p-4 relative overflow-hidden">
@@ -162,24 +204,6 @@ export function LoginForm() {
                 )}
               </Button>
             </div>
-          </div>
-
-          {/* Remember Me Checkbox */}
-          <div className="flex items-center space-x-2">
-            <div 
-              className="h-4 w-4 border-2 border-[#FFD700] rounded bg-[#0f0f23] flex items-center justify-center cursor-pointer"
-              onClick={() => setRememberMe(!rememberMe)}
-            >
-              {rememberMe && (
-                <Check className="h-3 w-3 text-[#FFD700]" />
-              )}
-            </div>
-            <span 
-              className="text-sm text-gray-300 cursor-pointer"
-              onClick={() => setRememberMe(!rememberMe)}
-            >
-              Запомнить меня
-            </span>
           </div>
 
           {error && (

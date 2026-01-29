@@ -66,9 +66,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } catch (error: unknown) {
           // Проверяем тип ошибки - если это SESSION_EXPIRED, не логируем как ошибку
           if ((error as { isSessionExpired?: boolean })?.isSessionExpired) {
-            authLogger.log('Session expired, redirecting to login');
+            authLogger.log('Session expired, trying IndexedDB restore');
           } else {
-            authLogger.error('Auth check failed:', error);
+            authLogger.error('Auth check failed, trying IndexedDB restore:', error);
+          }
+          
+          // Пробуем восстановить сессию через IndexedDB
+          const restored = await authApi.restoreSessionFromIndexedDB();
+          
+          if (restored) {
+            authLogger.log('Session restored from IndexedDB');
+            // Получаем профиль после восстановления
+            try {
+              const profile = await authApi.getProfile();
+              if (profile.data) {
+                setUser(profile.data);
+                return; // Успешно восстановили
+              }
+            } catch {
+              // Ignore - go to login
+            }
           }
           
           // Очищаем локальные данные

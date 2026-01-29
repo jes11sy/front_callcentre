@@ -170,6 +170,7 @@ api.interceptors.response.use(
 export const authApi = {
   /**
    * 🍪 Login - токены устанавливаются сервером в httpOnly cookies
+   * Также сохраняем refresh token в IndexedDB как backup для iOS PWA
    */
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', {
@@ -177,6 +178,19 @@ export const authApi = {
       password: credentials.password,
       role: credentials.role
     });
+    
+    // Сохраняем refresh token в IndexedDB (backup для iOS PWA)
+    if (response.data?.success && response.data?.data?.refreshToken) {
+      try {
+        const { saveRefreshToken } = await import('./remember-me');
+        await saveRefreshToken(response.data.data.refreshToken);
+        authLogger.log('Refresh token saved to IndexedDB');
+      } catch (error) {
+        authLogger.error('Failed to save refresh token to IndexedDB:', error);
+        // Не прерываем логин
+      }
+    }
+    
     return response.data;
   },
 
@@ -184,6 +198,14 @@ export const authApi = {
    * 🍪 Logout - очищает httpOnly cookies на сервере
    */
   logout: async (): Promise<void> => {
+    // Очищаем refresh token из IndexedDB
+    try {
+      const { clearRefreshToken } = await import('./remember-me');
+      await clearRefreshToken();
+    } catch (error) {
+      authLogger.error('Failed to clear refresh token from IndexedDB:', error);
+    }
+    
     try {
       await api.post('/auth/logout', {}); // Пустой объект для POST запроса
     } catch (error) {
@@ -245,6 +267,56 @@ export const authApi = {
       await api.get('/auth/profile');
       return true;
     } catch {
+      return false;
+    }
+  },
+
+  /**
+   * 🔄 Восстановление сессии через refresh token из IndexedDB
+   * Используется когда cookies удалены (iOS ITP, PWA)
+   * @returns true если сессия восстановлена
+   */
+  restoreSessionFromIndexedDB: async (): Promise<boolean> => {
+    try {
+      const { getRefreshToken, saveRefreshToken, clearRefreshToken } = await import('./remember-me');
+      const refreshToken = await getRefreshToken();
+      
+      if (!refreshToken) {
+        authLogger.log('No refresh token in IndexedDB');
+        return false;
+      }
+      
+      authLogger.log('Found refresh token in IndexedDB, attempting to restore session');
+      
+      // Отправляем refresh token на сервер для получения новых cookies
+      // Используем refreshApi чтобы избежать интерцепторов
+      const response = await refreshApi.post('/auth/refresh', { refreshToken });
+      
+      if (response.data?.success) {
+        // Обновляем токен в IndexedDB если пришёл новый
+        if (response.data?.data?.refreshToken) {
+          await saveRefreshToken(response.data.data.refreshToken);
+        }
+        
+        authLogger.log('Session restored from IndexedDB token');
+        return true;
+      }
+      
+      return false;
+    } catch (error: unknown) {
+      // Токен невалиден — очищаем IndexedDB
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 401 || status === 403) {
+        authLogger.log('Refresh token from IndexedDB is invalid, clearing');
+        try {
+          const { clearRefreshToken } = await import('./remember-me');
+          await clearRefreshToken();
+        } catch {
+          // Ignore
+        }
+      }
+      
+      authLogger.error('Failed to restore session from IndexedDB:', error);
       return false;
     }
   },

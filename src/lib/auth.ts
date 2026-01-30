@@ -92,23 +92,21 @@ api.interceptors.request.use(async (config) => {
 let isRefreshing = false;
 let refreshSubscribers: Array<(token?: string) => void> = [];
 
+// ✅ FIX: Убраны редиректы из interceptor - редиректами занимается AuthProvider
+// Это унифицирует поведение с другими фронтами (frontend dir, front admin)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const requestUrl = error.config?.url || '';
     const originalRequest = error.config;
     
-    // Пропускаем обработку для страниц логина
+    // Пропускаем обработку для auth endpoints
     if (requestUrl.includes('/auth/login') || requestUrl.includes('/auth/refresh')) {
       return Promise.reject(error);
     }
     
     // Предотвращаем повторные попытки обновления токена
     if (originalRequest._retry) {
-      // Уже пытались обновить токен, но не получилось - редирект на логин
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
       const sessionError = new Error('SESSION_EXPIRED');
       (sessionError as any).isSessionExpired = true;
       return Promise.reject(sessionError);
@@ -121,17 +119,13 @@ api.interceptors.response.use(
         
         try {
           // Пробуем обновить токен через httpOnly cookies
-          // ⚠️ Используем refreshApi БЕЗ интерцепторов для избежания рекурсии
           const refreshResponse = await refreshApi.post('/auth/refresh', {});
           
-          // Проверяем что refresh успешен
           if (!refreshResponse.data?.success) {
             throw new Error('Refresh failed');
           }
           
           isRefreshing = false;
-          
-          // Уведомляем всех подписчиков
           refreshSubscribers.forEach(cb => cb());
           refreshSubscribers = [];
           
@@ -143,11 +137,7 @@ api.interceptors.response.use(
           refreshSubscribers.forEach(cb => cb());
           refreshSubscribers = [];
           
-          // Refresh failed - редиректим на логин только если мы не на странице логина
-          if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-            window.location.href = '/login';
-          }
-          // Throw special error to prevent showing error toast
+          // НЕ делаем редирект здесь - пусть AuthProvider решает
           const sessionError = new Error('SESSION_EXPIRED');
           (sessionError as any).isSessionExpired = true;
           return Promise.reject(sessionError);
@@ -264,11 +254,26 @@ export const authApi = {
 
   /**
    * 🍪 Is authenticated - проверяем через API
+   * ✅ FIX: Используем fetch напрямую БЕЗ axios interceptors
+   * Это предотвращает нежелательные редиректы при проверке на странице логина
    */
   isAuthenticated: async (): Promise<boolean> => {
     try {
-      await api.get('/auth/profile');
-      return true;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Use-Cookies': 'true',
+        },
+        credentials: 'include',
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      return response.ok;
     } catch {
       return false;
     }

@@ -55,47 +55,69 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return;
         }
 
-        // Проверяем валидность сессии через API
+        // ✅ FIX: Унифицировано с frontend dir - проверяем через isAuthenticated + getProfile
         try {
-          const profile = await authApi.getProfile();
-          if (profile.data) {
-            setUser(profile.data);
-          } else {
-            throw new Error('No profile data');
-          }
-        } catch (error: unknown) {
-          // Проверяем тип ошибки - если это SESSION_EXPIRED, не логируем как ошибку
-          if ((error as { isSessionExpired?: boolean })?.isSessionExpired) {
-            authLogger.log('Session expired, trying IndexedDB restore');
-          } else {
-            authLogger.error('Auth check failed, trying IndexedDB restore:', error);
+          // Сначала проверяем валидность сессии (без interceptors)
+          const isAuth = await authApi.isAuthenticated();
+          
+          if (isAuth) {
+            // Сессия валидна - получаем профиль
+            const profile = await authApi.getProfile();
+            if (profile.data) {
+              setUser(profile.data);
+              return;
+            }
           }
           
-          // Пробуем восстановить сессию через IndexedDB
+          // Сессия невалидна - пробуем восстановить через IndexedDB
+          authLogger.log('Session invalid, trying IndexedDB restore');
           const restored = await authApi.restoreSessionFromIndexedDB();
           
           if (restored) {
             authLogger.log('Session restored from IndexedDB');
-            // Получаем профиль после восстановления
-            try {
-              const profile = await authApi.getProfile();
-              if (profile.data) {
-                setUser(profile.data);
-                return; // Успешно восстановили
-              }
-            } catch {
-              // Ignore - go to login
+            const profile = await authApi.getProfile();
+            if (profile.data) {
+              setUser(profile.data);
+              return;
             }
           }
           
-          // Очищаем локальные данные
+          // Не удалось восстановить - редирект на логин
+          authLogger.log('Could not restore session, redirecting to login');
           if (typeof window !== 'undefined') {
             localStorage.removeItem('user');
             sessionStorage.removeItem('user');
           }
           setUser(null);
           
-          // Редирект только если еще не на странице логина
+          if (!window.location.pathname.includes('/login')) {
+            router.replace('/login');
+          }
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          
+          // Проверяем сетевые ошибки - НЕ редиректим
+          if (errorMessage.includes('network') || 
+              errorMessage.includes('сеть') || 
+              errorMessage.includes('timeout') ||
+              errorMessage.includes('aborted')) {
+            authLogger.warn('Network error during auth check, keeping user');
+            // Оставляем сохранённого пользователя, не редиректим
+            if (storedUser) {
+              setUser(storedUser);
+            }
+            return;
+          }
+          
+          authLogger.error('Auth check failed:', errorMessage);
+          
+          // Очищаем и редиректим
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
+          }
+          setUser(null);
+          
           if (!window.location.pathname.includes('/login')) {
             router.replace('/login');
           }

@@ -1,25 +1,56 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { authLogger } from '@/lib/logger';
+import axios from 'axios';
 
-const CHECK_INTERVAL = 5 * 60 * 1000; // 🍪 Проверяем каждые 5 минут (реже, так как сервер сам обновляет)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
+
+// 🔄 Silent Refresh - обновляем токен каждые 4 минуты (токен живёт 15 минут)
+const REFRESH_INTERVAL = 4 * 60 * 1000; // 4 минуты
+// Считаем пользователя неактивным после 10 минут без действий
+const INACTIVITY_THRESHOLD = 10 * 60 * 1000; // 10 минут
 
 /**
- * 🍪 TokenRefresher - проверяет валидность httpOnly cookies сессии
- * Не обновляет токены вручную - это делает axios interceptor
+ * 🍪 TokenRefresher - проактивно обновляет httpOnly cookies сессию
+ * ✅ FIX: Добавлен Silent Refresh аналогично frontend dir
+ * Обновляет токены каждые 4 минуты если пользователь активен
  */
 export function TokenRefresher() {
   const { isAuthenticated, setUser, logout } = useAuthStore();
   const pathname = usePathname();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
   const isLoginPage = pathname === '/login';
 
+  // 🔧 Отслеживание активности пользователя
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    // Отслеживаем клики, нажатия клавиш и скролл
+    document.addEventListener('click', updateActivity, { passive: true });
+    document.addEventListener('keypress', updateActivity, { passive: true });
+    document.addEventListener('scroll', updateActivity, { passive: true });
+    document.addEventListener('touchstart', updateActivity, { passive: true });
+    document.addEventListener('mousemove', updateActivity, { passive: true });
+
+    return () => {
+      document.removeEventListener('click', updateActivity);
+      document.removeEventListener('keypress', updateActivity);
+      document.removeEventListener('scroll', updateActivity);
+      document.removeEventListener('touchstart', updateActivity);
+      document.removeEventListener('mousemove', updateActivity);
+    };
+  }, []);
+
   // 🔧 FIX: Сбрасываем состояние аутентификации при переходе на страницу логина
-  // Это предотвращает циклические запросы когда zustand хранит устаревший isAuthenticated: true
   useEffect(() => {
     if (isLoginPage && isAuthenticated) {
       authLogger.log('On login page with stale auth state - clearing');
@@ -27,10 +58,56 @@ export function TokenRefresher() {
     }
   }, [isLoginPage, isAuthenticated, logout]);
 
+  // 🔄 Функция обновления токена через /auth/refresh
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/refresh`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Use-Cookies': 'true',
+          },
+          timeout: 10000,
+        }
+      );
+
+      if (response.data?.success) {
+        authLogger.log('🔄 Silent refresh successful');
+        
+        // Обновляем refresh token в IndexedDB если пришёл новый
+        if (response.data?.data?.refreshToken) {
+          try {
+            const { saveRefreshToken } = await import('@/lib/remember-me');
+            await saveRefreshToken(response.data.data.refreshToken);
+          } catch (e) {
+            // Ignore IndexedDB errors
+          }
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      
+      // 401/403 - токен невалиден, не логируем как ошибку
+      if (status === 401 || status === 403) {
+        authLogger.log('Silent refresh failed - token expired or invalid');
+        return false;
+      }
+      
+      // Сетевые ошибки - просто пропускаем, попробуем позже
+      authLogger.warn('Silent refresh network error, will retry');
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
-    // 🍪 Пропускаем на страницах логина - ПРОВЕРКА В НАЧАЛЕ
+    // 🍪 Пропускаем на страницах логина
     if (isLoginPage) {
-      // Очищаем интервал если есть
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -39,7 +116,6 @@ export function TokenRefresher() {
     }
 
     if (!isAuthenticated) {
-      // Очищаем интервал если пользователь вышел
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -47,45 +123,53 @@ export function TokenRefresher() {
       return;
     }
 
-    // 🍪 Функция проверки валидности сессии
-    const checkSession = async () => {
-      // Дополнительная проверка - не запускаем если на странице логина
-      if (window.location.pathname.includes('/login')) {
-        authLogger.log('Skipping session check - on login page');
+    // 🔄 Silent Refresh - обновляем токен каждые 4 минуты если пользователь активен
+    const silentRefresh = async () => {
+      // Проверяем что не на странице логина
+      if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) {
+        authLogger.log('Skipping silent refresh - on login page');
         return;
       }
+
+      // Проверяем активность пользователя
+      const inactiveTime = Date.now() - lastActivityRef.current;
+      const isActive = inactiveTime < INACTIVITY_THRESHOLD;
+
+      if (!isActive) {
+        authLogger.log('Skipping silent refresh - user inactive for', Math.round(inactiveTime / 1000), 'seconds');
+        return;
+      }
+
+      authLogger.log('🔄 Running silent refresh...');
       
-      try {
-        authLogger.log('Checking session validity...');
-        
-        // Проверяем валидность сессии через profile запрос
-        const profile = await authApi.getProfile();
-        
-        // Обновляем данные пользователя если они изменились
-        if (profile.data) {
-          setUser(profile.data);
+      const success = await refreshToken();
+      
+      if (success) {
+        // Опционально: обновляем профиль после refresh
+        try {
+          const profile = await authApi.getProfile();
+          if (profile.data) {
+            setUser(profile.data);
+          }
+        } catch (e) {
+          // Игнорируем ошибки получения профиля
         }
-        
-        authLogger.log('Session is valid');
-      } catch (error) {
-        authLogger.error('Session check failed:', error);
-        // Не выкидываем пользователя - interceptor в api.ts сам обработает 401
       }
     };
 
-    // Проверяем сессию сразу при монтировании (с небольшой задержкой для стабильности)
-    const initialCheckTimeout = setTimeout(checkSession, 100);
+    // Запускаем первый refresh через 1 минуту (даём время на инициализацию)
+    const initialTimeout = setTimeout(silentRefresh, 60 * 1000);
 
-    // Запускаем периодическую проверку
-    intervalRef.current = setInterval(checkSession, CHECK_INTERVAL);
+    // Запускаем периодический refresh каждые 4 минуты
+    intervalRef.current = setInterval(silentRefresh, REFRESH_INTERVAL);
 
     return () => {
-      clearTimeout(initialCheckTimeout);
+      clearTimeout(initialTimeout);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isAuthenticated, setUser, isLoginPage]);
+  }, [isAuthenticated, setUser, isLoginPage, refreshToken]);
 
   return null; // Компонент не рендерит ничего
 }

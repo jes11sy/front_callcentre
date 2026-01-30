@@ -9,7 +9,7 @@ export const useCities = () => {
   return useQuery({
     queryKey: ['cities'],
     queryFn: async () => {
-      const response = await api.get('/cities');
+      const response = await api.get('/phones/cities');
       return response.data;
     },
     staleTime: 30 * 60 * 1000, // 30 минут
@@ -24,7 +24,7 @@ export const useRKs = () => {
   return useQuery({
     queryKey: ['rks'],
     queryFn: async () => {
-      const response = await api.get('/rks');
+      const response = await api.get('/phones/campaigns');
       return response.data;
     },
     staleTime: 30 * 60 * 1000, // 30 минут

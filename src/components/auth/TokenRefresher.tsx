@@ -11,44 +11,17 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.
 
 // 🔄 Silent Refresh - обновляем токен каждые 4 минуты (токен живёт 15 минут)
 const REFRESH_INTERVAL = 4 * 60 * 1000; // 4 минуты
-// Считаем пользователя неактивным после 10 минут без действий
-const INACTIVITY_THRESHOLD = 10 * 60 * 1000; // 10 минут
 
 /**
  * 🍪 TokenRefresher - проактивно обновляет httpOnly cookies сессию
  * ✅ FIX: Добавлен Silent Refresh аналогично frontend dir
- * Обновляет токены каждые 4 минуты если пользователь активен
+ * Обновляет токены каждые 4 минуты пока страница открыта
  */
 export function TokenRefresher() {
   const { isAuthenticated, setUser, logout } = useAuthStore();
   const pathname = usePathname();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastActivityRef = useRef<number>(Date.now());
   const isLoginPage = pathname === '/login';
-
-  // 🔧 Отслеживание активности пользователя
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const updateActivity = () => {
-      lastActivityRef.current = Date.now();
-    };
-
-    // Отслеживаем клики, нажатия клавиш и скролл
-    document.addEventListener('click', updateActivity, { passive: true });
-    document.addEventListener('keypress', updateActivity, { passive: true });
-    document.addEventListener('scroll', updateActivity, { passive: true });
-    document.addEventListener('touchstart', updateActivity, { passive: true });
-    document.addEventListener('mousemove', updateActivity, { passive: true });
-
-    return () => {
-      document.removeEventListener('click', updateActivity);
-      document.removeEventListener('keypress', updateActivity);
-      document.removeEventListener('scroll', updateActivity);
-      document.removeEventListener('touchstart', updateActivity);
-      document.removeEventListener('mousemove', updateActivity);
-    };
-  }, []);
 
   // 🔧 FIX: Сбрасываем состояние аутентификации при переходе на страницу логина
   useEffect(() => {
@@ -123,20 +96,11 @@ export function TokenRefresher() {
       return;
     }
 
-    // 🔄 Silent Refresh - обновляем токен каждые 4 минуты если пользователь активен
+    // 🔄 Silent Refresh - обновляем токен каждые 4 минуты пока страница открыта
     const silentRefresh = async () => {
       // Проверяем что не на странице логина
       if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) {
         authLogger.log('Skipping silent refresh - on login page');
-        return;
-      }
-
-      // Проверяем активность пользователя
-      const inactiveTime = Date.now() - lastActivityRef.current;
-      const isActive = inactiveTime < INACTIVITY_THRESHOLD;
-
-      if (!isActive) {
-        authLogger.log('Skipping silent refresh - user inactive for', Math.round(inactiveTime / 1000), 'seconds');
         return;
       }
 
@@ -151,7 +115,7 @@ export function TokenRefresher() {
           if (profile.data) {
             setUser(profile.data);
           }
-        } catch (e) {
+        } catch {
           // Игнорируем ошибки получения профиля
         }
       }

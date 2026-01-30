@@ -149,12 +149,9 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // ✅ ИСПРАВЛЕНО: Убраны 'unsafe-eval' и 'unsafe-inline' для защиты от XSS
-              // Next.js 15+ не требует unsafe директив для нормальной работы
-              // TODO: Внедрить nonce-based CSP для полного удаления unsafe-inline
-              isDevelopment
-                ? "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval' 'unsafe-inline'" // unsafe-eval для hot reload в dev
-                : "script-src 'self' 'unsafe-inline'", // ⚠️ Next.js требует только unsafe-inline для работы
+              // Scripts: unsafe-eval и unsafe-inline для Next.js и некоторых библиотек
+              // TODO: Внедрить nonce-based CSP для улучшения безопасности
+              "script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval' 'unsafe-inline'",
               // Для Tailwind и CSS-in-JS в production нужен hash или nonce
               // Временно разрешаем unsafe-inline только для стилей (lower risk чем для scripts)
               // TODO: Migrate to CSS-in-JS with nonce support

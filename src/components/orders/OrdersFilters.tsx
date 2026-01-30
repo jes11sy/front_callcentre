@@ -22,8 +22,7 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
       {/* Кнопка фильтров */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        variant="outline"
-        className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700] min-w-[140px]"
+        className="bg-[#0f0f23] border border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]/50 min-w-[140px]"
       >
         <Filter className="mr-2 h-4 w-4" />
         Фильтры

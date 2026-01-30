@@ -10,6 +10,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
+  // Отключаем source maps в production для безопасности
+  productionBrowserSourceMaps: false,
+  
   typescript: {
     // Отключаем проверки TypeScript во время сборки для Docker
     ignoreBuildErrors: true,
@@ -186,11 +189,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
-          },
-          // ✅ ДОБАВЛЕНО: Дополнительные security headers
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
           },
           {
             key: 'Strict-Transport-Security',

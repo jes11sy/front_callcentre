@@ -29,6 +29,7 @@ ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
 # Следующая строка отключает telemetry во время сборки.
 # https://nextjs.org/docs/advanced-features/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
 RUN npm run build
 

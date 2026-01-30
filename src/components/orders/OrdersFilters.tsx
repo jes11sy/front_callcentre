@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { OrderFilters } from '@/types/orders';
 import { STATUS_OPTIONS } from '@/constants/orders';
+import { useCities } from '@/hooks/useStaticData';
 
 interface OrdersFiltersProps {
   filters: OrderFilters;
@@ -16,6 +17,10 @@ interface OrdersFiltersProps {
 
 export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: citiesData } = useCities();
+  
+  // Получаем список городов из ответа API
+  const cities: string[] = citiesData?.data || citiesData || [];
 
   return (
     <div className="w-full">
@@ -71,13 +76,28 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
             
             <div className="space-y-2">
               <Label htmlFor="city" className="text-gray-300">Город</Label>
-              <Input
-                id="city"
-                placeholder="Фильтр по городу"
-                value={filters.city}
-                onChange={(e) => onFilterChange('city', e.target.value)}
-                className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
-              />
+              <Select value={filters.city || 'all'} onValueChange={(value) => onFilterChange('city', value === 'all' ? '' : value)}>
+                <SelectTrigger className="bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white">
+                  <SelectValue placeholder="Все города" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#17212b] border-[#FFD700]/30 [&>*]:text-white">
+                  <SelectItem 
+                    value="all" 
+                    className="!text-white focus:bg-[#FFD700]/20 focus:!text-white data-[highlighted]:bg-[#FFD700]/20 data-[highlighted]:text-white"
+                  >
+                    Все города
+                  </SelectItem>
+                  {cities.map((city: string) => (
+                    <SelectItem 
+                      key={city} 
+                      value={city} 
+                      className="!text-white focus:bg-[#FFD700]/20 focus:!text-white data-[highlighted]:bg-[#FFD700]/20 data-[highlighted]:text-white"
+                    >
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">

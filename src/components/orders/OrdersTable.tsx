@@ -94,18 +94,8 @@ const OrdersTableComponent = ({
             </Button>
           </div>
           <EmptyState
-            title={search ? 'Заказы не найдены' : 'Нет заказов'}
-            description={search ? 'Попробуйте изменить параметры поиска' : 'Создайте свой первый заказ'}
-            icon={<ShoppingCart className="h-12 w-12 text-gray-300" />}
-            action={!search ? (
-              <Button 
-                onClick={onCreateOrder}
-                className="mt-4"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Создать первый заказ
-              </Button>
-            ) : undefined}
+            title="Заказы не найдены"
+            description="Попробуйте изменить параметры фильтрации"
           />
         </CardContent>
       </Card>

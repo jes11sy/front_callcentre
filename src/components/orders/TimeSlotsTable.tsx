@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Clock, MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Order } from '@/types/orders';
 import { TIME_SLOTS, EQUIPMENT_TYPE_COLORS } from '@/constants/orders';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -185,57 +185,47 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
       <CardHeader className="pb-2">
-        {/* Заголовок с навигацией по датам */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2 text-[#FFD700]">
-            <Clock className="h-5 w-5" />
-            <span className="text-lg font-semibold">Активные заявки</span>
-          </div>
+        {/* Навигация по датам */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={goToPrevDay}
+            className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            title="Предыдущий день"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
           
-          {/* Навигация по датам */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goToPrevDay}
-              className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
-              title="Предыдущий день"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            
-            <div className="flex items-center gap-2">
-              <button
-                onClick={goToToday}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  isSelectedToday
-                    ? 'bg-[#FFD700] text-[#02111B]'
-                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
-                }`}
-              >
-                <Calendar className="h-3.5 w-3.5" />
-                {formatDateLabel(selectedDate)}
-              </button>
-              
-              <input
-                type="date"
-                value={selectedDate.toISOString().split('T')[0]}
-                onChange={(e) => {
-                  const newDate = new Date(e.target.value);
-                  if (!isNaN(newDate.getTime())) {
-                    onDateChange(newDate);
-                  }
-                }}
-                className="px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
-              />
-            </div>
-            
-            <button
-              onClick={goToNextDay}
-              className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
-              title="Следующий день"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
+          <button
+            onClick={goToToday}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              isSelectedToday
+                ? 'bg-[#FFD700] text-[#02111B]'
+                : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+            }`}
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            {formatDateLabel(selectedDate)}
+          </button>
+          
+          <input
+            type="date"
+            value={selectedDate.toISOString().split('T')[0]}
+            onChange={(e) => {
+              const newDate = new Date(e.target.value);
+              if (!isNaN(newDate.getTime())) {
+                onDateChange(newDate);
+              }
+            }}
+            className="px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+          />
+          
+          <button
+            onClick={goToNextDay}
+            className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            title="Следующий день"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
         
         {/* Табы городов */}

@@ -44,10 +44,11 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   const [activeCity, setActiveCity] = useState<string>('all');
 
   // Хелпер для проверки совпадения даты
+  // Сравниваем даты в локальном времени (orderDate конвертируется из UTC в локальное)
   const isSameDate = useCallback((orderDate: Date, targetDate: Date): boolean => {
-    return orderDate.getUTCDate() === targetDate.getDate() && 
-           orderDate.getUTCMonth() === targetDate.getMonth() && 
-           orderDate.getUTCFullYear() === targetDate.getFullYear();
+    return orderDate.getDate() === targetDate.getDate() && 
+           orderDate.getMonth() === targetDate.getMonth() && 
+           orderDate.getFullYear() === targetDate.getFullYear();
   }, []);
 
   // Фильтруем заказы только с активными статусами
@@ -131,8 +132,8 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
       // Проверяем, что заявка на выбранную дату
       if (!isSameDate(orderTime, selectedDate)) return false;
       
-      const orderHour = orderTime.getUTCHours();
-      const orderMinute = orderTime.getUTCMinutes();
+      const orderHour = orderTime.getHours();
+      const orderMinute = orderTime.getMinutes();
       return orderHour === hour && orderMinute === minute;
     }).length;
   }, [filteredOrders, selectedDate, isSameDate]);

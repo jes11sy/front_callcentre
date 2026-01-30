@@ -210,9 +210,10 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           
           <input
             type="date"
-            value={selectedDate.toISOString().split('T')[0]}
+            value={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`}
             onChange={(e) => {
-              const newDate = new Date(e.target.value);
+              const [year, month, day] = e.target.value.split('-').map(Number);
+              const newDate = new Date(year, month - 1, day);
               if (!isNaN(newDate.getTime())) {
                 onDateChange(newDate);
               }

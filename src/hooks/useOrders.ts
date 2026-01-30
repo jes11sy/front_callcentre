@@ -6,6 +6,14 @@ import { Order, OrdersResponse, OrderFilters, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
 import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 
+// Хелпер для форматирования даты в YYYY-MM-DD (локальное время)
+const formatDateForApi = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const useOrders = () => {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -31,7 +39,11 @@ export const useOrders = () => {
   const [loadingCalls, setLoadingCalls] = useState(false);
   
   // Выбранная дата для временной шкалы
-  const [timelineDate, setTimelineDate] = useState<Date>(new Date());
+  // Инициализируем как начало сегодняшнего дня в локальном времени
+  const [timelineDate, setTimelineDate] = useState<Date>(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  });
 
   // Мемоизированные параметры запроса для оптимизации
   const queryParams = useMemo(() => ({
@@ -75,14 +87,14 @@ export const useOrders = () => {
 
   // 🕐 Получение всех активных заказов для временной шкалы (на выбранную дату)
   const { data: timelineOrdersData } = useQuery<OrdersResponse>({
-    queryKey: ['orders-timeline', user?.id, user?.role, timelineDate.toISOString().split('T')[0]],
+    queryKey: ['orders-timeline', user?.id, user?.role, formatDateForApi(timelineDate)],
     queryFn: async () => {
       if (!user) {
         throw new Error('Данные пользователя не загружены');
       }
       
-      // Получаем выбранную дату в формате YYYY-MM-DD
-      const dateFrom = timelineDate.toISOString().split('T')[0];
+      // Получаем выбранную дату в формате YYYY-MM-DD (локальное время)
+      const dateFrom = formatDateForApi(timelineDate);
       const dateTo = dateFrom;
       
       const params = new URLSearchParams({

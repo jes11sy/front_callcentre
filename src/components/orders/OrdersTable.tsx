@@ -54,7 +54,7 @@ const OrdersTableComponent = ({
   if (isLoading) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="px-6 pb-6">
+        <CardContent className="px-4 pb-4 pt-4">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1">
               {filtersComponent}
@@ -80,7 +80,7 @@ const OrdersTableComponent = ({
   if (ordersData?.orders?.length === 0) {
     return (
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="px-6 pb-6">
+        <CardContent className="px-4 pb-4 pt-4">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1">
               {filtersComponent}
@@ -114,7 +114,7 @@ const OrdersTableComponent = ({
 
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1">
             {filtersComponent}

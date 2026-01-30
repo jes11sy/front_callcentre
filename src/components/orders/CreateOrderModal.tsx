@@ -131,7 +131,7 @@ export default function CreateOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg">
+      <div className="bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[90vw] max-w-2xl max-h-[85vh] flex flex-col rounded-lg">
         <div className="flex items-center justify-between p-4 border-b border-[#FFD700]/30">
           <h2 className="text-xl font-bold flex items-center gap-2 text-[#FFD700]">
             <Plus className="h-5 w-5 text-[#FFD700]" />

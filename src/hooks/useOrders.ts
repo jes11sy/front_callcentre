@@ -29,6 +29,9 @@ export const useOrders = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [orderCalls, setOrderCalls] = useState<Call[]>([]);
   const [loadingCalls, setLoadingCalls] = useState(false);
+  
+  // Выбранная дата для временной шкалы
+  const [timelineDate, setTimelineDate] = useState<Date>(new Date());
 
   // Мемоизированные параметры запроса для оптимизации
   const queryParams = useMemo(() => ({
@@ -70,22 +73,21 @@ export const useOrders = () => {
     enabled: !!user
   });
 
-  // 🕐 Получение всех активных заказов на сегодня для временной шкалы
-  const { data: todayOrdersData } = useQuery<OrdersResponse>({
-    queryKey: ['orders-today', user?.id, user?.role],
+  // 🕐 Получение всех активных заказов для временной шкалы (на выбранную дату)
+  const { data: timelineOrdersData } = useQuery<OrdersResponse>({
+    queryKey: ['orders-timeline', user?.id, user?.role, timelineDate.toISOString().split('T')[0]],
     queryFn: async () => {
       if (!user) {
         throw new Error('Данные пользователя не загружены');
       }
       
-      // Получаем сегодняшнюю дату в формате YYYY-MM-DD
-      const today = new Date();
-      const dateFrom = today.toISOString().split('T')[0];
+      // Получаем выбранную дату в формате YYYY-MM-DD
+      const dateFrom = timelineDate.toISOString().split('T')[0];
       const dateTo = dateFrom;
       
       const params = new URLSearchParams({
         page: '1',
-        limit: '300', // Все заказы на сегодня
+        limit: '300', // Все заказы на выбранную дату
         dateType: 'meeting',
         dateFrom,
         dateTo,
@@ -284,7 +286,8 @@ export const useOrders = () => {
     orderCalls,
     loadingCalls,
     ordersData,
-    todayOrders: todayOrdersData?.orders || [],
+    timelineOrders: timelineOrdersData?.orders || [],
+    timelineDate,
     isLoading,
     error,
     user,
@@ -311,6 +314,7 @@ export const useOrders = () => {
     setIsEditModalOpen,
     setIsViewModalOpen,
     setIsCreateModalOpen,
-    setOrderCalls
+    setOrderCalls,
+    setTimelineDate
   };
 };

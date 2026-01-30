@@ -31,7 +31,8 @@ function OrdersContent() {
     orderCalls,
     loadingCalls,
     ordersData,
-    todayOrders,
+    timelineOrders,
+    timelineDate,
     isLoading,
     error,
     user,
@@ -51,8 +52,14 @@ function OrdersContent() {
     setIsViewModalOpen: _setIsViewModalOpen,
     setIsCreateModalOpen,
     setOrderCalls: _setOrderCalls,
-    openOrderById
+    openOrderById,
+    setTimelineDate
   } = useOrders();
+
+  // Обработчик клика на город во временной шкале
+  const handleCityClick = React.useCallback((city: string) => {
+    updateFilter('city', city);
+  }, [updateFilter]);
 
   // Открываем заказ по ID из URL (только один раз)
   useEffect(() => {
@@ -94,7 +101,12 @@ function OrdersContent() {
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}
-            <TimeSlotsTable orders={todayOrders} />
+            <TimeSlotsTable 
+              orders={timelineOrders} 
+              selectedDate={timelineDate}
+              onDateChange={setTimelineDate}
+              onCityClick={handleCityClick}
+            />
 
             {/* Orders Table с встроенными фильтрами */}
             <OrdersTable

@@ -1,61 +1,85 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Clock, MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Order } from '@/types/orders';
 import { TIME_SLOTS, EQUIPMENT_TYPE_COLORS } from '@/constants/orders';
 import React, { useCallback, useMemo, useState } from 'react';
 
 interface TimeSlotsTableProps {
   orders: Order[];
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
+  onCityClick?: (city: string) => void;
 }
 
 // Статусы, которые учитываются во временной шкале
 const ACTIVE_STATUSES = ['Ожидает', 'Принял', 'В пути'];
 
-const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
+// Хелпер для форматирования даты
+const formatDateLabel = (date: Date): string => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const isToday = date.getDate() === today.getDate() && 
+                  date.getMonth() === today.getMonth() && 
+                  date.getFullYear() === today.getFullYear();
+  
+  const isTomorrow = date.getDate() === tomorrow.getDate() && 
+                     date.getMonth() === tomorrow.getMonth() && 
+                     date.getFullYear() === tomorrow.getFullYear();
+  
+  if (isToday) return 'Сегодня';
+  if (isTomorrow) return 'Завтра';
+  
+  return date.toLocaleDateString('ru-RU', { 
+    day: 'numeric', 
+    month: 'long',
+    weekday: 'short'
+  });
+};
+
+const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityClick }: TimeSlotsTableProps) => {
   const [activeCity, setActiveCity] = useState<string>('all');
+
+  // Хелпер для проверки совпадения даты
+  const isSameDate = useCallback((orderDate: Date, targetDate: Date): boolean => {
+    return orderDate.getUTCDate() === targetDate.getDate() && 
+           orderDate.getUTCMonth() === targetDate.getMonth() && 
+           orderDate.getUTCFullYear() === targetDate.getFullYear();
+  }, []);
 
   // Фильтруем заказы только с активными статусами
   const activeOrders = useMemo(() => {
     return orders.filter(order => ACTIVE_STATUSES.includes(order.statusOrder));
   }, [orders]);
 
-  // Получаем уникальные города из заказов на сегодня
+  // Получаем уникальные города из заказов на выбранную дату
   const cities = useMemo(() => {
-    const today = new Date();
     const citySet = new Set<string>();
     
     activeOrders.forEach(order => {
       if (!order.dateMeeting || !order.city) return;
       const orderTime = new Date(order.dateMeeting);
       
-      const isToday = orderTime.getUTCDate() === today.getDate() && 
-                     orderTime.getUTCMonth() === today.getMonth() && 
-                     orderTime.getUTCFullYear() === today.getFullYear();
-      
-      if (isToday) {
+      if (isSameDate(orderTime, selectedDate)) {
         citySet.add(order.city);
       }
     });
     
     return Array.from(citySet).sort();
-  }, [activeOrders]);
+  }, [activeOrders, selectedDate, isSameDate]);
 
-  // Подсчёт заказов на сегодня по городам
+  // Подсчёт заказов на выбранную дату по городам
   const cityCounts = useMemo(() => {
-    const today = new Date();
     const counts: Record<string, number> = { all: 0 };
     
     activeOrders.forEach(order => {
       if (!order.dateMeeting) return;
       const orderTime = new Date(order.dateMeeting);
       
-      const isToday = orderTime.getUTCDate() === today.getDate() && 
-                     orderTime.getUTCMonth() === today.getMonth() && 
-                     orderTime.getUTCFullYear() === today.getFullYear();
-      
-      if (isToday) {
+      if (isSameDate(orderTime, selectedDate)) {
         counts.all = (counts.all || 0) + 1;
         if (order.city) {
           counts[order.city] = (counts[order.city] || 0) + 1;
@@ -64,7 +88,33 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
     });
     
     return counts;
-  }, [activeOrders]);
+  }, [activeOrders, selectedDate, isSameDate]);
+
+  // Обработчик клика на город
+  const handleCityClick = useCallback((city: string) => {
+    setActiveCity(city);
+    if (onCityClick) {
+      // Передаем пустую строку для "Все города" чтобы сбросить фильтр
+      onCityClick(city === 'all' ? '' : city);
+    }
+  }, [onCityClick]);
+
+  // Переключение даты
+  const goToPrevDay = useCallback(() => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    onDateChange(newDate);
+  }, [selectedDate, onDateChange]);
+
+  const goToNextDay = useCallback(() => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    onDateChange(newDate);
+  }, [selectedDate, onDateChange]);
+
+  const goToToday = useCallback(() => {
+    onDateChange(new Date());
+  }, [onDateChange]);
 
   // Фильтрованные заказы по выбранному городу
   const filteredOrders = useMemo(() => {
@@ -77,35 +127,25 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
     return filteredOrders.filter(order => {
       if (!order.dateMeeting || order.typeEquipment !== typeEquipment) return false;
       const orderTime = new Date(order.dateMeeting);
-      const today = new Date();
       
-      // Проверяем, что заявка на сегодня (используем UTC для корректного сравнения)
-      const isToday = orderTime.getUTCDate() === today.getDate() && 
-                     orderTime.getUTCMonth() === today.getMonth() && 
-                     orderTime.getUTCFullYear() === today.getFullYear();
-      
-      if (!isToday) return false;
+      // Проверяем, что заявка на выбранную дату
+      if (!isSameDate(orderTime, selectedDate)) return false;
       
       const orderHour = orderTime.getUTCHours();
       const orderMinute = orderTime.getUTCMinutes();
       return orderHour === hour && orderMinute === minute;
     }).length;
-  }, [filteredOrders]);
+  }, [filteredOrders, selectedDate, isSameDate]);
 
   // Подсчёт итогов по типу техники
   const getEquipmentTotal = useCallback((typeEquipment: string) => {
-    const today = new Date();
     return filteredOrders.filter(order => {
       if (!order.dateMeeting || order.typeEquipment !== typeEquipment) return false;
       const orderTime = new Date(order.dateMeeting);
       
-      const isToday = orderTime.getUTCDate() === today.getDate() && 
-                     orderTime.getUTCMonth() === today.getMonth() && 
-                     orderTime.getUTCFullYear() === today.getFullYear();
-      
-      return isToday;
+      return isSameDate(orderTime, selectedDate);
     }).length;
-  }, [filteredOrders]);
+  }, [filteredOrders, selectedDate, isSameDate]);
 
   // Мемоизированная функция рендера строки временных слотов
   const renderTimeSlotRow = useCallback((typeEquipment: string, label: string, colorClass: string) => {
@@ -134,18 +174,74 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
     );
   }, [getOrdersForTimeSlot, getEquipmentTotal]);
 
+  // Проверка, является ли выбранная дата сегодняшней
+  const isSelectedToday = useMemo(() => {
+    const today = new Date();
+    return selectedDate.getDate() === today.getDate() && 
+           selectedDate.getMonth() === today.getMonth() && 
+           selectedDate.getFullYear() === today.getFullYear();
+  }, [selectedDate]);
+
   return (
     <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-[#FFD700]">
-          <Clock className="h-5 w-5" />
-          Активные заявки на сегодня
-        </CardTitle>
+        {/* Заголовок с навигацией по датам */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2 text-[#FFD700]">
+            <Clock className="h-5 w-5" />
+            <span className="text-lg font-semibold">Активные заявки</span>
+          </div>
+          
+          {/* Навигация по датам */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goToPrevDay}
+              className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              title="Предыдущий день"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={goToToday}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  isSelectedToday
+                    ? 'bg-[#FFD700] text-[#02111B]'
+                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                }`}
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                {formatDateLabel(selectedDate)}
+              </button>
+              
+              <input
+                type="date"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value);
+                  if (!isNaN(newDate.getTime())) {
+                    onDateChange(newDate);
+                  }
+                }}
+                className="px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+              />
+            </div>
+            
+            <button
+              onClick={goToNextDay}
+              className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              title="Следующий день"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
         
         {/* Табы городов */}
         <div className="flex flex-wrap gap-2 mt-3">
           <button
-            onClick={() => setActiveCity('all')}
+            onClick={() => handleCityClick('all')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               activeCity === 'all'
                 ? 'bg-[#FFD700] text-[#02111B]'
@@ -164,7 +260,7 @@ const TimeSlotsTableComponent = ({ orders }: TimeSlotsTableProps) => {
           {cities.map(city => (
             <button
               key={city}
-              onClick={() => setActiveCity(city)}
+              onClick={() => handleCityClick(city)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 activeCity === city
                   ? 'bg-[#FFD700] text-[#02111B]'

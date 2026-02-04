@@ -171,7 +171,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
     if (direction === 'callback') {
       return {
         icon: PhoneOutgoing,
-        label: 'Callback',
+        label: 'От мастера',
         color: 'text-purple-400',
         bgColor: 'bg-purple-500/10',
         borderColor: 'border-purple-500/30',
@@ -192,9 +192,10 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   const directionConfig = getDirectionConfig(call.callDirection);
   const DirectionIcon = directionConfig.icon;
   const isOutgoing = isSipCall(call.phoneClient);
+  const isCallback = call.callDirection === 'callback';
   
-  // Для исходящих звонков показываем phoneAts (номер клиента), для входящих — phoneClient
-  const displayPhone = isOutgoing 
+  // Для исходящих/callback звонков показываем phoneAts (номер клиента), для входящих — phoneClient
+  const displayPhone = (isOutgoing || isCallback)
     ? formatPhoneNumber(call.phoneAts) 
     : formatPhoneNumber(call.phoneClient);
 
@@ -213,16 +214,28 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             <>
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                isOutgoing ? directionConfig.bgColor : statusConfig.bgColor
+                isCallback ? directionConfig.bgColor : isOutgoing ? directionConfig.bgColor : statusConfig.bgColor
               )}>
-                {isOutgoing ? (
+                {isCallback ? (
+                  <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
+                ) : isOutgoing ? (
                   <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
                 ) : (
                   <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
                 )}
               </div>
               <div>
-                {isOutgoing ? (
+                {isCallback ? (
+                  // Callback - звонок от мастера клиенту
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-purple-400 font-mono">
+                      {displayPhone}
+                    </span>
+                    <span className="text-xs text-purple-400/70">
+                      Мастер → Клиент {call.masterId && `(ID: ${call.masterId})`}
+                    </span>
+                  </div>
+                ) : isOutgoing ? (
                   // Исходящий звонок - показываем номер клиента (куда звонили)
                   <div className="flex flex-col">
                     <span className="font-semibold text-blue-400 font-mono">
@@ -259,16 +272,17 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           ) : (
             <div className="flex items-center gap-2 pl-8">
               <div className="w-0.5 h-5 bg-[#FFD700]/30 rounded" />
-              {isOutgoing ? (
+              {isCallback || isOutgoing ? (
                 <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
               ) : (
                 <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
               )}
               <span className={cn(
                 "text-sm font-mono",
-                isOutgoing ? "text-blue-400" : "text-gray-400"
+                isCallback ? "text-purple-400" : isOutgoing ? "text-blue-400" : "text-gray-400"
               )}>
                 {displayPhone}
+                {isCallback && <span className="text-xs ml-1 text-purple-400/60">(от мастера)</span>}
               </span>
             </div>
           )}

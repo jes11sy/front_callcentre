@@ -525,7 +525,7 @@ export function CreateOrderModal({
                                       : 'bg-emerald-500/10 text-emerald-400'
                                 }`}>
                                   {isOutgoing ? <PhoneOutgoing className="h-2.5 w-2.5" /> : <PhoneIncoming className="h-2.5 w-2.5" />}
-                                  {isCallback ? 'Callback' : isOutgoing ? 'Исход.' : 'Вход.'}
+                                  {isCallback ? 'От мастера' : isOutgoing ? 'Исход.' : 'Вход.'}
                                 </span>
                               </div>
                               {/* Статус */}
@@ -926,7 +926,7 @@ export function CreateOrderModal({
                         ? 'text-blue-400' 
                         : 'text-emerald-400'
                   }>
-                    {playingCall.callDirection === 'callback' ? 'Callback' : playingCall.callDirection === 'outbound' ? 'Исход.' : 'Вход.'}
+                    {playingCall.callDirection === 'callback' ? 'От мастера' : playingCall.callDirection === 'outbound' ? 'Исход.' : 'Вход.'}
                   </span>
                 </div>
               </div>

@@ -88,9 +88,51 @@ api.interceptors.request.use(async (config) => {
 });
 
 // 🍪 Response interceptor - автоматическое обновление токена при 401
-// Флаг для предотвращения бесконечных циклов
-let isRefreshing = false;
-let refreshSubscribers: Array<(token?: string) => void> = [];
+// ✅ FIX: Mutex для предотвращения race condition при параллельных refresh запросах
+let refreshPromise: Promise<boolean> | null = null;
+let refreshSubscribers: Array<(success: boolean) => void> = [];
+
+/**
+ * Выполняет refresh токена с mutex защитой
+ * Если refresh уже выполняется - возвращает тот же Promise
+ */
+const doRefreshWithMutex = async (): Promise<boolean> => {
+  // Если refresh уже выполняется - ждём его результат
+  if (refreshPromise) {
+    authLogger.log('[Auth] Refresh already in progress, waiting...');
+    return refreshPromise;
+  }
+  
+  // Создаём новый Promise для refresh
+  refreshPromise = (async () => {
+    try {
+      authLogger.log('[Auth] Starting token refresh');
+      const refreshResponse = await refreshApi.post('/auth/refresh', {});
+      
+      if (!refreshResponse.data?.success) {
+        authLogger.warn('[Auth] Refresh response not successful');
+        return false;
+      }
+      
+      authLogger.log('[Auth] Token refresh successful');
+      return true;
+    } catch (error) {
+      authLogger.error('[Auth] Token refresh failed:', error);
+      return false;
+    }
+  })();
+  
+  try {
+    const result = await refreshPromise;
+    // Оповещаем подписчиков о результате
+    refreshSubscribers.forEach(cb => cb(result));
+    refreshSubscribers = [];
+    return result;
+  } finally {
+    // Сбрасываем Promise после завершения
+    refreshPromise = null;
+  }
+};
 
 // ✅ FIX: Убраны редиректы из interceptor - редиректами занимается AuthProvider
 // Это унифицирует поведение с другими фронтами (frontend dir, front admin)
@@ -114,42 +156,34 @@ api.interceptors.response.use(
     
     // Обрабатываем 401 ошибки (токен истек или отсутствует)
     if (error.response?.status === 401) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        
-        try {
-          // Пробуем обновить токен через httpOnly cookies
-          const refreshResponse = await refreshApi.post('/auth/refresh', {});
-          
-          if (!refreshResponse.data?.success) {
-            throw new Error('Refresh failed');
-          }
-          
-          isRefreshing = false;
-          refreshSubscribers.forEach(cb => cb());
-          refreshSubscribers = [];
-          
-          // Повторяем исходный запрос с обновленными cookies
-          originalRequest._retry = true;
-          return api.request(originalRequest);
-        } catch (refreshError) {
-          isRefreshing = false;
-          refreshSubscribers.forEach(cb => cb());
-          refreshSubscribers = [];
-          
-          // НЕ делаем редирект здесь - пусть AuthProvider решает
-          const sessionError = new Error('SESSION_EXPIRED');
-          (sessionError as any).isSessionExpired = true;
-          return Promise.reject(sessionError);
-        }
-      } else {
-        // Refresh уже идет - подписываемся на завершение
+      // Если refresh уже идёт - подписываемся на завершение
+      if (refreshPromise) {
         return new Promise((resolve, reject) => {
-          refreshSubscribers.push(() => {
-            originalRequest._retry = true;
-            api.request(originalRequest).then(resolve).catch(reject);
+          refreshSubscribers.push((success) => {
+            if (success) {
+              originalRequest._retry = true;
+              api.request(originalRequest).then(resolve).catch(reject);
+            } else {
+              const sessionError = new Error('SESSION_EXPIRED');
+              (sessionError as any).isSessionExpired = true;
+              reject(sessionError);
+            }
           });
         });
+      }
+      
+      // Выполняем refresh с mutex защитой
+      const refreshSuccess = await doRefreshWithMutex();
+      
+      if (refreshSuccess) {
+        // Повторяем исходный запрос с обновленными cookies
+        originalRequest._retry = true;
+        return api.request(originalRequest);
+      } else {
+        // НЕ делаем редирект здесь - пусть AuthProvider решает
+        const sessionError = new Error('SESSION_EXPIRED');
+        (sessionError as any).isSessionExpired = true;
+        return Promise.reject(sessionError);
       }
     }
     return Promise.reject(error);

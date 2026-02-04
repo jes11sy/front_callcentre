@@ -5,12 +5,13 @@ export interface Call {
   avitoName?: string;
   phoneClient: string;
   phoneAts: string;
-  dateCreate: string;
+  createdAt: string;
   status: 'answered' | 'missed' | 'busy' | 'no_answer';
-  /** Направление звонка: incoming - входящий, outgoing - исходящий */
-  callDirection?: 'incoming' | 'outgoing';
+  /** Направление звонка: inbound - входящий, outbound - исходящий, callback - обратный звонок */
+  callDirection: 'inbound' | 'outbound' | 'callback';
+  /** ID мастера для callback-звонков */
+  masterId?: number | null;
   recordingPath?: string;
-  recordingEmailSent?: boolean;
   recordingProcessedAt?: string;
   // Поля от Mango Office
   callId?: string;

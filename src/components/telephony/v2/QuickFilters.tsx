@@ -178,10 +178,10 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                <SelectItem value="dateCreate-desc" className="text-white focus:bg-[#FFD700]/20">
+                <SelectItem value="createdAt-desc" className="text-white focus:bg-[#FFD700]/20">
                   Дата (новые)
                 </SelectItem>
-                <SelectItem value="dateCreate-asc" className="text-white focus:bg-[#FFD700]/20">
+                <SelectItem value="createdAt-asc" className="text-white focus:bg-[#FFD700]/20">
                   Дата (старые)
                 </SelectItem>
                 <SelectItem value="city-asc" className="text-white focus:bg-[#FFD700]/20">

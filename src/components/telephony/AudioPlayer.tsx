@@ -27,13 +27,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const hasRecording = !!call.recordingPath;
 
   if (!hasRecording) {
-    if (call.recordingEmailSent) {
-      return (
-        <Badge variant="outline" className="text-xs">
-          Ожидается
-        </Badge>
-      );
-    }
     return <span className="text-muted-foreground">—</span>;
   }
 

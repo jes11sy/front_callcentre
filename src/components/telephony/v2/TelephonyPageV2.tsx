@@ -135,7 +135,7 @@ export const TelephonyPageV2: React.FC<TelephonyPageV2Props> = ({
             case 'answered':
               return latestCall.status === 'answered';
             case 'today':
-              const callDate = new Date(latestCall.dateCreate);
+              const callDate = new Date(latestCall.createdAt);
               callDate.setHours(0, 0, 0, 0);
               return callDate.getTime() === today.getTime();
             default:

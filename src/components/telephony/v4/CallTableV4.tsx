@@ -116,7 +116,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
       missed: calls.filter(c => c.status === 'missed').length,
       answered: calls.filter(c => c.status === 'answered').length,
       today: calls.filter(c => {
-        const callDate = new Date(c.dateCreate);
+        const callDate = new Date(c.createdAt);
         callDate.setHours(0, 0, 0, 0);
         return callDate.getTime() === today.getTime();
       }).length
@@ -149,7 +149,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
       filtered = Object.fromEntries(
         Object.entries(filtered).filter(([_, groupCalls]) => {
           const latestCall = groupCalls[0];
-          const callDate = new Date(latestCall.dateCreate);
+          const callDate = new Date(latestCall.createdAt);
           
           switch (activeFilter) {
             case 'missed':
@@ -244,11 +244,11 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   </TableHead>
                   <TableHead className="w-[18%] py-3 px-4">
                     <button 
-                      onClick={() => onSort('dateCreate')}
+                      onClick={() => onSort('createdAt')}
                       className="flex items-center text-white font-medium hover:text-[#FFD700] transition-colors"
                     >
                       Дата и время
-                      <SortIcon field="dateCreate" />
+                      <SortIcon field="createdAt" />
                     </button>
                   </TableHead>
                   <TableHead className="w-[20%] py-3 px-4">

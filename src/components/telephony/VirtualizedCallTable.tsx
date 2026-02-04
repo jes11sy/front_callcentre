@@ -134,7 +134,7 @@ const GroupHeader = React.memo(({
       <TableCell className="font-mono text-white">{latestCall.phoneAts}</TableCell>
       
       <TableCell className="text-white">
-        {formatDate(latestCall.dateCreate)}
+        {formatDate(latestCall.createdAt)}
       </TableCell>
       
       <TableCell className="text-white">{latestCall.operator.name}</TableCell>
@@ -371,9 +371,9 @@ export const VirtualizedCallTable: React.FC<VirtualizedCallTableProps> = ({
             <TableHead className="text-white">Куда звонил</TableHead>
             <TableHead 
               className="cursor-pointer hover:bg-[#FFD700]/10 text-white"
-              onClick={() => onSort('dateCreate')}
+              onClick={() => onSort('createdAt')}
             >
-              Дата звонка {sortBy === 'dateCreate' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Дата звонка {sortBy === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead className="text-white">Оператор</TableHead>
             <TableHead className="text-white">Статус</TableHead>

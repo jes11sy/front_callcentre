@@ -20,7 +20,7 @@ export const useCallsFilters = () => {
   // States
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [sortBy, setSortBy] = useState('dateCreate');
+  const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
   const [limit, setLimit] = useState(10); // 10 групп на страницу по умолчанию

@@ -406,7 +406,7 @@ const CallPlayer = ({
         <div className="flex items-center gap-3">
           <span className="text-sm text-white font-medium">Звонок #{call.id}</span>
           <span className="text-xs text-gray-500">
-            {new Date(call.dateCreate).toLocaleString('ru-RU')}
+            {new Date(call.createdAt).toLocaleString('ru-RU')}
           </span>
         </div>
         {!isCurrentCall && (

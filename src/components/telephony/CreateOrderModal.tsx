@@ -60,10 +60,11 @@ interface Call {
   avitoName?: string;
   phoneClient: string;
   phoneAts: string;
-  dateCreate: string;
+  createdAt: string;
   duration?: number;
   status: 'answered' | 'missed' | 'busy' | 'no_answer';
-  callDirection?: 'incoming' | 'outgoing';
+  callDirection: 'inbound' | 'outbound' | 'callback';
+  masterId?: number | null;
   recordingPath?: string;
   operator?: {
     id: number;
@@ -502,7 +503,8 @@ export function CreateOrderModal({
                       </div>
                     ) : (
                       callHistory.map((c) => {
-                        const isOutgoing = c.callDirection === 'outgoing' || c.phoneClient?.toLowerCase().includes('sip:');
+                        const isOutgoing = c.callDirection === 'outbound' || c.callDirection === 'callback';
+                        const isCallback = c.callDirection === 'callback';
                         const isCurrentCall = c.id === call?.id;
                         
                         return (
@@ -513,15 +515,17 @@ export function CreateOrderModal({
                             {/* Строка 1: Дата/время + Направление + Статус */}
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className="text-gray-300 font-medium">{formatDate(c.dateCreate)}</span>
+                                <span className="text-gray-300 font-medium">{formatDate(c.createdAt)}</span>
                                 {/* Направление */}
                                 <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
-                                  isOutgoing 
-                                    ? 'bg-blue-500/10 text-blue-400' 
-                                    : 'bg-emerald-500/10 text-emerald-400'
+                                  isCallback
+                                    ? 'bg-purple-500/10 text-purple-400'
+                                    : isOutgoing 
+                                      ? 'bg-blue-500/10 text-blue-400' 
+                                      : 'bg-emerald-500/10 text-emerald-400'
                                 }`}>
                                   {isOutgoing ? <PhoneOutgoing className="h-2.5 w-2.5" /> : <PhoneIncoming className="h-2.5 w-2.5" />}
-                                  {isOutgoing ? 'Исход.' : 'Вход.'}
+                                  {isCallback ? 'Callback' : isOutgoing ? 'Исход.' : 'Вход.'}
                                 </span>
                               </div>
                               {/* Статус */}
@@ -913,10 +917,16 @@ export function CreateOrderModal({
                   {playingCall.operator?.name || 'Оператор'}
                 </div>
                 <div className="text-xs text-gray-400 flex items-center gap-1.5 truncate">
-                  <span>{formatDate(playingCall.dateCreate)}</span>
+                  <span>{formatDate(playingCall.createdAt)}</span>
                   <span className="text-gray-600">•</span>
-                  <span className={playingCall.callDirection === 'outgoing' ? 'text-blue-400' : 'text-emerald-400'}>
-                    {playingCall.callDirection === 'outgoing' ? 'Исход.' : 'Вход.'}
+                  <span className={
+                    playingCall.callDirection === 'callback' 
+                      ? 'text-purple-400' 
+                      : playingCall.callDirection === 'outbound' 
+                        ? 'text-blue-400' 
+                        : 'text-emerald-400'
+                  }>
+                    {playingCall.callDirection === 'callback' ? 'Callback' : playingCall.callDirection === 'outbound' ? 'Исход.' : 'Вход.'}
                   </span>
                 </div>
               </div>

@@ -81,8 +81,8 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
               <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                <SelectItem value="dateCreate-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (новые)</SelectItem>
-                <SelectItem value="dateCreate-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (старые)</SelectItem>
+                <SelectItem value="createdAt-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (новые)</SelectItem>
+                <SelectItem value="createdAt-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (старые)</SelectItem>
                 <SelectItem value="city-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Город (А-Я)</SelectItem>
                 <SelectItem value="city-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Город (Я-А)</SelectItem>
                 <SelectItem value="rk-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">РК (А-Я)</SelectItem>

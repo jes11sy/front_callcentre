@@ -56,7 +56,7 @@ export const useTelephony = () => {
     const basicParams = new URLSearchParams({
       page: '1',
       limit: '10',
-      sortBy: 'dateCreate',
+      sortBy: 'createdAt',
       sortOrder: 'desc'
     });
     

@@ -155,9 +155,9 @@ export const CallCard: React.FC<CallCardProps> = ({
       <div className="flex items-center gap-3 mb-3 text-sm">
         <div className="flex items-center gap-1.5 text-gray-400">
           <Clock className="w-3.5 h-3.5" />
-          <span>{formatDate(call.dateCreate)}</span>
+          <span>{formatDate(call.createdAt)}</span>
           <span className="text-gray-600">•</span>
-          <span className="font-medium text-white">{formatTime(call.dateCreate)}</span>
+          <span className="font-medium text-white">{formatTime(call.createdAt)}</span>
         </div>
         
         <Badge 

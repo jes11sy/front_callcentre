@@ -169,9 +169,9 @@ export const CallTable: React.FC<CallTableProps> = ({
             <TableHead className="text-white">Куда звонил</TableHead>
             <TableHead 
               className="cursor-pointer text-white"
-              onClick={() => onSort('dateCreate')}
+              onClick={() => onSort('createdAt')}
             >
-              Дата звонка {sortBy === 'dateCreate' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Дата звонка {sortBy === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead className="text-white">Оператор</TableHead>
             <TableHead className="text-white">Статус</TableHead>

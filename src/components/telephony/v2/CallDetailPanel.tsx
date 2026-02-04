@@ -201,7 +201,7 @@ export const CallDetailPanel: React.FC<CallDetailPanelProps> = ({
             <DetailRow 
               icon={Calendar} 
               label="Дата" 
-              value={formatDateTime(call.dateCreate)} 
+              value={formatDateTime(call.createdAt)} 
             />
             <DetailRow 
               icon={Clock} 
@@ -283,7 +283,7 @@ export const CallDetailPanel: React.FC<CallDetailPanelProps> = ({
                       <GroupStatusIcon className={cn("w-4 h-4", groupStatusConfig.color)} />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm text-white">
-                          {formatTime(groupCall.dateCreate)}
+                          {formatTime(groupCall.createdAt)}
                         </div>
                         <div className="text-xs text-gray-400">
                           {groupCall.operator.name}

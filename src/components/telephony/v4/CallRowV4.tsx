@@ -158,14 +158,23 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   };
 
   // Конфигурация направления звонка
-  const getDirectionConfig = (direction?: 'incoming' | 'outgoing') => {
-    if (direction === 'outgoing') {
+  const getDirectionConfig = (direction: 'inbound' | 'outbound' | 'callback') => {
+    if (direction === 'outbound') {
       return {
         icon: PhoneOutgoing,
         label: 'Исходящий',
         color: 'text-blue-400',
         bgColor: 'bg-blue-500/10',
         borderColor: 'border-blue-500/30',
+      };
+    }
+    if (direction === 'callback') {
+      return {
+        icon: PhoneOutgoing,
+        label: 'Callback',
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-500/10',
+        borderColor: 'border-purple-500/30',
       };
     }
     return {
@@ -297,8 +306,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 text-sm">
             <Clock className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-            <span className="text-gray-400">{formatDate(call.dateCreate)}</span>
-            <span className="font-medium text-white">{formatTime(call.dateCreate)}</span>
+            <span className="text-gray-400">{formatDate(call.createdAt)}</span>
+            <span className="font-medium text-white">{formatTime(call.createdAt)}</span>
           </div>
           {duration && (
             <div className="text-xs text-gray-500 font-mono pl-5">

@@ -122,7 +122,7 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
       <TableCell className="font-mono text-white">{call.phoneAts}</TableCell>
       
       <TableCell className={isMainRow ? "text-white" : "text-sm text-gray-300"}>
-        {formatDate(call.dateCreate)}
+        {formatDate(call.createdAt)}
       </TableCell>
       
       <TableCell className="text-white">{call.operator.name}</TableCell>

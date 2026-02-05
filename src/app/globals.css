@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Myriad Pro для V2 дизайна */
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MyriadPro-Regular.woff2') format('woff2'),
+       url('/fonts/MyriadPro-Regular.woff') format('woff'),
+       url('/fonts/MyriadPro-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MyriadPro-Semibold.woff2') format('woff2'),
+       url('/fonts/MyriadPro-Semibold.woff') format('woff'),
+       url('/fonts/MyriadPro-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MyriadPro-Bold.woff2') format('woff2'),
+       url('/fonts/MyriadPro-Bold.woff') format('woff'),
+       url('/fonts/MyriadPro-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

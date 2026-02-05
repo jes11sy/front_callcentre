@@ -153,11 +153,14 @@ export function LoginForm() {
   // Показываем загрузку пока проверяем авторизацию
   if (isCheckingAuth) {
     return (
-      <div className={`min-h-screen flex items-center justify-center relative ${
-        version === 'v1' 
-          ? 'bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e]' 
-          : 'bg-[#F3F3EE]'
-      }`}>
+      <div 
+        className={`min-h-screen flex items-center justify-center relative ${
+          version === 'v1' 
+            ? 'bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e]' 
+            : 'bg-[#F3F3EE]'
+        }`}
+        style={version === 'v2' ? { fontFamily: "'Myriad Pro', sans-serif" } : undefined}
+      >
         <VersionToggle />
         <div className="text-center">
           <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${version === 'v1' ? 'text-[#FFD700]' : 'text-gray-800'}`} />
@@ -170,7 +173,7 @@ export function LoginForm() {
   // ============ V2 DESIGN ============
   if (version === 'v2') {
     return (
-      <div className="min-h-screen bg-[#F3F3EE] flex items-center justify-center p-4 relative">
+      <div className="min-h-screen bg-[#F3F3EE] flex items-center justify-center p-4 relative" style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
         <VersionToggle />
 
         {/* Login Card V2 */}

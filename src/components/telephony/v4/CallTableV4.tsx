@@ -371,7 +371,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   }}
                   disabled={loading}
                 >
-                  <SelectTrigger className="w-16 h-8 bg-white border-gray-200">
+                  <SelectTrigger className="w-16 h-8 bg-white border-gray-200 text-gray-700">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-gray-200">
@@ -397,6 +397,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   showPrevNext={true}
                   maxVisiblePages={5}
                   disabled={loading}
+                  variant="v2"
                 />
               )}
             </div>

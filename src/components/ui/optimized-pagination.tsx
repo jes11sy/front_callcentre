@@ -12,6 +12,7 @@ interface PaginationProps {
   maxVisiblePages?: number;
   className?: string;
   disabled?: boolean;
+  variant?: 'v1' | 'v2';
 }
 
 export function OptimizedPagination({
@@ -22,8 +23,10 @@ export function OptimizedPagination({
   showPrevNext = true,
   maxVisiblePages = 5,
   className,
-  disabled = false
+  disabled = false,
+  variant = 'v1'
 }: PaginationProps) {
+  const isV2 = variant === 'v2';
   const visiblePages = useMemo(() => {
     if (totalPages <= maxVisiblePages) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -74,7 +77,12 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(1)}
           disabled={disabled}
-          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          className={cn(
+            "h-8 w-8 p-0",
+            isV2 
+              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          )}
         >
           1
         </Button>
@@ -83,7 +91,7 @@ export function OptimizedPagination({
       {/* Start ellipsis */}
       {showStartEllipsis && (
         <div className="flex items-center justify-center h-8 w-8">
-          <MoreHorizontal className="h-4 w-4 text-gray-400" />
+          <MoreHorizontal className={cn("h-4 w-4", isV2 ? "text-gray-400" : "text-gray-400")} />
         </div>
       )}
 
@@ -94,7 +102,12 @@ export function OptimizedPagination({
           size="sm"
           onClick={handlePrevClick}
           disabled={disabled || currentPage === 1}
-          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700] disabled:opacity-50"
+          className={cn(
+            "h-8 w-8 p-0 disabled:opacity-50",
+            isV2 
+              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          )}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -110,9 +123,15 @@ export function OptimizedPagination({
           disabled={disabled}
           className={cn(
             "h-8 w-8 p-0",
-            page === currentPage 
-              ? "bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700] border-[#FFD700]" 
-              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+            isV2 ? (
+              page === currentPage 
+                ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] border-[#FEC004]" 
+                : "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+            ) : (
+              page === currentPage 
+                ? "bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700] border-[#FFD700]" 
+                : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+            )
           )}
         >
           {page}
@@ -126,7 +145,12 @@ export function OptimizedPagination({
           size="sm"
           onClick={handleNextClick}
           disabled={disabled || currentPage === totalPages}
-          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700] disabled:opacity-50"
+          className={cn(
+            "h-8 w-8 p-0 disabled:opacity-50",
+            isV2 
+              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          )}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -135,7 +159,7 @@ export function OptimizedPagination({
       {/* End ellipsis */}
       {showEndEllipsis && (
         <div className="flex items-center justify-center h-8 w-8">
-          <MoreHorizontal className="h-4 w-4 text-gray-400" />
+          <MoreHorizontal className={cn("h-4 w-4", isV2 ? "text-gray-400" : "text-gray-400")} />
         </div>
       )}
 
@@ -146,7 +170,12 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(totalPages)}
           disabled={disabled}
-          className="h-8 w-8 p-0 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          className={cn(
+            "h-8 w-8 p-0",
+            isV2 
+              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+          )}
         >
           {totalPages}
         </Button>

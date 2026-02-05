@@ -361,12 +361,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       <TableCell className="py-3 px-4">
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 text-sm">
-            <Clock className={cn("w-3.5 h-3.5 flex-shrink-0", isV2 ? "text-gray-400" : "text-gray-500")} />
+            {!isV2 && <Clock className="w-3.5 h-3.5 flex-shrink-0 text-gray-500" />}
             <span className={isV2 ? "text-gray-600" : "text-gray-400"}>{formatDate(call.createdAt)}</span>
             <span className={cn("font-medium", isV2 ? "text-gray-900" : "text-white")}>{formatTime(call.createdAt)}</span>
           </div>
           {duration && (
-            <div className={cn("text-xs font-mono pl-5", isV2 ? "text-gray-500" : "text-gray-500")}>
+            <div className={cn("text-xs font-mono", isV2 ? "text-gray-500" : "text-gray-500 pl-5")}>
               Длительность: {duration}
             </div>
           )}

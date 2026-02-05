@@ -101,7 +101,29 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
 
   // Подсчёт для фильтров - используем серверную статистику если есть
   const filterCounts = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const isToday = (dateString: string) => {
+      const callDate = new Date(dateString);
+      callDate.setHours(0, 0, 0, 0);
+      return callDate.getTime() === today.getTime();
+    };
+    
+    // Подсчет пропущенных за сегодня (локально)
+    const missedToday = calls.filter(c => c.status === 'missed' && isToday(c.createdAt)).length;
+    const todayCalls = calls.filter(c => isToday(c.createdAt)).length;
+    
     if (stats) {
+      // Для V2: показываем только за сегодня
+      if (version === 'v2') {
+        return {
+          all: stats.todayCalls,
+          missed: missedToday,
+          answered: stats.answeredCalls,
+          today: stats.todayCalls
+        };
+      }
       return {
         all: stats.totalCalls,
         missed: stats.missedCalls,
@@ -111,20 +133,23 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     }
     
     // Fallback на локальный подсчёт
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Для V2: показываем только за сегодня
+    if (version === 'v2') {
+      return {
+        all: todayCalls,
+        missed: missedToday,
+        answered: calls.filter(c => c.status === 'answered' && isToday(c.createdAt)).length,
+        today: todayCalls
+      };
+    }
     
     return {
       all: totalCalls,
       missed: calls.filter(c => c.status === 'missed').length,
       answered: calls.filter(c => c.status === 'answered').length,
-      today: calls.filter(c => {
-        const callDate = new Date(c.createdAt);
-        callDate.setHours(0, 0, 0, 0);
-        return callDate.getTime() === today.getTime();
-      }).length
+      today: todayCalls
     };
-  }, [stats, calls, totalCalls]);
+  }, [stats, calls, totalCalls, version]);
 
   // Локальная фильтрация для поиска и быстрых фильтров
   // Серверная пагинация уже применена, здесь только дополнительная фильтрация на клиенте

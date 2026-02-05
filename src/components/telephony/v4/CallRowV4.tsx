@@ -226,18 +226,21 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         <div className="flex items-center gap-3">
           {isMainRow ? (
             <>
-              <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                isCallback ? directionConfig.bgColor : isOutgoing ? directionConfig.bgColor : statusConfig.bgColor
-              )}>
-                {isCallback ? (
-                  <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
-                ) : isOutgoing ? (
-                  <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
-                ) : (
-                  <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
-                )}
-              </div>
+              {/* Иконка статуса/направления - только для V1 */}
+              {!isV2 && (
+                <div className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                  isCallback ? directionConfig.bgColor : isOutgoing ? directionConfig.bgColor : statusConfig.bgColor
+                )}>
+                  {isCallback ? (
+                    <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
+                  ) : isOutgoing ? (
+                    <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
+                  ) : (
+                    <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
+                  )}
+                </div>
+              )}
               <div>
                 {isCallback ? (
                   // Callback - звонок от мастера клиенту
@@ -292,15 +295,18 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               </div>
             </>
           ) : (
-            <div className="flex items-center gap-2 pl-8">
+            <div className={cn("flex items-center gap-2", isV2 ? "pl-4" : "pl-8")}>
               <div className={cn(
                 "w-0.5 h-5 rounded",
                 isV2 ? "bg-[#FEC004]/40" : "bg-[#FFD700]/30"
               )} />
-              {isCallback || isOutgoing ? (
-                <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
-              ) : (
-                <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
+              {/* Иконка статуса/направления - только для V1 */}
+              {!isV2 && (
+                isCallback || isOutgoing ? (
+                  <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
+                ) : (
+                  <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
+                )
               )}
               <span className={cn(
                 "text-sm font-mono",

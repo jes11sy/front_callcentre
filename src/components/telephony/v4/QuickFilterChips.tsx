@@ -39,7 +39,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
   variant = 'v1'
 }) => {
   const isV2 = variant === 'v2';
-  const filters = [
+  const allFilters = [
     { 
       id: 'all' as const, 
       label: 'Все', 
@@ -87,6 +87,11 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       activeBorder: 'border-[#FFD700]'
     },
   ];
+
+  // Для V2 показываем только "Все" и "Пропущенные"
+  const filters = isV2 
+    ? allFilters.filter(f => f.id === 'all' || f.id === 'missed')
+    : allFilters;
 
   return (
     <div className="flex flex-wrap items-center gap-3">

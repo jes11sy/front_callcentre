@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2, User, Lock, ArrowRight, Palette } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 
 import { authApi } from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
@@ -153,19 +154,9 @@ export function LoginForm() {
   // Показываем загрузку пока проверяем авторизацию
   if (isCheckingAuth) {
     return (
-      <div 
-        className={`min-h-screen flex items-center justify-center relative ${
-          version === 'v1' 
-            ? 'bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e]' 
-            : 'bg-[#F3F3EE]'
-        }`}
-        style={version === 'v2' ? { fontFamily: "'Myriad Pro', sans-serif" } : undefined}
-      >
+      <div className="relative">
         <VersionToggle />
-        <div className="text-center">
-          <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${version === 'v1' ? 'text-[#FFD700]' : 'text-gray-800'}`} />
-          <p className={version === 'v1' ? 'text-gray-400' : 'text-gray-600'}>Проверка авторизации...</p>
-        </div>
+        <LoadingScreen />
       </div>
     );
   }

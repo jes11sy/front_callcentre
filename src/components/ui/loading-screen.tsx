@@ -1,6 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useDesignStore } from '@/store/designStore';
 
 interface LoadingScreenProps {
   /** Текст под спиннером */
@@ -17,13 +19,62 @@ interface LoadingScreenProps {
  * - AuthProvider (проверка сессии)
  * - Suspense fallback
  * - Любые полноэкранные загрузки
+ * Поддерживает V1 и V2 дизайн
  */
 export function LoadingScreen({ 
-  message = 'Загрузка...', 
+  message, 
   fullScreen = true,
   className
 }: LoadingScreenProps) {
-  const content = (
+  const { version } = useDesignStore();
+
+  // ============ V2 DESIGN ============
+  if (version === 'v2') {
+    const contentV2 = (
+      <div 
+        className="flex flex-col items-center justify-center px-4"
+        style={{ fontFamily: "'Myriad Pro', sans-serif" }}
+      >
+        {/* Logo V2 */}
+        <div className="mb-8">
+          <Image src="/logo_v2.png" alt="Logo" width={200} height={50} className="h-12 w-auto" />
+        </div>
+
+        {/* Spinner V2 */}
+        <div className="relative mb-6 w-12 h-12">
+          <div className="w-full h-full rounded-full border-4 border-[#FEC004]/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#FEC004] animate-spin" />
+        </div>
+
+        {/* Text */}
+        {message && (
+          <div className="text-gray-600 text-base font-medium text-center">
+            {message}
+          </div>
+        )}
+      </div>
+    );
+
+    if (fullScreen) {
+      return (
+        <div className={cn(
+          "min-h-screen min-h-[100dvh] flex items-center justify-center bg-[#F3F3EE]",
+          className
+        )}>
+          {contentV2}
+        </div>
+      );
+    }
+
+    return (
+      <div className={cn("flex items-center justify-center py-12 bg-[#F3F3EE]", className)}>
+        {contentV2}
+      </div>
+    );
+  }
+
+  // ============ V1 DESIGN ============
+  const contentV1 = (
     <div className="flex flex-col items-center justify-center px-4">
       {/* Логотип/Название */}
       <div className="mb-8">
@@ -49,7 +100,7 @@ export function LoadingScreen({
 
       {/* Текст загрузки */}
       <div className="text-[#F8F7F9] text-lg font-medium text-center">
-        {message}
+        {message || 'Загрузка...'}
       </div>
       
       {/* Прогресс-бар */}
@@ -65,20 +116,21 @@ export function LoadingScreen({
         "min-h-screen min-h-[100dvh] flex items-center justify-center bg-[#02111B]",
         className
       )}>
-        {content}
+        {contentV1}
       </div>
     );
   }
 
   return (
     <div className={cn("flex items-center justify-center py-12", className)}>
-      {content}
+      {contentV1}
     </div>
   );
 }
 
 /**
  * Минимальный спиннер для использования внутри компонентов
+ * Поддерживает V1 и V2 дизайн
  */
 export function LoadingSpinner({ 
   size = 'md', 
@@ -87,18 +139,23 @@ export function LoadingSpinner({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
+  const { version } = useDesignStore();
+  
   const sizeClasses = {
     sm: 'w-5 h-5',
     md: 'w-8 h-8',
     lg: 'w-12 h-12'
   };
 
+  const borderColor = version === 'v2' ? 'border-[#FEC004]' : 'border-[#FFD700]';
+  const borderBgColor = version === 'v2' ? 'border-[#FEC004]/20' : 'border-[#FFD700]/20';
+
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
-      <div className={cn(sizeClasses[size], "rounded-full border-2 border-[#FFD700]/20")} />
+      <div className={cn(sizeClasses[size], "rounded-full border-2", borderBgColor)} />
       <div className={cn(
-        "absolute top-0 left-0 rounded-full border-2 border-transparent",
-        "border-t-[#FFD700] border-r-[#FFA500]/50 animate-spin",
+        "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin",
+        version === 'v2' ? 'border-t-[#FEC004]' : 'border-t-[#FFD700] border-r-[#FFA500]/50',
         sizeClasses[size]
       )} />
     </div>
@@ -107,6 +164,7 @@ export function LoadingSpinner({
 
 /**
  * Состояние загрузки для контента (таблицы, списки и т.д.)
+ * Поддерживает V1 и V2 дизайн
  */
 export function LoadingState({ 
   message = 'Загрузка...', 
@@ -117,19 +175,22 @@ export function LoadingState({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
+  const { version } = useDesignStore();
+  
   return (
     <div className={cn(
       "flex flex-col items-center justify-center py-8 space-y-3",
       className
     )}>
       <LoadingSpinner size={size} />
-      <p className="text-sm text-[#9CA3AF]">{message}</p>
+      <p className={cn("text-sm", version === 'v2' ? 'text-gray-600' : 'text-[#9CA3AF]')}>{message}</p>
     </div>
   );
 }
 
 /**
  * Оверлей загрузки поверх контента
+ * Поддерживает V1 и V2 дизайн
  */
 export function LoadingOverlay({ 
   isLoading, 
@@ -140,11 +201,16 @@ export function LoadingOverlay({
   message?: string;
   children: React.ReactNode;
 }) {
+  const { version } = useDesignStore();
+  
   return (
     <div className="relative">
       {children}
       {isLoading && (
-        <div className="absolute inset-0 bg-[#02111B]/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className={cn(
+          "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50",
+          version === 'v2' ? 'bg-[#F3F3EE]/80' : 'bg-[#02111B]/80'
+        )}>
           <LoadingState message={message} />
         </div>
       )}

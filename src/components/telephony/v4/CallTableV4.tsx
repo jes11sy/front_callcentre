@@ -230,7 +230,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
         </div>
 
         {/* Таблица V2 */}
-        <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <Card className="bg-white border border-gray-200 rounded-xl shadow-sm font-myriad">
           <CardContent className="p-4">
             <div className="overflow-x-auto rounded-lg">
               <Table className="table-fixed w-full">

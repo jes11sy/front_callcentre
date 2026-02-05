@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
+import { useDesignStore } from '@/store/designStore';
 
 // Склонение слов
 function pluralize(count: number, one: string, few: string, many: string): string {
@@ -88,6 +89,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   isPlaying,
   orderHistoryLoading: _orderHistoryLoading
 }) => {
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU', {
       hour: '2-digit',
@@ -202,9 +205,20 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   return (
     <TableRow 
       className={cn(
-        "border-b border-[#FFD700]/10",
-        isMainRow ? "hover:bg-[#1a1a2e]" : "hover:bg-[#1a1a2e]/50 bg-[#0f0f23]/50",
-        statusConfig.rowBg
+        "border-b",
+        isV2 ? (
+          cn(
+            "border-gray-100 font-myriad",
+            isMainRow ? "hover:bg-gray-50" : "hover:bg-gray-50/50 bg-gray-50/30",
+            call.status === 'missed' && "bg-red-50/50"
+          )
+        ) : (
+          cn(
+            "border-[#FFD700]/10",
+            isMainRow ? "hover:bg-[#1a1a2e]" : "hover:bg-[#1a1a2e]/50 bg-[#0f0f23]/50",
+            statusConfig.rowBg
+          )
+        )
       )}
     >
       {/* Колонка 1: Клиент */}
@@ -247,7 +261,10 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                   </div>
                 ) : (
                   // Входящий звонок - показываем номер телефона клиента
-                  <div className="font-semibold text-[#FFD700] font-mono">
+                  <div className={cn(
+                    "font-semibold font-mono",
+                    isV2 ? "text-gray-900" : "text-[#FFD700]"
+                  )}>
                     {displayPhone}
                   </div>
                 )}
@@ -257,7 +274,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                       e.stopPropagation();
                       onToggleGroup(phoneClient);
                     }}
-                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#FFD700] transition-colors mt-0.5"
+                    className={cn(
+                      "flex items-center gap-1 text-xs transition-colors mt-0.5",
+                      isV2 
+                        ? "text-gray-500 hover:text-[#FEC004]"
+                        : "text-gray-400 hover:text-[#FFD700]"
+                    )}
                   >
                     <span>+{groupCalls.length - 1} {pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span>
                     {isExpanded ? (
@@ -271,7 +293,10 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             </>
           ) : (
             <div className="flex items-center gap-2 pl-8">
-              <div className="w-0.5 h-5 bg-[#FFD700]/30 rounded" />
+              <div className={cn(
+                "w-0.5 h-5 rounded",
+                isV2 ? "bg-[#FEC004]/40" : "bg-[#FFD700]/30"
+              )} />
               {isCallback || isOutgoing ? (
                 <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
               ) : (
@@ -279,7 +304,13 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               )}
               <span className={cn(
                 "text-sm font-mono",
-                isCallback ? "text-purple-400" : isOutgoing ? "text-blue-400" : "text-gray-400"
+                isCallback 
+                  ? "text-purple-400" 
+                  : isOutgoing 
+                    ? "text-blue-400" 
+                    : isV2 
+                      ? "text-gray-700" 
+                      : "text-gray-400"
               )}>
                 {displayPhone}
                 {isCallback && <span className="text-xs ml-1 text-purple-400/60">(от мастера)</span>}
@@ -298,14 +329,19 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           // Для входящих звонков показываем город, РК и источник
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-sm">
-              <span className="text-white">{call.city}</span>
-              <span className="text-gray-600">•</span>
-              <span className="text-gray-400">{call.rk}</span>
+              <span className={isV2 ? "text-gray-900" : "text-white"}>{call.city}</span>
+              <span className="text-gray-400">•</span>
+              <span className={isV2 ? "text-gray-600" : "text-gray-400"}>{call.rk}</span>
             </div>
             {call.avitoName && (
               <Badge 
                 variant="outline" 
-                className="text-xs border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5 max-w-[150px] truncate"
+                className={cn(
+                  "text-xs max-w-[150px] truncate",
+                  isV2 
+                    ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/5" 
+                    : "border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
+                )}
                 title={call.avitoName}
               >
                 {call.avitoName}
@@ -319,12 +355,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       <TableCell className="py-3 px-4">
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 text-sm">
-            <Clock className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-            <span className="text-gray-400">{formatDate(call.createdAt)}</span>
-            <span className="font-medium text-white">{formatTime(call.createdAt)}</span>
+            <Clock className={cn("w-3.5 h-3.5 flex-shrink-0", isV2 ? "text-gray-400" : "text-gray-500")} />
+            <span className={isV2 ? "text-gray-600" : "text-gray-400"}>{formatDate(call.createdAt)}</span>
+            <span className={cn("font-medium", isV2 ? "text-gray-900" : "text-white")}>{formatTime(call.createdAt)}</span>
           </div>
           {duration && (
-            <div className="text-xs text-gray-500 font-mono pl-5">
+            <div className={cn("text-xs font-mono pl-5", isV2 ? "text-gray-500" : "text-gray-500")}>
               Длительность: {duration}
             </div>
           )}
@@ -335,8 +371,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       <TableCell className="py-3 px-4">
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-sm">
-            <User className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-            <span className="text-white">{call.operator.name}</span>
+            <User className={cn("w-3.5 h-3.5 flex-shrink-0", isV2 ? "text-gray-400" : "text-gray-500")} />
+            <span className={isV2 ? "text-gray-900" : "text-white"}>{call.operator.name}</span>
           </div>
           <div className="flex items-center gap-1">
             {/* Направление звонка */}
@@ -372,8 +408,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     className={cn(
                       "h-8 w-8 p-0",
                       isPlaying 
-                        ? "text-[#FFD700] bg-[#FFD700]/20" 
-                        : "text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                        ? isV2 
+                          ? "text-[#FEC004] bg-[#FEC004]/20" 
+                          : "text-[#FFD700] bg-[#FFD700]/20"
+                        : isV2
+                          ? "text-gray-500 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                          : "text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
                     )}
                     title="Прослушать"
                   >
@@ -383,7 +423,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     variant="ghost"
                     size="sm"
                     onClick={() => onDownloadRecording(call)}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                    className={cn(
+                      "h-8 w-8 p-0",
+                      isV2 
+                        ? "text-gray-500 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                        : "text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                    )}
                     title="Скачать"
                   >
                     <Download className="w-4 h-4" />
@@ -394,7 +439,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               <Button
                 size="sm"
                 onClick={() => onCreateOrder(call, groupCalls)}
-                className="h-8 bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23] font-medium px-3"
+                className={cn(
+                  "h-8 font-medium px-3",
+                  isV2 
+                    ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
+                    : "bg-[#FFD700] hover:bg-[#FFC700] text-[#0f0f23]"
+                )}
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />
                 Новый заказ
@@ -406,7 +456,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 variant="ghost"
                 size="sm"
                 onClick={() => onPlayRecording(call)}
-                className="h-7 w-7 p-0 text-gray-500 hover:text-[#FFD700]"
+                className={cn(
+                  "h-7 w-7 p-0",
+                  isV2 
+                    ? "text-gray-500 hover:text-[#FEC004]"
+                    : "text-gray-500 hover:text-[#FFD700]"
+                )}
               >
                 <Play className="w-3.5 h-3.5" />
               </Button>

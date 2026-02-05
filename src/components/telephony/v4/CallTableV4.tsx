@@ -16,6 +16,7 @@ import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { Call } from '@/types/telephony';
+import { useDesignStore } from '@/store/designStore';
 
 // Размеры для пагинации по группам
 const GROUP_SIZES = [
@@ -91,6 +92,8 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLimitChange,
   stats
 }) => {
+  const { version } = useDesignStore();
+  
   // Local state
   const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -210,6 +213,187 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     );
   }
 
+  // V2 Design
+  if (version === 'v2') {
+    return (
+      <>
+        {/* Фильтры отдельно для V2 */}
+        <div className="mb-6 bg-white rounded-xl p-4 shadow-sm">
+          <QuickFilterChips
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            counts={filterCounts}
+            variant="v2"
+          />
+        </div>
+
+        {/* Таблица V2 */}
+        <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+          <CardContent className="p-4">
+            <div className="overflow-x-auto rounded-lg">
+              <Table className="table-fixed w-full">
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-gray-200 hover:bg-gray-50">
+                    <TableHead className="w-[18%] py-3 px-4">
+                      <span className="text-gray-800 font-medium">Клиент</span>
+                    </TableHead>
+                    <TableHead className="w-[22%] py-3 px-4">
+                      <button 
+                        onClick={() => onSort('city')}
+                        className="flex items-center text-gray-800 font-medium hover:text-[#FEC004] transition-colors"
+                      >
+                        Источник
+                        <SortIcon field="city" />
+                      </button>
+                    </TableHead>
+                    <TableHead className="w-[18%] py-3 px-4">
+                      <button 
+                        onClick={() => onSort('createdAt')}
+                        className="flex items-center text-gray-800 font-medium hover:text-[#FEC004] transition-colors"
+                      >
+                        Дата и время
+                        <SortIcon field="createdAt" />
+                      </button>
+                    </TableHead>
+                    <TableHead className="w-[20%] py-3 px-4">
+                      <span className="text-gray-800 font-medium">Оператор</span>
+                    </TableHead>
+                    <TableHead className="w-[22%] py-3 px-4 text-right">
+                      <span className="text-gray-800 font-medium"></span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <td colSpan={5} className="text-center py-12">
+                        <LoadingState message="Загрузка звонков..." size="md" />
+                      </td>
+                    </TableRow>
+                  ) : displayedGroupsCount === 0 ? (
+                    <TableRow>
+                      <td colSpan={5} className="text-center py-12">
+                        <EmptyState
+                          title="Звонки не найдены"
+                          description={searchTerm || activeFilter !== 'all' 
+                            ? "Попробуйте изменить параметры фильтрации" 
+                            : "Нет данных для отображения"
+                          }
+                        />
+                      </td>
+                    </TableRow>
+                  ) : (
+                    Object.entries(filteredGroupedCalls).map(([phoneClient, groupCalls]) => {
+                      const isExpanded = expandedGroups.has(phoneClient);
+                      const latestCall = groupCalls[0];
+                      const hasMultipleCalls = groupCalls.length > 1;
+                      
+                      return (
+                        <React.Fragment key={phoneClient}>
+                          <CallRowV4
+                            call={latestCall}
+                            phoneClient={phoneClient}
+                            groupCalls={groupCalls}
+                            hasMultipleCalls={hasMultipleCalls}
+                            isExpanded={isExpanded}
+                            isMainRow={true}
+                            onToggleGroup={onToggleGroup}
+                            onCreateOrder={onCreateOrder}
+                            onLoadOrderHistory={onLoadOrderHistory}
+                            onPlayRecording={handlePlayRecording}
+                            onDownloadRecording={onDownloadRecording}
+                            isPlaying={playingCall === latestCall.id}
+                            orderHistoryLoading={orderHistoryLoading}
+                          />
+                          
+                          {isExpanded && groupCalls.slice(1).map((call) => (
+                            <CallRowV4
+                              key={call.id}
+                              call={call}
+                              phoneClient={phoneClient}
+                              groupCalls={groupCalls}
+                              hasMultipleCalls={false}
+                              isExpanded={false}
+                              isMainRow={false}
+                              onToggleGroup={onToggleGroup}
+                              onCreateOrder={onCreateOrder}
+                              onLoadOrderHistory={onLoadOrderHistory}
+                              onPlayRecording={handlePlayRecording}
+                              onDownloadRecording={onDownloadRecording}
+                              isPlaying={playingCall === call.id}
+                              orderHistoryLoading={orderHistoryLoading}
+                            />
+                          ))}
+                        </React.Fragment>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Пагинация V2 */}
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm text-gray-500">На странице:</Label>
+                <Select
+                  value={limit.toString()}
+                  onValueChange={(value) => {
+                    onLimitChange(parseInt(value));
+                    onPageChange(1);
+                  }}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="w-16 h-8 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-gray-200">
+                    {GROUP_SIZES.map((size) => (
+                      <SelectItem 
+                        key={size.value} 
+                        value={size.value}
+                        className="text-gray-800 focus:bg-[#FEC004]/10"
+                      >
+                        {size.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {totalPages > 1 && (
+                <OptimizedPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                  showFirstLast={true}
+                  showPrevNext={true}
+                  maxVisiblePages={5}
+                  disabled={loading}
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sticky Audio Player */}
+        <StickyAudioPlayer
+          call={stickyPlayerCall}
+          audioUrl={currentAudioUrl}
+          isVisible={isStickyPlayerVisible}
+          onClose={handleCloseStickyPlayer}
+          onDownload={onDownloadRecording}
+        />
+
+        {/* Spacer for sticky player */}
+        {isStickyPlayerVisible && <div className="h-20" />}
+      </>
+    );
+  }
+
+  // V1 Design (original)
   return (
     <>
       <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
@@ -53,7 +54,7 @@ export function Sidebar() {
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
@@ -70,7 +71,7 @@ export function Sidebar() {
                 className={`nav-icon w-5 h-5 transition-all ${active ? 'nav-icon-active' : ''}`}
               />
               {item.name}
-            </a>
+            </Link>
           );
         })}
       </nav>
@@ -78,7 +79,7 @@ export function Sidebar() {
       {/* Bottom Section */}
       <div className="px-5 pb-6 space-y-3">
         {/* Profile with user name */}
-        <a
+        <Link
           href="/profile"
           className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
             isActive('/profile') 
@@ -88,7 +89,7 @@ export function Sidebar() {
         >
           <User className={`nav-icon h-5 w-5 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
           {user?.name || user?.login || 'Профиль'}
-        </a>
+        </Link>
 
         {/* Version Toggle */}
         <button

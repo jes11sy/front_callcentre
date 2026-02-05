@@ -37,21 +37,14 @@ export function LoadingScreen({
       >
         {/* Logo V2 */}
         <div className="mb-8">
-          <Image src="/logo_v2.png" alt="Logo" width={200} height={50} className="h-12 w-auto" />
+          <Image src="/img/logo/logo_v2.png" alt="Logo" width={200} height={50} className="h-12 w-auto" />
         </div>
 
         {/* Spinner V2 */}
-        <div className="relative mb-6 w-12 h-12">
+        <div className="relative w-12 h-12">
           <div className="w-full h-full rounded-full border-4 border-[#FEC004]/20" />
           <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#FEC004] animate-spin" />
         </div>
-
-        {/* Text */}
-        {message && (
-          <div className="text-gray-600 text-base font-medium text-center">
-            {message}
-          </div>
-        )}
       </div>
     );
 
@@ -84,7 +77,7 @@ export function LoadingScreen({
       </div>
 
       {/* Спиннер */}
-      <div className="relative mb-6 w-14 h-14">
+      <div className="relative w-14 h-14">
         {/* Внешнее кольцо */}
         <div className="w-full h-full rounded-full border-4 border-[#FFD700]/20" />
         
@@ -96,16 +89,6 @@ export function LoadingScreen({
         <div className="absolute top-2 left-2 w-10 h-10 rounded-full 
                         border-4 border-transparent border-b-[#FFD700]/70 border-l-[#FFA500]/30 animate-spin"
              style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
-      </div>
-
-      {/* Текст загрузки */}
-      <div className="text-[#F8F7F9] text-lg font-medium text-center">
-        {message || 'Загрузка...'}
-      </div>
-      
-      {/* Прогресс-бар */}
-      <div className="mt-6 w-48 h-1 bg-[#FFD700]/10 rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full animate-loading-bar" />
       </div>
     </div>
   );

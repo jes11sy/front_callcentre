@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* V2 Navigation Icon Hover Effect */
+.nav-icon-hover:hover .nav-icon {
+  filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);
+}
+
+.nav-icon-active {
+  filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);
+}
+
 /* Myriad Pro для V2 дизайна */
 @font-face {
   font-family: 'Myriad Pro';

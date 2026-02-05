@@ -171,7 +171,7 @@ export function LoginForm() {
         <div className="w-full max-w-md bg-white rounded-2xl p-10 shadow-xl relative z-10">
           {/* Logo V2 */}
           <div className="flex justify-center mb-6">
-            <Image src="/logo_v2.png" alt="Logo" width={180} height={40} className="h-10 w-auto" />
+            <Image src="/img/logo/logo_v2.png" alt="Logo" width={180} height={40} className="h-10 w-auto" />
           </div>
 
           {/* Title */}

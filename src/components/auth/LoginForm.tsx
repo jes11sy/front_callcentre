@@ -198,7 +198,7 @@ export function LoginForm() {
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
                 disabled={isLoading}
-                className="h-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus:border-[#FEC004] focus:ring-2 focus:ring-[#FEC004]/30 focus:outline-none transition-colors rounded-lg"
+                className="h-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30 transition-colors rounded-lg"
               />
             </div>
 
@@ -213,7 +213,7 @@ export function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 pr-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus:border-[#FEC004] focus:ring-2 focus:ring-[#FEC004]/30 focus:outline-none transition-colors rounded-lg"
+                  className="h-12 pr-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30 transition-colors rounded-lg"
                 />
                 <Button
                   type="button"

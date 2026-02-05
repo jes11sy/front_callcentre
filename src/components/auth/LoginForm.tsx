@@ -132,42 +132,135 @@ export function LoginForm() {
     }
   };
 
+  // Кнопка переключения версии - общая для обеих версий
+  const VersionToggle = () => (
+    <Button 
+      variant="ghost" 
+      size="sm"
+      onClick={toggleVersion}
+      className={`absolute top-4 right-4 z-20 gap-2 font-mono border ${
+        version === 'v1' 
+          ? 'text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] border-[#FFD700]/30' 
+          : 'text-gray-600 hover:text-white hover:bg-gray-800 border-gray-300'
+      }`}
+      title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
+    >
+      <Palette className="h-4 w-4" />
+      <span className="text-xs font-bold">{version.toUpperCase()}</span>
+    </Button>
+  );
+
   // Показываем загрузку пока проверяем авторизацию
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center relative">
-        {/* Design Version Toggle */}
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={toggleVersion}
-          className="absolute top-4 right-4 z-20 text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] gap-2 font-mono border border-[#FFD700]/30"
-          title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
-        >
-          <Palette className="h-4 w-4" />
-          <span className="text-xs font-bold">{version.toUpperCase()}</span>
-        </Button>
+      <div className={`min-h-screen flex items-center justify-center relative ${
+        version === 'v1' 
+          ? 'bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e]' 
+          : 'bg-[#F3F3EE]'
+      }`}>
+        <VersionToggle />
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
-          <p className="text-gray-400">Проверка авторизации...</p>
+          <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${version === 'v1' ? 'text-[#FFD700]' : 'text-gray-800'}`} />
+          <p className={version === 'v1' ? 'text-gray-400' : 'text-gray-600'}>Проверка авторизации...</p>
         </div>
       </div>
     );
   }
 
+  // ============ V2 DESIGN ============
+  if (version === 'v2') {
+    return (
+      <div className="min-h-screen bg-[#F3F3EE] flex items-center justify-center p-4 relative">
+        <VersionToggle />
+
+        {/* Login Card V2 */}
+        <div className="w-full max-w-md bg-white rounded-2xl p-10 shadow-xl relative z-10">
+          {/* Logo V2 */}
+          <div className="flex justify-center mb-6">
+            <Image src="/logo_v2.png" alt="Logo" width={180} height={40} className="h-10 w-auto" />
+          </div>
+
+          {/* Title */}
+          <h1 className="text-2xl font-semibold text-gray-800 text-center mb-8">
+            Авторизация
+          </h1>
+
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+            <div>
+              <Label className="text-gray-700 text-sm font-medium mb-2 block">
+                Логин
+              </Label>
+              <Input
+                placeholder="Введите логин"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                disabled={isLoading}
+                className="h-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-800 focus:ring-0 transition-colors rounded-lg"
+              />
+            </div>
+
+            <div>
+              <Label className="text-gray-700 text-sm font-medium mb-2 block">
+                Пароль
+              </Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Введите пароль"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="h-12 pr-12 bg-[#F3F3EE] border border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-800 focus:ring-0 transition-colors rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-12 px-3 text-gray-400 hover:text-gray-800 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </Button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-200">
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="button"
+              onClick={handleLogin}
+              className="w-full h-12 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-lg transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Вход...
+                </>
+              ) : (
+                'Войти'
+              )}
+            </Button>
+          </form>
+        </div>
+
+        {/* Footer V2 */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center text-gray-500 text-sm">
+          © 2025 Новые схемы
+        </div>
+      </div>
+    );
+  }
+
+  // ============ V1 DESIGN (Original) ============
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Design Version Toggle */}
-      <Button 
-        variant="ghost" 
-        size="sm"
-        onClick={toggleVersion}
-        className="absolute top-4 right-4 z-20 text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] gap-2 font-mono border border-[#FFD700]/30"
-        title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
-      >
-        <Palette className="h-4 w-4" />
-        <span className="text-xs font-bold">{version.toUpperCase()}</span>
-      </Button>
+      <VersionToggle />
 
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">

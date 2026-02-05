@@ -49,17 +49,17 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-5 space-y-1">
+      <nav className="flex-1 px-5 space-y-3">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
             <a
               key={item.name}
               href={item.href}
-              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-colors ${
+              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
                 active 
-                  ? 'bg-[#FEC004]/10 text-gray-800' 
-                  : 'text-gray-800 hover:text-[#FEC004]'
+                  ? 'border-[#FEC004] text-gray-800' 
+                  : 'border-transparent text-gray-800 hover:text-[#FEC004]'
               }`}
             >
               <Image 
@@ -76,7 +76,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-5 pb-6 space-y-1">
+      <div className="px-5 pb-6 space-y-3">
         {/* Profile with user name */}
         <a
           href="/profile"

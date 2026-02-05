@@ -19,7 +19,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <ProtectedRoute>
         <div className="min-h-screen bg-[#F3F3EE]" style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
           <Sidebar />
-          <main className="ml-52 min-h-screen">
+          <main className="ml-56 min-h-screen">
             {children}
           </main>
         </div>

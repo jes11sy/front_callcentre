@@ -42,14 +42,14 @@ export function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside className="w-52 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0 font-myriad">
+    <aside className="w-56 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0 font-myriad">
       {/* Logo */}
-      <div className="p-6 pb-10">
-        <Image src="/img/logo/logo_v2.png" alt="Logo" width={180} height={60} className="h-14 w-auto" />
+      <div className="p-6 pb-16">
+        <Image src="/img/logo/logo_v2.png" alt="Logo" width={160} height={45} className="h-10 w-auto" />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-5 space-y-1">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
@@ -76,7 +76,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-3 pb-6 space-y-1">
+      <div className="px-5 pb-6 space-y-1">
         {/* Profile with user name */}
         <a
           href="/profile"

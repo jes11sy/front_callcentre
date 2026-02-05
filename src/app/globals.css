@@ -5,11 +5,18 @@
 /* V2 Design Font */
 .font-myriad {
   font-family: 'Myriad Pro', -apple-system, BlinkMacSystemFont, sans-serif !important;
-  font-weight: 400;
+  font-weight: 400 !important;
 }
 
 .font-myriad * {
   font-family: inherit !important;
+  font-weight: 400 !important;
+}
+
+.font-myriad a,
+.font-myriad button,
+.font-myriad span {
+  font-weight: 400 !important;
 }
 
 /* V2 Navigation Icon Hover Effect */

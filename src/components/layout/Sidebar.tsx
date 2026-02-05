@@ -80,20 +80,20 @@ export function Sidebar() {
         {/* Profile with user name */}
         <a
           href="/profile"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-colors ${
+          className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
             isActive('/profile') 
-              ? 'bg-[#FEC004]/10 text-[#FEC004]' 
-              : 'text-gray-800 hover:text-[#FEC004]'
+              ? 'border-[#FEC004] text-gray-800' 
+              : 'border-transparent text-gray-800 hover:text-[#FEC004]'
           }`}
         >
-          <User className={`h-5 w-5 ${isActive('/profile') ? 'text-[#FEC004]' : ''}`} />
+          <User className={`nav-icon h-5 w-5 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
           {user?.name || user?.login || 'Профиль'}
         </a>
 
         {/* Version Toggle */}
         <button
           onClick={toggleVersion}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
         >
           <Palette className="h-5 w-5" />
           Дизайн: {version.toUpperCase()}
@@ -102,7 +102,7 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
         >
           <LogOut className="h-5 w-5" />
           Выйти

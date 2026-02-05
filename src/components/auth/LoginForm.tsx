@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Loader2, User, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, User, Lock, ArrowRight, Palette } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 
 import { authApi } from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
+import { useDesignStore } from '@/store/designStore';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +26,7 @@ export function LoginForm() {
   
   const _router = useRouter(); // Оставляем для возможного использования
   const _authStore = useAuthStore(); // Сохраняем для возможного использования
+  const { version, toggleVersion } = useDesignStore();
 
   // Проверяем авторизацию при загрузке (ОДИН РАЗ)
   useEffect(() => {
@@ -133,7 +135,18 @@ export function LoginForm() {
   // Показываем загрузку пока проверяем авторизацию
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center relative">
+        {/* Design Version Toggle */}
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={toggleVersion}
+          className="absolute top-4 right-4 z-20 text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] gap-2 font-mono border border-[#FFD700]/30"
+          title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
+        >
+          <Palette className="h-4 w-4" />
+          <span className="text-xs font-bold">{version.toUpperCase()}</span>
+        </Button>
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
           <p className="text-gray-400">Проверка авторизации...</p>
@@ -144,6 +157,18 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#16213e] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Design Version Toggle */}
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={toggleVersion}
+        className="absolute top-4 right-4 z-20 text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] gap-2 font-mono border border-[#FFD700]/30"
+        title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
+      >
+        <Palette className="h-4 w-4" />
+        <span className="text-xs font-bold">{version.toUpperCase()}</span>
+      </Button>
+
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="w-full h-full bg-gradient-to-br from-transparent via-[#FFD700]/5 to-transparent"></div>

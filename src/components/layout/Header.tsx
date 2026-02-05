@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { useDesignStore } from '@/store/designStore';
 import { authApi } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,11 +37,13 @@ import {
   Bell,
   BookOpen,
   AlertTriangle,
-  Globe
+  Globe,
+  Palette
 } from 'lucide-react';
 
 export function Header() {
   const { user, logout } = useAuthStore();
+  const { version, toggleVersion } = useDesignStore();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -115,11 +118,22 @@ export function Header() {
 
           {/* Right Side Actions - справа */}
           <div className="flex items-center gap-2">
+            {/* Design Version Toggle */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={toggleVersion}
+              className="text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] gap-2 font-mono"
+              title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
+            >
+              <Palette className="h-4 w-4" />
+              <span className="text-xs font-bold">{version.toUpperCase()}</span>
+            </Button>
+
             {/* Simple notification icon */}
             <Button variant="ghost" size="icon" className="text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700]">
               <Bell className="h-4 w-4" />
             </Button>
-
 
             {/* User Profile Dropdown */}
             <DropdownMenu>

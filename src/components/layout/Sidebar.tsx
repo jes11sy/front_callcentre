@@ -42,24 +42,21 @@ export function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside 
-      className="w-64 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0"
-      style={{ fontFamily: "'Myriad Pro', sans-serif" }}
-    >
+    <aside className="w-52 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0 font-myriad">
       {/* Logo */}
-      <div className="p-6">
-        <Image src="/img/logo/logo_v2.png" alt="Logo" width={160} height={40} className="h-8 w-auto" />
+      <div className="p-6 pb-10">
+        <Image src="/img/logo/logo_v2.png" alt="Logo" width={180} height={60} className="h-14 w-auto" />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-3 space-y-1">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
             <a
               key={item.name}
               href={item.href}
-              className={`nav-icon-hover flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-colors ${
                 active 
                   ? 'bg-[#FEC004]/10 text-gray-800' 
                   : 'text-gray-800 hover:text-[#FEC004]'
@@ -79,11 +76,11 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-4 pb-6 space-y-1">
+      <div className="px-3 pb-6 space-y-1">
         {/* Profile with user name */}
         <a
           href="/profile"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-colors ${
             isActive('/profile') 
               ? 'bg-[#FEC004]/10 text-[#FEC004]' 
               : 'text-gray-800 hover:text-[#FEC004]'
@@ -96,7 +93,7 @@ export function Sidebar() {
         {/* Version Toggle */}
         <button
           onClick={toggleVersion}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-800 hover:text-[#FEC004] transition-colors w-full"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full"
         >
           <Palette className="h-5 w-5" />
           Дизайн: {version.toUpperCase()}
@@ -105,7 +102,7 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-800 hover:text-[#FEC004] transition-colors w-full"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full"
         >
           <LogOut className="h-5 w-5" />
           Выйти

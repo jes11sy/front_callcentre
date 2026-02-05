@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* V2 Design Font */
+.font-myriad {
+  font-family: 'Myriad Pro', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 400;
+}
+
+.font-myriad * {
+  font-family: inherit !important;
+}
+
 /* V2 Navigation Icon Hover Effect */
 .nav-icon-hover:hover .nav-icon {
   filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);

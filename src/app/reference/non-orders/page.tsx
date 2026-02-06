@@ -4,8 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { XCircle, AlertTriangle, Phone, MessageSquare, Clock, Wrench } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useDesignStore } from '@/store/designStore';
 
 export default function NonOrdersPage() {
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
+  
+  const cardClass = isV2 
+    ? "border border-gray-200 bg-white font-myriad"
+    : "border-2 border-[#FFD700]/30 bg-[#17212b]";
+  
+  const badgeClass = isV2 
+    ? "border-[#FEC004]/30 text-[#FEC004]"
+    : "border-[#FFD700]/30 text-[#FFD700]";
   const nonOrderReasons = [
     {
       category: 'Техника и проблемы которые мы НЕ решаем',
@@ -100,12 +111,12 @@ export default function NonOrdersPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#0f0f23] min-h-screen">
+      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
         <div className="flex items-center space-x-3 mb-8">
-          <XCircle className="h-8 w-8 text-[#FFD700]" />
+          <XCircle className={`h-8 w-8 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
           <div>
-            <h1 className="text-3xl font-bold text-[#FFD700]">Незаказы</h1>
-            <p className="text-gray-400">Причины отказа от заказов и правила обработки</p>
+            <h1 className={`text-3xl font-bold ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>Незаказы</h1>
+            <p className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Причины отказа от заказов и правила обработки</p>
           </div>
         </div>
 
@@ -113,27 +124,27 @@ export default function NonOrdersPage() {
         {nonOrderReasons.map((category, index) => {
           const Icon = category.icon;
           return (
-            <Card key={index} className="border-2 border-[#FFD700]/30 bg-[#17212b]">
+            <Card key={index} className={cardClass}>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-white">
-                  <Icon className="h-6 w-6 text-[#FFD700]" />
+                <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
+                  <Icon className={`h-6 w-6 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
                   <span>{category.category}</span>
                 </CardTitle>
-                <CardDescription className="text-gray-400">Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
+                <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {category.reasons.map((reason, reasonIndex) => (
-                  <div key={reasonIndex} className="border border-[#FFD700]/30 rounded-lg p-4 space-y-2 bg-[#0f0f23]">
+                  <div key={reasonIndex} className={isV2 ? "border border-gray-200 rounded-lg p-4 space-y-2 bg-gray-50" : "border border-[#FFD700]/30 rounded-lg p-4 space-y-2 bg-[#0f0f23]"}>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">{reason.title}</Badge>
+                      <Badge variant="outline" className={badgeClass}>{reason.title}</Badge>
                     </div>
-                    <p className="text-sm text-gray-400">{reason.description}</p>
-                    <div className="bg-blue-900/20 p-3 rounded-md border border-blue-500/30">
+                    <p className={`text-sm ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>{reason.description}</p>
+                    <div className={isV2 ? "bg-blue-50 p-3 rounded-md border border-blue-200" : "bg-blue-900/20 p-3 rounded-md border border-blue-500/30"}>
                       <div className="flex items-center space-x-2 mb-1">
-                        <Clock className="h-4 w-4 text-blue-400" />
-                        <span className="text-sm font-medium text-blue-400">Действия:</span>
+                        <Clock className={`h-4 w-4 ${isV2 ? 'text-blue-600' : 'text-blue-400'}`} />
+                        <span className={`text-sm font-medium ${isV2 ? 'text-blue-600' : 'text-blue-400'}`}>Действия:</span>
                       </div>
-                      <p className="text-sm text-blue-300">{reason.action}</p>
+                      <p className={`text-sm ${isV2 ? 'text-blue-700' : 'text-blue-300'}`}>{reason.action}</p>
                     </div>
                   </div>
                 ))}
@@ -143,80 +154,80 @@ export default function NonOrdersPage() {
         })}
       </div>
 
-        <Card className="border-2 border-red-500/30 bg-red-900/20">
+        <Card className={isV2 ? "border border-red-200 bg-red-50 mt-6" : "border-2 border-red-500/30 bg-red-900/20"}>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-red-300">
-              <Badge variant="destructive">Важно</Badge>
+            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-red-700' : 'text-red-300'}`}>
+              <Badge variant="destructive" className={isV2 ? "bg-red-100 text-red-700 border-red-200" : ""}>Важно</Badge>
               <span>Правила обработки незаказов</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid gap-2 text-sm">
               <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-red-400" />
-                <span className="text-white">Всегда сохранять вежливый тон, даже при отказе клиента</span>
+                <Phone className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Всегда сохранять вежливый тон, даже при отказе клиента</span>
               </div>
               <div className="flex items-center space-x-2">
-                <MessageSquare className="h-4 w-4 text-red-400" />
-                <span className="text-white">Обязательно записывать причину отказа в системе</span>
+                <MessageSquare className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Обязательно записывать причину отказа в системе</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-red-400" />
-                <span className="text-white">Не тратить более 5 минут на попытки убедить клиента</span>
+                <Clock className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Не тратить более 5 минут на попытки убедить клиента</span>
               </div>
               <div className="flex items-center space-x-2">
-                <XCircle className="h-4 w-4 text-red-400" />
-                <span className="text-white">При грубом поведении - завершить разговор, не отвечать грубостью</span>
+                <XCircle className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>При грубом поведении - завершить разговор, не отвечать грубостью</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-red-500/30 bg-red-900/20">
+        <Card className={isV2 ? "border border-red-200 bg-red-50 mt-6" : "border-2 border-red-500/30 bg-red-900/20"}>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-red-300">
-              <Badge variant="destructive">КРИТИЧЕСКИ ВАЖНО</Badge>
+            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-red-700' : 'text-red-300'}`}>
+              <Badge variant="destructive" className={isV2 ? "bg-red-100 text-red-700 border-red-200" : ""}>КРИТИЧЕСКИ ВАЖНО</Badge>
               <span>Что мы НЕ делаем</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3">
               <div className="flex items-center space-x-3">
-                <XCircle className="h-5 w-5 text-red-400" />
+                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
                 <div>
-                  <div className="font-semibold text-red-300">Не выкупаем технику</div>
-                  <div className="text-sm text-red-300">Мы не занимаемся выкупом техники у клиентов</div>
+                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не выкупаем технику</div>
+                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Мы не занимаемся выкупом техники у клиентов</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className="h-5 w-5 text-red-400" />
+                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
                 <div>
-                  <div className="font-semibold text-red-300">Не ездим только ради диагностики</div>
-                  <div className="text-sm text-red-300">Диагностика бесплатна только при заказе ремонта</div>
+                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ездим только ради диагностики</div>
+                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Диагностика бесплатна только при заказе ремонта</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className="h-5 w-5 text-red-400" />
+                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
                 <div>
-                  <div className="font-semibold text-red-300">Не ремонтируем/меняем матрицы</div>
-                  <div className="text-sm text-red-300">Не работаем с матрицами экранов</div>
+                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ремонтируем/меняем матрицы</div>
+                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Не работаем с матрицами экранов</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className="h-5 w-5 text-red-400" />
+                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
                 <div>
-                  <div className="font-semibold text-red-300">Не ремонтируем мелкую бытовую технику</div>
-                  <div className="text-sm text-red-300">Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
+                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ремонтируем мелкую бытовую технику</div>
+                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-green-500/30 bg-green-900/20">
+        <Card className={isV2 ? "border border-green-200 bg-green-50 mt-6" : "border-2 border-green-500/30 bg-green-900/20"}>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-green-300">
-              <Badge variant="outline" className="border-green-500/30 text-green-300">
+            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-green-700' : 'text-green-300'}`}>
+              <Badge variant="outline" className={isV2 ? "border-green-300 text-green-700" : "border-green-500/30 text-green-300"}>
                 Совет
               </Badge>
               <span>Как минимизировать незаказы</span>
@@ -225,20 +236,20 @@ export default function NonOrdersPage() {
           <CardContent className="space-y-3">
             <div className="grid gap-2 text-sm">
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Цена</Badge>
-                <span className="text-white">Четко объяснять ценовую политику с самого начала</span>
+                <Badge variant="outline" className={`text-xs ${badgeClass}`}>Цена</Badge>
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Четко объяснять ценовую политику с самого начала</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Время</Badge>
-                <span className="text-white">Уточнять удобное время для клиента</span>
+                <Badge variant="outline" className={`text-xs ${badgeClass}`}>Время</Badge>
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Уточнять удобное время для клиента</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Гарантия</Badge>
-                <span className="text-white">Подчеркивать гарантийные обязательства</span>
+                <Badge variant="outline" className={`text-xs ${badgeClass}`}>Гарантия</Badge>
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Подчеркивать гарантийные обязательства</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Опыт</Badge>
-                <span className="text-white">Рассказывать о опыте и квалификации мастеров</span>
+                <Badge variant="outline" className={`text-xs ${badgeClass}`}>Опыт</Badge>
+                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Рассказывать о опыте и квалификации мастеров</span>
               </div>
             </div>
           </CardContent>

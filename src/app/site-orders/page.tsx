@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuthStore } from '@/store/authStore';
+import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 import { 
   Globe, 
@@ -46,7 +47,19 @@ interface SiteOrdersResponse {
 
 const STATUS_OPTIONS = ['Создан', 'Не отвечает', 'Отказ'] as const;
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: string, isV2: boolean = false) => {
+  if (isV2) {
+    switch (status) {
+      case 'Создан':
+        return 'bg-green-100 text-green-700 border-green-300';
+      case 'Не отвечает':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+      case 'Отказ':
+        return 'bg-red-100 text-red-700 border-red-300';
+      default:
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+    }
+  }
   switch (status) {
     case 'Создан':
       return 'bg-green-500/20 text-green-400 border-green-500/30';
@@ -61,6 +74,8 @@ const getStatusColor = (status: string) => {
 
 export default function SiteOrdersPage() {
   const { user } = useAuthStore();
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -133,10 +148,10 @@ export default function SiteOrdersPage() {
   if (isLoading && !data) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
+        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE]' : ''}`}>
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
-            <p className="text-gray-400">Загрузка заявок...</p>
+            <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+            <p className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Загрузка заявок...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -146,7 +161,7 @@ export default function SiteOrdersPage() {
   if (error) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
+        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE]' : ''}`}>
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-red-400">Ошибка при загрузке заявок</p>
@@ -158,36 +173,45 @@ export default function SiteOrdersPage() {
 
   return (
     <DashboardLayout>
-      <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen">
+      <div className={`w-full py-4 px-4 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
         <div className="w-full">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Globe className="h-8 w-8 text-[#FFD700]" />
-              <h1 className="text-2xl font-bold text-[#F8F7F9]">Заявки Сайт</h1>
+              <Globe className={`h-8 w-8 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+              <h1 className={`text-2xl font-bold ${isV2 ? 'text-gray-900' : 'text-[#F8F7F9]'}`}>Заявки Сайт</h1>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="bg-[#17212b] border border-[#FFD700]/30 rounded-lg p-4 mb-4">
+          <div className={isV2 
+            ? "bg-white border border-gray-200 rounded-lg p-4 mb-4"
+            : "bg-[#17212b] border border-[#FFD700]/30 rounded-lg p-4 mb-4"
+          }>
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
                 <Input
                   placeholder="Поиск по имени, телефону, сайту..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
+                  className={isV2 
+                    ? "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                    : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500"
+                  }
                 />
               </div>
               <div className="w-[200px]">
                 <Select value={statusFilter || ''} onValueChange={(val) => setStatusFilter(val === 'all' ? '' : val)}>
-                  <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white [&>span]:text-white">
-                    <SelectValue placeholder="Все статусы" className="text-white" />
+                  <SelectTrigger className={isV2 
+                    ? "bg-white border-gray-200 text-gray-900"
+                    : "bg-[#0f0f23] border-[#FFD700]/30 text-white [&>span]:text-white"
+                  }>
+                    <SelectValue placeholder="Все статусы" className={isV2 ? "" : "text-white"} />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                    <SelectItem value="all" className="text-white hover:bg-[#FFD700]/10">Все статусы</SelectItem>
+                  <SelectContent className={isV2 ? "bg-white border-gray-200" : "bg-[#0f0f23] border-[#FFD700]/30"}>
+                    <SelectItem value="all" className={isV2 ? "text-gray-700 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}>Все статусы</SelectItem>
                     {STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status} value={status} className="text-white hover:bg-[#FFD700]/10">
+                      <SelectItem key={status} value={status} className={isV2 ? "text-gray-700 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}>
                         {status}
                       </SelectItem>
                     ))}
@@ -198,50 +222,56 @@ export default function SiteOrdersPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-[#17212b] border border-[#FFD700]/30 rounded-lg overflow-hidden">
+          <div className={isV2 
+            ? "bg-white border border-gray-200 rounded-lg overflow-hidden"
+            : "bg-[#17212b] border border-[#FFD700]/30 rounded-lg overflow-hidden"
+          }>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-[#0f0f23] border-b border-[#FFD700]/30">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">ID</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                  <tr className={isV2 
+                    ? "bg-gray-50 border-b border-gray-200"
+                    : "bg-[#0f0f23] border-b border-[#FFD700]/30"
+                  }>
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>ID</th>
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
+                        {!isV2 && <MapPin className="h-4 w-4" />}
                         Город
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
+                        {!isV2 && <Globe className="h-4 w-4" />}
                         Сайт
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
+                        {!isV2 && <User className="h-4 w-4" />}
                         Имя
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
+                        {!isV2 && <Phone className="h-4 w-4" />}
                         Телефон
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">Статус</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Статус</th>
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
+                        {!isV2 && <MessageSquare className="h-4 w-4" />}
                         Инфо с сайта
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
+                        {!isV2 && <MessageSquare className="h-4 w-4" />}
                         Комментарий КЦ
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#FFD700]">Действия</th>
+                    <th className={`px-4 py-3 text-left text-sm font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Действия</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -249,13 +279,16 @@ export default function SiteOrdersPage() {
                     data.data.map((order) => (
                       <tr 
                         key={order.id} 
-                        className="border-b border-[#FFD700]/10 hover:bg-[#FFD700]/5 transition-colors"
+                        className={isV2 
+                          ? "border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                          : "border-b border-[#FFD700]/10 hover:bg-[#FFD700]/5 transition-colors"
+                        }
                       >
-                        <td className="px-4 py-3 text-sm text-gray-300">{order.id}</td>
-                        <td className="px-4 py-3 text-sm text-white">{order.city}</td>
-                        <td className="px-4 py-3 text-sm text-white">{order.site}</td>
-                        <td className="px-4 py-3 text-sm text-white">{order.clientName}</td>
-                        <td className="px-4 py-3 text-sm text-white font-mono">{order.phone}</td>
+                        <td className={`px-4 py-3 text-sm ${isV2 ? 'text-gray-500' : 'text-gray-300'}`}>{order.id}</td>
+                        <td className={`px-4 py-3 text-sm ${isV2 ? 'text-gray-900' : 'text-white'}`}>{order.city}</td>
+                        <td className={`px-4 py-3 text-sm ${isV2 ? 'text-gray-900' : 'text-white'}`}>{order.site}</td>
+                        <td className={`px-4 py-3 text-sm ${isV2 ? 'text-gray-900' : 'text-white'}`}>{order.clientName}</td>
+                        <td className={`px-4 py-3 text-sm font-mono ${isV2 ? 'text-gray-900' : 'text-white'}`}>{order.phone}</td>
                         <td className="px-4 py-3">
                           <Select 
                             value={order.status} 
@@ -263,16 +296,16 @@ export default function SiteOrdersPage() {
                             disabled={order.status === 'Заказ создан'}
                           >
                             <SelectTrigger 
-                              className={`w-[150px] h-8 text-xs border ${getStatusColor(order.status)} bg-transparent`}
+                              className={`w-[150px] h-8 text-xs border ${getStatusColor(order.status, isV2)} bg-transparent`}
                             >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
+                            <SelectContent className={isV2 ? "bg-white border-gray-200" : "bg-[#0f0f23] border-[#FFD700]/30"}>
                               {STATUS_OPTIONS.map((status) => (
                                 <SelectItem 
                                   key={status} 
                                   value={status} 
-                                  className="text-white hover:bg-[#FFD700]/10"
+                                  className={isV2 ? "text-gray-700 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}
                                 >
                                   {status}
                                 </SelectItem>
@@ -281,8 +314,8 @@ export default function SiteOrdersPage() {
                           </Select>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="text-sm text-gray-400 max-w-[200px] whitespace-pre-line">
-                            {order.comment || <span className="text-gray-600 italic">—</span>}
+                          <div className={`text-sm max-w-[200px] whitespace-pre-line ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                            {order.comment || <span className={isV2 ? 'text-gray-400 italic' : 'text-gray-600 italic'}>—</span>}
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -291,7 +324,10 @@ export default function SiteOrdersPage() {
                               <Input
                                 value={editingComment.value}
                                 onChange={(e) => setEditingComment({ ...editingComment, value: e.target.value })}
-                                className="h-8 text-sm bg-[#0f0f23] border-[#FFD700]/30 text-white"
+                                className={isV2 
+                                  ? "h-8 text-sm bg-white border-gray-200 text-gray-900"
+                                  : "h-8 text-sm bg-[#0f0f23] border-[#FFD700]/30 text-white"
+                                }
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') handleSaveComment(order.id);
                                   if (e.key === 'Escape') setEditingComment(null);
@@ -301,17 +337,23 @@ export default function SiteOrdersPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleSaveComment(order.id)}
-                                className="h-8 bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700]"
+                                className={isV2 
+                                  ? "h-8 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+                                  : "h-8 bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700]"
+                                }
                               >
                                 ОК
                               </Button>
                             </div>
                           ) : (
                             <div 
-                              className="text-sm text-gray-400 cursor-pointer hover:text-white min-h-[32px] flex items-center"
+                              className={`text-sm cursor-pointer min-h-[32px] flex items-center ${isV2 
+                                ? 'text-gray-500 hover:text-gray-900'
+                                : 'text-gray-400 hover:text-white'
+                              }`}
                               onClick={() => setEditingComment({ id: order.id, value: order.commentOperator || '' })}
                             >
-                              {order.commentOperator || <span className="text-gray-600 italic">Добавить...</span>}
+                              {order.commentOperator || <span className={isV2 ? 'text-gray-400 italic' : 'text-gray-600 italic'}>Добавить...</span>}
                             </div>
                           )}
                         </td>
@@ -320,13 +362,16 @@ export default function SiteOrdersPage() {
                             <Button
                               size="sm"
                               onClick={() => handleCreateOrder(order)}
-                              className="h-8 bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
+                              className={isV2 
+                                ? "h-8 bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
+                                : "h-8 bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
+                              }
                             >
                               <Plus className="h-4 w-4 mr-1" />
                               Заказ
                             </Button>
                           ) : (
-                            <span className="text-sm text-green-400">
+                            <span className={`text-sm ${isV2 ? 'text-green-600' : 'text-green-400'}`}>
                               Заказ #{order.orderId}
                             </span>
                           )}
@@ -335,7 +380,7 @@ export default function SiteOrdersPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
+                      <td colSpan={9} className={`px-4 py-8 text-center ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                         Заявки не найдены
                       </td>
                     </tr>
@@ -346,8 +391,8 @@ export default function SiteOrdersPage() {
 
             {/* Pagination */}
             {data?.pagination && data.pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-[#FFD700]/30">
-                <div className="text-sm text-gray-400">
+              <div className={`flex items-center justify-between px-4 py-3 border-t ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/30'}`}>
+                <div className={`text-sm ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>
                   Показано {data.data.length} из {data.pagination.total} заявок
                 </div>
                 <div className="flex gap-2">
@@ -356,11 +401,14 @@ export default function SiteOrdersPage() {
                     size="sm"
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                    className={isV2 
+                      ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004]"
+                      : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                    }
                   >
                     Назад
                   </Button>
-                  <span className="px-3 py-1 text-sm text-gray-400">
+                  <span className={`px-3 py-1 text-sm ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>
                     {page} / {data.pagination.totalPages}
                   </span>
                   <Button
@@ -368,7 +416,10 @@ export default function SiteOrdersPage() {
                     size="sm"
                     onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
                     disabled={page === data.pagination.totalPages}
-                    className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                    className={isV2 
+                      ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004]"
+                      : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+                    }
                   >
                     Далее
                   </Button>

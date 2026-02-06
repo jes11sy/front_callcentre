@@ -118,8 +118,8 @@ export function CreateOrderModal({
   const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
   const [callHistory, setCallHistory] = useState<Call[]>([]);
   const [callHistoryLoading, setCallHistoryLoading] = useState(false);
-  const [showCallHistory, setShowCallHistory] = useState(true);
-  const [showOrderHistory, setShowOrderHistory] = useState(true);
+  const [showCallHistory, setShowCallHistory] = useState(false);
+  const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [sources, setSources] = useState<string[]>([]);
   const [campaigns, setCampaigns] = useState<string[]>([]);
   const [playingCallId, setPlayingCallId] = useState<number | null>(null);
@@ -447,36 +447,28 @@ export function CreateOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className={`w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col ${
+      <div className={`w-full max-w-5xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col ${
         isV2 
           ? 'bg-[#F3F3EE] border border-gray-200 shadow-xl' 
           : 'bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
       }`}>
         {/* Header */}
-        <div className={`flex items-center justify-between px-4 py-3 border-b shrink-0 ${
+        <div className={`flex items-center justify-between px-5 py-3 border-b shrink-0 ${
           isV2 
             ? 'bg-white border-gray-200' 
             : 'bg-[#0f0f23] border-[#FFD700]/20'
         }`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-              isV2 ? 'bg-[#FEC004]/10' : 'bg-[#FFD700]/10'
-            }`}>
-              <Plus className={`h-4 w-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-            </div>
-            <div>
-              <h2 className={`text-base font-semibold ${isV2 ? 'text-gray-900' : 'text-white'}`}>Новый заказ</h2>
-              <div className={`flex items-center gap-2 text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
-                <Phone className="h-3 w-3" />
-                <span className={`font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>{call.phoneClient}</span>
-                {call.city && (
-                  <>
-                    <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
-                    <MapPin className="h-3 w-3" />
-                    <span>{call.city}</span>
-                  </>
-                )}
-              </div>
+          <div className="flex items-center gap-4">
+            <h2 className={`text-lg font-semibold ${isV2 ? 'text-gray-900' : 'text-white'}`}>Новый заказ</h2>
+            <div className={`flex items-center gap-2 text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+              <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>|</span>
+              <span className={`font-medium ${isV2 ? 'text-gray-700' : 'text-white'}`}>{call.phoneClient}</span>
+              {call.city && (
+                <>
+                  <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
+                  <span>{call.city}</span>
+                </>
+              )}
             </div>
           </div>
           <button
@@ -492,7 +484,7 @@ export function CreateOrderModal({
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden max-h-[600px]">
+        <div className="flex flex-1 overflow-hidden max-h-[700px]">
           {/* Left: History panels */}
           <div className={`w-[420px] border-r flex flex-col overflow-hidden ${
             isV2 
@@ -553,11 +545,13 @@ export function CreateOrderModal({
                                 <span className={`font-medium ${isV2 ? 'text-gray-700' : 'text-gray-300'}`}>{formatDate(c.createdAt)}</span>
                                 {/* Направление */}
                                 <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
-                                  isCallback
-                                    ? 'bg-purple-500/10 text-purple-400'
-                                    : isOutgoing 
-                                      ? 'bg-blue-500/10 text-blue-400' 
-                                      : 'bg-emerald-500/10 text-emerald-400'
+                                  isV2 
+                                    ? 'bg-gray-100 text-gray-600'
+                                    : isCallback
+                                      ? 'bg-purple-500/10 text-purple-400'
+                                      : isOutgoing 
+                                        ? 'bg-blue-500/10 text-blue-400' 
+                                        : 'bg-emerald-500/10 text-emerald-400'
                                 }`}>
                                   {isOutgoing ? <PhoneOutgoing className="h-2.5 w-2.5" /> : <PhoneIncoming className="h-2.5 w-2.5" />}
                                   {isCallback ? 'От мастера' : isOutgoing ? 'Исход.' : 'Вход.'}
@@ -566,8 +560,8 @@ export function CreateOrderModal({
                               {/* Статус */}
                               <span className={`flex items-center gap-1 ${
                                 c.status === 'answered' 
-                                  ? isV2 ? 'text-green-600' : 'text-green-400' 
-                                  : isV2 ? 'text-red-600' : 'text-red-400'
+                                  ? isV2 ? 'text-gray-600' : 'text-green-400' 
+                                  : isV2 ? 'text-red-500' : 'text-red-400'
                               }`}>
                                 {c.status === 'answered' ? (
                                   <PhoneCall className="h-3 w-3" />
@@ -585,11 +579,11 @@ export function CreateOrderModal({
                                 <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
                               </div>
                               <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
-                              <span className={`shrink-0 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`}>{c.rk || '—'}</span>
+                              <span className={`shrink-0 ${isV2 ? 'text-gray-700 font-medium' : 'text-[#FFD700]'}`}>{c.rk || '—'}</span>
                               {c.avitoName && (
                                 <>
                                   <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
-                                  <span className="text-purple-400 shrink-0">{c.avitoName}</span>
+                                  <span className={`shrink-0 ${isV2 ? 'text-gray-600' : 'text-purple-400'}`}>{c.avitoName}</span>
                                 </>
                               )}
                               <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
@@ -667,12 +661,20 @@ export function CreateOrderModal({
                             <div className="flex items-center gap-2">
                               <span className={`font-semibold ${isV2 ? 'text-gray-900' : 'text-white'}`}>#{order.id}</span>
                               {order.typeOrder && (
-                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-purple-500/10 text-purple-400 border-purple-500/30">
+                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${
+                                  isV2 
+                                    ? 'bg-gray-100 text-gray-600 border-gray-200' 
+                                    : 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+                                }`}>
                                   {order.typeOrder}
                                 </Badge>
                               )}
                             </div>
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-blue-500/10 text-blue-400 border-blue-500/30">
+                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${
+                              isV2 
+                                ? 'bg-gray-100 text-gray-600 border-gray-200' 
+                                : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+                            }`}>
                               {(order as any).status || order.statusOrder || 'Нет статуса'}
                             </Badge>
                           </div>
@@ -680,11 +682,11 @@ export function CreateOrderModal({
                           {/* Строка 2: РК + Источник */}
                           <div className={`flex items-center gap-2 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                             {order.rk && (
-                              <span className={isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}>{order.rk}</span>
+                              <span className={isV2 ? 'text-gray-700 font-medium' : 'text-[#FFD700]'}>{order.rk}</span>
                             )}
                             {order.rk && order.avitoName && <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>}
                             {order.avitoName && (
-                              <span className="text-purple-400">{order.avitoName}</span>
+                              <span className={isV2 ? 'text-gray-600' : 'text-purple-400'}>{order.avitoName}</span>
                             )}
                           </div>
                           
@@ -711,7 +713,7 @@ export function CreateOrderModal({
                               <span className={isV2 ? 'text-gray-700' : 'text-gray-300'}>{order.master?.name || '—'}</span>
                             </div>
                             {order.result !== undefined && order.result !== null && (
-                              <span className={`font-medium ${isV2 ? 'text-green-600' : 'text-green-400'}`}>{order.result.toLocaleString('ru-RU')} ₽</span>
+                              <span className={`font-medium ${isV2 ? 'text-gray-900' : 'text-green-400'}`}>{order.result.toLocaleString('ru-RU')} ₽</span>
                             )}
                           </div>
                           

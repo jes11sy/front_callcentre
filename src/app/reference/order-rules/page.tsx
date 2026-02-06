@@ -17,13 +17,15 @@ export default function OrderRulesPage() {
   return (
     <DashboardLayout>
       <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
-        <div className="flex items-center space-x-3 mb-8">
-          <ClipboardList className={`h-8 w-8 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-          <div>
-            <h1 className={`text-3xl font-bold ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>Правила приема заказов</h1>
-            <p className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Процедуры и требования при создании заказов</p>
+        {!isV2 && (
+          <div className="flex items-center space-x-3 mb-8">
+            <ClipboardList className="h-8 w-8 text-[#FFD700]" />
+            <div>
+              <h1 className="text-3xl font-bold text-[#FFD700]">Правила приема заказов</h1>
+              <p className="text-gray-400">Процедуры и требования при создании заказов</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="grid gap-6">
           <Card className={cardClass}>

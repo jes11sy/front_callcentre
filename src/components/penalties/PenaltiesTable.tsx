@@ -73,12 +73,14 @@ export const PenaltiesTable = ({
     return (
       <Card className={cardClass}>
         <CardContent className="px-6 pb-6">
-          <div className="flex items-center justify-between mb-6 pt-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-              <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
-            </div>
-            <Button onClick={onCreatePenalty} className={createBtnClass}>
+          <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+            {!isV2 && (
+              <div className="flex items-center gap-3">
+                <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
+                <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+              </div>
+            )}
+            <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
               <Plus className="mr-2 h-4 w-4" />
               Создать
             </Button>
@@ -97,12 +99,14 @@ export const PenaltiesTable = ({
     return (
       <Card className={cardClass}>
         <CardContent className="px-6 pb-6">
-          <div className="flex items-center justify-between mb-6 pt-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-              <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
-            </div>
-            <Button onClick={onCreatePenalty} className={createBtnClass}>
+          <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+            {!isV2 && (
+              <div className="flex items-center gap-3">
+                <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
+                <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+              </div>
+            )}
+            <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
               <Plus className="mr-2 h-4 w-4" />
               Создать
             </Button>
@@ -119,12 +123,14 @@ export const PenaltiesTable = ({
   return (
     <Card className={cardClass}>
       <CardContent className="px-6 pb-6">
-        <div className="flex items-center justify-between mb-6 pt-6">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-            <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
-          </div>
-          <Button onClick={onCreatePenalty} className={createBtnClass}>
+        <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+          {!isV2 && (
+            <div className="flex items-center gap-3">
+              <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
+              <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+            </div>
+          )}
+          <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
             <Plus className="mr-2 h-4 w-4" />
             Создать
           </Button>

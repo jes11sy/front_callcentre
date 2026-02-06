@@ -163,16 +163,18 @@ export default function StatsPage() {
       <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className={`text-3xl font-bold flex items-center ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>
-                  <BarChart3 className={`h-8 w-8 mr-3 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-                  Моя статистика
-                </h1>
+          {!isV2 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
+                    <BarChart3 className="h-8 w-8 mr-3 text-[#FFD700]" />
+                    Моя статистика
+                  </h1>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Date Filter */}
           <Card className={`mb-8 ${cardClass}`}>

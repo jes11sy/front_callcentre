@@ -176,12 +176,14 @@ export default function SiteOrdersPage() {
       <div className={`w-full py-4 px-4 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
         <div className="w-full">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Globe className={`h-8 w-8 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-              <h1 className={`text-2xl font-bold ${isV2 ? 'text-gray-900' : 'text-[#F8F7F9]'}`}>Заявки Сайт</h1>
+          {!isV2 && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Globe className="h-8 w-8 text-[#FFD700]" />
+                <h1 className="text-2xl font-bold text-[#F8F7F9]">Заявки Сайт</h1>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Filters */}
           <div className={isV2 

@@ -13,15 +13,13 @@
 }
 
 /* Навигация использует Light (300) */
-.font-myriad nav,
-.font-myriad nav * {
+.font-myriad nav a,
+.font-myriad nav button,
+.font-myriad nav span,
+.font-myriad aside a,
+.font-myriad aside button,
+.font-myriad aside span {
   font-weight: 300 !important;
-}
-
-.font-myriad a,
-.font-myriad button,
-.font-myriad span {
-  font-weight: 400 !important;
 }
 
 /* V2 Navigation Icon Hover Effect */

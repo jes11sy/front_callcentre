@@ -49,26 +49,55 @@ export default function ReferencePage() {
     ? "text-xs border-[#FEC004]/30 text-[#FEC004]"
     : "text-xs border-[#FFD700]/30 text-[#FFD700]";
 
+  // V2: Минималистичный вертикальный список
+  if (isV2) {
+    return (
+      <DashboardLayout variant="operator" requiredRole="operator">
+        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="space-y-1">
+            {referenceSections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <Link 
+                  key={index} 
+                  href={section.href} 
+                  className="group flex items-center justify-between py-4 border-b border-gray-200 hover:border-[#FEC004] transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <Icon className="h-5 w-5 text-gray-400 group-hover:text-[#FEC004] transition-colors" />
+                    <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors font-light">
+                      {section.title}
+                    </span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all" />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
-          {!isV2 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
-                    <BookOpen className="h-8 w-8 mr-3 text-[#FFD700]" />
-                    Справочник
-                  </h1>
-                  <p className="mt-2 text-gray-400">
-                    Справочная информация для операторов
-                  </p>
-                </div>
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
+                  <BookOpen className="h-8 w-8 mr-3 text-[#FFD700]" />
+                  Справочник
+                </h1>
+                <p className="mt-2 text-gray-400">
+                  Справочная информация для операторов
+                </p>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Reference Sections */}
           <div className="grid gap-6 md:grid-cols-2 mb-8">
@@ -78,18 +107,18 @@ export default function ReferencePage() {
                 <Link key={index} href={section.href} className="group">
                   <Card className={cardClass}>
                     <CardHeader>
-                      <CardTitle className={`flex items-center space-x-2 transition-colors ${isV2 ? 'text-gray-900 group-hover:text-[#FEC004]' : 'text-white group-hover:text-[#FFD700]'}`}>
-                        <Icon className={`h-6 w-6 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                      <CardTitle className="flex items-center space-x-2 transition-colors text-white group-hover:text-[#FFD700]">
+                        <Icon className="h-6 w-6 text-[#FFD700]" />
                         <span>{section.title}</span>
                         <ArrowRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" />
                       </CardTitle>
-                      <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+                      <CardDescription className="text-gray-400">
                         {section.description}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        <div className={`text-sm font-medium mb-2 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <div className="text-sm font-medium mb-2 text-gray-400">
                           Содержит разделы:
                         </div>
                         <div className="flex flex-wrap gap-1">
@@ -108,13 +137,13 @@ export default function ReferencePage() {
           </div>
 
           {/* Quick Access Info */}
-          <Card className={isV2 ? "border border-gray-200 bg-white" : "border-2 border-[#FFD700]/30 bg-[#17212b]"}>
+          <Card className="border-2 border-[#FFD700]/30 bg-[#17212b]">
             <CardHeader>
-              <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>
-                <BookOpen className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+              <CardTitle className="flex items-center space-x-2 text-[#FFD700]">
+                <BookOpen className="h-5 w-5" />
                 <span>Быстрый доступ</span>
               </CardTitle>
-              <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+              <CardDescription className="text-gray-400">
                 Все разделы справочника доступны для быстрого поиска информации
               </CardDescription>
             </CardHeader>
@@ -122,15 +151,15 @@ export default function ReferencePage() {
               <div className="grid gap-3 text-sm">
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className={badgeClass}>Цены</Badge>
-                  <span className={isV2 ? 'text-gray-700' : 'text-gray-300'}>Актуальные цены на ремонт по всем категориям техники</span>
+                  <span className="text-gray-300">Актуальные цены на ремонт по всем категориям техники</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className={badgeClass}>Правила</Badge>
-                  <span className={isV2 ? 'text-gray-700' : 'text-gray-300'}>Обязательные процедуры и требования для операторов</span>
+                  <span className="text-gray-300">Обязательные процедуры и требования для операторов</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className={badgeClass}>Незаказы</Badge>
-                  <span className={isV2 ? 'text-gray-700' : 'text-gray-300'}>Руководство по обработке отказов и проблемных ситуаций</span>
+                  <span className="text-gray-300">Руководство по обработке отказов и проблемных ситуаций</span>
                 </div>
               </div>
             </CardContent>

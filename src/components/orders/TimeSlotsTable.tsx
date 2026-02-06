@@ -5,6 +5,13 @@ import { MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Order } from '@/types/orders';
 import { TIME_SLOTS, EQUIPMENT_TYPE_COLORS } from '@/constants/orders';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useDesignStore } from '@/store/designStore';
+
+const EQUIPMENT_TYPE_COLORS_V2 = {
+  'КП': 'text-blue-600',
+  'БТ': 'text-green-600',
+  'МНЧ': 'text-orange-600'
+} as const;
 
 interface TimeSlotsTableProps {
   orders: Order[];
@@ -42,6 +49,9 @@ const formatDateLabel = (date: Date): string => {
 
 const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityClick }: TimeSlotsTableProps) => {
   const [activeCity, setActiveCity] = useState<string>('all');
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
+  const equipmentColors = isV2 ? EQUIPMENT_TYPE_COLORS_V2 : EQUIPMENT_TYPE_COLORS;
 
   // Хелпер для проверки совпадения даты
   // Сравниваем даты в локальном времени (orderDate конвертируется из UTC в локальное)
@@ -161,19 +171,19 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           return (
             <div key={`${typeEquipment}-${_index}`} className="text-center">
               <div className={`text-lg font-bold ${
-                count > 0 ? colorClass : 'text-gray-600'
+                count > 0 ? colorClass : (isV2 ? 'text-gray-400' : 'text-gray-600')
               }`}>
                 {count}
               </div>
             </div>
           );
         })}
-        <div className={`text-lg font-bold ${colorClass} text-center border-l border-[#FFD700]/20 pl-2`}>
+        <div className={`text-lg font-bold ${colorClass} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
           {total}
         </div>
       </div>
     );
-  }, [getOrdersForTimeSlot, getEquipmentTotal]);
+  }, [getOrdersForTimeSlot, getEquipmentTotal, isV2]);
 
   // Проверка, является ли выбранная дата сегодняшней
   const isSelectedToday = useMemo(() => {
@@ -184,13 +194,16 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   }, [selectedDate]);
 
   return (
-    <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
+    <Card className={isV2 ? "bg-white border border-gray-200 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
       <CardHeader className="pb-2">
         {/* Навигация по датам */}
         <div className="flex items-center gap-2">
           <button
             onClick={goToPrevDay}
-            className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            className={isV2 
+              ? "p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 transition-all"
+              : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            }
             title="Предыдущий день"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -200,8 +213,11 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             onClick={goToToday}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               isSelectedToday
-                ? 'bg-[#FFD700] text-[#02111B]'
-                : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                : (isV2 
+                    ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                  )
             }`}
           >
             <Calendar className="h-3.5 w-3.5" />
@@ -218,12 +234,18 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                 onDateChange(newDate);
               }
             }}
-            className="px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+            className={isV2 
+              ? "px-2 py-1.5 rounded-lg text-sm bg-white text-gray-700 border border-gray-200 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none"
+              : "px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+            }
           />
           
           <button
             onClick={goToNextDay}
-            className="p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            className={isV2 
+              ? "p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 transition-all"
+              : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+            }
             title="Следующий день"
           >
             <ChevronRight className="h-4 w-4" />
@@ -236,14 +258,19 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             onClick={() => handleCityClick('all')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               activeCity === 'all'
-                ? 'bg-[#FFD700] text-[#02111B]'
-                : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                : (isV2 
+                    ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                  )
             }`}
           >
             <MapPin className="h-3.5 w-3.5" />
             Все города
             <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
-              activeCity === 'all' ? 'bg-[#02111B]/20' : 'bg-[#FFD700]/20 text-[#FFD700]'
+              activeCity === 'all' 
+                ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
+                : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
             }`}>
               {cityCounts.all || 0}
             </span>
@@ -255,13 +282,18 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               onClick={() => handleCityClick(city)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 activeCity === city
-                  ? 'bg-[#FFD700] text-[#02111B]'
-                  : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                  ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                  : (isV2 
+                      ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                      : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                    )
               }`}
             >
               {city}
               <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
-                activeCity === city ? 'bg-[#02111B]/20' : 'bg-[#FFD700]/20 text-[#FFD700]'
+                activeCity === city 
+                  ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
+                  : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
               }`}>
                 {cityCounts[city] || 0}
               </span>
@@ -274,21 +306,21 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <div className="space-y-4">
             {/* Header with time slots */}
             <div className="grid gap-2 min-w-max grid-time-slots-with-total">
-              <div className="text-sm font-medium text-gray-300 text-center">Тип</div>
+              <div className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-gray-300'} text-center`}>Тип</div>
               {TIME_SLOTS.map(({ timeString }) => (
-                <div key={timeString} className="text-sm font-medium text-gray-300 text-center">
+                <div key={timeString} className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-gray-300'} text-center`}>
                   {timeString}
                 </div>
               ))}
-              <div className="text-sm font-medium text-[#FFD700] text-center border-l border-[#FFD700]/20 pl-2">
+              <div className={`text-sm font-medium ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
                 Итого
               </div>
             </div>
             
             {/* Equipment type rows */}
-            {renderTimeSlotRow('КП', 'КП', EQUIPMENT_TYPE_COLORS['КП'])}
-            {renderTimeSlotRow('БТ', 'БТ', EQUIPMENT_TYPE_COLORS['БТ'])}
-            {renderTimeSlotRow('МНЧ', 'МНЧ', EQUIPMENT_TYPE_COLORS['МНЧ'])}
+            {renderTimeSlotRow('КП', 'КП', equipmentColors['КП'])}
+            {renderTimeSlotRow('БТ', 'БТ', equipmentColors['БТ'])}
+            {renderTimeSlotRow('МНЧ', 'МНЧ', equipmentColors['МНЧ'])}
           </div>
         </div>
       </CardContent>

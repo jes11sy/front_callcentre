@@ -20,6 +20,17 @@ export const STATUS_COLORS = {
   'Незаказ': 'bg-gray-800 text-gray-300 border-gray-600'
 } as const;
 
+export const STATUS_COLORS_V2 = {
+  'Ожидает': 'bg-amber-100 text-amber-700 border-amber-300',
+  'Принял': 'bg-blue-100 text-blue-700 border-blue-300',
+  'В пути': 'bg-indigo-100 text-indigo-700 border-indigo-300',
+  'В работе': 'bg-yellow-100 text-yellow-700 border-yellow-300',
+  'Готово': 'bg-green-100 text-green-700 border-green-300',
+  'Отказ': 'bg-red-100 text-red-700 border-red-300',
+  'Модерн': 'bg-orange-100 text-orange-700 border-orange-300',
+  'Незаказ': 'bg-gray-100 text-gray-600 border-gray-300'
+} as const;
+
 export const ORDER_TYPES = [
   { value: 'Впервые', label: 'Впервые' },
   { value: 'Повтор', label: 'Повтор' },

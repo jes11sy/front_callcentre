@@ -14,11 +14,14 @@ import {
   OrderEditModal 
 } from '@/components/orders';
 import { useOrders } from '@/hooks/useOrders';
+import { useDesignStore } from '@/store/designStore';
 
 function OrdersContent() {
   const searchParams = useSearchParams();
   const orderIdFromUrl = searchParams.get('orderId');
   const openedRef = useRef(false);
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
   
   const {
     filters,
@@ -97,7 +100,7 @@ function OrdersContent() {
 
   return (
     <DashboardLayout>
-      <div className="w-full py-4 px-4 bg-[#0f0f23] min-h-screen custom-scrollbar">
+      <div className={`w-full py-4 px-4 min-h-screen custom-scrollbar ${isV2 ? 'bg-[#F3F3EE]' : 'bg-[#0f0f23]'}`}>
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}

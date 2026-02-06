@@ -34,6 +34,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
+import { useDesignStore } from '@/store/designStore';
 
 // Статические опции
 const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
@@ -130,6 +131,8 @@ export function CreateOrderModal({
   const [duration, setDuration] = useState(0);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { user } = useAuthStore();
+  const { version } = useDesignStore();
+  const isV2 = version === 'v2';
 
   // Загрузка источников и РК из БД
   useEffect(() => {
@@ -444,21 +447,31 @@ export function CreateOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)] w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col">
+      <div className={`w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col ${
+        isV2 
+          ? 'bg-[#F3F3EE] border border-gray-200 shadow-xl' 
+          : 'bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
+      }`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#0f0f23] border-b border-[#FFD700]/20 shrink-0">
+        <div className={`flex items-center justify-between px-4 py-3 border-b shrink-0 ${
+          isV2 
+            ? 'bg-white border-gray-200' 
+            : 'bg-[#0f0f23] border-[#FFD700]/20'
+        }`}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center">
-              <Plus className="h-4 w-4 text-[#FFD700]" />
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+              isV2 ? 'bg-[#FEC004]/10' : 'bg-[#FFD700]/10'
+            }`}>
+              <Plus className={`h-4 w-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white">Новый заказ</h2>
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+              <h2 className={`text-base font-semibold ${isV2 ? 'text-gray-900' : 'text-white'}`}>Новый заказ</h2>
+              <div className={`flex items-center gap-2 text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                 <Phone className="h-3 w-3" />
-                <span className="font-medium text-white">{call.phoneClient}</span>
+                <span className={`font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>{call.phoneClient}</span>
                 {call.city && (
                   <>
-                    <span className="text-gray-600">•</span>
+                    <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
                     <MapPin className="h-3 w-3" />
                     <span>{call.city}</span>
                   </>
@@ -468,7 +481,11 @@ export function CreateOrderModal({
           </div>
           <button
             onClick={handleClose}
-            className="w-7 h-7 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+              isV2 
+                ? 'text-gray-400 hover:text-gray-900 hover:bg-gray-100' 
+                : 'text-gray-400 hover:text-white hover:bg-white/10'
+            }`}
           >
             <X className="h-4 w-4" />
           </button>
@@ -477,12 +494,22 @@ export function CreateOrderModal({
         {/* Content */}
         <div className="flex flex-1 overflow-hidden max-h-[600px]">
           {/* Left: History panels */}
-          <div className="w-[420px] border-r border-[#FFD700]/10 flex flex-col overflow-hidden bg-[#0f0f23]/30">
+          <div className={`w-[420px] border-r flex flex-col overflow-hidden ${
+            isV2 
+              ? 'border-gray-200 bg-white' 
+              : 'border-[#FFD700]/10 bg-[#0f0f23]/30'
+          }`}>
             {/* История звонков (все операторы) */}
-            <div className="border-b border-[#FFD700]/10 flex flex-col overflow-hidden max-h-[50%]">
+            <div className={`border-b flex flex-col overflow-hidden max-h-[50%] ${
+              isV2 ? 'border-gray-200' : 'border-[#FFD700]/10'
+            }`}>
               <button 
                 onClick={() => setShowCallHistory(!showCallHistory)}
-                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors shrink-0"
+                className={`w-full px-3 py-2 flex items-center justify-between text-xs font-medium transition-colors shrink-0 ${
+                  isV2 
+                    ? 'text-gray-500 hover:text-gray-900' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
                 <div className="flex items-center gap-2">
                   <PhoneCall className="h-3.5 w-3.5" />
@@ -510,12 +537,20 @@ export function CreateOrderModal({
                         return (
                           <div 
                             key={c.id} 
-                            className={`p-2.5 rounded-lg text-xs ${isCurrentCall ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' : 'bg-[#17212b]/50 hover:bg-[#17212b]'} transition-colors`}
+                            className={`p-2.5 rounded-lg text-xs transition-colors ${
+                              isV2 
+                                ? isCurrentCall 
+                                  ? 'bg-[#FEC004]/10 border border-[#FEC004]/30' 
+                                  : 'bg-gray-50 hover:bg-gray-100'
+                                : isCurrentCall 
+                                  ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' 
+                                  : 'bg-[#17212b]/50 hover:bg-[#17212b]'
+                            }`}
                           >
                             {/* Строка 1: Дата/время + Направление + Статус */}
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className="text-gray-300 font-medium">{formatDate(c.createdAt)}</span>
+                                <span className={`font-medium ${isV2 ? 'text-gray-700' : 'text-gray-300'}`}>{formatDate(c.createdAt)}</span>
                                 {/* Направление */}
                                 <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
                                   isCallback
@@ -530,7 +565,9 @@ export function CreateOrderModal({
                               </div>
                               {/* Статус */}
                               <span className={`flex items-center gap-1 ${
-                                c.status === 'answered' ? 'text-green-400' : 'text-red-400'
+                                c.status === 'answered' 
+                                  ? isV2 ? 'text-green-600' : 'text-green-400' 
+                                  : isV2 ? 'text-red-600' : 'text-red-400'
                               }`}>
                                 {c.status === 'answered' ? (
                                   <PhoneCall className="h-3 w-3" />
@@ -542,26 +579,26 @@ export function CreateOrderModal({
                             </div>
                             
                             {/* Строка 2: Оператор + РК + Источник + Город */}
-                            <div className="flex items-center gap-2 mb-1.5 text-gray-400 text-[11px]">
+                            <div className={`flex items-center gap-2 mb-1.5 text-[11px] ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                               <div className="flex items-center gap-1 min-w-0">
                                 <User className="h-3 w-3 shrink-0" />
                                 <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
                               </div>
-                              <span className="text-gray-600">•</span>
-                              <span className="text-[#FFD700] shrink-0">{c.rk || '—'}</span>
+                              <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
+                              <span className={`shrink-0 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`}>{c.rk || '—'}</span>
                               {c.avitoName && (
                                 <>
-                                  <span className="text-gray-600">•</span>
+                                  <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
                                   <span className="text-purple-400 shrink-0">{c.avitoName}</span>
                                 </>
                               )}
-                              <span className="text-gray-600">•</span>
+                              <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
                               <span className="shrink-0">{c.city || '—'}</span>
                             </div>
                             
                             {/* Строка 3: Номер клиента + Запись */}
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1 text-gray-500">
+                              <div className={`flex items-center gap-1 ${isV2 ? 'text-gray-500' : 'text-gray-500'}`}>
                                 <Phone className="h-3 w-3" />
                                 <span className="font-mono text-[11px]">{formatPhoneDisplay(c.phoneClient)}</span>
                               </div>
@@ -570,9 +607,13 @@ export function CreateOrderModal({
                                 <button
                                   onClick={() => handlePlayRecording(c)}
                                   className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-colors ${
-                                    playingCallId === c.id 
-                                      ? 'bg-[#FFD700]/20 text-[#FFD700]' 
-                                      : 'bg-gray-700/50 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10'
+                                    isV2 
+                                      ? playingCallId === c.id 
+                                        ? 'bg-[#FEC004]/20 text-[#FEC004]' 
+                                        : 'bg-gray-200 text-gray-500 hover:text-[#FEC004] hover:bg-[#FEC004]/10'
+                                      : playingCallId === c.id 
+                                        ? 'bg-[#FFD700]/20 text-[#FFD700]' 
+                                        : 'bg-gray-700/50 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10'
                                   }`}
                                 >
                                   <Play className="h-3 w-3" />
@@ -593,7 +634,11 @@ export function CreateOrderModal({
             <div className="flex-1 overflow-hidden flex flex-col">
               <button 
                 onClick={() => setShowOrderHistory(!showOrderHistory)}
-                className="w-full px-3 py-2 flex items-center justify-between text-xs font-medium text-gray-400 hover:text-white transition-colors shrink-0"
+                className={`w-full px-3 py-2 flex items-center justify-between text-xs font-medium transition-colors shrink-0 ${
+                  isV2 
+                    ? 'text-gray-500 hover:text-gray-900' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-3.5 w-3.5" />
@@ -614,11 +659,13 @@ export function CreateOrderModal({
                       </div>
                     ) : (
                       orderHistory.map((order) => (
-                        <div key={order.id} className="p-2.5 rounded-lg bg-[#17212b]/50 text-xs space-y-1.5">
+                        <div key={order.id} className={`p-2.5 rounded-lg text-xs space-y-1.5 ${
+                          isV2 ? 'bg-gray-50' : 'bg-[#17212b]/50'
+                        }`}>
                           {/* Строка 1: ID + Тип заказа + Статус */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="text-white font-semibold">#{order.id}</span>
+                              <span className={`font-semibold ${isV2 ? 'text-gray-900' : 'text-white'}`}>#{order.id}</span>
                               {order.typeOrder && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-purple-500/10 text-purple-400 border-purple-500/30">
                                   {order.typeOrder}
@@ -631,11 +678,11 @@ export function CreateOrderModal({
                           </div>
                           
                           {/* Строка 2: РК + Источник */}
-                          <div className="flex items-center gap-2 text-gray-400">
+                          <div className={`flex items-center gap-2 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                             {order.rk && (
-                              <span className="text-[#FFD700]">{order.rk}</span>
+                              <span className={isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}>{order.rk}</span>
                             )}
-                            {order.rk && order.avitoName && <span className="text-gray-600">•</span>}
+                            {order.rk && order.avitoName && <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>}
                             {order.avitoName && (
                               <span className="text-purple-400">{order.avitoName}</span>
                             )}
@@ -643,26 +690,28 @@ export function CreateOrderModal({
                           
                           {/* Строка 3: Имя клиента */}
                           <div className="flex items-center gap-1.5">
-                            <User className="h-3 w-3 text-gray-500" />
-                            <span className="text-gray-300 truncate">{order.clientName}</span>
+                            <User className={`h-3 w-3 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
+                            <span className={`truncate ${isV2 ? 'text-gray-700' : 'text-gray-300'}`}>{order.clientName}</span>
                           </div>
                           
                           {/* Строка 4: Адрес */}
                           {order.address && (
                             <div className="flex items-center gap-1.5">
-                              <MapPin className="h-3 w-3 text-gray-500" />
-                              <span className="text-gray-400 truncate">{order.address}</span>
+                              <MapPin className={`h-3 w-3 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
+                              <span className={`truncate ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>{order.address}</span>
                             </div>
                           )}
                           
                           {/* Строка 5: Мастер + Итог */}
-                          <div className="flex items-center justify-between pt-1 border-t border-gray-700/50">
-                            <div className="flex items-center gap-1.5 text-gray-400">
+                          <div className={`flex items-center justify-between pt-1 border-t ${
+                            isV2 ? 'border-gray-200' : 'border-gray-700/50'
+                          }`}>
+                            <div className={`flex items-center gap-1.5 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                               <span>Мастер:</span>
-                              <span className="text-gray-300">{order.master?.name || '—'}</span>
+                              <span className={isV2 ? 'text-gray-700' : 'text-gray-300'}>{order.master?.name || '—'}</span>
                             </div>
                             {order.result !== undefined && order.result !== null && (
-                              <span className="text-green-400 font-medium">{order.result.toLocaleString('ru-RU')} ₽</span>
+                              <span className={`font-medium ${isV2 ? 'text-green-600' : 'text-green-400'}`}>{order.result.toLocaleString('ru-RU')} ₽</span>
                             )}
                           </div>
                           
@@ -671,7 +720,11 @@ export function CreateOrderModal({
                             variant="outline"
                             size="sm"
                             onClick={() => window.open(`/orders?orderId=${order.id}`, '_blank')}
-                            className="w-full mt-2 h-6 text-[10px] text-[#FFD700] border-[#FFD700]/30 hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
+                            className={`w-full mt-2 h-6 text-[10px] ${
+                              isV2 
+                                ? 'text-[#FEC004] border-[#FEC004]/30 hover:bg-[#FEC004]/10 hover:border-[#FEC004]'
+                                : 'text-[#FFD700] border-[#FFD700]/30 hover:bg-[#FFD700]/10 hover:border-[#FFD700]'
+                            }`}
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Открыть заказ
@@ -692,19 +745,23 @@ export function CreateOrderModal({
                 {/* Row 1: РК + Город */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">РК</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>РК</Label>
                     <Controller
                       name="rk"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                          <SelectTrigger className={`h-9 text-sm ${
+                            isV2 
+                              ? 'bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]' 
+                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                          }`}>
                             <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                            <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
+                          <SelectContent className={isV2 ? 'bg-white border-gray-200' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                            <SelectItem value="Не указано" className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Не указано</SelectItem>
                             {campaigns.map((option) => (
-                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-900' : 'text-white'}>{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -712,18 +769,22 @@ export function CreateOrderModal({
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Город *</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Город *</Label>
                     <Controller
                       name="city"
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                          <SelectTrigger className={`h-9 text-sm ${
+                            isV2 
+                              ? 'bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]' 
+                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                          }`}>
                             <SelectValue placeholder={<span className="text-gray-500">Выберите город</span>} />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                          <SelectContent className={isV2 ? 'bg-white border-gray-200' : 'bg-[#17212b] border-[#FFD700]/30'}>
                             {CITY_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-900' : 'text-white'}>{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -736,19 +797,23 @@ export function CreateOrderModal({
                 {/* Row 2: Источник + Направление */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Источник</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Источник</Label>
                     <Controller
                       name="avitoName"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                          <SelectTrigger className={`h-9 text-sm ${
+                            isV2 
+                              ? 'bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]' 
+                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                          }`}>
                             <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30 max-h-60">
-                            <SelectItem value="Не указано" className="text-gray-400">Не указано</SelectItem>
+                          <SelectContent className={`max-h-60 ${isV2 ? 'bg-white border-gray-200' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
+                            <SelectItem value="Не указано" className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Не указано</SelectItem>
                             {sources.map((option) => (
-                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-900' : 'text-white'}>{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -756,18 +821,22 @@ export function CreateOrderModal({
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Направление</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Направление</Label>
                     <Controller
                       name="typeEquipment"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-sm text-white">
+                          <SelectTrigger className={`h-9 text-sm ${
+                            isV2 
+                              ? 'bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]' 
+                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                          }`}>
                             <SelectValue placeholder={<span className="text-gray-500">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
+                          <SelectContent className={isV2 ? 'bg-white border-gray-200' : 'bg-[#17212b] border-[#FFD700]/30'}>
                             {DIRECTION_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className="text-white">{option}</SelectItem>
+                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-900' : 'text-white'}>{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -777,25 +846,33 @@ export function CreateOrderModal({
                 </div>
 
                 {/* Divider */}
-                <div className="border-t border-[#FFD700]/10" />
+                <div className={`border-t ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/10'}`} />
 
                 {/* Row 3: Клиент + Адрес */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Имя клиента *</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Имя клиента *</Label>
                     <Input
                       {...register('clientName')}
                       placeholder="Введите имя"
-                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
+                      className={`h-9 text-sm placeholder:text-gray-500 ${
+                        isV2 
+                          ? 'bg-white border-gray-200 text-gray-900 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
+                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                      }`}
                     />
                     {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
                   </div>
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Адрес *</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Адрес *</Label>
                     <Input
                       {...register('address')}
                       placeholder="Введите адрес"
-                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500"
+                      className={`h-9 text-sm placeholder:text-gray-500 ${
+                        isV2 
+                          ? 'bg-white border-gray-200 text-gray-900 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
+                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                      }`}
                     />
                     {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
                   </div>
@@ -804,19 +881,23 @@ export function CreateOrderModal({
                 {/* Row 4: Тип заказа + Дата встречи */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Тип заказа *</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Тип заказа *</Label>
                     <Controller
                       name="typeOrder"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm">
+                          <SelectTrigger className={`h-9 text-sm ${
+                            isV2 
+                              ? 'bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]' 
+                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                          }`}>
                             <SelectValue placeholder="Выберите тип" />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                            <SelectItem value="Впервые" className="text-white">Впервые</SelectItem>
-                            <SelectItem value="Повтор" className="text-white">Повтор</SelectItem>
-                            <SelectItem value="Гарантия" className="text-white">Гарантия</SelectItem>
+                          <SelectContent className={isV2 ? 'bg-white border-gray-200' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                            <SelectItem value="Впервые" className={isV2 ? 'text-gray-900' : 'text-white'}>Впервые</SelectItem>
+                            <SelectItem value="Повтор" className={isV2 ? 'text-gray-900' : 'text-white'}>Повтор</SelectItem>
+                            <SelectItem value="Гарантия" className={isV2 ? 'text-gray-900' : 'text-white'}>Гарантия</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -824,11 +905,15 @@ export function CreateOrderModal({
                     {errors.typeOrder && <p className="text-xs text-red-400 mt-1">{errors.typeOrder.message}</p>}
                   </div>
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1 block">Дата встречи *</Label>
+                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Дата встречи *</Label>
                     <Input
                       type="datetime-local"
                       {...register('dateMeeting')}
-                      className="h-9 bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm [&::-webkit-calendar-picker-indicator]:invert"
+                      className={`h-9 text-sm ${
+                        isV2 
+                          ? 'bg-white border-gray-200 text-gray-900 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
+                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white [&::-webkit-calendar-picker-indicator]:invert'
+                      }`}
                     />
                     {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
                   </div>
@@ -836,12 +921,16 @@ export function CreateOrderModal({
 
                 {/* Row 5: Проблема */}
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1 block">Проблема *</Label>
+                  <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>Проблема *</Label>
                   <Textarea
                     {...register('problem')}
                     placeholder="Опишите проблему клиента..."
                     rows={3}
-                    className="bg-[#0f0f23] border-[#FFD700]/20 text-white text-sm placeholder:text-gray-500 resize-none"
+                    className={`text-sm placeholder:text-gray-500 resize-none ${
+                      isV2 
+                        ? 'bg-white border-gray-200 text-gray-900 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
+                        : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
+                    }`}
                   />
                   {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
                 </div>
@@ -849,13 +938,21 @@ export function CreateOrderModal({
             </ScrollArea>
 
             {/* Footer */}
-            <div className="px-4 py-3 bg-[#0f0f23] border-t border-[#FFD700]/20 flex justify-end gap-2 shrink-0">
+            <div className={`px-4 py-3 border-t flex justify-end gap-2 shrink-0 ${
+              isV2 
+                ? 'bg-white border-gray-200' 
+                : 'bg-[#0f0f23] border-[#FFD700]/20'
+            }`}>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className="h-9 px-4 text-gray-400 hover:text-white hover:bg-white/5"
+                className={`h-9 px-4 ${
+                  isV2 
+                    ? 'text-gray-500 hover:text-gray-900 hover:bg-gray-100' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
               >
                 Отмена
               </Button>
@@ -863,7 +960,11 @@ export function CreateOrderModal({
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit(onSubmit)}
-                className="h-9 px-5 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
+                className={`h-9 px-5 font-medium ${
+                  isV2 
+                    ? 'bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900' 
+                    : 'bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23]'
+                }`}
               >
                 {isSubmitting ? (
                   <>
@@ -880,7 +981,11 @@ export function CreateOrderModal({
 
         {/* Audio Player - показывается снизу при воспроизведении */}
         {playingCall && (
-          <div className="border-t-2 border-[#FFD700]/40 bg-gradient-to-r from-[#0f0f23] to-[#17212b] px-4 py-3 shrink-0">
+          <div className={`border-t-2 px-4 py-3 shrink-0 ${
+            isV2 
+              ? 'border-[#FEC004]/40 bg-white' 
+              : 'border-[#FFD700]/40 bg-gradient-to-r from-[#0f0f23] to-[#17212b]'
+          }`}>
             {/* Скрытый audio элемент */}
             {audioUrl && (
               <audio
@@ -900,25 +1005,29 @@ export function CreateOrderModal({
               <button
                 onClick={togglePlayPause}
                 disabled={audioLoading || !audioUrl}
-                className="w-10 h-10 rounded-full bg-[#FFD700] hover:bg-[#FFD700]/90 flex items-center justify-center shrink-0 transition-colors disabled:opacity-50"
+                className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors disabled:opacity-50 ${
+                  isV2 
+                    ? 'bg-[#FEC004] hover:bg-[#e6ac00]' 
+                    : 'bg-[#FFD700] hover:bg-[#FFD700]/90'
+                }`}
               >
                 {audioLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-[#0f0f23]" />
+                  <Loader2 className="w-5 h-5 animate-spin text-gray-900" />
                 ) : isPlaying ? (
-                  <Pause className="w-5 h-5 text-[#0f0f23]" />
+                  <Pause className="w-5 h-5 text-gray-900" />
                 ) : (
-                  <Play className="w-5 h-5 text-[#0f0f23] ml-0.5" />
+                  <Play className="w-5 h-5 text-gray-900 ml-0.5" />
                 )}
               </button>
 
               {/* Информация о звонке */}
               <div className="min-w-0 w-48">
-                <div className="text-sm text-white font-medium truncate">
+                <div className={`text-sm font-medium truncate ${isV2 ? 'text-gray-900' : 'text-white'}`}>
                   {playingCall.operator?.name || 'Оператор'}
                 </div>
-                <div className="text-xs text-gray-400 flex items-center gap-1.5 truncate">
+                <div className={`text-xs flex items-center gap-1.5 truncate ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                   <span>{formatDate(playingCall.createdAt)}</span>
-                  <span className="text-gray-600">•</span>
+                  <span className={isV2 ? 'text-gray-300' : 'text-gray-600'}>•</span>
                   <span className={
                     playingCall.callDirection === 'callback' 
                       ? 'text-purple-400' 
@@ -933,7 +1042,7 @@ export function CreateOrderModal({
 
               {/* Прогресс-бар */}
               <div className="flex-1 flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-10 text-right font-mono">
+                <span className={`text-xs w-10 text-right font-mono ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                   {formatAudioTime(currentTime)}
                 </span>
                 <div className="flex-1 relative">
@@ -943,26 +1052,29 @@ export function CreateOrderModal({
                     max={duration || 100}
                     value={currentTime}
                     onChange={handleSeek}
-                    className="w-full h-1.5 bg-gray-700 rounded-full appearance-none cursor-pointer
+                    className={`w-full h-1.5 rounded-full appearance-none cursor-pointer
                       [&::-webkit-slider-thumb]:appearance-none
                       [&::-webkit-slider-thumb]:w-3
                       [&::-webkit-slider-thumb]:h-3
                       [&::-webkit-slider-thumb]:rounded-full
-                      [&::-webkit-slider-thumb]:bg-[#FFD700]
                       [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(255,215,0,0.5)]
                       [&::-moz-range-thumb]:w-3
                       [&::-moz-range-thumb]:h-3
                       [&::-moz-range-thumb]:rounded-full
-                      [&::-moz-range-thumb]:bg-[#FFD700]
                       [&::-moz-range-thumb]:border-0
-                      [&::-moz-range-thumb]:cursor-pointer"
+                      [&::-moz-range-thumb]:cursor-pointer
+                      ${isV2 
+                        ? 'bg-gray-200 [&::-webkit-slider-thumb]:bg-[#FEC004] [&::-moz-range-thumb]:bg-[#FEC004]' 
+                        : 'bg-gray-700 [&::-webkit-slider-thumb]:bg-[#FFD700] [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(255,215,0,0.5)] [&::-moz-range-thumb]:bg-[#FFD700]'
+                      }`}
                     style={{
-                      background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${(currentTime / (duration || 1)) * 100}%, #374151 ${(currentTime / (duration || 1)) * 100}%, #374151 100%)`
+                      background: isV2 
+                        ? `linear-gradient(to right, #FEC004 0%, #FEC004 ${(currentTime / (duration || 1)) * 100}%, #e5e7eb ${(currentTime / (duration || 1)) * 100}%, #e5e7eb 100%)`
+                        : `linear-gradient(to right, #FFD700 0%, #FFD700 ${(currentTime / (duration || 1)) * 100}%, #374151 ${(currentTime / (duration || 1)) * 100}%, #374151 100%)`
                     }}
                   />
                 </div>
-                <span className="text-xs text-gray-400 w-10 font-mono">
+                <span className={`text-xs w-10 font-mono ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
                   {formatAudioTime(duration)}
                 </span>
               </div>
@@ -970,7 +1082,11 @@ export function CreateOrderModal({
               {/* Кнопка закрытия */}
               <button
                 onClick={handleClosePlayer}
-                className="w-8 h-8 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors shrink-0"
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
+                  isV2 
+                    ? 'text-gray-400 hover:text-gray-900 hover:bg-gray-100' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
               >
                 <X className="w-4 h-4" />
               </button>

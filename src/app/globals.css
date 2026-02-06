@@ -10,7 +10,12 @@
 
 .font-myriad * {
   font-family: inherit !important;
-  font-weight: 400 !important;
+}
+
+/* Навигация использует Light (300) */
+.font-myriad nav,
+.font-myriad nav * {
+  font-weight: 300 !important;
 }
 
 .font-myriad a,

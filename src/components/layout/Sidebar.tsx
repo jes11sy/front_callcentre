@@ -57,7 +57,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
+              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors border-l-[3px] rounded-l-md ${
                 active 
                   ? 'border-[#FEC004] text-gray-800' 
                   : 'border-transparent text-gray-800 hover:text-[#FEC004]'
@@ -81,7 +81,7 @@ export function Sidebar() {
         {/* Profile with user name */}
         <Link
           href="/profile"
-          className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors border-l-[3px] rounded-l-md ${
+          className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors border-l-[3px] rounded-l-md ${
             isActive('/profile') 
               ? 'border-[#FEC004] text-gray-800' 
               : 'border-transparent text-gray-800 hover:text-[#FEC004]'
@@ -94,7 +94,7 @@ export function Sidebar() {
         {/* Version Toggle */}
         <button
           onClick={toggleVersion}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-light text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
         >
           <Palette className="h-5 w-5" />
           Дизайн: {version.toUpperCase()}
@@ -103,7 +103,7 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-light text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
         >
           <LogOut className="h-5 w-5" />
           Выйти

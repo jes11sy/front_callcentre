@@ -198,83 +198,80 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Notifications */}
-        <div className="relative" ref={isMobile ? undefined : notificationsRef}>
-          <button
-            onClick={toggleDropdown}
-            className={`relative flex items-center gap-3 px-3 font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group ${
-              isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
-            }`}
-          >
-            <div className="relative">
-              <Bell className={isMobile ? 'h-6 w-6' : 'h-5 w-5'} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </div>
-            <span className="group-hover:text-[#FEC004] transition-colors">
-              Уведомления
-            </span>
-          </button>
-
-          {/* Notifications Dropdown */}
-          {isDropdownOpen && (
-            <div 
-              ref={isMobile ? notificationsRef : undefined}
-              className={`absolute ${isMobile ? 'left-0 right-0 mx-3 bottom-full mb-2' : 'left-full ml-2 w-80 bottom-full mb-2'} bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}
+        {/* Notifications - только для десктопа */}
+        {!isMobile && (
+          <div className="relative" ref={notificationsRef}>
+            <button
+              onClick={toggleDropdown}
+              className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group"
             >
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+              <div className="relative">
+                <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                  <button
-                    onClick={markAllAsRead}
-                    className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
-                  >
-                    <Check className="h-3 w-3" />
-                    Прочитать все
-                  </button>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
               </div>
-              <div className="max-h-72 overflow-y-auto">
-                {notifications.length > 0 ? (
-                  notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
-                        !notification.read ? 'bg-[#FEC004]/5' : ''
-                      }`}
+              <span className="group-hover:text-[#FEC004] transition-colors">
+                Уведомления
+              </span>
+            </button>
+
+            {/* Notifications Dropdown */}
+            {isDropdownOpen && (
+              <div className="absolute left-full ml-2 w-80 bottom-full mb-2 bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
-                            {notification.title}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                            {formatTime(notification.createdAt)}
-                          </p>
+                      <Check className="h-3 w-3" />
+                      Прочитать все
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
+                          !notification.read ? 'bg-[#FEC004]/5' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                              {notification.title}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              {formatTime(notification.createdAt)}
+                            </p>
+                          </div>
+                          {!notification.read && (
+                            <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                          )}
                         </div>
-                        {!notification.read && (
-                          <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
-                        )}
                       </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Нет уведомлений</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет уведомлений</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* Profile with user name */}
         <Link
@@ -323,17 +320,89 @@ export function Sidebar() {
             className="h-9 w-auto" 
           />
         </Link>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors"
-          aria-label="Открыть меню"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-7 w-7" />
-          ) : (
-            <Menu className="h-7 w-7" />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Mobile Notifications Bell */}
+          <div className="relative" ref={notificationsRef}>
+            <button
+              onClick={toggleDropdown}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors relative"
+              aria-label="Уведомления"
+            >
+              <Bell className="h-6 w-6" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Mobile Notifications Dropdown */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                    >
+                      <Check className="h-3 w-3" />
+                      Прочитать все
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
+                          !notification.read ? 'bg-[#FEC004]/5' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                              {notification.title}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              {formatTime(notification.createdAt)}
+                            </p>
+                          </div>
+                          {!notification.read && (
+                            <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Нет уведомлений</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors"
+            aria-label="Открыть меню"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-7 w-7" />
+            ) : (
+              <Menu className="h-7 w-7" />
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Full-screen Menu */}

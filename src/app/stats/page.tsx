@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
@@ -109,29 +109,16 @@ export default function StatsPage() {
   const { user } = useAuthStore();
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-
-  // Устанавливаем даты по умолчанию (последние 30 дней)
-  useEffect(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 30);
-    
-    setEndDate(end.toISOString().split('T')[0]);
-    setStartDate(start.toISOString().split('T')[0]);
-  }, []);
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   // Используем кастомный хук для статистики
   const { stats, isLoading, error, refetch, formatDate, processedDailyStats } = useStats(startDate, endDate);
 
   const resetToCurrentPeriod = useCallback(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 30);
-    
-    setEndDate(end.toISOString().split('T')[0]);
-    setStartDate(start.toISOString().split('T')[0]);
+    const today = new Date().toISOString().split('T')[0];
+    setStartDate(today);
+    setEndDate(today);
   }, []);
 
   // Общие стили для V2

@@ -109,18 +109,79 @@ export default function NonOrdersPage() {
     }
   ];
 
+  // V2: Минималистичная версия
+  if (isV2) {
+    return (
+      <DashboardLayout>
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="max-w-4xl space-y-10">
+            
+            {/* Что мы НЕ делаем - в начале */}
+            <section className="bg-red-50 p-6 rounded-lg border border-red-200">
+              <h2 className="text-lg text-red-700 mb-4">Что мы НЕ делаем</h2>
+              <ul className="space-y-2 text-gray-700">
+                <li><span className="text-red-600 font-medium">Не выкупаем технику</span> — мы не занимаемся выкупом</li>
+                <li><span className="text-red-600 font-medium">Не ездим только ради диагностики</span> — диагностика бесплатна только при ремонте</li>
+                <li><span className="text-red-600 font-medium">Не ремонтируем/меняем матрицы</span> — не работаем с матрицами экранов</li>
+                <li><span className="text-red-600 font-medium">Не ремонтируем мелкую бытовую технику</span> — пылесосы, тостеры и прочую мелочовку</li>
+              </ul>
+            </section>
+
+            {/* Категории причин */}
+            {nonOrderReasons.slice(1).map((category, index) => (
+              <section key={index}>
+                <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">{category.category}</h2>
+                <div className="space-y-4">
+                  {category.reasons.map((reason, reasonIndex) => (
+                    <div key={reasonIndex} className="pb-4 border-b border-gray-100 last:border-0">
+                      <p className="text-gray-900 font-medium">{reason.title}</p>
+                      <p className="text-gray-500 text-sm mt-1">{reason.description}</p>
+                      <p className="text-blue-600 text-sm mt-2">Действие: {reason.action}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            {/* Правила обработки */}
+            <section>
+              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Правила обработки незаказов</h2>
+              <ul className="space-y-2 text-gray-700">
+                <li>Всегда сохранять вежливый тон, даже при отказе клиента</li>
+                <li>Обязательно записывать причину отказа в системе</li>
+                <li>Не тратить более 5 минут на попытки убедить клиента</li>
+                <li>При грубом поведении — завершить разговор, не отвечать грубостью</li>
+              </ul>
+            </section>
+
+            {/* Советы */}
+            <section className="bg-green-50 p-6 rounded-lg border border-green-200">
+              <h2 className="text-lg text-green-700 mb-4">Как минимизировать незаказы</h2>
+              <ul className="space-y-2 text-gray-700">
+                <li>Четко объяснять ценовую политику с самого начала</li>
+                <li>Уточнять удобное время для клиента</li>
+                <li>Подчеркивать гарантийные обязательства</li>
+                <li>Рассказывать о опыте и квалификации мастеров</li>
+              </ul>
+            </section>
+
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout>
-      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
-        {!isV2 && (
-          <div className="flex items-center space-x-3 mb-8">
-            <XCircle className="h-8 w-8 text-[#FFD700]" />
-            <div>
-              <h1 className="text-3xl font-bold text-[#FFD700]">Незаказы</h1>
-              <p className="text-gray-400">Причины отказа от заказов и правила обработки</p>
-            </div>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
+        <div className="flex items-center space-x-3 mb-8">
+          <XCircle className="h-8 w-8 text-[#FFD700]" />
+          <div>
+            <h1 className="text-3xl font-bold text-[#FFD700]">Незаказы</h1>
+            <p className="text-gray-400">Причины отказа от заказов и правила обработки</p>
           </div>
-        )}
+        </div>
 
       <div className="space-y-6">
         {nonOrderReasons.map((category, index) => {
@@ -128,25 +189,25 @@ export default function NonOrdersPage() {
           return (
             <Card key={index} className={cardClass}>
               <CardHeader>
-                <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
-                  <Icon className={`h-6 w-6 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                <CardTitle className="flex items-center space-x-2 text-white">
+                  <Icon className="h-6 w-6 text-[#FFD700]" />
                   <span>{category.category}</span>
                 </CardTitle>
-                <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
+                <CardDescription className="text-gray-400">Основные причины из категории &quot;{category.category.toLowerCase()}&quot;</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {category.reasons.map((reason, reasonIndex) => (
-                  <div key={reasonIndex} className={isV2 ? "border border-gray-200 rounded-lg p-4 space-y-2 bg-gray-50" : "border border-[#FFD700]/30 rounded-lg p-4 space-y-2 bg-[#0f0f23]"}>
+                  <div key={reasonIndex} className="border border-[#FFD700]/30 rounded-lg p-4 space-y-2 bg-[#0f0f23]">
                     <div className="flex items-center space-x-2">
                       <Badge variant="outline" className={badgeClass}>{reason.title}</Badge>
                     </div>
-                    <p className={`text-sm ${isV2 ? 'text-gray-600' : 'text-gray-400'}`}>{reason.description}</p>
-                    <div className={isV2 ? "bg-blue-50 p-3 rounded-md border border-blue-200" : "bg-blue-900/20 p-3 rounded-md border border-blue-500/30"}>
+                    <p className="text-sm text-gray-400">{reason.description}</p>
+                    <div className="bg-blue-900/20 p-3 rounded-md border border-blue-500/30">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Clock className={`h-4 w-4 ${isV2 ? 'text-blue-600' : 'text-blue-400'}`} />
-                        <span className={`text-sm font-medium ${isV2 ? 'text-blue-600' : 'text-blue-400'}`}>Действия:</span>
+                        <Clock className="h-4 w-4 text-blue-400" />
+                        <span className="text-sm font-medium text-blue-400">Действия:</span>
                       </div>
-                      <p className={`text-sm ${isV2 ? 'text-blue-700' : 'text-blue-300'}`}>{reason.action}</p>
+                      <p className="text-sm text-blue-300">{reason.action}</p>
                     </div>
                   </div>
                 ))}
@@ -156,80 +217,80 @@ export default function NonOrdersPage() {
         })}
       </div>
 
-        <Card className={isV2 ? "border border-red-200 bg-red-50 mt-6" : "border-2 border-red-500/30 bg-red-900/20"}>
+        <Card className="border-2 border-red-500/30 bg-red-900/20">
           <CardHeader>
-            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-red-700' : 'text-red-300'}`}>
-              <Badge variant="destructive" className={isV2 ? "bg-red-100 text-red-700 border-red-200" : ""}>Важно</Badge>
+            <CardTitle className="flex items-center space-x-2 text-red-300">
+              <Badge variant="destructive">Важно</Badge>
               <span>Правила обработки незаказов</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid gap-2 text-sm">
               <div className="flex items-center space-x-2">
-                <Phone className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Всегда сохранять вежливый тон, даже при отказе клиента</span>
+                <Phone className="h-4 w-4 text-red-400" />
+                <span className="text-white">Всегда сохранять вежливый тон, даже при отказе клиента</span>
               </div>
               <div className="flex items-center space-x-2">
-                <MessageSquare className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Обязательно записывать причину отказа в системе</span>
+                <MessageSquare className="h-4 w-4 text-red-400" />
+                <span className="text-white">Обязательно записывать причину отказа в системе</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Не тратить более 5 минут на попытки убедить клиента</span>
+                <Clock className="h-4 w-4 text-red-400" />
+                <span className="text-white">Не тратить более 5 минут на попытки убедить клиента</span>
               </div>
               <div className="flex items-center space-x-2">
-                <XCircle className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>При грубом поведении - завершить разговор, не отвечать грубостью</span>
+                <XCircle className="h-4 w-4 text-red-400" />
+                <span className="text-white">При грубом поведении - завершить разговор, не отвечать грубостью</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={isV2 ? "border border-red-200 bg-red-50 mt-6" : "border-2 border-red-500/30 bg-red-900/20"}>
+        <Card className="border-2 border-red-500/30 bg-red-900/20 mt-6">
           <CardHeader>
-            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-red-700' : 'text-red-300'}`}>
-              <Badge variant="destructive" className={isV2 ? "bg-red-100 text-red-700 border-red-200" : ""}>КРИТИЧЕСКИ ВАЖНО</Badge>
+            <CardTitle className="flex items-center space-x-2 text-red-300">
+              <Badge variant="destructive">КРИТИЧЕСКИ ВАЖНО</Badge>
               <span>Что мы НЕ делаем</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3">
               <div className="flex items-center space-x-3">
-                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <XCircle className="h-5 w-5 text-red-400" />
                 <div>
-                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не выкупаем технику</div>
-                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Мы не занимаемся выкупом техники у клиентов</div>
+                  <div className="font-semibold text-red-300">Не выкупаем технику</div>
+                  <div className="text-sm text-red-300">Мы не занимаемся выкупом техники у клиентов</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <XCircle className="h-5 w-5 text-red-400" />
                 <div>
-                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ездим только ради диагностики</div>
-                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Диагностика бесплатна только при заказе ремонта</div>
+                  <div className="font-semibold text-red-300">Не ездим только ради диагностики</div>
+                  <div className="text-sm text-red-300">Диагностика бесплатна только при заказе ремонта</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <XCircle className="h-5 w-5 text-red-400" />
                 <div>
-                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ремонтируем/меняем матрицы</div>
-                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Не работаем с матрицами экранов</div>
+                  <div className="font-semibold text-red-300">Не ремонтируем/меняем матрицы</div>
+                  <div className="text-sm text-red-300">Не работаем с матрицами экранов</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <XCircle className={`h-5 w-5 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                <XCircle className="h-5 w-5 text-red-400" />
                 <div>
-                  <div className={`font-semibold ${isV2 ? 'text-red-700' : 'text-red-300'}`}>Не ремонтируем мелкую бытовую технику</div>
-                  <div className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-300'}`}>Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
+                  <div className="font-semibold text-red-300">Не ремонтируем мелкую бытовую технику</div>
+                  <div className="text-sm text-red-300">Пылесосы, сушилки для овощей, тостеры и прочая мелочовка</div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={isV2 ? "border border-green-200 bg-green-50 mt-6" : "border-2 border-green-500/30 bg-green-900/20"}>
+        <Card className="border-2 border-green-500/30 bg-green-900/20 mt-6">
           <CardHeader>
-            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-green-700' : 'text-green-300'}`}>
-              <Badge variant="outline" className={isV2 ? "border-green-300 text-green-700" : "border-green-500/30 text-green-300"}>
+            <CardTitle className="flex items-center space-x-2 text-green-300">
+              <Badge variant="outline" className="border-green-500/30 text-green-300">
                 Совет
               </Badge>
               <span>Как минимизировать незаказы</span>
@@ -239,19 +300,19 @@ export default function NonOrdersPage() {
             <div className="grid gap-2 text-sm">
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className={`text-xs ${badgeClass}`}>Цена</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Четко объяснять ценовую политику с самого начала</span>
+                <span className="text-white">Четко объяснять ценовую политику с самого начала</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className={`text-xs ${badgeClass}`}>Время</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Уточнять удобное время для клиента</span>
+                <span className="text-white">Уточнять удобное время для клиента</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className={`text-xs ${badgeClass}`}>Гарантия</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Подчеркивать гарантийные обязательства</span>
+                <span className="text-white">Подчеркивать гарантийные обязательства</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className={`text-xs ${badgeClass}`}>Опыт</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Рассказывать о опыте и квалификации мастеров</span>
+                <span className="text-white">Рассказывать о опыте и квалификации мастеров</span>
               </div>
             </div>
           </CardContent>

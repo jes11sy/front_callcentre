@@ -230,8 +230,8 @@ export default function ProfilePage() {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    if (isV2) {
+  const getStatusColor = (status: string, forV2 = false) => {
+    if (forV2) {
       switch (status) {
         case 'active': return 'bg-green-100 text-green-700 border-green-200';
         case 'inactive': return 'bg-red-100 text-red-700 border-red-200';
@@ -285,40 +285,264 @@ export default function ProfilePage() {
     );
   }
 
-  // Helper classes for V2
-  const cardClass = isV2 
-    ? "border border-gray-200 bg-white font-myriad"
-    : "border-2 border-[#FFD700]/30 bg-[#17212b]";
-  
-  const inputClass = isV2 
-    ? "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-    : "bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]";
-  
-  const selectTriggerClass = isV2 
-    ? "bg-white border-gray-200 text-gray-900 hover:border-[#FEC004]/50 focus:border-[#FEC004] [&>span]:text-gray-900"
-    : "bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white";
-  
-  const selectContentClass = isV2 
-    ? "bg-white border-gray-200"
-    : "bg-[#17212b] border-[#FFD700]/30";
-  
-  const selectItemClass = isV2 
-    ? "text-gray-900 focus:bg-[#FEC004]/10 focus:text-gray-900"
-    : "!text-white focus:bg-[#FFD700]/20 focus:!text-white";
+  // Helper classes for V1
+  const cardClass = "border-2 border-[#FFD700]/30 bg-[#17212b]";
+  const inputClass = "bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]";
+  const selectTriggerClass = "bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white";
+  const selectContentClass = "bg-[#17212b] border-[#FFD700]/30";
+  const selectItemClass = "!text-white focus:bg-[#FFD700]/20 focus:!text-white";
 
+  // V2: Компактный минималистичный дизайн
+  if (isV2) {
+    // Получаем инициалы для аватара
+    const getInitials = (name: string) => {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    };
+
+    if (isLoading) {
+      return (
+        <DashboardLayout variant="operator" requiredRole="operator">
+          <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+            <div className="max-w-3xl">
+              <div className="text-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FEC004]" />
+                <p className="text-gray-500">Загрузка профиля...</p>
+              </div>
+            </div>
+          </div>
+        </DashboardLayout>
+      );
+    }
+
+    if (!profile) return null;
+
+    return (
+      <DashboardLayout variant="operator" requiredRole="operator">
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="max-w-3xl space-y-8">
+            
+            {/* Шапка профиля */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-[#FEC004] flex items-center justify-center text-gray-900 text-xl font-medium">
+                  {getInitials(profile.name)}
+                </div>
+                <div>
+                  <h1 className="text-xl text-gray-900">{profile.name}</h1>
+                  <p className="text-gray-500">{profile.login} • {profile.city}</p>
+                  <Badge className={getStatusColor(profile.status, true) + ' mt-1'}>
+                    {getStatusText(profile.status)}
+                  </Badge>
+                </div>
+              </div>
+              {!isEditing ? (
+                <Button 
+                  onClick={handleEdit} 
+                  variant="ghost"
+                  className="text-gray-500 hover:text-[#FEC004]"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button onClick={handleCancel} variant="ghost" className="text-gray-500">
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    onClick={profileForm.handleSubmit(handleSave)}
+                    disabled={updateProfileMutation.isPending}
+                    className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
+                  >
+                    {updateProfileMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Статистика (для операторов) */}
+            {profile.role === 'operator' && profileStats && (
+              <>
+                <div className="border-b border-gray-200" />
+                <div className="grid grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl text-gray-900">{profileStats.total.calls}</div>
+                    <div className="text-sm text-gray-500">Звонков</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl text-gray-900">{profileStats.total.orders}</div>
+                    <div className="text-sm text-gray-500">Заказов</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl text-gray-900">{profileStats.monthly.calls}</div>
+                    <div className="text-sm text-gray-500">За месяц</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl text-gray-900">{profileStats.today.calls}</div>
+                    <div className="text-sm text-gray-500">Сегодня</div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Информация */}
+            <div className="border-b border-gray-200" />
+            
+            <div className="space-y-4">
+              {/* Рабочий статус */}
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-500">Рабочий статус</span>
+                {isEditing ? (
+                  <Select 
+                    value={profileForm.watch('statusWork')} 
+                    onValueChange={(value) => profileForm.setValue('statusWork', value)}
+                  >
+                    <SelectTrigger className="w-32 bg-white border-gray-200 text-gray-900">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="offline" className="text-gray-900">Оффлайн</SelectItem>
+                      <SelectItem value="online" className="text-gray-900">В сети</SelectItem>
+                      <SelectItem value="break" className="text-gray-900">Перерыв</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="text-gray-900">{getWorkStatusText(profile.statusWork)}</span>
+                )}
+              </div>
+
+              {/* Город (редактируемый) */}
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-500">Город</span>
+                {isEditing ? (
+                  <Input
+                    {...profileForm.register('city')}
+                    className="w-40 bg-white border-gray-200 text-gray-900 text-right"
+                  />
+                ) : (
+                  <span className="text-gray-900">{profile.city}</span>
+                )}
+              </div>
+
+              {/* Дата начала */}
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-500">Дата начала</span>
+                <span className="text-gray-900">{formatDate(profile.dateCreate)}</span>
+              </div>
+
+              {/* Примечание */}
+              <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                <span className="text-gray-500">Примечание</span>
+                {isEditing ? (
+                  <Textarea
+                    {...profileForm.register('note')}
+                    className="w-64 bg-white border-gray-200 text-gray-900"
+                    rows={2}
+                  />
+                ) : (
+                  <span className="text-gray-900 text-right max-w-xs">{profile.note || 'Не указано'}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Смена пароля */}
+            <div className="border-b border-gray-200" />
+            
+            <div>
+              <button
+                onClick={() => setIsChangingPassword(!isChangingPassword)}
+                className="text-gray-500 hover:text-[#FEC004] transition-colors"
+              >
+                {isChangingPassword ? 'Отмена' : 'Сменить пароль'}
+              </button>
+
+              {isChangingPassword && (
+                <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="mt-4 space-y-4">
+                  <div className="space-y-1">
+                    <Label className="text-gray-500 text-sm">Текущий пароль</Label>
+                    <div className="relative">
+                      <Input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        {...passwordForm.register('currentPassword')}
+                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-gray-500 text-sm">Новый пароль</Label>
+                    <div className="relative">
+                      <Input
+                        type={showNewPassword ? 'text' : 'password'}
+                        {...passwordForm.register('newPassword')}
+                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      >
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-gray-500 text-sm">Подтвердите пароль</Label>
+                    <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        {...passwordForm.register('confirmPassword')}
+                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit"
+                    disabled={changePasswordMutation.isPending}
+                    className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
+                  >
+                    {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Сохранить пароль
+                  </Button>
+                </form>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // V1: Оригинальный дизайн
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className={`text-3xl font-bold flex items-center ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>
-                  <User className={`h-8 w-8 mr-3 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
+                  <User className="h-8 w-8 mr-3 text-[#FFD700]" />
                   Мой профиль
                 </h1>
-                <p className={`mt-2 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                <p className="mt-2 text-gray-400">
                   Управление личной информацией и настройками
                 </p>
               </div>
@@ -327,8 +551,8 @@ export default function ProfilePage() {
 
           {isLoading ? (
             <div className="text-center py-8">
-              <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-              <p className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Загрузка профиля...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FFD700]" />
+              <p className="text-gray-400">Загрузка профиля...</p>
             </div>
           ) : profile ? (
             <div className="space-y-6">
@@ -337,11 +561,11 @@ export default function ProfilePage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className={`flex items-center gap-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
-                        <User className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                      <CardTitle className="flex items-center gap-2 text-white">
+                        <User className="h-5 w-5 text-[#FFD700]" />
                         Основная информация
                       </CardTitle>
-                      <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+                      <CardDescription className="text-gray-400">
                         Личные данные и контактная информация
                       </CardDescription>
                     </div>
@@ -349,10 +573,7 @@ export default function ProfilePage() {
                       <Button 
                         onClick={handleEdit} 
                         variant="outline" 
-                        className={isV2 
-                          ? "border-[#FEC004]/30 text-[#FEC004] hover:bg-[#FEC004]/10 hover:border-[#FEC004]"
-                          : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-                        }
+                        className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Редактировать
@@ -362,10 +583,7 @@ export default function ProfilePage() {
                         <Button 
                           onClick={handleCancel} 
                           variant="outline" 
-                          className={isV2 
-                            ? "border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            : "border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-                          }
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                         >
                           <X className="mr-2 h-4 w-4" />
                           Отмена
@@ -373,10 +591,7 @@ export default function ProfilePage() {
                         <Button 
                           onClick={profileForm.handleSubmit(handleSave)}
                           disabled={updateProfileMutation.isPending}
-                          className={isV2 
-                            ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
-                            : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
-                          }
+                          className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
                         >
                           {updateProfileMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -393,7 +608,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Полное имя</Label>
+                        <Label htmlFor="name" className="text-gray-300">Полное имя</Label>
                         {isEditing ? (
                           <Input
                             id="name"
@@ -403,28 +618,28 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="flex items-center space-x-2">
-                            <User className={`h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-gray-400'}`} />
-                            <span className={isV2 ? 'text-gray-900' : 'text-white'}>{profile.name}</span>
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="text-white">{profile.name}</span>
                           </div>
                         )}
                         {profileForm.formState.errors.name && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {profileForm.formState.errors.name.message}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="login" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Логин</Label>
+                        <Label htmlFor="login" className="text-gray-300">Логин</Label>
                         <div className="flex items-center space-x-2">
                           <Mail className="h-4 w-4 text-gray-400" />
-                          <span className={isV2 ? 'text-gray-900' : 'text-white'}>{profile.login}</span>
+                          <span className="text-white">{profile.login}</span>
                         </div>
                         <p className="text-xs text-gray-500">Логин нельзя изменить</p>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="city" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Город</Label>
+                        <Label htmlFor="city" className="text-gray-300">Город</Label>
                         {isEditing ? (
                           <Input
                             id="city"
@@ -435,11 +650,11 @@ export default function ProfilePage() {
                         ) : (
                           <div className="flex items-center space-x-2">
                             <MapPin className="h-4 w-4 text-gray-400" />
-                            <span className={isV2 ? 'text-gray-900' : 'text-white'}>{profile.city}</span>
+                            <span className="text-white">{profile.city}</span>
                           </div>
                         )}
                         {profileForm.formState.errors.city && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {profileForm.formState.errors.city.message}
                           </p>
                         )}
@@ -448,7 +663,7 @@ export default function ProfilePage() {
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="status" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Статус</Label>
+                        <Label htmlFor="status" className="text-gray-300">Статус</Label>
                         <div className="flex items-center space-x-2">
                           <Shield className="h-4 w-4 text-gray-400" />
                           <Badge className={getStatusColor(profile.status)}>
@@ -459,7 +674,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="statusWork" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Рабочий статус</Label>
+                        <Label htmlFor="statusWork" className="text-gray-300">Рабочий статус</Label>
                         {isEditing ? (
                           <Select 
                             value={profileForm.watch('statusWork')} 
@@ -477,28 +692,28 @@ export default function ProfilePage() {
                         ) : (
                           <div className="flex items-center space-x-2">
                             <Clock className="h-4 w-4 text-gray-400" />
-                            <span className={isV2 ? 'text-gray-900' : 'text-white'}>{getWorkStatusText(profile.statusWork)}</span>
+                            <span className="text-white">{getWorkStatusText(profile.statusWork)}</span>
                           </div>
                         )}
                         {profileForm.formState.errors.statusWork && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {profileForm.formState.errors.statusWork.message}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="dateCreate" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Дата начала работы</Label>
+                        <Label htmlFor="dateCreate" className="text-gray-300">Дата начала работы</Label>
                         <div className="flex items-center space-x-2">
                           <Calendar className="h-4 w-4 text-gray-400" />
-                          <span className={isV2 ? 'text-gray-900' : 'text-white'}>{formatDate(profile.dateCreate)}</span>
+                          <span className="text-white">{formatDate(profile.dateCreate)}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 space-y-2">
-                    <Label htmlFor="note" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Примечание</Label>
+                    <Label htmlFor="note" className="text-gray-300">Примечание</Label>
                     {isEditing ? (
                       <Textarea
                         id="note"
@@ -508,14 +723,14 @@ export default function ProfilePage() {
                         className={inputClass}
                       />
                     ) : (
-                      <div className={`p-3 rounded-md border ${isV2 ? 'bg-gray-50 border-gray-200' : 'bg-[#0f0f23] border-gray-600'}`}>
-                        <span className={isV2 ? 'text-gray-900' : 'text-white'}>
+                      <div className="p-3 rounded-md border bg-[#0f0f23] border-gray-600">
+                        <span className="text-white">
                           {profile.note || 'Примечание не указано'}
                         </span>
                       </div>
                     )}
                     {profileForm.formState.errors.note && (
-                      <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                      <p className="text-sm text-red-400">
                         {profileForm.formState.errors.note.message}
                       </p>
                     )}
@@ -527,39 +742,39 @@ export default function ProfilePage() {
               {profile.role === 'operator' && profileStats && (
                 <Card className={cardClass}>
                   <CardHeader>
-                    <CardTitle className={`flex items-center gap-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
-                      <CheckCircle className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <CheckCircle className="h-5 w-5 text-[#FFD700]" />
                       Статистика работы
                     </CardTitle>
-                    <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+                    <CardDescription className="text-gray-400">
                       Показатели вашей работы
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`}>
+                        <div className="text-2xl font-bold text-[#FFD700]">
                           {profileStats.total.calls}
                         </div>
-                        <p className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>Всего звонков</p>
+                        <p className="text-sm text-gray-400">Всего звонков</p>
                       </div>
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${isV2 ? 'text-green-600' : 'text-green-400'}`}>
+                        <div className="text-2xl font-bold text-green-400">
                           {profileStats.total.orders}
                         </div>
-                        <p className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>Всего заказов</p>
+                        <p className="text-sm text-gray-400">Всего заказов</p>
                       </div>
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${isV2 ? 'text-purple-600' : 'text-purple-400'}`}>
+                        <div className="text-2xl font-bold text-purple-400">
                           {profileStats.monthly.calls}
                         </div>
-                        <p className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>Звонков за месяц</p>
+                        <p className="text-sm text-gray-400">Звонков за месяц</p>
                       </div>
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${isV2 ? 'text-orange-600' : 'text-orange-400'}`}>
+                        <div className="text-2xl font-bold text-orange-400">
                           {profileStats.today.calls}
                         </div>
-                        <p className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>Звонков сегодня</p>
+                        <p className="text-sm text-gray-400">Звонков сегодня</p>
                       </div>
                     </div>
                   </CardContent>
@@ -571,21 +786,18 @@ export default function ProfilePage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className={`flex items-center gap-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
-                        <Shield className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                      <CardTitle className="flex items-center gap-2 text-white">
+                        <Shield className="h-5 w-5 text-[#FFD700]" />
                         Безопасность
                       </CardTitle>
-                      <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+                      <CardDescription className="text-gray-400">
                         Управление паролем и безопасностью
                       </CardDescription>
                     </div>
                     <Button 
                       onClick={() => setIsChangingPassword(!isChangingPassword)}
                       variant="outline"
-                      className={isV2 
-                        ? "border-[#FEC004]/30 text-[#FEC004] hover:bg-[#FEC004]/10 hover:border-[#FEC004]"
-                        : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-                      }
+                      className="border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
                     >
                       {isChangingPassword ? 'Отмена' : 'Сменить пароль'}
                     </Button>
@@ -595,7 +807,7 @@ export default function ProfilePage() {
                   <CardContent>
                     <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="currentPassword" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Текущий пароль</Label>
+                        <Label htmlFor="currentPassword" className="text-gray-300">Текущий пароль</Label>
                         <div className="relative">
                           <Input
                             id="currentPassword"
@@ -608,7 +820,7 @@ export default function ProfilePage() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className={`absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent ${isV2 ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-white'}`}
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-white"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                           >
                             {showCurrentPassword ? (
@@ -619,14 +831,14 @@ export default function ProfilePage() {
                           </Button>
                         </div>
                         {passwordForm.formState.errors.currentPassword && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {passwordForm.formState.errors.currentPassword.message}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="newPassword" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Новый пароль</Label>
+                        <Label htmlFor="newPassword" className="text-gray-300">Новый пароль</Label>
                         <div className="relative">
                           <Input
                             id="newPassword"
@@ -639,7 +851,7 @@ export default function ProfilePage() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className={`absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent ${isV2 ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-white'}`}
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-white"
                             onClick={() => setShowNewPassword(!showNewPassword)}
                           >
                             {showNewPassword ? (
@@ -650,14 +862,14 @@ export default function ProfilePage() {
                           </Button>
                         </div>
                         {passwordForm.formState.errors.newPassword && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {passwordForm.formState.errors.newPassword.message}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword" className={isV2 ? 'text-gray-600' : 'text-gray-300'}>Подтвердите пароль</Label>
+                        <Label htmlFor="confirmPassword" className="text-gray-300">Подтвердите пароль</Label>
                         <div className="relative">
                           <Input
                             id="confirmPassword"
@@ -670,7 +882,7 @@ export default function ProfilePage() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className={`absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent ${isV2 ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-white'}`}
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-white"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           >
                             {showConfirmPassword ? (
@@ -681,7 +893,7 @@ export default function ProfilePage() {
                           </Button>
                         </div>
                         {passwordForm.formState.errors.confirmPassword && (
-                          <p className={`text-sm ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                          <p className="text-sm text-red-400">
                             {passwordForm.formState.errors.confirmPassword.message}
                           </p>
                         )}
@@ -692,20 +904,14 @@ export default function ProfilePage() {
                           type="button" 
                           variant="outline" 
                           onClick={() => setIsChangingPassword(false)}
-                          className={isV2 
-                            ? "border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            : "border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-                          }
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                         >
                           Отмена
                         </Button>
                         <Button 
                           type="submit"
                           disabled={changePasswordMutation.isPending}
-                          className={isV2 
-                            ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
-                            : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
-                          }
+                          className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold"
                         >
                           {changePasswordMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -242,7 +242,7 @@ const OrdersTableComponent = ({
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className={isV2 ? "w-20 text-gray-700 bg-white border-gray-200" : "w-20"}>
+                      <SelectTrigger className={isV2 ? "w-20 text-gray-700 bg-white border-gray-200 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0" : "w-20"}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className={isV2 ? "bg-white border-gray-200" : ""}>

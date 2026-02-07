@@ -217,18 +217,63 @@ export default function PricingPage() {
     }
   ];
 
+  // V2: Минималистичная версия
+  if (isV2) {
+    return (
+      <DashboardLayout>
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="max-w-4xl space-y-10">
+            
+            {pricingData.map((category, index) => (
+              <section key={index}>
+                <h2 className="text-xl text-gray-900 mb-6 pb-2 border-b border-gray-300">{category.category}</h2>
+                
+                <div className="space-y-8">
+                  {category.subcategories.map((subcategory, subIndex) => (
+                    <div key={subIndex}>
+                      <h3 className="text-base text-gray-700 mb-3">{subcategory.name}</h3>
+                      <div className="space-y-1">
+                        {subcategory.services.map((service, serviceIndex) => (
+                          <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-700">{service.name}</span>
+                            <span className="text-[#FEC004] font-medium">{service.price}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            {/* Доп информация */}
+            <section className="bg-orange-50 p-6 rounded-lg border border-orange-200">
+              <h2 className="text-lg text-orange-700 mb-4">Дополнительная информация</h2>
+              <ul className="space-y-2 text-gray-700">
+                <li>Гарантия на все виды работ — 3-6 месяцев</li>
+                <li>Оплата производится после выполнения работ</li>
+                <li>Постоянным клиентам скидки до 15%</li>
+                <li>Выезд мастера: 500₽ (засчитывается в стоимость ремонта)</li>
+              </ul>
+            </section>
+
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout>
-      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
-        {!isV2 && (
-          <div className="flex items-center space-x-3 mb-8">
-            <DollarSign className="h-8 w-8 text-[#FFD700]" />
-            <div>
-              <h1 className="text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
-              <p className="text-gray-400">Актуальные цены на услуги по ремонту</p>
-            </div>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
+        <div className="flex items-center space-x-3 mb-8">
+          <DollarSign className="h-8 w-8 text-[#FFD700]" />
+          <div>
+            <h1 className="text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
+            <p className="text-gray-400">Актуальные цены на услуги по ремонту</p>
           </div>
-        )}
+        </div>
 
       <div className="space-y-8">
         {pricingData.map((category, index) => {
@@ -237,11 +282,11 @@ export default function PricingPage() {
             <div key={index} className="space-y-6">
               <Card className={cardClass}>
                 <CardHeader>
-                  <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-gray-900' : 'text-white'}`}>
-                    <Icon className={`h-6 w-6 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                  <CardTitle className="flex items-center space-x-2 text-white">
+                    <Icon className="h-6 w-6 text-[#FFD700]" />
                     <span>{category.category}</span>
                   </CardTitle>
-                  <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Услуги по ремонту {category.category.toLowerCase()}</CardDescription>
+                  <CardDescription className="text-gray-400">Услуги по ремонту {category.category.toLowerCase()}</CardDescription>
                 </CardHeader>
               </Card>
               
@@ -249,20 +294,20 @@ export default function PricingPage() {
                 {category.subcategories.map((subcategory, subIndex) => (
                   <Card key={subIndex} className={`ml-4 ${cardClass}`}>
                     <CardHeader>
-                      <CardTitle className={`text-lg ${isV2 ? 'text-gray-900' : 'text-white'}`}>{subcategory.name}</CardTitle>
+                      <CardTitle className="text-lg text-white">{subcategory.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
-                          <TableRow className={isV2 ? 'hover:bg-gray-50' : ''}>
-                            <TableHead className={isV2 ? 'text-gray-600' : 'text-white'}>Услуга</TableHead>
-                            <TableHead className={`text-right ${isV2 ? 'text-gray-600' : 'text-white'}`}>Цена</TableHead>
+                          <TableRow>
+                            <TableHead className="text-white">Услуга</TableHead>
+                            <TableHead className="text-right text-white">Цена</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {subcategory.services.map((service, serviceIndex) => (
-                            <TableRow key={serviceIndex} className={isV2 ? 'hover:bg-gray-50' : ''}>
-                              <TableCell className={`font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>{service.name}</TableCell>
+                            <TableRow key={serviceIndex}>
+                              <TableCell className="font-medium text-white">{service.name}</TableCell>
                               <TableCell className="text-right">
                                 <Badge variant="outline" className={badgeClass}>
                                   {service.price}
@@ -281,10 +326,10 @@ export default function PricingPage() {
         })}
       </div>
 
-        <Card className={isV2 ? "border border-orange-200 bg-orange-50" : "border-2 border-orange-500/30 bg-orange-900/20"}>
+        <Card className="border-2 border-orange-500/30 bg-orange-900/20">
           <CardHeader>
-            <CardTitle className={`flex items-center space-x-2 ${isV2 ? 'text-orange-700' : 'text-orange-300'}`}>
-              <Badge variant="outline" className={isV2 ? "border-orange-300 text-orange-700" : "border-orange-500/30 text-orange-300"}>
+            <CardTitle className="flex items-center space-x-2 text-orange-300">
+              <Badge variant="outline" className="border-orange-500/30 text-orange-300">
                 Важно
               </Badge>
               <span>Дополнительная информация</span>
@@ -293,20 +338,20 @@ export default function PricingPage() {
           <CardContent className="space-y-3">
             <div className="grid gap-2 text-sm">
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className={`text-xs ${isV2 ? 'border-[#FEC004]/30 text-[#FEC004]' : 'border-[#FFD700]/30 text-[#FFD700]'}`}>Гарантия</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>На все виды работ предоставляется гарантия 3-6 месяцев</span>
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Гарантия</Badge>
+                <span className="text-white">На все виды работ предоставляется гарантия 3-6 месяцев</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className={`text-xs ${isV2 ? 'border-[#FEC004]/30 text-[#FEC004]' : 'border-[#FFD700]/30 text-[#FFD700]'}`}>Оплата</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Оплата производится после выполнения работ</span>
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Оплата</Badge>
+                <span className="text-white">Оплата производится после выполнения работ</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className={`text-xs ${isV2 ? 'border-[#FEC004]/30 text-[#FEC004]' : 'border-[#FFD700]/30 text-[#FFD700]'}`}>Скидки</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Постоянным клиентам предоставляются скидки до 15%</span>
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Скидки</Badge>
+                <span className="text-white">Постоянным клиентам предоставляются скидки до 15%</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className={`text-xs ${isV2 ? 'border-[#FEC004]/30 text-[#FEC004]' : 'border-[#FFD700]/30 text-[#FFD700]'}`}>Выезд</Badge>
-                <span className={isV2 ? 'text-gray-700' : 'text-white'}>Выезд мастера на дом: 500₽ (засчитывается в стоимость ремонта)</span>
+                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Выезд</Badge>
+                <span className="text-white">Выезд мастера на дом: 500₽ (засчитывается в стоимость ремонта)</span>
               </div>
             </div>
           </CardContent>

@@ -118,7 +118,7 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
     : "bg-[#17212b] border-2 border-[#FFD700]/30 text-white max-w-md";
   
   const selectTriggerClass = isV2 
-    ? "bg-white border-gray-200 text-gray-900 focus:border-[#FEC004] focus:ring-[#FEC004]/20"
+    ? "bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
     : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 hover:bg-[#0f0f23] [&_span]:!text-white [&_span[data-placeholder]]:!text-gray-500";
   
   const selectContentClass = isV2 

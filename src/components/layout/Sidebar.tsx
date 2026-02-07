@@ -61,7 +61,7 @@ export function Sidebar() {
             >
               {/* Индикатор активной вкладки */}
               <span 
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full transition-all ${
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full transition-all ${
                   active ? 'bg-[#FEC004]' : 'bg-transparent'
                 }`}
               />
@@ -89,7 +89,7 @@ export function Sidebar() {
         >
           {/* Индикатор активной вкладки */}
           <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full transition-all ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full transition-all ${
               isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
             }`}
           />

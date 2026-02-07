@@ -59,9 +59,9 @@ export function Sidebar() {
               href={item.href}
               className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
             >
-              {/* Индикатор активной вкладки */}
+              {/* Индикатор активной вкладки - скобка */}
               <span 
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full transition-all ${
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full transition-all ${
                   active ? 'bg-[#FEC004]' : 'bg-transparent'
                 }`}
               />
@@ -87,9 +87,9 @@ export function Sidebar() {
           href="/profile"
           className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
         >
-          {/* Индикатор активной вкладки */}
+          {/* Индикатор активной вкладки - скобка */}
           <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full transition-all ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full transition-all ${
               isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
             }`}
           />

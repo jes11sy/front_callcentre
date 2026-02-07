@@ -89,7 +89,7 @@ const OrderViewModalComponent = ({
 
   return (
     <div 
-      className="fixed inset-0 top-16 lg:top-0 z-50 flex items-start lg:items-center justify-center bg-black/50 p-0 lg:p-4"
+      className="fixed inset-x-0 top-16 bottom-0 lg:inset-0 z-50 flex lg:items-center justify-center lg:bg-black/50 lg:p-4"
       onClick={handleClose}
     >
       <div 

@@ -763,7 +763,7 @@ export function CreateOrderModal({
                           }`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
                             <SelectItem value="Не указано" className={isV2 ? 'text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10' : 'text-gray-400'}>Не указано</SelectItem>
                             {campaigns.map((option) => (
                               <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
@@ -787,7 +787,7 @@ export function CreateOrderModal({
                           }`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите город</span>} />
                           </SelectTrigger>
-                          <SelectContent className={isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
                             {CITY_OPTIONS.map((option) => (
                               <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
                             ))}
@@ -815,7 +815,7 @@ export function CreateOrderModal({
                           }`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={`max-h-60 ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
+                          <SelectContent className={`z-[10000] max-h-60 ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
                             <SelectItem value="Не указано" className={isV2 ? 'text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10' : 'text-gray-400'}>Не указано</SelectItem>
                             {sources.map((option) => (
                               <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
@@ -839,7 +839,7 @@ export function CreateOrderModal({
                           }`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
                             {DIRECTION_OPTIONS.map((option) => (
                               <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
                             ))}
@@ -899,7 +899,7 @@ export function CreateOrderModal({
                           }`}>
                             <SelectValue placeholder="Выберите тип" />
                           </SelectTrigger>
-                          <SelectContent className={isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}>
+                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
                             <SelectItem value="Впервые" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Впервые</SelectItem>
                             <SelectItem value="Повтор" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Повтор</SelectItem>
                             <SelectItem value="Гарантия" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Гарантия</SelectItem>

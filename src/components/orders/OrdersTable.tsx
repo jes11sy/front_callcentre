@@ -227,9 +227,11 @@ const OrdersTableComponent = ({
             {ordersData.pagination && (
               <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
                 <div className="flex items-center gap-4">
-                  <div className={`text-sm ${isV2 ? "text-gray-600" : "text-gray-400"}`}>
-                    Показано {((ordersData.pagination.page - 1) * ordersData.pagination.limit) + 1} - {Math.min(ordersData.pagination.page * ordersData.pagination.limit, ordersData.pagination.total)} из {ordersData.pagination.total} заказов
-                  </div>
+                  {!isV2 && (
+                    <div className="text-sm text-gray-400">
+                      Показано {((ordersData.pagination.page - 1) * ordersData.pagination.limit) + 1} - {Math.min(ordersData.pagination.page * ordersData.pagination.limit, ordersData.pagination.total)} из {ordersData.pagination.total} заказов
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <Label htmlFor="page-size" className={`text-sm ${isV2 ? "text-gray-600" : "text-gray-400"}`}>
                       На странице:

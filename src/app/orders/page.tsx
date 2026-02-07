@@ -15,6 +15,7 @@ import {
 } from '@/components/orders';
 import { useOrders } from '@/hooks/useOrders';
 import { useDesignStore } from '@/store/designStore';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
 function OrdersContent() {
   const searchParams = useSearchParams();
@@ -22,6 +23,16 @@ function OrdersContent() {
   const openedRef = useRef(false);
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
+  
+  // Audio player for call recordings
+  const {
+    loadRecording,
+    skipBackward,
+    skipForward,
+    seekTo,
+    setVolume,
+    stopPlayback
+  } = useAudioPlayer();
   
   const {
     filters,
@@ -132,15 +143,18 @@ function OrdersContent() {
             {/* View Modal */}
             <OrderViewModal
               isOpen={isViewModalOpen}
-              onClose={handleCloseViewModal}
+              onClose={() => {
+                stopPlayback();
+                handleCloseViewModal();
+              }}
               order={selectedOrder}
               orderCalls={orderCalls}
               loadingCalls={loadingCalls}
-              loadRecording={() => {}}
-              skipBackward={() => {}}
-              skipForward={() => {}}
-              seekTo={() => {}}
-              setVolume={() => {}}
+              loadRecording={loadRecording}
+              skipBackward={skipBackward}
+              skipForward={skipForward}
+              seekTo={seekTo}
+              setVolume={setVolume}
               formatDate={(date) => new Date(date).toLocaleString('ru-RU')}
               onEdit={() => {
                 setIsEditModalOpen(true);

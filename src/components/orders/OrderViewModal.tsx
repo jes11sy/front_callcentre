@@ -259,14 +259,14 @@ const InfoTab = ({
 
       {/* Оператор */}
       <div className={isV2 
-        ? "px-4 py-3 border-t border-gray-200 bg-white flex items-center justify-between"
+        ? "px-4 py-3 border-t border-gray-200 bg-white flex items-center"
         : "px-4 py-3 border-t border-[#FFD700]/20 bg-[#17212b]/30 flex items-center justify-between"
       }>
         <div className="flex items-center gap-2">
           <span className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>Оператор:</span>
           <span className={`text-sm ${isV2 ? 'text-gray-900' : 'text-white'}`}>{order.operator.name}</span>
         </div>
-        <span className={`text-xs ${isV2 ? 'text-gray-400' : 'text-gray-500'}`}>ID: {order.operatorNameId}</span>
+        {!isV2 && <span className="text-xs text-gray-500">ID: {order.operatorNameId}</span>}
       </div>
 
       {/* Записи звонков */}
@@ -469,16 +469,15 @@ const CallPlayer = ({
         </div>
         {!isCurrentCall && (
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => loadRecording(call)}
             className={isV2 
-              ? "h-7 px-3 border-[#FEC004]/30 text-[#FEC004] hover:bg-[#FEC004]/10 hover:border-[#FEC004]"
-              : "h-7 px-3 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
+              ? "h-8 w-8 p-0 text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+              : "h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
             }
           >
-            <Play className="h-3 w-3 mr-1" />
-            Воспроизвести
+            <Play className="h-4 w-4" />
           </Button>
         )}
       </div>

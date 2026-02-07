@@ -133,22 +133,20 @@ export function LoginForm() {
     }
   };
 
-  // Кнопка переключения версии - общая для обеих версий
+  // Кнопка переключения версии - только для V1
   const VersionToggle = () => (
-    <Button 
-      variant="ghost" 
-      size="sm"
-      onClick={toggleVersion}
-      className={`absolute top-4 right-4 z-20 gap-2 font-mono border ${
-        version === 'v1' 
-          ? 'text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] border-[#FFD700]/30' 
-          : 'text-gray-600 hover:text-white hover:bg-gray-800 border-gray-300'
-      }`}
-      title={`Текущий дизайн: ${version.toUpperCase()}. Нажми для переключения.`}
-    >
-      <Palette className="h-4 w-4" />
-      <span className="text-xs font-bold">{version.toUpperCase()}</span>
-    </Button>
+    version === 'v1' ? (
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={toggleVersion}
+        className="absolute top-4 right-4 z-20 gap-2 font-mono border text-[#FFD700] hover:text-[#02111B] hover:bg-[#FFD700] border-[#FFD700]/30"
+        title="Текущий дизайн: V1. Нажми для переключения."
+      >
+        <Palette className="h-4 w-4" />
+        <span className="text-xs font-bold">V1</span>
+      </Button>
+    ) : null
   );
 
   // Переключатель темы - маленькая иконка в углу карточки (только для V2)

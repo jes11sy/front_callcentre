@@ -60,11 +60,13 @@ interface _OperatorStats {
 const DailyStatsList = ({ 
   processedStats, 
   formatDate,
-  isV2 = false
+  isV2 = false,
+  isDark = false
 }: { 
   processedStats: { sortedStats: Array<{ date: string; calls: number }>; maxCalls: number }; 
   formatDate: (dateString: string) => string;
   isV2?: boolean;
+  isDark?: boolean;
 }) => {
   return (
     <div className="space-y-4">
@@ -81,14 +83,14 @@ const DailyStatsList = ({
               </span>
             </div>
             <div>
-              <p className={`font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>{formatDate(day.date)}</p>
-              <p className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+              <p className={`font-medium ${isV2 ? (isDark ? 'text-gray-100' : 'text-gray-900') : 'text-white'}`}>{formatDate(day.date)}</p>
+              <p className={`text-sm ${isV2 ? (isDark ? 'text-gray-400' : 'text-gray-500') : 'text-gray-400'}`}>
                 {new Date(day.date).toLocaleDateString('ru-RU', { weekday: 'long' })}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`w-32 rounded-full h-2 ${isV2 ? 'bg-gray-200' : 'bg-gray-600'}`}>
+            <div className={`w-32 rounded-full h-2 ${isV2 ? (isDark ? 'bg-gray-700' : 'bg-gray-200') : 'bg-gray-600'}`}>
               <div 
                 className={`h-2 rounded-full progress-bar ${isV2 ? 'bg-[#FEC004]' : 'bg-[#FFD700]'}`}
                 style={{ 
@@ -96,7 +98,7 @@ const DailyStatsList = ({
                 } as React.CSSProperties}
               ></div>
             </div>
-            <span className={`text-sm font-medium w-8 text-right ${isV2 ? 'text-gray-900' : 'text-white'}`}>{day.calls}</span>
+            <span className={`text-sm font-medium w-8 text-right ${isV2 ? (isDark ? 'text-gray-100' : 'text-gray-900') : 'text-white'}`}>{day.calls}</span>
           </div>
         </div>
       ))}
@@ -153,9 +155,10 @@ export default function StatsPage() {
 
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className={`max-w-3xl mx-auto py-8 px-6 min-h-screen font-myriad transition-colors duration-300 ${
+        <div className={`w-full min-h-screen font-myriad transition-colors duration-300 ${
           isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
         }`}>
+          <div className="max-w-3xl mx-auto py-8 px-6">
           {/* Date Filter */}
           <div className={`flex items-center justify-between mb-8 pb-4 border-b ${
             isDark ? 'border-gray-700' : 'border-gray-200'
@@ -241,6 +244,7 @@ export default function StatsPage() {
               </div>
             </div>
           ) : null}
+          </div>
         </div>
       </DashboardLayout>
     );

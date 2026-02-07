@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Filter, Hash, Phone, MapPin } from 'lucide-react';
 import { OrderFilters } from '@/types/orders';
 import { STATUS_OPTIONS } from '@/constants/orders';
 import { useCities } from '@/hooks/useStaticData';
@@ -50,18 +50,49 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
           ? "space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1e2530] mt-4"
           : "space-y-4 p-4 border border-[#FFD700]/20 rounded-lg bg-[#0f0f23]/50 mt-4"
         }>
-          {/* Поиск */}
-          <div className="relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-[#FFD700]'}`} />
-            <Input
-              placeholder="Поиск по ID, номеру телефона или адресу..."
-              value={filters.search}
-              onChange={(e) => onFilterChange('search', e.target.value)}
-              className={isV2 
-                ? "pl-10 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-                : "pl-10 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
-              }
-            />
+          {/* Поиск - 3 отдельных поля */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Поиск по ID */}
+            <div className="relative">
+              <Hash className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-[#FFD700]'}`} />
+              <Input
+                placeholder="ID заказа"
+                value={filters.searchId}
+                onChange={(e) => onFilterChange('searchId', e.target.value)}
+                className={isV2 
+                  ? "pl-10 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
+                  : "pl-10 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                }
+              />
+            </div>
+
+            {/* Поиск по телефону */}
+            <div className="relative">
+              <Phone className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-[#FFD700]'}`} />
+              <Input
+                placeholder="Номер телефона"
+                value={filters.searchPhone}
+                onChange={(e) => onFilterChange('searchPhone', e.target.value)}
+                className={isV2 
+                  ? "pl-10 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
+                  : "pl-10 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                }
+              />
+            </div>
+
+            {/* Поиск по адресу */}
+            <div className="relative">
+              <MapPin className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-[#FFD700]'}`} />
+              <Input
+                placeholder="Адрес"
+                value={filters.searchAddress}
+                onChange={(e) => onFilterChange('searchAddress', e.target.value)}
+                className={isV2 
+                  ? "pl-10 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
+                  : "pl-10 bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                }
+              />
+            </div>
           </div>
 
           {/* Остальные фильтры */}

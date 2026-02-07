@@ -23,6 +23,9 @@ export const useOrders = () => {
   // Состояние фильтров
   const [filters, setFilters] = useState<OrderFilters>({
     search: '',
+    searchId: '',
+    searchPhone: '',
+    searchAddress: '',
     status: '',
     city: '',
     master: '',
@@ -50,6 +53,9 @@ export const useOrders = () => {
     page,
     limit,
     search: filters.search || undefined,
+    searchId: filters.searchId || undefined,
+    searchPhone: filters.searchPhone || undefined,
+    searchAddress: filters.searchAddress || undefined,
     status: filters.status !== 'all' ? filters.status : undefined,
     city: filters.city || undefined,
     master: filters.master || undefined,
@@ -68,6 +74,9 @@ export const useOrders = () => {
         page: page.toString(),
         limit: limit.toString(),
         ...(filters.search && { search: filters.search }),
+        ...(filters.searchId && { searchId: filters.searchId }),
+        ...(filters.searchPhone && { searchPhone: filters.searchPhone }),
+        ...(filters.searchAddress && { searchAddress: filters.searchAddress }),
         ...(filters.status && filters.status !== 'all' && { status: filters.status }),
         ...(filters.city && { city: filters.city }),
         ...(filters.master && { master: filters.master }),
@@ -255,6 +264,9 @@ export const useOrders = () => {
   const resetFilters = useCallback(() => {
     setFilters({
       search: '',
+      searchId: '',
+      searchPhone: '',
+      searchAddress: '',
       status: '',
       city: '',
       master: '',

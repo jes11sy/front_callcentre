@@ -62,6 +62,9 @@ export interface AudioPlayerState {
 
 export interface OrderFilters {
   search: string;
+  searchId: string;
+  searchPhone: string;
+  searchAddress: string;
   status: string;
   city: string;
   master: string;

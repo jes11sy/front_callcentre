@@ -191,16 +191,16 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-[#1e2530] flex items-center justify-between px-6 transition-all ${
+      <header className={`lg:hidden fixed top-0 left-0 right-0 z-[60] h-16 bg-white dark:bg-[#1e2530] flex items-center justify-between px-6 transition-all ${
         isMobileMenuOpen ? '' : 'border-b border-gray-200 dark:border-gray-700'
       }`}>
         <Link href="/telephony">
           <Image 
             src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
             alt="Logo" 
-            width={140} 
-            height={40} 
-            className="h-10 w-auto" 
+            width={130} 
+            height={36} 
+            className="h-9 w-auto" 
           />
         </Link>
         <button
@@ -218,7 +218,7 @@ export function Sidebar() {
 
       {/* Mobile Full-screen Menu */}
       <aside 
-        className={`lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-white dark:bg-[#1e2530] z-50 transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
+        className={`lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-white dark:bg-[#1e2530] z-[60] transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

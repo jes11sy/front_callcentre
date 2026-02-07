@@ -79,26 +79,27 @@
     --radius: 0.5rem;
   }
 
+  /* V2 Dark Theme */
   .dark {
-    --background: 221 100% 6%;
-    --foreground: 248 100% 97%;
-    --card: 221 100% 6%;
-    --card-foreground: 248 100% 97%;
-    --popover: 221 100% 6%;
-    --popover-foreground: 248 100% 97%;
-    --primary: 51 100% 50%;
-    --primary-foreground: 221 100% 6%;
-    --secondary: 248 100% 97%;
-    --secondary-foreground: 221 100% 6%;
-    --muted: 248 100% 97%;
-    --muted-foreground: 248 100% 80%;
-    --accent: 51 100% 50%;
-    --accent-foreground: 221 100% 6%;
+    --background: 220 13% 13%;
+    --foreground: 0 0% 95%;
+    --card: 220 13% 16%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 13% 16%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 45 100% 51%;
+    --primary-foreground: 220 13% 13%;
+    --secondary: 220 13% 20%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 220 13% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 45 100% 51%;
+    --accent-foreground: 220 13% 13%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 248 100% 97%;
-    --input: 248 100% 97%;
-    --ring: 248 100% 97%;
+    --border: 220 13% 25%;
+    --input: 220 13% 20%;
+    --ring: 45 100% 51%;
   }
 }
 
@@ -110,28 +111,37 @@
     @apply bg-background text-foreground;
   }
   
-  /* Глобальный кастомный скроллбар */
+  /* Глобальный кастомный скроллбар - V1/V2 Dark */
   *::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
   }
   
   *::-webkit-scrollbar-track {
-    background: #1a1a2e !important;
+    background: #e5e5e5 !important;
     border-radius: 4px !important;
   }
   
   *::-webkit-scrollbar-thumb {
-    background: #FFD700 !important;
+    background: #FEC004 !important;
     border-radius: 3px !important;
   }
   
   *::-webkit-scrollbar-thumb:hover {
-    background: #FFC700 !important;
+    background: #d9a800 !important;
   }
   
   *::-webkit-scrollbar-corner {
-    background: #1a1a2e !important;
+    background: #e5e5e5 !important;
+  }
+
+  /* Скроллбар для V2 Dark Theme */
+  .dark *::-webkit-scrollbar-track {
+    background: #1f2937 !important;
+  }
+  
+  .dark *::-webkit-scrollbar-corner {
+    background: #1f2937 !important;
   }
 }
 

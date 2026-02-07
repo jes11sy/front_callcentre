@@ -271,12 +271,12 @@ export default function ProfilePage() {
   if (error) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ${isV2 ? 'bg-[#F3F3EE] font-myriad' : ''}`}>
+        <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827] font-myriad' : ''}`}>
           <div className="px-4 py-6 sm:px-0">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <p className={isV2 ? 'text-red-700' : 'text-red-600'}>Ошибка при загрузке профиля</p>
+                <p className={isV2 ? 'text-red-700 dark:text-red-400' : 'text-red-600'}>Ошибка при загрузке профиля</p>
               </div>
             </div>
           </div>
@@ -302,11 +302,11 @@ export default function ProfilePage() {
     if (isLoading) {
       return (
         <DashboardLayout variant="operator" requiredRole="operator">
-          <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
             <div className="max-w-3xl">
               <div className="text-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FEC004]" />
-                <p className="text-gray-500">Загрузка профиля...</p>
+                <p className="text-gray-500 dark:text-gray-400">Загрузка профиля...</p>
               </div>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function ProfilePage() {
 
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
           <div className="max-w-3xl space-y-8">
             
             {/* Шапка профиля */}

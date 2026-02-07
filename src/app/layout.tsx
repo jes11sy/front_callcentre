@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
@@ -36,13 +37,15 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-          <AuthProvider>
-            <SocketProviders />
-            {children}
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <SocketProviders />
+              {children}
+            </AuthProvider>
+          </ThemeProvider>
         </QueryProvider>
         <Toaster position="top-right" />
         <WebVitalsScript />

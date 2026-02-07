@@ -133,7 +133,7 @@ export default function StatsPage() {
   if (error) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ${isV2 ? 'bg-[#F3F3EE]' : ''}`}>
+        <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827]' : ''}`}>
           <div className="px-4 py-6 sm:px-0">
             <ErrorMessage 
               error={error.message || 'Ошибка при загрузке статистики'}
@@ -152,7 +152,7 @@ export default function StatsPage() {
 
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] font-myriad">
+        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
           {/* Date Filter */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
             <div className="flex items-center gap-3">

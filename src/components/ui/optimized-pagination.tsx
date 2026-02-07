@@ -80,7 +80,7 @@ export function OptimizedPagination({
           className={cn(
             "h-8 w-8 p-0",
             isV2 
-              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
               : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
           )}
         >
@@ -105,7 +105,7 @@ export function OptimizedPagination({
           className={cn(
             "h-8 w-8 p-0 disabled:opacity-50",
             isV2 
-              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
               : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
           )}
         >
@@ -126,7 +126,7 @@ export function OptimizedPagination({
             isV2 ? (
               page === currentPage 
                 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] border-[#FEC004]" 
-                : "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+                : "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
             ) : (
               page === currentPage 
                 ? "bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700] border-[#FFD700]" 
@@ -148,7 +148,7 @@ export function OptimizedPagination({
           className={cn(
             "h-8 w-8 p-0 disabled:opacity-50",
             isV2 
-              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
               : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
           )}
         >
@@ -173,7 +173,7 @@ export function OptimizedPagination({
           className={cn(
             "h-8 w-8 p-0",
             isV2 
-              ? "border-gray-200 text-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
+              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
               : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
           )}
         >

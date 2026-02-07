@@ -106,14 +106,14 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
           className={cn(
             "w-48 pl-9 h-9",
             isV2 
-              ? "bg-[#F3F3EE] border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:ring-[#FEC004]/30" 
+              ? "bg-[#F3F3EE] dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:ring-[#FEC004]/30" 
               : "bg-[#0f0f23] border-[#FFD700]/20 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
           )}
         />
         {searchTerm && (
           <button
             onClick={() => onSearchChange('')}
-            className={cn("absolute right-3 top-1/2 -translate-y-1/2", isV2 ? "text-gray-400 hover:text-gray-800" : "text-gray-500 hover:text-white")}
+            className={cn("absolute right-3 top-1/2 -translate-y-1/2", isV2 ? "text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" : "text-gray-500 hover:text-white")}
           >
             <X className="w-4 h-4" />
           </button>
@@ -121,7 +121,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       </div>
 
       {/* Разделитель */}
-      <div className={cn("w-px h-6", isV2 ? "bg-gray-200" : "bg-[#FFD700]/20")} />
+      <div className={cn("w-px h-6", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
 
       {/* Фильтры-чипы */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -142,9 +142,9 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                       ? "bg-red-500 text-white border-red-500"
                       : "bg-[#FEC004] text-gray-900 border-[#FEC004]"
                     : cn(
-                        "bg-white border-gray-200 text-gray-600",
+                        "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300",
                         "hover:border-[#FEC004] hover:text-[#FEC004]",
-                        filter.highlight && "border-red-300 text-red-500"
+                        filter.highlight && "border-red-300 dark:border-red-500/50 text-red-500"
                       )
                 ) : (
                   isActive
@@ -171,8 +171,8 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                           ? "bg-white/30 text-white"
                           : "bg-gray-900/20 text-gray-900"
                         : filter.id === 'missed' && filter.count > 0
-                          ? "bg-red-100 text-red-500"
-                          : "bg-gray-100 text-gray-600"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-500"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                     ) : (
                       isActive 
                         ? filter.id === 'missed' 
@@ -195,9 +195,9 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       {/* Активный фильтр поиска */}
       {searchTerm && (
         <>
-          <div className={cn("w-px h-6", isV2 ? "bg-gray-200" : "bg-[#FFD700]/20")} />
+          <div className={cn("w-px h-6", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
           <div className="flex items-center gap-2">
-            <span className={cn("text-sm", isV2 ? "text-gray-500" : "text-gray-400")}>Поиск:</span>
+            <span className={cn("text-sm", isV2 ? "text-gray-500 dark:text-gray-400" : "text-gray-400")}>Поиск:</span>
             <Badge 
               variant="outline" 
               className={cn(
@@ -209,7 +209,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
               {searchTerm}
               <button
                 onClick={() => onSearchChange('')}
-                className={cn("ml-1", isV2 ? "hover:text-gray-800" : "hover:text-white")}
+                className={cn("ml-1", isV2 ? "hover:text-gray-800 dark:hover:text-gray-200" : "hover:text-white")}
               >
                 <X className="w-3 h-3" />
               </button>

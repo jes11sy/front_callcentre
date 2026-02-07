@@ -148,10 +148,10 @@ export default function SiteOrdersPage() {
   if (isLoading && !data) {
     return (
       <DashboardLayout>
-        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE]' : ''}`}>
+        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827]' : ''}`}>
           <div className="text-center">
             <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-            <p className={isV2 ? 'text-gray-500' : 'text-gray-400'}>Загрузка заявок...</p>
+            <p className={isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}>Загрузка заявок...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -161,7 +161,7 @@ export default function SiteOrdersPage() {
   if (error) {
     return (
       <DashboardLayout>
-        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE]' : ''}`}>
+        <div className={`flex items-center justify-center h-64 ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827]' : ''}`}>
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-red-400">Ошибка при загрузке заявок</p>
@@ -173,7 +173,7 @@ export default function SiteOrdersPage() {
 
   return (
     <DashboardLayout>
-      <div className={`w-full py-4 px-4 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
+      <div className={`w-full py-4 px-4 min-h-screen ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827] font-myriad' : 'bg-[#0f0f23]'}`}>
         <div className="w-full">
           {/* Header */}
           {!isV2 && (

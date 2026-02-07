@@ -155,7 +155,7 @@ function OrdersContent() {
 
   return (
     <DashboardLayout>
-      <div className={`w-full py-4 px-4 min-h-screen custom-scrollbar ${isV2 ? 'bg-[#F3F3EE]' : 'bg-[#0f0f23]'}`}>
+      <div className={`w-full py-4 px-4 min-h-screen custom-scrollbar ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827]' : 'bg-[#0f0f23]'}`}>
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}

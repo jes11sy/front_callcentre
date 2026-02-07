@@ -57,7 +57,7 @@ const OrdersTableComponent = ({
 
   if (isLoading) {
     return (
-      <Card className={isV2 ? "bg-white border border-gray-200 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
+      <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
         <CardContent className="px-2 py-2">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1">
@@ -83,7 +83,7 @@ const OrdersTableComponent = ({
 
   if (ordersData?.orders?.length === 0) {
     return (
-      <Card className={isV2 ? "bg-white border border-gray-200 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
+      <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
         <CardContent className="px-2 py-2">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1">
@@ -109,7 +109,7 @@ const OrdersTableComponent = ({
   const statusColors = isV2 ? STATUS_COLORS_V2 : STATUS_COLORS;
 
   return (
-    <Card className={isV2 ? "bg-white border border-gray-200 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
+    <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
       <CardContent className="px-2 py-2">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1">
@@ -128,20 +128,20 @@ const OrdersTableComponent = ({
             <div className="overflow-x-auto w-full">
               <Table className="w-full">
                 <TableHeader>
-                  <TableRow className={isV2 ? "border-b border-gray-200 hover:bg-gray-50" : "border-b border-[#FFD700]/30 hover:bg-[#FFD700]/5"}>
-                    <TableHead className={isV2 ? "w-16 text-gray-600" : "w-16 text-gray-300"}>ID</TableHead>
-                    <TableHead className={isV2 ? "w-20 text-gray-600" : "w-20 text-gray-300"}>РК</TableHead>
-                    <TableHead className={isV2 ? "w-24 text-gray-600" : "w-24 text-gray-300"}>Город</TableHead>
-                    <TableHead className={isV2 ? "w-28 text-gray-600" : "w-28 text-gray-300"}>Источник</TableHead>
-                    <TableHead className={isV2 ? "w-24 text-gray-600" : "w-24 text-gray-300"}>Телефон</TableHead>
-                    <TableHead className={isV2 ? "w-24 text-gray-600" : "w-24 text-gray-300"}>Тип заявки</TableHead>
-                    <TableHead className={isV2 ? "w-32 text-gray-600" : "w-32 text-gray-300"}>Клиент</TableHead>
-                    <TableHead className={isV2 ? "w-40 text-gray-600" : "w-40 text-gray-300"}>Адрес</TableHead>
-                    <TableHead className={isV2 ? "w-28 text-gray-600" : "w-28 text-gray-300"}>Дата встречи</TableHead>
-                    <TableHead className={isV2 ? "w-28 text-gray-600" : "w-28 text-gray-300"}>Тип техники</TableHead>
-                    <TableHead className={isV2 ? "w-40 text-gray-600" : "w-40 text-gray-300"}>Проблема</TableHead>
-                    <TableHead className={isV2 ? "w-24 text-gray-600" : "w-24 text-gray-300"}>Статус</TableHead>
-                    <TableHead className={isV2 ? "w-24 text-gray-600" : "w-24 text-gray-300"}>Мастер</TableHead>
+                  <TableRow className={isV2 ? "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]" : "border-b border-[#FFD700]/30 hover:bg-[#FFD700]/5"}>
+                    <TableHead className={isV2 ? "w-16 text-gray-600 dark:text-gray-400" : "w-16 text-gray-300"}>ID</TableHead>
+                    <TableHead className={isV2 ? "w-20 text-gray-600 dark:text-gray-400" : "w-20 text-gray-300"}>РК</TableHead>
+                    <TableHead className={isV2 ? "w-24 text-gray-600 dark:text-gray-400" : "w-24 text-gray-300"}>Город</TableHead>
+                    <TableHead className={isV2 ? "w-28 text-gray-600 dark:text-gray-400" : "w-28 text-gray-300"}>Источник</TableHead>
+                    <TableHead className={isV2 ? "w-24 text-gray-600 dark:text-gray-400" : "w-24 text-gray-300"}>Телефон</TableHead>
+                    <TableHead className={isV2 ? "w-24 text-gray-600 dark:text-gray-400" : "w-24 text-gray-300"}>Тип заявки</TableHead>
+                    <TableHead className={isV2 ? "w-32 text-gray-600 dark:text-gray-400" : "w-32 text-gray-300"}>Клиент</TableHead>
+                    <TableHead className={isV2 ? "w-40 text-gray-600 dark:text-gray-400" : "w-40 text-gray-300"}>Адрес</TableHead>
+                    <TableHead className={isV2 ? "w-28 text-gray-600 dark:text-gray-400" : "w-28 text-gray-300"}>Дата встречи</TableHead>
+                    <TableHead className={isV2 ? "w-28 text-gray-600 dark:text-gray-400" : "w-28 text-gray-300"}>Тип техники</TableHead>
+                    <TableHead className={isV2 ? "w-40 text-gray-600 dark:text-gray-400" : "w-40 text-gray-300"}>Проблема</TableHead>
+                    <TableHead className={isV2 ? "w-24 text-gray-600 dark:text-gray-400" : "w-24 text-gray-300"}>Статус</TableHead>
+                    <TableHead className={isV2 ? "w-24 text-gray-600 dark:text-gray-400" : "w-24 text-gray-300"}>Мастер</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -149,44 +149,44 @@ const OrdersTableComponent = ({
                     <TableRow 
                       key={order.id} 
                       className={isV2 
-                        ? "border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                        ? "border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a] cursor-pointer transition-colors"
                         : "border-b border-gray-700 hover:bg-[#FFD700]/10 cursor-pointer transition-colors"
                       }
                       onClick={() => onViewOrder(order)}
                     >
-                      <TableCell className={isV2 ? "font-medium text-gray-900" : "font-medium text-white"}>{order.id}</TableCell>
-                      <TableCell className={isV2 ? "text-gray-700" : "text-gray-300"}>{order.rk}</TableCell>
-                      <TableCell className={isV2 ? "text-gray-700" : "text-gray-300"}>{order.city}</TableCell>
+                      <TableCell className={isV2 ? "font-medium text-gray-900 dark:text-gray-100" : "font-medium text-white"}>{order.id}</TableCell>
+                      <TableCell className={isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}>{order.rk}</TableCell>
+                      <TableCell className={isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}>{order.city}</TableCell>
                       <TableCell>
-                        <div className={`max-w-28 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.avitoName || 'Не указан'}>
+                        <div className={`max-w-28 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.avitoName || 'Не указан'}>
                           {order.avitoName || <span className={isV2 ? "text-gray-400" : "text-gray-500"}>Не указан</span>}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className={`max-w-24 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.phone}>
+                        <div className={`max-w-24 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.phone}>
                           {order.phone || <span className={isV2 ? "text-gray-400" : "text-gray-500"}>Не указан</span>}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={isV2 
-                          ? "text-xs whitespace-nowrap border-gray-300 text-gray-600 bg-gray-100"
+                          ? "text-xs whitespace-nowrap border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700"
                           : "text-xs whitespace-nowrap border-[#FFD700]/30 text-[#FFD700]"
                         }>
                           {order.typeOrder || 'Не указан'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className={`max-w-32 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.clientName}>
+                        <div className={`max-w-32 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.clientName}>
                           {order.clientName}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className={`max-w-40 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.address}>
+                        <div className={`max-w-40 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.address}>
                           {order.address}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className={`text-sm whitespace-nowrap ${isV2 ? "text-gray-700" : "text-gray-300"}`}>
+                        <div className={`text-sm whitespace-nowrap ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`}>
                           {formatDate(order.dateMeeting)}
                         </div>
                       </TableCell>
@@ -201,19 +201,19 @@ const OrdersTableComponent = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className={`max-w-40 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.problem}>
+                        <div className={`max-w-40 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.problem}>
                           {order.problem}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge 
-                          className={`text-xs whitespace-nowrap ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 text-gray-500 border-gray-300' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}
+                          className={`text-xs whitespace-nowrap ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}
                         >
                           {order.statusOrder}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className={`max-w-24 truncate ${isV2 ? "text-gray-700" : "text-gray-300"}`} title={order.master?.name || 'Не назначен'}>
+                        <div className={`max-w-24 truncate ${isV2 ? "text-gray-700 dark:text-gray-300" : "text-gray-300"}`} title={order.master?.name || 'Не назначен'}>
                           {order.master?.name || <span className={isV2 ? "text-gray-400" : "text-gray-500"}>Не назначен</span>}
                         </div>
                       </TableCell>
@@ -233,7 +233,7 @@ const OrdersTableComponent = ({
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="page-size" className={`text-sm ${isV2 ? "text-gray-600" : "text-gray-400"}`}>
+                    <Label htmlFor="page-size" className={`text-sm ${isV2 ? "text-gray-600 dark:text-gray-400" : "text-gray-400"}`}>
                       На странице:
                     </Label>
                     <Select
@@ -244,12 +244,12 @@ const OrdersTableComponent = ({
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className={isV2 ? "w-20 text-gray-700 bg-white border-gray-200 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0" : "w-20"}>
+                      <SelectTrigger className={isV2 ? "w-20 text-gray-700 dark:text-gray-300 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0" : "w-20"}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className={isV2 ? "bg-white border-gray-200" : ""}>
+                      <SelectContent className={isV2 ? "bg-white dark:bg-[#1e2530] border-gray-200 dark:border-gray-600" : ""}>
                         {PAGE_SIZES.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className={isV2 ? "text-gray-700" : ""}>
+                          <SelectItem key={size.value} value={size.value} className={isV2 ? "text-gray-700 dark:text-gray-300" : ""}>
                             {size.label}
                           </SelectItem>
                         ))}
@@ -275,7 +275,7 @@ const OrdersTableComponent = ({
         ) : (
           <div className="text-center py-8">
             <ShoppingCart className={`h-12 w-12 mx-auto mb-4 ${isV2 ? "text-gray-400" : "text-gray-300"}`} />
-            <p className={isV2 ? "text-gray-500" : "text-gray-600"}>Нет данных для отображения</p>
+            <p className={isV2 ? "text-gray-500 dark:text-gray-400" : "text-gray-600"}>Нет данных для отображения</p>
           </div>
         )}
       </CardContent>

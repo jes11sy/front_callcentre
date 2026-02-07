@@ -449,7 +449,7 @@ export function CreateOrderModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className={`w-full max-w-5xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col ${
         isV2 
-          ? 'bg-[#F3F3EE] border border-gray-200 shadow-xl' 
+          ? 'bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none' 
           : 'bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
       }`}>
         {/* Header */}

@@ -243,7 +243,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     return (
       <>
         {/* Фильтры отдельно для V2 */}
-        <div className="mb-6 bg-white rounded-xl p-4 shadow-sm">
+        <div className="mb-6 bg-white dark:bg-[#1e2530] rounded-xl p-4 shadow-sm dark:shadow-none dark:border dark:border-gray-700">
           <QuickFilterChips
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
@@ -255,19 +255,19 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
         </div>
 
         {/* Таблица V2 */}
-        <Card className="bg-white border border-gray-200 rounded-xl shadow-sm font-myriad">
+        <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-none font-myriad">
           <CardContent className="p-4">
             <div className="overflow-x-auto rounded-lg">
               <Table className="table-fixed w-full">
                 <TableHeader>
-                  <TableRow className="bg-gray-50 border-gray-200 hover:bg-gray-50">
+                  <TableRow className="bg-gray-50 dark:bg-[#252d3a] border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]">
                     <TableHead className="w-[18%] py-3 px-4">
-                      <span className="text-gray-800 font-medium">Клиент</span>
+                      <span className="text-gray-800 dark:text-gray-200 font-medium">Клиент</span>
                     </TableHead>
                     <TableHead className="w-[22%] py-3 px-4">
                       <button 
                         onClick={() => onSort('city')}
-                        className="flex items-center text-gray-800 font-medium hover:text-[#FEC004] transition-colors"
+                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors"
                       >
                         Источник
                         <SortIcon field="city" />
@@ -276,17 +276,17 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                     <TableHead className="w-[18%] py-3 px-4">
                       <button 
                         onClick={() => onSort('createdAt')}
-                        className="flex items-center text-gray-800 font-medium hover:text-[#FEC004] transition-colors"
+                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors"
                       >
                         Дата и время
                         <SortIcon field="createdAt" />
                       </button>
                     </TableHead>
                     <TableHead className="w-[20%] py-3 px-4">
-                      <span className="text-gray-800 font-medium">Оператор</span>
+                      <span className="text-gray-800 dark:text-gray-200 font-medium">Оператор</span>
                     </TableHead>
                     <TableHead className="w-[22%] py-3 px-4 text-right">
-                      <span className="text-gray-800 font-medium"></span>
+                      <span className="text-gray-800 dark:text-gray-200 font-medium"></span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -362,7 +362,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
             {/* Пагинация V2 */}
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-2">
-                <Label className="text-sm text-gray-500">На странице:</Label>
+                <Label className="text-sm text-gray-500 dark:text-gray-400">На странице:</Label>
                 <Select
                   value={limit.toString()}
                   onValueChange={(value) => {
@@ -371,15 +371,15 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   }}
                   disabled={loading}
                 >
-                  <SelectTrigger className="w-16 h-8 bg-white border-gray-200 text-gray-700">
+                  <SelectTrigger className="w-16 h-8 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-200">
+                  <SelectContent className="bg-white dark:bg-[#1e2530] border-gray-200 dark:border-gray-600">
                     {GROUP_SIZES.map((size) => (
                       <SelectItem 
                         key={size.value} 
                         value={size.value}
-                        className="text-gray-800 focus:bg-[#FEC004]/10"
+                        className="text-gray-800 dark:text-gray-200 focus:bg-[#FEC004]/10"
                       >
                         {size.label}
                       </SelectItem>

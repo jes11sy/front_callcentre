@@ -44,7 +44,7 @@ export function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside className="w-56 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0 font-myriad">
+    <aside className="w-56 bg-white dark:bg-[#1e2530] h-screen flex flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad">
       {/* Logo */}
       <div className="p-6 pb-16">
         <Link href="/telephony">
@@ -75,7 +75,7 @@ export function Sidebar() {
                 height={20} 
                 className={`nav-icon w-5 h-5 transition-all ${active ? 'nav-icon-active' : ''}`}
               />
-              <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors">
+              <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
                 {item.name}
               </span>
             </Link>
@@ -91,7 +91,7 @@ export function Sidebar() {
           <button
             onClick={toggleVersion}
             className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-              version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300'
+              version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300 dark:bg-gray-600'
             }`}
           >
             <span
@@ -133,8 +133,8 @@ export function Sidebar() {
               isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
             }`}
           />
-          <User className={`nav-icon h-5 w-5 text-gray-600 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
-          <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors">
+          <User className={`nav-icon h-5 w-5 text-gray-600 dark:text-gray-400 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
+          <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
             {user?.name || user?.login || 'Профиль'}
           </span>
         </Link>
@@ -142,7 +142,7 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full group"
+          className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group"
         >
           <LogOut className="h-5 w-5" />
           Выйти

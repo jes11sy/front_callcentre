@@ -113,7 +113,7 @@ export default function NonOrdersPage() {
   if (isV2) {
     return (
       <DashboardLayout>
-        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
           <div className="max-w-4xl space-y-10">
             
             {/* Что мы НЕ делаем - в начале */}

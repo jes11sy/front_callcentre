@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -15,7 +15,10 @@ import {
 } from '@/components/orders';
 import { useOrders } from '@/hooks/useOrders';
 import { useDesignStore } from '@/store/designStore';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { StickyAudioPlayer } from '@/components/telephony/v2/StickyAudioPlayer';
+import { Call } from '@/types/orders';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 function OrdersContent() {
   const searchParams = useSearchParams();
@@ -24,15 +27,56 @@ function OrdersContent() {
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
   
-  // Audio player for call recordings
-  const {
-    loadRecording,
-    skipBackward,
-    skipForward,
-    seekTo,
-    setVolume,
-    stopPlayback
-  } = useAudioPlayer();
+  // Audio player state
+  const [playingCall, setPlayingCall] = useState<Call | null>(null);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
+  
+  // Load recording function
+  const loadRecording = useCallback(async (call: Call) => {
+    try {
+      setPlayingCall(call);
+      
+      const response = await api.get(`/recordings/call/${call.id}/download`, {
+        responseType: 'json',
+      });
+      
+      if (response.data.success && response.data.url) {
+        setCurrentAudioUrl(response.data.url);
+      } else {
+        throw new Error(response.data.message || 'Не удалось получить URL записи');
+      }
+    } catch (error: unknown) {
+      console.error('Error loading recording:', error);
+      toast.error('Ошибка загрузки записи');
+      setPlayingCall(null);
+      setCurrentAudioUrl(null);
+    }
+  }, []);
+  
+  const closePlayer = useCallback(() => {
+    setPlayingCall(null);
+    setCurrentAudioUrl(null);
+  }, []);
+  
+  const downloadRecording = useCallback(async (call: Call) => {
+    try {
+      const response = await api.get(`/recordings/call/${call.id}/download`);
+      if (response.data.success && response.data.url) {
+        const a = document.createElement('a');
+        a.href = response.data.url;
+        a.download = `call_${call.id}_recording.mp3`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast.success('Запись загружена');
+      }
+    } catch (error) {
+      toast.error('Ошибка при загрузке записи');
+    }
+  }, []);
+  
+  const isStickyPlayerVisible = playingCall !== null && currentAudioUrl !== null;
   
   const {
     filters,
@@ -144,17 +188,17 @@ function OrdersContent() {
             <OrderViewModal
               isOpen={isViewModalOpen}
               onClose={() => {
-                stopPlayback();
+                closePlayer();
                 handleCloseViewModal();
               }}
               order={selectedOrder}
               orderCalls={orderCalls}
               loadingCalls={loadingCalls}
               loadRecording={loadRecording}
-              skipBackward={skipBackward}
-              skipForward={skipForward}
-              seekTo={seekTo}
-              setVolume={setVolume}
+              skipBackward={() => {}}
+              skipForward={() => {}}
+              seekTo={() => {}}
+              setVolume={() => {}}
               formatDate={(date) => new Date(date).toLocaleString('ru-RU')}
               onEdit={() => {
                 setIsEditModalOpen(true);
@@ -183,6 +227,29 @@ function OrdersContent() {
           </div>
         </div>
       </div>
+      
+      {/* Sticky Audio Player */}
+      {isStickyPlayerVisible && playingCall && (
+        <StickyAudioPlayer
+          call={{
+            id: playingCall.id,
+            phoneClient: selectedOrder?.phone || 'Неизвестный номер',
+            city: selectedOrder?.city || '',
+            operator: { 
+              id: selectedOrder?.operatorNameId || 0, 
+              name: selectedOrder?.operator?.name || 'Оператор' 
+            },
+            recordingPath: playingCall.recordingPath || ''
+          } as import('@/types/telephony').Call}
+          audioUrl={currentAudioUrl}
+          isVisible={isStickyPlayerVisible}
+          onClose={closePlayer}
+          onDownload={() => downloadRecording(playingCall)}
+        />
+      )}
+      
+      {/* Spacer for sticky player */}
+      {isStickyPlayerVisible && <div className="h-20" />}
     </DashboardLayout>
   );
 }

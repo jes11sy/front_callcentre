@@ -10,15 +10,10 @@ import {
   FileText, 
   X,
   Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Volume2,
   Edit
 } from 'lucide-react';
 import { Order, Call } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS, STATUS_COLORS_V2 } from '@/constants/orders';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useDesignStore } from '@/store/designStore';
 
 type ViewTab = 'info' | 'documents';
@@ -30,10 +25,10 @@ interface OrderViewModalProps {
   orderCalls: Call[];
   loadingCalls: boolean;
   loadRecording: (call: Call) => void;
-  skipBackward: () => void;
-  skipForward: () => void;
-  seekTo: (time: number) => void;
-  setVolume: (volume: number) => void;
+  skipBackward?: () => void;
+  skipForward?: () => void;
+  seekTo?: (time: number) => void;
+  setVolume?: (volume: number) => void;
   formatDate: (date: string | number) => string;
   onEdit?: () => void;
 }
@@ -45,27 +40,16 @@ const OrderViewModalComponent = ({
   orderCalls, 
   loadingCalls,
   loadRecording,
-  skipBackward,
-  skipForward,
-  seekTo,
-  setVolume,
   formatDate,
   onEdit
 }: OrderViewModalProps) => {
   const [activeTab, setActiveTab] = useState<ViewTab>('info');
-  const { 
-    audioPlayer, 
-    togglePlayPause, 
-    stopPlayback, 
-    formatTime 
-  } = useAudioPlayer();
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
 
   if (!isOpen || !order) return null;
 
   const handleClose = () => {
-    stopPlayback();
     onClose();
   };
 
@@ -152,15 +136,7 @@ const OrderViewModalComponent = ({
               orderCalls={orderCalls}
               loadingCalls={loadingCalls}
               loadRecording={loadRecording}
-              skipBackward={skipBackward}
-              skipForward={skipForward}
-              seekTo={seekTo}
-              setVolume={setVolume}
               formatDate={formatDate}
-              audioPlayer={audioPlayer}
-              stopPlayback={stopPlayback}
-              formatTime={formatTime}
-              togglePlayPause={togglePlayPause}
               isV2={isV2}
             />
           )}
@@ -180,30 +156,14 @@ const InfoTab = ({
   orderCalls,
   loadingCalls,
   loadRecording,
-  skipBackward,
-  skipForward,
-  seekTo,
-  setVolume,
   formatDate,
-  audioPlayer, 
-  stopPlayback, 
-  formatTime,
-  togglePlayPause,
   isV2
 }: { 
   order: Order;
   orderCalls: Call[];
   loadingCalls: boolean;
   loadRecording: (call: Call) => void;
-  skipBackward: () => void;
-  skipForward: () => void;
-  seekTo: (time: number) => void;
-  setVolume: (volume: number) => void;
   formatDate: (date: string | number) => string;
-  audioPlayer: unknown; 
-  stopPlayback: () => void; 
-  formatTime: (time: number) => string;
-  togglePlayPause: () => void;
   isV2: boolean;
 }) => {
   const statusColors = isV2 ? STATUS_COLORS_V2 : STATUS_COLORS;
@@ -287,15 +247,15 @@ const InfoTab = ({
               <CallPlayer
                 key={call.id || index}
                 call={call}
-                audioPlayer={audioPlayer}
+                audioPlayer={null}
                 loadRecording={loadRecording}
-                togglePlayPause={togglePlayPause}
-                skipBackward={skipBackward}
-                skipForward={skipForward}
-                seekTo={seekTo}
-                setVolume={setVolume}
-                stopPlayback={stopPlayback}
-                formatTime={formatTime}
+                togglePlayPause={() => {}}
+                skipBackward={() => {}}
+                skipForward={() => {}}
+                seekTo={() => {}}
+                setVolume={() => {}}
+                stopPlayback={() => {}}
+                formatTime={() => ''}
                 isV2={isV2}
               />
             ))}
@@ -429,15 +389,7 @@ const DocumentPreview = ({ fileKey, index, isV2 = false }: { fileKey: string; in
 
 const CallPlayer = ({
   call,
-  audioPlayer,
   loadRecording,
-  togglePlayPause,
-  skipBackward,
-  skipForward,
-  seekTo,
-  setVolume,
-  stopPlayback,
-  formatTime,
   isV2 = false,
 }: {
   call: Call;
@@ -452,8 +404,9 @@ const CallPlayer = ({
   formatTime: (time: number) => string;
   isV2?: boolean;
 }) => {
-  const isCurrentCall = (audioPlayer as { currentCallId?: string }).currentCallId === String(call.id);
-  const player = audioPlayer as { isPlaying?: boolean; currentTime?: number; duration?: number; volume?: number };
+  // Format date - handle both createdAt and dateCreate
+  const callDate = (call as unknown as { createdAt?: string; dateCreate?: string }).createdAt || 
+                   (call as unknown as { dateCreate?: string }).dateCreate;
 
   return (
     <div className={isV2 
@@ -463,88 +416,25 @@ const CallPlayer = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className={`text-sm font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>Звонок #{call.id}</span>
-          <span className={`text-xs ${isV2 ? 'text-gray-400' : 'text-gray-500'}`}>
-            {new Date(call.createdAt).toLocaleString('ru-RU')}
-          </span>
+          {callDate && (
+            <span className={`text-xs ${isV2 ? 'text-gray-400' : 'text-gray-500'}`}>
+              {new Date(callDate).toLocaleString('ru-RU')}
+            </span>
+          )}
         </div>
-        {!isCurrentCall && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => loadRecording(call)}
-            className={isV2 
-              ? "h-8 w-8 p-0 text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-              : "h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
-            }
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => loadRecording(call)}
+          className={isV2 
+            ? "h-8 w-8 p-0 text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+            : "h-8 w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+          }
+          title="Воспроизвести запись"
+        >
+          <Play className="h-4 w-4" />
+        </Button>
       </div>
-
-      {isCurrentCall && (
-        <div className={`flex items-center gap-3 mt-3 pt-3 border-t ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'}`}>
-          {/* Кнопки управления */}
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={skipBackward} className={isV2 
-              ? "h-8 w-8 p-0 text-[#FEC004] hover:bg-[#FEC004]/10"
-              : "h-8 w-8 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-            }>
-              <SkipBack className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={togglePlayPause} className={isV2 
-              ? "h-8 w-8 p-0 text-[#FEC004] hover:bg-[#FEC004]/10"
-              : "h-8 w-8 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-            }>
-              {player.isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={skipForward} className={isV2 
-              ? "h-8 w-8 p-0 text-[#FEC004] hover:bg-[#FEC004]/10"
-              : "h-8 w-8 p-0 text-[#FFD700] hover:bg-[#FFD700]/10"
-            }>
-              <SkipForward className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Прогресс бар */}
-          <div className="flex-1 flex items-center gap-2">
-            <span className={`text-xs w-10 text-right ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>{formatTime(player.currentTime || 0)}</span>
-            <div 
-              className={`flex-1 rounded-full h-2 cursor-pointer ${isV2 ? 'bg-gray-200' : 'bg-gray-700'}`}
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const percentage = (e.clientX - rect.left) / rect.width;
-                seekTo(percentage * (player.duration || 0));
-              }}
-            >
-              <div
-                className={`h-2 rounded-full transition-all ${isV2 ? 'bg-[#FEC004]' : 'bg-[#FFD700]'}`}
-                style={{ width: `${(player.duration || 0) > 0 ? ((player.currentTime || 0) / (player.duration || 1)) * 100 : 0}%` }}
-              />
-            </div>
-            <span className={`text-xs w-10 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>{formatTime(player.duration || 0)}</span>
-          </div>
-
-          {/* Громкость */}
-          <div className="flex items-center gap-2">
-            <Volume2 className={`h-4 w-4 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={player.volume || 1}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className={`w-20 h-1.5 ${isV2 ? 'accent-[#FEC004]' : 'accent-[#FFD700]'}`}
-            />
-          </div>
-
-          {/* Закрыть */}
-          <Button variant="ghost" size="sm" onClick={stopPlayback} className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

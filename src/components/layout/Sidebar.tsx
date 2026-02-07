@@ -80,13 +80,13 @@ export function Sidebar() {
             >
               {/* Индикатор активной вкладки - тонкая скобка */}
               <span 
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-7 transition-all ${
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-10 transition-all ${
                   active ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                <svg viewBox="0 0 6 28" fill="none" className="w-full h-full">
+                <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
                   <path 
-                    d="M5 1C2.5 1 1 3.5 1 7v14c0 3.5 1.5 6 4 6" 
+                    d="M5 1C2.5 1 1 4.5 1 10v20c0 5.5 1.5 9 4 9" 
                     stroke="#FEC004" 
                     strokeWidth="1.5" 
                     strokeLinecap="round"
@@ -156,13 +156,13 @@ export function Sidebar() {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-7 transition-all ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-10 transition-all ${
               isActive('/profile') ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <svg viewBox="0 0 6 28" fill="none" className="w-full h-full">
+            <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
               <path 
-                d="M5 1C2.5 1 1 3.5 1 7v14c0 3.5 1.5 6 4 6" 
+                d="M5 1C2.5 1 1 4.5 1 10v20c0 5.5 1.5 9 4 9" 
                 stroke="#FEC004" 
                 strokeWidth="1.5" 
                 strokeLinecap="round"
@@ -191,14 +191,16 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-white dark:bg-[#1e2530] border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4">
+      <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-[#1e2530] flex items-center justify-between px-6 transition-all ${
+        isMobileMenuOpen ? '' : 'border-b border-gray-200 dark:border-gray-700'
+      }`}>
         <Link href="/telephony">
           <Image 
             src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
             alt="Logo" 
-            width={120} 
-            height={34} 
-            className="h-8 w-auto" 
+            width={140} 
+            height={40} 
+            className="h-10 w-auto" 
           />
         </Link>
         <button
@@ -207,28 +209,20 @@ export function Sidebar() {
           aria-label="Открыть меню"
         >
           {isMobileMenuOpen ? (
-            <X className="h-6 w-6" />
+            <X className="h-7 w-7" />
           ) : (
-            <Menu className="h-6 w-6" />
+            <Menu className="h-7 w-7" />
           )}
         </button>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Mobile Slide-in Menu */}
+      {/* Mobile Full-screen Menu */}
       <aside 
-        className={`lg:hidden fixed top-14 left-0 bottom-0 w-64 bg-white dark:bg-[#1e2530] border-r border-gray-200 dark:border-gray-700 z-50 transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
+        className={`lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-white dark:bg-[#1e2530] z-50 transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="pt-4 flex flex-col h-full">
+        <div className="pt-6 flex flex-col h-full overflow-y-auto">
           <MenuContent />
         </div>
       </aside>

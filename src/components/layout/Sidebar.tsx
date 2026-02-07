@@ -65,24 +65,26 @@ export function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   // Контент меню (переиспользуется для десктопа и мобильной версии)
-  const MenuContent = () => (
+  const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       {/* Navigation */}
-      <nav className="flex-1 px-5 space-y-3">
+      <nav className={`flex-1 px-5 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.name}
               href={item.href}
-              className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
+              className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
+                isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+              }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {/* Индикатор активной вкладки - тонкая скобка */}
               <span 
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-10 transition-all ${
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
                   active ? 'opacity-100' : 'opacity-0'
-                }`}
+                } ${isMobile ? 'h-12' : 'h-10'}`}
               >
                 <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
                   <path 
@@ -97,9 +99,9 @@ export function Sidebar() {
               <Image 
                 src={item.icon} 
                 alt={item.name} 
-                width={20} 
-                height={20} 
-                className={`nav-icon w-5 h-5 transition-all ${active ? 'nav-icon-active' : ''}`}
+                width={isMobile ? 24 : 20} 
+                height={isMobile ? 24 : 20} 
+                className={`nav-icon transition-all ${active ? 'nav-icon-active' : ''} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
               />
               <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
                 {item.name}
@@ -110,10 +112,10 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-5 pb-6 space-y-3">
+      <div className={`px-5 pb-6 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
         {/* Version Toggle */}
-        <div className="flex items-center gap-3 px-3 py-2">
-          <span className={`text-sm transition-colors ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
+        <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
+          <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
           <button
             onClick={toggleVersion}
             className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
@@ -126,13 +128,13 @@ export function Sidebar() {
               }`}
             />
           </button>
-          <span className={`text-sm transition-colors ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
+          <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
         </div>
 
         {/* Theme Toggle - только для V2 */}
         {version === 'v2' && (
-          <div className="flex items-center gap-3 px-3 py-2">
-            <Sun className={`h-5 w-5 transition-colors ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
+            <Sun className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
             <button
               onClick={toggleTheme}
               className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
@@ -145,20 +147,22 @@ export function Sidebar() {
                 }`}
               />
             </button>
-            <Moon className={`h-5 w-5 transition-colors ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+            <Moon className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
           </div>
         )}
 
         {/* Profile with user name */}
         <Link
           href="/profile"
-          className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
+          className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
+            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+          }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-10 transition-all ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
               isActive('/profile') ? 'opacity-100' : 'opacity-0'
-            }`}
+            } ${isMobile ? 'h-12' : 'h-10'}`}
           >
             <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
               <path 
@@ -170,7 +174,7 @@ export function Sidebar() {
               />
             </svg>
           </span>
-          <User className={`nav-icon h-5 w-5 text-gray-600 dark:text-gray-400 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
+          <User className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`} />
           <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
             {user?.name || user?.login || 'Профиль'}
           </span>
@@ -179,9 +183,11 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group"
+          className={`relative flex items-center gap-3 px-3 font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group ${
+            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+          }`}
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className={isMobile ? 'h-6 w-6' : 'h-5 w-5'} />
           Выйти
         </button>
       </div>
@@ -223,7 +229,7 @@ export function Sidebar() {
         }`}
       >
         <div className="pt-6 flex flex-col h-full overflow-y-auto">
-          <MenuContent />
+          <MenuContent isMobile={true} />
         </div>
       </aside>
 
@@ -242,7 +248,7 @@ export function Sidebar() {
           </Link>
         </div>
 
-        <MenuContent />
+        <MenuContent isMobile={false} />
       </aside>
     </>
   );

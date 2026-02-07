@@ -1,32 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
+import { useNotifications } from '@/hooks/useNotifications';
 import { 
   User, 
   Sun,
   Moon,
   Menu,
   X,
-  Bell
+  Bell,
+  Check,
+  Trash2
 } from 'lucide-react';
-import { useState as useStateReact } from 'react';
 
 export function Sidebar() {
   const { user } = useAuthStore();
   const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useStateReact(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  
+  // Реальные уведомления из хука
+  const {
+    notifications,
+    unreadCount,
+    isDropdownOpen,
+    toggleDropdown,
+    closeDropdown,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
 
   // Закрываем меню при смене маршрута
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [pathname]);
+    closeDropdown();
+  }, [pathname, closeDropdown]);
 
   // Блокируем скролл body при открытом меню
   useEffect(() => {
@@ -40,13 +55,48 @@ export function Sidebar() {
     };
   }, [isMobileMenuOpen]);
 
-  // Моковые уведомления (потом заменить на реальные данные)
-  const notifications = [
-    { id: 1, text: 'Новый заказ #1234', time: '5 мин назад', read: false },
-    { id: 2, text: 'Заказ #1230 закрыт', time: '15 мин назад', read: false },
-    { id: 3, text: 'Мастер принял заказ #1228', time: '1 час назад', read: true },
-  ];
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Закрываем dropdown при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        closeDropdown();
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen, closeDropdown]);
+
+  // Форматирование времени уведомления
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'только что';
+    if (diffMins < 60) return `${diffMins} мин назад`;
+    if (diffHours < 24) return `${diffHours} ч назад`;
+    return `${diffDays} дн назад`;
+  };
+
+  // Обработка клика на уведомление
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
+    if (notification.orderId) {
+      router.push(`/orders?id=${notification.orderId}`);
+      closeDropdown();
+    }
+  };
 
   const navItems = [
     { name: 'Телефония', href: '/telephony', icon: '/img/navigate/telephony.svg' },
@@ -149,9 +199,9 @@ export function Sidebar() {
         )}
 
         {/* Notifications */}
-        <div className="relative">
+        <div className="relative" ref={isMobile ? undefined : notificationsRef}>
           <button
-            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            onClick={toggleDropdown}
             className={`relative flex items-center gap-3 px-3 font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group ${
               isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
             }`}
@@ -160,7 +210,7 @@ export function Sidebar() {
               <Bell className={isMobile ? 'h-6 w-6' : 'h-5 w-5'} />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {unreadCount}
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </div>
@@ -170,36 +220,57 @@ export function Sidebar() {
           </button>
 
           {/* Notifications Dropdown */}
-          {isNotificationsOpen && (
-            <div className={`absolute ${isMobile ? 'left-0 right-0 mx-3' : 'left-full ml-2 w-72'} bottom-full mb-2 bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}>
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          {isDropdownOpen && (
+            <div 
+              ref={isMobile ? notificationsRef : undefined}
+              className={`absolute ${isMobile ? 'left-0 right-0 mx-3 bottom-full mb-2' : 'left-full ml-2 w-80 bottom-0'} bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}
+            >
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                  >
+                    <Check className="h-3 w-3" />
+                    Прочитать все
+                  </button>
+                )}
               </div>
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-72 overflow-y-auto">
                 {notifications.length > 0 ? (
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
+                      onClick={() => handleNotificationClick(notification)}
                       className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
                         !notification.read ? 'bg-[#FEC004]/5' : ''
                       }`}
                     >
-                      <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
-                        {notification.text}
-                      </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{notification.time}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                            {notification.title}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            {formatTime(notification.createdAt)}
+                          </p>
+                        </div>
+                        {!notification.read && (
+                          <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                        )}
+                      </div>
                     </div>
                   ))
                 ) : (
-                  <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                    Нет уведомлений
+                  <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Нет уведомлений</p>
                   </div>
                 )}
-              </div>
-              <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                <button className="text-sm text-[#FEC004] hover:underline w-full text-center">
-                  Показать все
-                </button>
               </div>
             </div>
           )}

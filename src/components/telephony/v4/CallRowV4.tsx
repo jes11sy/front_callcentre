@@ -255,7 +255,11 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                       "text-xs",
                       isV2 ? "text-gray-500" : "text-purple-400/70"
                     )}>
-                      Мастер → Клиент {call.masterName ? `(${call.masterName})` : call.masterId ? `(ID: ${call.masterId})` : ''}
+                      {call.masterName 
+                        ? `От мастера: ${call.masterName}` 
+                        : call.masterId 
+                          ? `От мастера (ID: ${call.masterId})` 
+                          : 'Звонок от мастера'}
                     </span>
                   </div>
                 ) : isOutgoing ? (
@@ -327,7 +331,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 {displayPhone}
                 {isCallback && (
                   <span className={cn("text-xs ml-1", isV2 ? "text-gray-500" : "text-purple-400/60")}>
-                    (от мастера{call.masterName ? `: ${call.masterName}` : ''})
+                    {call.masterName ? `(мастер: ${call.masterName})` : '(от мастера)'}
                   </span>
                 )}
               </span>

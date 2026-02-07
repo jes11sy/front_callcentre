@@ -21,14 +21,14 @@ export const STATUS_COLORS = {
 } as const;
 
 export const STATUS_COLORS_V2 = {
-  'Ожидает': 'bg-amber-100 text-amber-700 border-amber-300',
-  'Принял': 'bg-blue-100 text-blue-700 border-blue-300',
-  'В пути': 'bg-indigo-100 text-indigo-700 border-indigo-300',
-  'В работе': 'bg-yellow-100 text-yellow-700 border-yellow-300',
-  'Готово': 'bg-green-100 text-green-700 border-green-300',
-  'Отказ': 'bg-red-100 text-red-700 border-red-300',
-  'Модерн': 'bg-orange-100 text-orange-700 border-orange-300',
-  'Незаказ': 'bg-gray-100 text-gray-600 border-gray-300'
+  'Ожидает': 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600',
+  'Принял': 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600',
+  'В пути': 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600',
+  'В работе': 'bg-[#FEC004]/15 text-[#b38a00] dark:text-[#FEC004] border-[#FEC004]/40',
+  'Готово': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700',
+  'Отказ': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700',
+  'Модерн': 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600',
+  'Незаказ': 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'
 } as const;
 
 export const ORDER_TYPES = [

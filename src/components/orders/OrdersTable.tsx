@@ -244,7 +244,7 @@ const OrdersTableComponent = ({
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
                         <Badge 
-                          className={`text-[10px] sm:text-xs whitespace-nowrap ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}
+                          className={`text-[10px] sm:text-xs whitespace-nowrap ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}
                         >
                           {order.statusOrder}
                         </Badge>

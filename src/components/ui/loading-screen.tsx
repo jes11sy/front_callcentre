@@ -26,7 +26,7 @@ export function LoadingScreen({
   fullScreen = true,
   className
 }: LoadingScreenProps) {
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
 
   // ============ V2 DESIGN ============
   if (version === 'v2') {
@@ -37,7 +37,13 @@ export function LoadingScreen({
       >
         {/* Logo V2 */}
         <div className="mb-8">
-          <Image src="/img/logo/logo_v2.png" alt="Logo" width={200} height={50} className="h-12 w-auto" />
+          <Image 
+            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+            alt="Logo" 
+            width={200} 
+            height={50} 
+            className="h-12 w-auto" 
+          />
         </div>
 
         {/* Spinner V2 */}

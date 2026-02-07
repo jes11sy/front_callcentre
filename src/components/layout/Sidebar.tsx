@@ -48,7 +48,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 pb-16">
         <Link href="/telephony">
-          <Image src="/img/logo/logo_v2.png" alt="Logo" width={160} height={45} className="h-10 w-auto cursor-pointer" />
+          <Image 
+            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+            alt="Logo" 
+            width={160} 
+            height={45} 
+            className="h-10 w-auto cursor-pointer" 
+          />
         </Link>
       </div>
 

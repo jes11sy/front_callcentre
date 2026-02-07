@@ -61,17 +61,17 @@ export default function ReferencePage() {
                   <Link 
                     key={index} 
                     href={section.href} 
-                    className="group flex items-center justify-between py-5 border-b border-gray-200 hover:border-[#FEC004] transition-colors"
+                    className="group flex items-center justify-between py-5 border-b border-gray-200 dark:border-gray-700 hover:border-[#FEC004] transition-colors"
                   >
                     <div>
-                      <div className="text-gray-900 group-hover:text-[#FEC004] transition-colors text-base">
+                      <div className="text-gray-900 dark:text-gray-100 group-hover:text-[#FEC004] transition-colors text-base">
                         {section.title}
                       </div>
-                      <div className="text-gray-400 text-sm mt-1">
+                      <div className="text-gray-400 dark:text-gray-500 text-sm mt-1">
                         {section.description}
                       </div>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-gray-300 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all flex-shrink-0 ml-4" />
+                    <ArrowRight className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all flex-shrink-0 ml-4" />
                   </Link>
                 );
               })}

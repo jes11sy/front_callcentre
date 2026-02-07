@@ -154,27 +154,27 @@ export default function StatsPage() {
       <DashboardLayout variant="operator" requiredRole="operator">
         <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
           {/* Date Filter */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-[140px] h-9 bg-white border-gray-200 text-gray-900 text-sm font-light"
+                className="w-[140px] h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm font-light dark:[color-scheme:dark]"
               />
               <span className="text-gray-400">—</span>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-[140px] h-9 bg-white border-gray-200 text-gray-900 text-sm font-light"
+                className="w-[140px] h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm font-light dark:[color-scheme:dark]"
               />
             </div>
             <Button 
               onClick={resetToCurrentPeriod} 
               variant="ghost" 
               size="sm"
-              className="text-gray-500 hover:text-[#FEC004] font-light"
+              className="text-gray-500 dark:text-gray-400 hover:text-[#FEC004] font-light"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Сбросить
@@ -188,12 +188,12 @@ export default function StatsPage() {
               {/* Звонки */}
               <div>
                 <div className="flex items-baseline justify-between mb-3">
-                  <span className="text-gray-800 font-light">Звонки</span>
-                  <span className="text-2xl font-light text-gray-900">{stats.calls.total}</span>
+                  <span className="text-gray-800 dark:text-gray-200 font-light">Звонки</span>
+                  <span className="text-2xl font-light text-gray-900 dark:text-gray-100">{stats.calls.total}</span>
                 </div>
                 
                 {/* Прогресс-бар */}
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
                   <div 
                     className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
                     style={{ width: `${acceptanceRate}%` }}
@@ -202,27 +202,27 @@ export default function StatsPage() {
                 
                 {/* Принятые / Пропущенные */}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 font-light">
-                    Принятые: <span className="text-gray-900">{stats.calls.accepted}</span>
-                    <span className="text-gray-400 ml-1">({acceptanceRate}%)</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-light">
+                    Принятые: <span className="text-gray-900 dark:text-gray-100">{stats.calls.accepted}</span>
+                    <span className="text-gray-400 dark:text-gray-500 ml-1">({acceptanceRate}%)</span>
                   </span>
-                  <span className="text-gray-600 font-light">
-                    Пропущенные: <span className="text-gray-900">{stats.calls.missed}</span>
-                    <span className="text-gray-400 ml-1">({missedRate}%)</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-light">
+                    Пропущенные: <span className="text-gray-900 dark:text-gray-100">{stats.calls.missed}</span>
+                    <span className="text-gray-400 dark:text-gray-500 ml-1">({missedRate}%)</span>
                   </span>
                 </div>
               </div>
 
               {/* Разделитель */}
-              <div className="border-b border-gray-200" />
+              <div className="border-b border-gray-200 dark:border-gray-700" />
 
               {/* Заказы */}
               <div>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-gray-800 font-light">Заказы</span>
-                  <span className="text-2xl font-light text-gray-900">{stats.orders.total}</span>
+                  <span className="text-gray-800 dark:text-gray-200 font-light">Заказы</span>
+                  <span className="text-2xl font-light text-gray-900 dark:text-gray-100">{stats.orders.total}</span>
                 </div>
-                <p className="text-sm text-gray-400 font-light mt-1">за период</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 font-light mt-1">за период</p>
               </div>
             </div>
           ) : null}

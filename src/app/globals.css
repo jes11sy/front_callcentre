@@ -22,6 +22,15 @@
   filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);
 }
 
+/* Dark mode - инвертируем иконки навигации для светлого отображения */
+.dark .nav-icon:not(.nav-icon-active) {
+  filter: invert(1) brightness(0.8);
+}
+
+.dark .nav-icon-hover:hover .nav-icon {
+  filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);
+}
+
 /* Myriad Pro для V2 дизайна */
 @font-face {
   font-family: 'Myriad Pro';

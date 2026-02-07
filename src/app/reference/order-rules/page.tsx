@@ -23,8 +23,8 @@ export default function OrderRulesPage() {
             
             {/* Роли и представление */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Роли и представление</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Роли и представление</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Общение ведется от лица мастера/напарника мастера/жены мастера</li>
                 <li>При первом звонке: «Здравствуйте, это [Имя] мастер по ремонту [тип техники]»</li>
                 <li>При повторном звонке с негативом: представиться напарником/женой и сказать что передадите информацию</li>
@@ -34,19 +34,19 @@ export default function OrderRulesPage() {
 
             {/* Этика общения */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Этика общения</h2>
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Этика общения</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-red-600 font-medium mb-2">Запрещено:</p>
-                  <ul className="space-y-1 text-gray-700 ml-4">
+                  <p className="text-red-600 dark:text-red-400 font-medium mb-2">Запрещено:</p>
+                  <ul className="space-y-1 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Грубить/хамить</li>
                     <li>Перебивать клиента</li>
                     <li>Использовать жаргон и мат</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="text-green-600 font-medium mb-2">Обязательно:</p>
-                  <ul className="space-y-1 text-gray-700 ml-4">
+                  <p className="text-green-600 dark:text-green-400 font-medium mb-2">Обязательно:</p>
+                  <ul className="space-y-1 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Вежливо и профессионально</li>
                     <li>Говорить четко и понятно</li>
                     <li>Слушать клиента до конца</li>
@@ -59,8 +59,8 @@ export default function OrderRulesPage() {
 
             {/* Обязательные поля */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Обязательные поля заказа</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Обязательные поля заказа</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Имя клиента</li>
                 <li>Номер телефона</li>
                 <li>Адрес</li>
@@ -72,18 +72,18 @@ export default function OrderRulesPage() {
 
             {/* Правила работы с ценами */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Правила работы с ценами</h2>
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Правила работы с ценами</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-red-600 font-medium mb-2">Что НЕ говорить:</p>
-                  <ul className="space-y-1 text-gray-700 ml-4">
+                  <p className="text-red-600 dark:text-red-400 font-medium mb-2">Что НЕ говорить:</p>
+                  <ul className="space-y-1 text-gray-700 dark:text-gray-300 ml-4">
                     <li>«В районе», «до», «примерно»</li>
                     <li>Конкретные суммы без диагностики</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="text-green-600 font-medium mb-2">Что говорить:</p>
-                  <ul className="space-y-1 text-gray-700 ml-4">
+                  <p className="text-green-600 dark:text-green-400 font-medium mb-2">Что говорить:</p>
+                  <ul className="space-y-1 text-gray-700 dark:text-gray-300 ml-4">
                     <li>«Цены ОТ [сумма]» — всегда «ОТ», никаких других формулировок</li>
                     <li>«Давайте лучше подъеду, посмотрю и на месте все скажу»</li>
                     <li>«Не волнуйтесь, о цене договоримся, главное чтобы вы остались довольны»</li>
@@ -94,25 +94,25 @@ export default function OrderRulesPage() {
             </section>
 
             {/* Описание проблемы - важно */}
-            <section className="bg-red-50 p-6 rounded-lg border border-red-200">
-              <h2 className="text-lg text-red-700 mb-4">Критически важно: описание проблемы</h2>
-              <div className="space-y-4 text-gray-700">
+            <section className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-500/30">
+              <h2 className="text-lg text-red-700 dark:text-red-400 mb-4">Критически важно: описание проблемы</h2>
+              <div className="space-y-4 text-gray-700 dark:text-gray-300">
                 <div>
                   <p className="font-medium mb-1">Обязательно указывать суммы:</p>
                   <p>В описании ВСЕГДА указывать суммы, озвученные клиенту</p>
-                  <p className="text-gray-500 text-sm mt-1">Пример: «Проблема: не включается ноутбук. Озвучена цена ОТ 1500₽»</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Пример: «Проблема: не включается ноутбук. Озвучена цена ОТ 1500₽»</p>
                 </div>
                 <div>
                   <p className="font-medium mb-1">Для заказов с Авито:</p>
-                  <p className="text-red-600">Обязательно дописывать: «ОБЯЗАТЕЛЬНО ОТЗЫВ!»</p>
+                  <p className="text-red-600 dark:text-red-400">Обязательно дописывать: «ОБЯЗАТЕЛЬНО ОТЗЫВ!»</p>
                 </div>
               </div>
             </section>
 
             {/* Техника ведения разговора */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Техника ведения разговора</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Техника ведения разговора</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Начинать с приветствия и представления</li>
                 <li>Уточнять удобное время для звонка/встречи</li>
                 <li>Задавать уточняющие вопросы о проблеме</li>
@@ -122,8 +122,8 @@ export default function OrderRulesPage() {
 
             {/* Критические ситуации */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Критические ситуации</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Критические ситуации</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>При агрессии клиента — сохранять спокойствие, не отвечать грубостью</li>
                 <li>При технических проблемах — честно говорить о возможных сложностях</li>
                 <li>При сомнениях в диагнозе — предлагать диагностику</li>
@@ -132,8 +132,8 @@ export default function OrderRulesPage() {
 
             {/* Временные слоты */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Временные слоты</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Временные слоты</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Интервалы: каждые 30 минут с 10:00 до 22:00</li>
                 <li>Максимум 3 заказа на один временной слот</li>
                 <li>Распределение по типам: КП, БТ, МНЧ</li>
@@ -142,11 +142,11 @@ export default function OrderRulesPage() {
 
             {/* Типы заявок */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Типы заявок</h2>
-              <ul className="space-y-2 text-gray-700">
-                <li><span className="text-blue-600">Впервые</span> — новый клиент, первое обращение</li>
-                <li><span className="text-green-600">Повтор</span> — повторное обращение существующего клиента</li>
-                <li><span className="text-orange-600">Гарантия</span> — обращение по гарантийному случаю</li>
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Типы заявок</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><span className="text-blue-600 dark:text-blue-400">Впервые</span> — новый клиент, первое обращение</li>
+                <li><span className="text-green-600 dark:text-green-400">Повтор</span> — повторное обращение существующего клиента</li>
+                <li><span className="text-orange-600 dark:text-orange-400">Гарантия</span> — обращение по гарантийному случаю</li>
               </ul>
             </section>
 

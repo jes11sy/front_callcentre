@@ -226,16 +226,16 @@ export default function PricingPage() {
             
             {pricingData.map((category, index) => (
               <section key={index}>
-                <h2 className="text-xl text-gray-900 mb-6 pb-2 border-b border-gray-300">{category.category}</h2>
+                <h2 className="text-xl text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">{category.category}</h2>
                 
                 <div className="space-y-8">
                   {category.subcategories.map((subcategory, subIndex) => (
                     <div key={subIndex}>
-                      <h3 className="text-base text-gray-700 mb-3">{subcategory.name}</h3>
+                      <h3 className="text-base text-gray-700 dark:text-gray-300 mb-3">{subcategory.name}</h3>
                       <div className="space-y-1">
                         {subcategory.services.map((service, serviceIndex) => (
-                          <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-700">{service.name}</span>
+                          <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                            <span className="text-gray-700 dark:text-gray-300">{service.name}</span>
                             <span className="text-[#FEC004] font-medium">{service.price}</span>
                           </div>
                         ))}
@@ -247,9 +247,9 @@ export default function PricingPage() {
             ))}
 
             {/* Доп информация */}
-            <section className="bg-orange-50 p-6 rounded-lg border border-orange-200">
-              <h2 className="text-lg text-orange-700 mb-4">Дополнительная информация</h2>
-              <ul className="space-y-2 text-gray-700">
+            <section className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border border-orange-200 dark:border-orange-500/30">
+              <h2 className="text-lg text-orange-700 dark:text-orange-400 mb-4">Дополнительная информация</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Гарантия на все виды работ — 3-6 месяцев</li>
                 <li>Оплата производится после выполнения работ</li>
                 <li>Постоянным клиентам скидки до 15%</li>

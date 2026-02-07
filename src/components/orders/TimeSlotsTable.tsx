@@ -8,9 +8,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useDesignStore } from '@/store/designStore';
 
 const EQUIPMENT_TYPE_COLORS_V2 = {
-  'КП': 'text-gray-700',
-  'БТ': 'text-gray-700',
-  'МНЧ': 'text-gray-700'
+  'КП': 'text-gray-700 dark:text-gray-300',
+  'БТ': 'text-gray-700 dark:text-gray-300',
+  'МНЧ': 'text-gray-700 dark:text-gray-300'
 } as const;
 
 interface TimeSlotsTableProps {
@@ -171,14 +171,14 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           return (
             <div key={`${typeEquipment}-${_index}`} className="text-center">
               <div className={`text-lg font-bold ${
-                count > 0 ? colorClass : (isV2 ? 'text-gray-400' : 'text-gray-600')
+                count > 0 ? colorClass : (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
               }`}>
                 {count}
               </div>
             </div>
           );
         })}
-        <div className={`text-lg font-bold ${colorClass} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
+        <div className={`text-lg font-bold ${colorClass} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-2`}>
           {total}
         </div>
       </div>
@@ -194,14 +194,14 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   }, [selectedDate]);
 
   return (
-    <Card className={isV2 ? "bg-white border border-gray-200 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
+    <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
       <CardHeader className="pb-2">
         {/* Навигация по датам */}
         <div className="flex items-center gap-2">
           <button
             onClick={goToPrevDay}
             className={isV2 
-              ? "p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 transition-all"
+              ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
               : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
             }
             title="Предыдущий день"
@@ -215,7 +215,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               isSelectedToday
                 ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                 : (isV2 
-                    ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                    ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
                     : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
                   )
             }`}
@@ -235,7 +235,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               }
             }}
             className={isV2 
-              ? "px-2 py-1.5 rounded-lg text-sm bg-white text-gray-700 border border-gray-200 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none"
+              ? "px-2 py-1.5 rounded-lg text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
               : "px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
             }
           />
@@ -243,7 +243,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <button
             onClick={goToNextDay}
             className={isV2 
-              ? "p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 transition-all"
+              ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
               : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
             }
             title="Следующий день"
@@ -260,7 +260,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               activeCity === 'all'
                 ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                 : (isV2 
-                    ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                    ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
                     : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
                   )
             }`}
@@ -284,7 +284,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                 activeCity === city
                   ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                   : (isV2 
-                      ? 'bg-gray-50 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200'
+                      ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
                       : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
                     )
               }`}
@@ -306,13 +306,13 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <div className="space-y-4">
             {/* Header with time slots */}
             <div className="grid gap-2 min-w-max grid-time-slots-with-total">
-              <div className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-gray-300'} text-center`}>Тип</div>
+              <div className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>Тип</div>
               {TIME_SLOTS.map(({ timeString }) => (
-                <div key={timeString} className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-gray-300'} text-center`}>
+                <div key={timeString} className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>
                   {timeString}
                 </div>
               ))}
-              <div className={`text-sm font-medium ${isV2 ? 'text-gray-700' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
+              <div className={`text-sm font-medium ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-2`}>
                 Итого
               </div>
             </div>

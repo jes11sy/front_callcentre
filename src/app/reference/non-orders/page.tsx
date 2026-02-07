@@ -117,26 +117,26 @@ export default function NonOrdersPage() {
           <div className="max-w-4xl space-y-10">
             
             {/* Что мы НЕ делаем - в начале */}
-            <section className="bg-red-50 p-6 rounded-lg border border-red-200">
-              <h2 className="text-lg text-red-700 mb-4">Что мы НЕ делаем</h2>
-              <ul className="space-y-2 text-gray-700">
-                <li><span className="text-red-600 font-medium">Не выкупаем технику</span> — мы не занимаемся выкупом</li>
-                <li><span className="text-red-600 font-medium">Не ездим только ради диагностики</span> — диагностика бесплатна только при ремонте</li>
-                <li><span className="text-red-600 font-medium">Не ремонтируем/меняем матрицы</span> — не работаем с матрицами экранов</li>
-                <li><span className="text-red-600 font-medium">Не ремонтируем мелкую бытовую технику</span> — пылесосы, тостеры и прочую мелочовку</li>
+            <section className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-500/30">
+              <h2 className="text-lg text-red-700 dark:text-red-400 mb-4">Что мы НЕ делаем</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><span className="text-red-600 dark:text-red-400 font-medium">Не выкупаем технику</span> — мы не занимаемся выкупом</li>
+                <li><span className="text-red-600 dark:text-red-400 font-medium">Не ездим только ради диагностики</span> — диагностика бесплатна только при ремонте</li>
+                <li><span className="text-red-600 dark:text-red-400 font-medium">Не ремонтируем/меняем матрицы</span> — не работаем с матрицами экранов</li>
+                <li><span className="text-red-600 dark:text-red-400 font-medium">Не ремонтируем мелкую бытовую технику</span> — пылесосы, тостеры и прочую мелочовку</li>
               </ul>
             </section>
 
             {/* Категории причин */}
             {nonOrderReasons.slice(1).map((category, index) => (
               <section key={index}>
-                <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">{category.category}</h2>
+                <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">{category.category}</h2>
                 <div className="space-y-4">
                   {category.reasons.map((reason, reasonIndex) => (
-                    <div key={reasonIndex} className="pb-4 border-b border-gray-100 last:border-0">
-                      <p className="text-gray-900 font-medium">{reason.title}</p>
-                      <p className="text-gray-500 text-sm mt-1">{reason.description}</p>
-                      <p className="text-blue-600 text-sm mt-2">Действие: {reason.action}</p>
+                    <div key={reasonIndex} className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                      <p className="text-gray-900 dark:text-gray-100 font-medium">{reason.title}</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{reason.description}</p>
+                      <p className="text-blue-600 dark:text-blue-400 text-sm mt-2">Действие: {reason.action}</p>
                     </div>
                   ))}
                 </div>
@@ -145,8 +145,8 @@ export default function NonOrdersPage() {
 
             {/* Правила обработки */}
             <section>
-              <h2 className="text-lg text-gray-900 mb-4 pb-2 border-b border-gray-200">Правила обработки незаказов</h2>
-              <ul className="space-y-2 text-gray-700">
+              <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Правила обработки незаказов</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Всегда сохранять вежливый тон, даже при отказе клиента</li>
                 <li>Обязательно записывать причину отказа в системе</li>
                 <li>Не тратить более 5 минут на попытки убедить клиента</li>
@@ -155,9 +155,9 @@ export default function NonOrdersPage() {
             </section>
 
             {/* Советы */}
-            <section className="bg-green-50 p-6 rounded-lg border border-green-200">
-              <h2 className="text-lg text-green-700 mb-4">Как минимизировать незаказы</h2>
-              <ul className="space-y-2 text-gray-700">
+            <section className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-500/30">
+              <h2 className="text-lg text-green-700 dark:text-green-400 mb-4">Как минимизировать незаказы</h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li>Четко объяснять ценовую политику с самого начала</li>
                 <li>Уточнять удобное время для клиента</li>
                 <li>Подчеркивать гарантийные обязательства</li>

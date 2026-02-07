@@ -57,11 +57,11 @@ export const PenaltiesTable = ({
 
   // Общие стили для карточки
   const cardClass = isV2 
-    ? "bg-white border border-gray-200 font-myriad"
+    ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad"
     : "bg-[#17212b] border-2 border-[#FFD700]/30";
 
   // Стили для заголовка
-  const titleClass = isV2 ? 'text-gray-900' : 'text-white';
+  const titleClass = isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white';
   const iconClass = isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]';
   
   // Стили для кнопки создания
@@ -136,18 +136,18 @@ export const PenaltiesTable = ({
           </Button>
         </div>
 
-        <div className={`rounded-md border overflow-hidden ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'}`}>
+        <div className={`rounded-md border overflow-hidden ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
           <Table>
             <TableHeader>
               <TableRow className={isV2 
-                ? "bg-gray-50 hover:bg-gray-50 border-b border-gray-200"
+                ? "bg-gray-50 dark:bg-[#252d3a] hover:bg-gray-50 dark:hover:bg-[#252d3a] border-b border-gray-200 dark:border-gray-700"
                 : "bg-[#0f0f23] hover:bg-[#0f0f23] border-b border-[#FFD700]/20"
               }>
-                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Город</TableHead>
-                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Причина</TableHead>
-                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Сумма</TableHead>
-                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Дата</TableHead>
-                <TableHead className={`font-semibold text-right ${isV2 ? 'text-gray-600' : 'text-[#FFD700]'}`}>Действия</TableHead>
+                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-[#FFD700]'}`}>Город</TableHead>
+                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-[#FFD700]'}`}>Причина</TableHead>
+                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-[#FFD700]'}`}>Сумма</TableHead>
+                <TableHead className={`font-semibold ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-[#FFD700]'}`}>Дата</TableHead>
+                <TableHead className={`font-semibold text-right ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-[#FFD700]'}`}>Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -155,20 +155,20 @@ export const PenaltiesTable = ({
                 <TableRow 
                   key={penalty.id}
                   className={isV2 
-                    ? "border-b border-gray-100 hover:bg-gray-50"
+                    ? "border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]"
                     : "border-b border-[#FFD700]/10 hover:bg-[#FFD700]/5"
                   }
                 >
-                  <TableCell className={`font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>
+                  <TableCell className={`font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>
                     {penalty.city}
                   </TableCell>
-                  <TableCell className={isV2 ? 'text-gray-700' : 'text-gray-300'}>
+                  <TableCell className={isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}>
                     {penalty.note}
                   </TableCell>
-                  <TableCell className={`font-semibold ${isV2 ? 'text-red-600' : 'text-red-400'}`}>
+                  <TableCell className={`font-semibold ${isV2 ? 'text-red-600 dark:text-red-400' : 'text-red-400'}`}>
                     {formatCurrency(penalty.amount)}
                   </TableCell>
-                  <TableCell className={`text-sm ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <TableCell className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
                     {formatDate(penalty.dateCreate)}
                   </TableCell>
                   <TableCell className="text-right">

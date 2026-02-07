@@ -65,19 +65,19 @@ export const OrderEditModal = ({
 
   // Стили для V2
   const selectTriggerClass = isV2 
-    ? "h-9 bg-white border-gray-200 text-gray-900 focus:border-[#FEC004]"
+    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004]"
     : "h-9 bg-[#17212b] border-[#FFD700]/20 text-white";
   
   const selectContentClass = isV2 
-    ? "bg-white border-gray-200"
+    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600"
     : "bg-[#17212b] border-[#FFD700]/30";
   
   const selectItemClass = isV2 
-    ? "text-gray-700 hover:bg-[#FEC004]/10"
+    ? "text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10"
     : "text-white hover:bg-[#FFD700]/10";
   
   const inputClass = isV2 
-    ? "h-9 bg-white border-gray-200 text-gray-900 focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004] focus-visible:border-[#FEC004]"
     : "h-9 bg-[#17212b] border-[#FFD700]/20 text-white";
 
   return (
@@ -87,17 +87,17 @@ export const OrderEditModal = ({
     >
       <div 
         className={isV2 
-          ? "bg-[#F3F3EE] rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] overflow-hidden border border-gray-200 flex flex-col font-myriad"
+          ? "bg-[#F3F3EE] dark:bg-[#1e2530] rounded-lg shadow-xl dark:shadow-none w-full max-w-2xl max-h-[85vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col font-myriad"
           : "bg-[#0f0f23] rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.2)] w-full max-w-2xl max-h-[85vh] overflow-hidden border-2 border-[#FFD700]/50 flex flex-col"
         }
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className={isV2 
-          ? "flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white"
+          ? "flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
           : "flex items-center justify-between px-5 py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
         }>
-          <h2 className={isV2 ? "text-lg font-bold text-gray-900" : "text-lg font-bold text-[#FFD700]"}>
+          <h2 className={isV2 ? "text-lg font-bold text-gray-900 dark:text-gray-100" : "text-lg font-bold text-[#FFD700]"}>
             Редактирование #{order.id}
           </h2>
           <Button
@@ -105,7 +105,7 @@ export const OrderEditModal = ({
             size="sm"
             onClick={onClose}
             className={isV2 
-              ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 hover:bg-gray-100"
+              ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               : "h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
             }
           >
@@ -119,7 +119,7 @@ export const OrderEditModal = ({
           <div className="grid grid-cols-2 gap-6">
             {/* Левая колонка — Информация по заказу */}
             <div className="space-y-3">
-              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 border-gray-200' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Информация по заказу</h3>
+              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Информация по заказу</h3>
               
               <Row label="Тип заявки" isV2={isV2}>
                 <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
@@ -192,7 +192,7 @@ export const OrderEditModal = ({
 
             {/* Правая колонка — Контакты и время */}
             <div className="space-y-3">
-              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 border-gray-200' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Контакты и время</h3>
+              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Контакты и время</h3>
               
               <Row label="Клиент" isV2={isV2}>
                 <Input 
@@ -229,7 +229,7 @@ export const OrderEditModal = ({
                   type="datetime-local"
                   value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
                   onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
-                  className={`${inputClass} ${!isV2 && '[color-scheme:dark]'}`}
+                  className={`${inputClass} ${isV2 ? 'dark:[color-scheme:dark]' : '[color-scheme:dark]'}`}
                 />
               </Row>
 
@@ -251,7 +251,7 @@ export const OrderEditModal = ({
           </div>
 
           {/* Нижняя часть — на всю ширину */}
-          <div className={`mt-5 pt-5 border-t space-y-3 ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'}`}>
+          <div className={`mt-5 pt-5 border-t space-y-3 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
             <Row label="Адрес" isV2={isV2}>
               <Input 
                 value={order.address} 
@@ -265,7 +265,7 @@ export const OrderEditModal = ({
                 value={order.problem} 
                 onChange={(e) => handleOrderChange('problem', e.target.value)}
                 className={isV2 
-                  ? "min-h-[80px] bg-white border-gray-200 text-gray-900 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                  ? "min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
                   : "min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
                 }
               />
@@ -275,14 +275,14 @@ export const OrderEditModal = ({
 
         {/* Footer */}
         <div className={isV2 
-          ? "flex items-center justify-end gap-3 px-5 py-3 border-t border-gray-200 bg-white"
+          ? "flex items-center justify-end gap-3 px-5 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
           : "flex items-center justify-end gap-3 px-5 py-3 border-t border-[#FFD700]/30 bg-[#17212b]"
         }>
           <Button
             variant="outline"
             onClick={onClose}
             className={isV2 
-              ? "border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+              ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               : "border-gray-600 text-gray-300 hover:bg-gray-800"
             }
           >
@@ -318,7 +318,7 @@ export const OrderEditModal = ({
 
 const Row = ({ label, children, isV2 = false }: { label: string; children: React.ReactNode; isV2?: boolean }) => (
   <div className="flex items-center gap-3">
-    <Label className={`text-sm shrink-0 w-24 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>{label}</Label>
+    <Label className={`text-sm shrink-0 w-24 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>{label}</Label>
     <div className="flex-1 min-w-0">{children}</div>
   </div>
 );

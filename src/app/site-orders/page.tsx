@@ -205,7 +205,7 @@ export default function SiteOrdersPage() {
               <div className="w-[200px]">
                 <Select value={statusFilter || ''} onValueChange={(val) => setStatusFilter(val === 'all' ? '' : val)}>
                   <SelectTrigger className={isV2 
-                    ? "bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
+                    ? "bg-white border-gray-200 text-gray-900 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
                     : "bg-[#0f0f23] border-[#FFD700]/30 text-white [&>span]:text-white"
                   }>
                     <SelectValue placeholder="Все статусы" className={isV2 ? "" : "text-white"} />

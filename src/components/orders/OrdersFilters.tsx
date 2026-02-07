@@ -70,7 +70,7 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
               <Label htmlFor="status" className={isV2 ? "text-gray-600" : "text-gray-300"}>Статус</Label>
               <Select value={filters.status} onValueChange={(value) => onFilterChange('status', value)}>
                 <SelectTrigger className={isV2 
-                  ? "bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
+                  ? "bg-white border-gray-200 text-gray-900 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
                   : "bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white"
                 }>
                   <SelectValue placeholder="Все статусы" className={isV2 ? "" : "text-white placeholder:text-white"} />
@@ -96,7 +96,7 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
               <Label htmlFor="city" className={isV2 ? "text-gray-600" : "text-gray-300"}>Город</Label>
               <Select value={filters.city || 'all'} onValueChange={(value) => onFilterChange('city', value === 'all' ? '' : value)}>
                 <SelectTrigger className={isV2 
-                  ? "bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
+                  ? "bg-white border-gray-200 text-gray-900 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
                   : "bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white"
                 }>
                   <SelectValue placeholder="Все города" />

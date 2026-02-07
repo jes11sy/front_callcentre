@@ -17,9 +17,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   if (version === 'v2') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-[#F3F3EE]" style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
+        <div className="min-h-screen bg-[#F3F3EE] dark:bg-[#111827]" style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
           <Sidebar />
-          <main className="ml-56 min-h-screen">
+          {/* pt-14 на мобильных для header, lg:pt-0 на десктопе */}
+          {/* ml-0 на мобильных, lg:ml-56 на десктопе для sidebar */}
+          <main className="pt-14 lg:pt-0 lg:ml-56 min-h-screen">
             {children}
           </main>
         </div>

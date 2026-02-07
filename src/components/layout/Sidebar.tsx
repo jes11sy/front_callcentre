@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -11,7 +12,9 @@ import {
   User, 
   LogOut,
   Sun,
-  Moon
+  Moon,
+  Menu,
+  X
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -19,6 +22,24 @@ export function Sidebar() {
   const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Закрываем меню при смене маршрута
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Блокируем скролл body при открытом меню
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -43,21 +64,9 @@ export function Sidebar() {
 
   const isActive = (href: string) => pathname === href;
 
-  return (
-    <aside className="w-56 bg-white dark:bg-[#1e2530] h-screen flex flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad">
-      {/* Logo */}
-      <div className="p-6 pb-16">
-        <Link href="/telephony">
-          <Image 
-            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
-            alt="Logo" 
-            width={160} 
-            height={45} 
-            className="h-10 w-auto cursor-pointer" 
-          />
-        </Link>
-      </div>
-
+  // Контент меню (переиспользуется для десктопа и мобильной версии)
+  const MenuContent = () => (
+    <>
       {/* Navigation */}
       <nav className="flex-1 px-5 space-y-3">
         {navItems.map((item) => {
@@ -67,13 +76,24 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
-              {/* Индикатор активной вкладки - скобка */}
+              {/* Индикатор активной вкладки - тонкая скобка */}
               <span 
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full transition-all ${
-                  active ? 'bg-[#FEC004]' : 'bg-transparent'
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-7 transition-all ${
+                  active ? 'opacity-100' : 'opacity-0'
                 }`}
-              />
+              >
+                <svg viewBox="0 0 6 28" fill="none" className="w-full h-full">
+                  <path 
+                    d="M5 1C2.5 1 1 3.5 1 7v14c0 3.5 1.5 6 4 6" 
+                    stroke="#FEC004" 
+                    strokeWidth="1.5" 
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </svg>
+              </span>
               <Image 
                 src={item.icon} 
                 alt={item.name} 
@@ -133,12 +153,23 @@ export function Sidebar() {
         <Link
           href="/profile"
           className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
+          onClick={() => setIsMobileMenuOpen(false)}
         >
           <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full transition-all ${
-              isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] h-7 transition-all ${
+              isActive('/profile') ? 'opacity-100' : 'opacity-0'
             }`}
-          />
+          >
+            <svg viewBox="0 0 6 28" fill="none" className="w-full h-full">
+              <path 
+                d="M5 1C2.5 1 1 3.5 1 7v14c0 3.5 1.5 6 4 6" 
+                stroke="#FEC004" 
+                strokeWidth="1.5" 
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </span>
           <User className={`nav-icon h-5 w-5 text-gray-600 dark:text-gray-400 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
           <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
             {user?.name || user?.login || 'Профиль'}
@@ -154,6 +185,71 @@ export function Sidebar() {
           Выйти
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-white dark:bg-[#1e2530] border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4">
+        <Link href="/telephony">
+          <Image 
+            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+            alt="Logo" 
+            width={120} 
+            height={34} 
+            className="h-8 w-auto" 
+          />
+        </Link>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors"
+          aria-label="Открыть меню"
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Slide-in Menu */}
+      <aside 
+        className={`lg:hidden fixed top-14 left-0 bottom-0 w-64 bg-white dark:bg-[#1e2530] border-r border-gray-200 dark:border-gray-700 z-50 transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="pt-4 flex flex-col h-full">
+          <MenuContent />
+        </div>
+      </aside>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-56 bg-white dark:bg-[#1e2530] h-screen flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad">
+        {/* Logo */}
+        <div className="p-6 pb-16">
+          <Link href="/telephony">
+            <Image 
+              src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+              alt="Logo" 
+              width={160} 
+              height={45} 
+              className="h-10 w-auto cursor-pointer" 
+            />
+          </Link>
+        </div>
+
+        <MenuContent />
+      </aside>
+    </>
   );
 }

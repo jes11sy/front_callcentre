@@ -338,7 +338,7 @@ export function Sidebar() {
 
             {/* Mobile Notifications Dropdown */}
             {isDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+              <div className="fixed left-4 right-4 top-20 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[10000]">
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   {unreadCount > 0 && (
@@ -351,7 +351,7 @@ export function Sidebar() {
                     </button>
                   )}
                 </div>
-                <div className="max-h-72 overflow-y-auto">
+                <div className="max-h-80 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => (
                       <div

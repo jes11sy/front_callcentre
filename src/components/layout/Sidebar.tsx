@@ -220,7 +220,7 @@ export function Sidebar() {
 
             {/* Notifications Dropdown */}
             {isDropdownOpen && (
-              <div className="absolute left-full ml-2 w-80 bottom-full mb-2 bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+              <div className="fixed left-60 bottom-24 w-96 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   {unreadCount > 0 && (
@@ -233,7 +233,7 @@ export function Sidebar() {
                     </button>
                   )}
                 </div>
-                <div className="max-h-72 overflow-y-auto">
+                <div className="max-h-96 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => (
                       <div
@@ -262,9 +262,9 @@ export function Sidebar() {
                       </div>
                     ))
                   ) : (
-                    <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                      <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Нет уведомлений</p>
+                    <div className="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
+                      <Bell className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">Нет уведомлений</p>
                     </div>
                   )}
                 </div>

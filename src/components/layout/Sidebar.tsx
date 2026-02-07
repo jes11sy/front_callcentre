@@ -10,12 +10,14 @@ import { useRouter } from 'next/navigation';
 import { 
   User, 
   LogOut, 
-  Palette
+  Palette,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export function Sidebar() {
   const { user, logout } = useAuthStore();
-  const { version, toggleVersion } = useDesignStore();
+  const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -109,6 +111,26 @@ export function Sidebar() {
           <Palette className="h-5 w-5" />
           Дизайн: {version.toUpperCase()}
         </button>
+
+        {/* Theme Toggle - только для V2 */}
+        {version === 'v2' && (
+          <div className="relative flex items-center gap-3 px-3 py-2.5">
+            <Sun className={`h-4 w-4 transition-colors ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+            <button
+              onClick={toggleTheme}
+              className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                  theme === 'dark' ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <Moon className={`h-4 w-4 transition-colors ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+          </div>
+        )}
 
         {/* Logout */}
         <button

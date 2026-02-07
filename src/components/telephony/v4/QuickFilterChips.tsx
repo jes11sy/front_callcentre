@@ -94,9 +94,9 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
     : allFilters;
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
       {/* Поиск */}
-      <div className="relative">
+      <div className="relative w-full sm:w-auto">
         <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4", isV2 ? "text-gray-400" : "text-gray-500")} />
         <Input
           type="text"
@@ -104,7 +104,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className={cn(
-            "w-48 pl-9 h-9",
+            "w-full sm:w-48 pl-9 h-8 sm:h-9 text-sm",
             isV2 
               ? "bg-[#F3F3EE] dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:ring-[#FEC004]/30" 
               : "bg-[#0f0f23] border-[#FFD700]/20 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
@@ -120,11 +120,11 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
         )}
       </div>
 
-      {/* Разделитель */}
-      <div className={cn("w-px h-6", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
+      {/* Разделитель - скрыт на мобильных */}
+      <div className={cn("w-px h-6 hidden sm:block", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
 
       {/* Фильтры-чипы */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
         {filters.map((filter) => {
           const Icon = filter.icon;
           const isActive = activeFilter === filter.id;

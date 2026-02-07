@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,13 +10,20 @@ import {
   FileText, 
   X,
   Play,
-  Edit
+  Edit,
+  History,
+  Plus,
+  RefreshCw,
+  CheckCircle,
+  ArrowRight,
+  User
 } from 'lucide-react';
-import { Order, Call } from '@/types/orders';
+import { Order, Call, OrderHistoryItem } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS, STATUS_COLORS_V2 } from '@/constants/orders';
 import { useDesignStore } from '@/store/designStore';
+import api from '@/lib/api';
 
-type ViewTab = 'info' | 'documents';
+type ViewTab = 'info' | 'documents' | 'history';
 
 interface OrderViewModalProps {
   isOpen: boolean;
@@ -44,8 +51,33 @@ const OrderViewModalComponent = ({
   onEdit
 }: OrderViewModalProps) => {
   const [activeTab, setActiveTab] = useState<ViewTab>('info');
+  const [history, setHistory] = useState<OrderHistoryItem[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
+
+  // Загрузка истории при переключении на вкладку
+  useEffect(() => {
+    if (activeTab === 'history' && order && history.length === 0) {
+      loadHistory();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, order?.id]);
+
+  const loadHistory = async () => {
+    if (!order) return;
+    setLoadingHistory(true);
+    try {
+      const response = await api.get(`/orders/${order.id}/history`);
+      if (response.data.success) {
+        setHistory(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load order history:', error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   if (!isOpen || !order) return null;
 
@@ -126,6 +158,17 @@ const OrderViewModalComponent = ({
           >
             Документы
           </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`px-5 py-2.5 text-sm font-medium transition-colors flex items-center gap-1.5 ${
+              activeTab === 'history'
+                ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
+                : (isV2 ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200')
+            }`}
+          >
+            <History className="w-4 h-4" />
+            История
+          </button>
         </div>
       
         {/* Content */}
@@ -143,6 +186,15 @@ const OrderViewModalComponent = ({
 
           {activeTab === 'documents' && (
             <DocumentsTab order={order} formatDate={formatDate} isV2={isV2} />
+          )}
+
+          {activeTab === 'history' && (
+            <HistoryTab 
+              history={history} 
+              loading={loadingHistory} 
+              onRefresh={loadHistory}
+              isV2={isV2} 
+            />
           )}
         </div>
       </div>
@@ -346,6 +398,208 @@ const DocumentsTab = ({ order, formatDate, isV2 }: { order: Order; formatDate: (
     </div>
   </div>
 );
+
+// Вкладка "История"
+const HistoryTab = ({ 
+  history, 
+  loading, 
+  onRefresh,
+  isV2 
+}: { 
+  history: OrderHistoryItem[]; 
+  loading: boolean;
+  onRefresh: () => void;
+  isV2: boolean;
+}) => {
+  const getEventLabel = (eventType: string) => {
+    const labels: Record<string, { text: string; icon: React.ReactNode; color: string }> = {
+      'order.create': { 
+        text: 'Создание заказа', 
+        icon: <Plus className="w-4 h-4" />,
+        color: isV2 ? 'text-green-600 bg-green-50' : 'text-green-400 bg-green-500/10'
+      },
+      'order.update': { 
+        text: 'Изменение заказа', 
+        icon: <RefreshCw className="w-4 h-4" />,
+        color: isV2 ? 'text-blue-600 bg-blue-50' : 'text-blue-400 bg-blue-500/10'
+      },
+      'order.close': { 
+        text: 'Закрытие заказа', 
+        icon: <CheckCircle className="w-4 h-4" />,
+        color: isV2 ? 'text-purple-600 bg-purple-50' : 'text-purple-400 bg-purple-500/10'
+      },
+      'order.status.change': { 
+        text: 'Смена статуса', 
+        icon: <ArrowRight className="w-4 h-4" />,
+        color: isV2 ? 'text-orange-600 bg-orange-50' : 'text-orange-400 bg-orange-500/10'
+      },
+    };
+    return labels[eventType] || { text: eventType, icon: null, color: '' };
+  };
+
+  const formatChanges = (metadata: OrderHistoryItem['metadata']) => {
+    if (!metadata) return null;
+
+    const changes: React.ReactNode[] = [];
+
+    // Изменение статуса
+    if (metadata.oldStatus && metadata.newStatus) {
+      changes.push(
+        <span key="status" className={isV2 ? 'text-gray-700' : 'text-gray-300'}>
+          Статус: <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>{metadata.oldStatus}</span>
+          {' → '}
+          <span className={isV2 ? 'text-gray-900 font-medium' : 'text-white font-medium'}>{metadata.newStatus}</span>
+        </span>
+      );
+    }
+
+    // Закрытие заказа
+    if (metadata.result) {
+      changes.push(
+        <span key="result" className={isV2 ? 'text-gray-700' : 'text-gray-300'}>
+          Итог: <span className={isV2 ? 'text-gray-900 font-medium' : 'text-white font-medium'}>{metadata.result} ₽</span>
+        </span>
+      );
+    }
+
+    // Другие изменения
+    if (metadata.changes) {
+      const fieldLabels: Record<string, string> = {
+        statusOrder: 'Статус',
+        masterId: 'Мастер',
+        address: 'Адрес',
+        phone: 'Телефон',
+        clientName: 'Клиент',
+        dateMeeting: 'Дата встречи',
+        problem: 'Проблема',
+      };
+
+      Object.entries(metadata.changes).forEach(([field, change]) => {
+        if (change && typeof change === 'object' && 'old' in change && 'new' in change) {
+          const label = fieldLabels[field] || field;
+          let oldVal = change.old ?? '—';
+          let newVal = change.new ?? '—';
+          
+          // Форматируем даты
+          if (field === 'dateMeeting' && oldVal !== '—') {
+            oldVal = new Date(oldVal as string).toLocaleString('ru-RU');
+          }
+          if (field === 'dateMeeting' && newVal !== '—') {
+            newVal = new Date(newVal as string).toLocaleString('ru-RU');
+          }
+
+          changes.push(
+            <span key={field} className={isV2 ? 'text-gray-700' : 'text-gray-300'}>
+              {label}: <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>{String(oldVal)}</span>
+              {' → '}
+              <span className={isV2 ? 'text-gray-900 font-medium' : 'text-white font-medium'}>{String(newVal)}</span>
+            </span>
+          );
+        }
+      });
+    }
+
+    return changes.length > 0 ? changes : null;
+  };
+
+  const formatDateTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  return (
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className={`text-sm font-medium ${isV2 ? 'text-gray-900' : 'text-[#FFD700]'}`}>
+          История изменений
+        </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onRefresh}
+          disabled={loading}
+          className={isV2 
+            ? "h-8 px-2 text-gray-500 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+            : "h-8 px-2 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+          }
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className={isV2 
+          ? "flex items-center justify-center py-8 bg-white rounded-lg border border-gray-200"
+          : "flex items-center justify-center py-8 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
+        }>
+          <LoadingSpinner size="md" />
+        </div>
+      ) : history.length === 0 ? (
+        <div className={isV2 
+          ? "flex flex-col items-center justify-center py-8 bg-white rounded-lg border border-gray-200"
+          : "flex flex-col items-center justify-center py-8 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
+        }>
+          <History className={`w-8 h-8 mb-2 ${isV2 ? 'text-gray-300' : 'text-gray-600'}`} />
+          <span className={`text-sm ${isV2 ? 'text-gray-400' : 'text-gray-500'}`}>История пуста</span>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {history.map((item) => {
+            const eventConfig = getEventLabel(item.eventType);
+            const changes = formatChanges(item.metadata);
+            
+            return (
+              <div 
+                key={item.id}
+                className={isV2 
+                  ? "p-3 bg-white rounded-lg border border-gray-200"
+                  : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
+                }
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className={`p-1.5 rounded-lg ${eventConfig.color}`}>
+                      {eventConfig.icon}
+                    </div>
+                    <div>
+                      <div className={`text-sm font-medium ${isV2 ? 'text-gray-900' : 'text-white'}`}>
+                        {eventConfig.text}
+                      </div>
+                      {changes && (
+                        <div className="mt-1 space-y-0.5 text-sm">
+                          {changes.map((change, idx) => (
+                            <div key={idx}>{change}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className={`text-xs ${isV2 ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {formatDateTime(item.timestamp)}
+                    </div>
+                    {item.login && (
+                      <div className={`flex items-center gap-1 text-xs mt-0.5 ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <User className="w-3 h-3" />
+                        {item.login}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // === Вспомогательные компоненты ===
 

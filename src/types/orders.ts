@@ -128,3 +128,24 @@ export const typeOrderLabels: Record<string, string> = {
   'Повтор': 'Повторный заказ', 
   'Гарантия': 'Гарантийный случай'
 };
+
+export interface OrderHistoryItem {
+  id: number;
+  timestamp: string;
+  eventType: 'order.create' | 'order.update' | 'order.close' | 'order.status.change';
+  userId?: number;
+  role?: string;
+  login?: string;
+  metadata?: {
+    orderId?: number;
+    changes?: Record<string, { old: string | number | null; new: string | number | null }>;
+    oldStatus?: string;
+    newStatus?: string;
+    result?: string;
+    expenditure?: string;
+    clean?: string;
+    city?: string;
+    clientName?: string;
+    phone?: string;
+  };
+}

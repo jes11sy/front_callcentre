@@ -6,23 +6,22 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
-import { authApi } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
 import { 
   User, 
-  LogOut,
   Sun,
   Moon,
   Menu,
-  X
+  X,
+  Bell
 } from 'lucide-react';
+import { useState as useStateReact } from 'react';
 
 export function Sidebar() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
   const pathname = usePathname();
-  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useStateReact(false);
 
   // Закрываем меню при смене маршрута
   useEffect(() => {
@@ -41,17 +40,13 @@ export function Sidebar() {
     };
   }, [isMobileMenuOpen]);
 
-  const handleLogout = async () => {
-    try {
-      await authApi.logout();
-      logout();
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      logout();
-      router.push('/login');
-    }
-  };
+  // Моковые уведомления (потом заменить на реальные данные)
+  const notifications = [
+    { id: 1, text: 'Новый заказ #1234', time: '5 мин назад', read: false },
+    { id: 2, text: 'Заказ #1230 закрыт', time: '15 мин назад', read: false },
+    { id: 3, text: 'Мастер принял заказ #1228', time: '1 час назад', read: true },
+  ];
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const navItems = [
     { name: 'Телефония', href: '/telephony', icon: '/img/navigate/telephony.svg' },
@@ -113,23 +108,25 @@ export function Sidebar() {
 
       {/* Bottom Section */}
       <div className={`px-5 pb-6 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
-        {/* Version Toggle */}
-        <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
-          <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
-          <button
-            onClick={toggleVersion}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-              version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300 dark:bg-gray-600'
-            }`}
-          >
-            <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
-                version === 'v2' ? 'translate-x-6' : 'translate-x-0'
+        {/* Version Toggle - только для V1 */}
+        {version === 'v1' && (
+          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
+            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
+            <button
+              onClick={toggleVersion}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300 dark:bg-gray-600'
               }`}
-            />
-          </button>
-          <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
-        </div>
+            >
+              <span
+                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
+                  version === 'v2' ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
+          </div>
+        )}
 
         {/* Theme Toggle - только для V2 */}
         {version === 'v2' && (
@@ -150,6 +147,63 @@ export function Sidebar() {
             <Moon className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
           </div>
         )}
+
+        {/* Notifications */}
+        <div className="relative">
+          <button
+            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            className={`relative flex items-center gap-3 px-3 font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group ${
+              isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+            }`}
+          >
+            <div className="relative">
+              <Bell className={isMobile ? 'h-6 w-6' : 'h-5 w-5'} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+            <span className="group-hover:text-[#FEC004] transition-colors">
+              Уведомления
+            </span>
+          </button>
+
+          {/* Notifications Dropdown */}
+          {isNotificationsOpen && (
+            <div className={`absolute ${isMobile ? 'left-0 right-0 mx-3' : 'left-full ml-2 w-72'} bottom-full mb-2 bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}>
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
+                        !notification.read ? 'bg-[#FEC004]/5' : ''
+                      }`}
+                    >
+                      <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                        {notification.text}
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{notification.time}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+                    Нет уведомлений
+                  </div>
+                )}
+              </div>
+              <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+                <button className="text-sm text-[#FEC004] hover:underline w-full text-center">
+                  Показать все
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Profile with user name */}
         <Link
@@ -179,17 +233,6 @@ export function Sidebar() {
             {user?.name || user?.login || 'Профиль'}
           </span>
         </Link>
-
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className={`relative flex items-center gap-3 px-3 font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group ${
-            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
-          }`}
-        >
-          <LogOut className={isMobile ? 'h-6 w-6' : 'h-5 w-5'} />
-          Выйти
-        </button>
       </div>
     </>
   );

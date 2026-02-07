@@ -30,7 +30,8 @@ import {
   CheckCircle,
   XCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  LogOut
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,6 +39,9 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
 import { useDesignStore } from '@/store/designStore';
+import { useAuthStore } from '@/store/authStore';
+import { authApi } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -107,10 +111,24 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const { logout } = useAuthStore();
   
   const { version, theme } = useDesignStore();
   const isV2 = version === 'v2';
   const isDark = theme === 'dark';
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+      logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      logout();
+      router.push('/login');
+    }
+  };
 
   // Формы
   const profileForm = useForm<ProfileFormData>({
@@ -552,6 +570,20 @@ export default function ProfilePage() {
               )}
             </div>
 
+            {/* Выход */}
+            <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
+            
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className={`w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${
+                isDark ? 'text-red-400' : ''
+              }`}
+            >
+              <LogOut className="h-4 w-4" />
+              Выйти из аккаунта
+            </Button>
+
           </div>
         </div>
       </DashboardLayout>
@@ -953,6 +985,20 @@ export default function ProfilePage() {
                     </form>
                   </CardContent>
                 )}
+              </Card>
+
+              {/* Выход */}
+              <Card className={cardClass}>
+                <CardContent className="pt-6">
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Выйти из аккаунта
+                  </Button>
+                </CardContent>
               </Card>
             </div>
           ) : null}

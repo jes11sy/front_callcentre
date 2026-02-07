@@ -136,6 +136,7 @@ export interface OrderHistoryItem {
   userId?: number;
   role?: string;
   login?: string;
+  userName?: string;
   metadata?: {
     orderId?: number;
     changes?: Record<string, { old: string | number | null; new: string | number | null }>;

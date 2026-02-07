@@ -84,52 +84,42 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-5 pb-6 space-y-2">
-        {/* Version Toggle - кнопки V1/V2 */}
-        <div className="px-3 py-2">
-          <div className="flex bg-gray-100 rounded-lg p-0.5">
-            <button
-              onClick={() => version !== 'v1' && toggleVersion()}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
-                version === 'v1' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+      <div className="px-5 pb-6 space-y-3">
+        {/* Version Toggle */}
+        <div className="flex items-center gap-3 px-3 py-2">
+          <span className={`text-sm transition-colors ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
+          <button
+            onClick={toggleVersion}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+              version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
+                version === 'v2' ? 'translate-x-6' : 'translate-x-0'
               }`}
-            >
-              V1
-            </button>
-            <button
-              onClick={() => version !== 'v2' && toggleVersion()}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
-                version === 'v2' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              V2
-            </button>
-          </div>
+            />
+          </button>
+          <span className={`text-sm transition-colors ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
         </div>
 
         {/* Theme Toggle - только для V2 */}
         {version === 'v2' && (
-          <div className="px-3 py-1 flex justify-center">
-            <div className="flex items-center gap-2">
-              <Sun className={`h-3.5 w-3.5 transition-colors ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-              <button
-                onClick={toggleTheme}
-                className={`relative w-9 h-5 rounded-full transition-colors duration-300 ${
-                  theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
+          <div className="flex items-center gap-3 px-3 py-2">
+            <Sun className={`h-5 w-5 transition-colors ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+            <button
+              onClick={toggleTheme}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
+                  theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
                 }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${
-                    theme === 'dark' ? 'translate-x-4' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-              <Moon className={`h-3.5 w-3.5 transition-colors ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-            </div>
+              />
+            </button>
+            <Moon className={`h-5 w-5 transition-colors ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
           </div>
         )}
 

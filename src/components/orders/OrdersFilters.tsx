@@ -30,10 +30,10 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
       {/* Кнопка фильтров */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className={isV2 
-          ? "bg-white dark:bg-[#252d3a] border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004] min-w-[140px]"
-          : "bg-[#0f0f23] border border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]/50 min-w-[140px]"
-        }
+        className={`w-full sm:w-auto ${isV2 
+          ? "bg-white dark:bg-[#252d3a] border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004] min-w-[120px] sm:min-w-[140px]"
+          : "bg-[#0f0f23] border border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]/50 min-w-[120px] sm:min-w-[140px]"
+        }`}
       >
         <Filter className="mr-2 h-4 w-4" />
         Фильтры

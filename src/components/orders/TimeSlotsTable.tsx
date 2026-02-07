@@ -163,14 +163,14 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
     const total = getEquipmentTotal(typeEquipment);
     
     return (
-      <div className="grid gap-2 min-w-max grid-time-slots-with-total">
-        <div className={`text-sm font-medium ${colorClass} text-center`}>{label}</div>
+      <div className="grid gap-1 sm:gap-2 min-w-max grid-time-slots-with-total">
+        <div className={`text-xs sm:text-sm font-medium ${colorClass} text-center`}>{label}</div>
         {TIME_SLOTS.map(({ hour, minute, index: _index }) => {
           const count = getOrdersForTimeSlot(hour, minute, typeEquipment);
           
           return (
             <div key={`${typeEquipment}-${_index}`} className="text-center">
-              <div className={`text-lg font-bold ${
+              <div className={`text-sm sm:text-lg font-bold ${
                 count > 0 ? colorClass : (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
               }`}>
                 {count}
@@ -178,7 +178,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             </div>
           );
         })}
-        <div className={`text-lg font-bold ${colorClass} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-2`}>
+        <div className={`text-sm sm:text-lg font-bold ${colorClass} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-1 sm:pl-2`}>
           {total}
         </div>
       </div>
@@ -195,14 +195,14 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
 
   return (
     <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 px-3 sm:px-6">
         {/* Навигация по датам */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button
             onClick={goToPrevDay}
             className={isV2 
-              ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
-              : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              ? "p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
+              : "p-1.5 sm:p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
             }
             title="Предыдущий день"
           >
@@ -211,7 +211,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           
           <button
             onClick={goToToday}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               isSelectedToday
                 ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                 : (isV2 
@@ -220,8 +220,9 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   )
             }`}
           >
-            <Calendar className="h-3.5 w-3.5" />
-            {formatDateLabel(selectedDate)}
+            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden sm:inline">{formatDateLabel(selectedDate)}</span>
+            <span className="sm:hidden">{formatDateLabel(selectedDate).slice(0, 7)}</span>
           </button>
           
           <input
@@ -234,17 +235,17 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                 onDateChange(newDate);
               }
             }}
-            className={isV2 
-              ? "px-2 py-1.5 rounded-lg text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
-              : "px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
-            }
+            className={`w-[130px] sm:w-auto ${isV2 
+              ? "px-2 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
+              : "px-2 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+            }`}
           />
           
           <button
             onClick={goToNextDay}
             className={isV2 
-              ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
-              : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              ? "p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
+              : "p-1.5 sm:p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
             }
             title="Следующий день"
           >
@@ -253,10 +254,10 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
         </div>
         
         {/* Табы городов */}
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
           <button
             onClick={() => handleCityClick('all')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               activeCity === 'all'
                 ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                 : (isV2 
@@ -265,9 +266,10 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   )
             }`}
           >
-            <MapPin className="h-3.5 w-3.5" />
-            Все города
-            <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
+            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden sm:inline">Все города</span>
+            <span className="sm:hidden">Все</span>
+            <span className={`ml-0.5 sm:ml-1 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs ${
               activeCity === 'all' 
                 ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
                 : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
@@ -280,7 +282,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             <button
               key={city}
               onClick={() => handleCityClick(city)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                 activeCity === city
                   ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                   : (isV2 
@@ -290,7 +292,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               }`}
             >
               {city}
-              <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
+              <span className={`ml-0.5 sm:ml-1 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs ${
                 activeCity === city 
                   ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
                   : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
@@ -301,18 +303,18 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           ))}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <div className="space-y-4">
+      <CardContent className="px-3 sm:px-6">
+        <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+          <div className="space-y-2 sm:space-y-4 min-w-[600px]">
             {/* Header with time slots */}
-            <div className="grid gap-2 min-w-max grid-time-slots-with-total">
-              <div className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>Тип</div>
+            <div className="grid gap-1 sm:gap-2 min-w-max grid-time-slots-with-total">
+              <div className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>Тип</div>
               {TIME_SLOTS.map(({ timeString }) => (
-                <div key={timeString} className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>
+                <div key={timeString} className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>
                   {timeString}
                 </div>
               ))}
-              <div className={`text-sm font-medium ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-2`}>
+              <div className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-1 sm:pl-2`}>
                 Итого
               </div>
             </div>

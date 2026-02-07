@@ -82,22 +82,22 @@ export const OrderEditModal = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4"
       onClick={onClose}
     >
       <div 
-        className={isV2 
-          ? "bg-[#F3F3EE] dark:bg-[#1e2530] rounded-lg shadow-xl dark:shadow-none w-full max-w-2xl max-h-[85vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col font-myriad"
-          : "bg-[#0f0f23] rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.2)] w-full max-w-2xl max-h-[85vh] overflow-hidden border-2 border-[#FFD700]/50 flex flex-col"
-        }
+        className={`w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg overflow-hidden flex flex-col ${isV2 
+          ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none sm:max-w-2xl sm:border border-gray-200 dark:border-gray-700 font-myriad"
+          : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] sm:max-w-2xl sm:border-2 border-[#FFD700]/50"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className={isV2 
-          ? "flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between px-5 py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
+          ? "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
+          : "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
         }>
-          <h2 className={isV2 ? "text-lg font-bold text-gray-900 dark:text-gray-100" : "text-lg font-bold text-[#FFD700]"}>
+          <h2 className={`text-base sm:text-lg font-bold ${isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"}`}>
             Редактирование #{order.id}
           </h2>
           <Button
@@ -114,9 +114,9 @@ export const OrderEditModal = ({
         </div>
       
         {/* Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
-          {/* Две колонки */}
-          <div className="grid grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5">
+          {/* Две колонки на десктопе, одна на мобильных */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Левая колонка — Информация по заказу */}
             <div className="space-y-3">
               <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Информация по заказу</h3>
@@ -251,7 +251,7 @@ export const OrderEditModal = ({
           </div>
 
           {/* Нижняя часть — на всю ширину */}
-          <div className={`mt-5 pt-5 border-t space-y-3 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
+          <div className={`mt-4 sm:mt-5 pt-4 sm:pt-5 border-t space-y-3 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
             <Row label="Адрес" isV2={isV2}>
               <Input 
                 value={order.address} 
@@ -265,8 +265,8 @@ export const OrderEditModal = ({
                 value={order.problem} 
                 onChange={(e) => handleOrderChange('problem', e.target.value)}
                 className={isV2 
-                  ? "min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
-                  : "min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
+                  ? "min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                  : "min-h-[60px] sm:min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
                 }
               />
             </Row>
@@ -275,36 +275,38 @@ export const OrderEditModal = ({
 
         {/* Footer */}
         <div className={isV2 
-          ? "flex items-center justify-end gap-3 px-5 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-end gap-3 px-5 py-3 border-t border-[#FFD700]/30 bg-[#17212b]"
+          ? "flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
+          : "flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 border-t border-[#FFD700]/30 bg-[#17212b]"
         }>
           <Button
             variant="outline"
             onClick={onClose}
-            className={isV2 
+            className={`text-sm ${isV2 
               ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               : "border-gray-600 text-gray-300 hover:bg-gray-800"
-            }
+            }`}
           >
             Отмена
           </Button>
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className={isV2 
+            className={`text-sm ${isV2 
               ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-medium"
               : "bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
-            }
+            }`}
           >
             {isSaving ? (
               <>
-                <LoadingSpinner size="sm" className="mr-2" />
-                Сохранение...
+                <LoadingSpinner size="sm" className="mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Сохранение...</span>
+                <span className="sm:hidden">...</span>
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
-                Сохранить
+                <Save className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Сохранить</span>
+                <span className="sm:hidden">ОК</span>
               </>
             )}
           </Button>
@@ -317,8 +319,8 @@ export const OrderEditModal = ({
 // === Вспомогательные компоненты ===
 
 const Row = ({ label, children, isV2 = false }: { label: string; children: React.ReactNode; isV2?: boolean }) => (
-  <div className="flex items-center gap-3">
-    <Label className={`text-sm shrink-0 w-24 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>{label}</Label>
+  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+    <Label className={`text-xs sm:text-sm shrink-0 sm:w-24 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>{label}</Label>
     <div className="flex-1 min-w-0">{children}</div>
   </div>
 );

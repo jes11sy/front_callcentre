@@ -133,21 +133,22 @@ export default function CreateOrderModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className={isV2 
-        ? "bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none w-[90vw] max-w-2xl max-h-[85vh] flex flex-col rounded-lg font-myriad"
-        : "bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[90vw] max-w-2xl max-h-[85vh] flex flex-col rounded-lg"
-      }>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-0 sm:p-4">
+      <div className={`w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg flex flex-col ${isV2 
+        ? "bg-[#F3F3EE] dark:bg-[#1e2530] sm:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none sm:max-w-2xl font-myriad"
+        : "bg-[#0f0f23] sm:border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] sm:max-w-2xl"
+      }`}>
         <div className={isV2 
-          ? "flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between p-4 border-b border-[#FFD700]/30"
+          ? "flex items-center justify-between px-3 sm:p-4 py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
+          : "flex items-center justify-between px-3 sm:p-4 py-2 sm:py-4 border-b border-[#FFD700]/30"
         }>
-          <h2 className={isV2 
-            ? "text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100"
-            : "text-xl font-bold flex items-center gap-2 text-[#FFD700]"
-          }>
-            {!isV2 && <Plus className="h-5 w-5 text-[#FFD700]" />}
-            Создать новый заказ
+          <h2 className={`text-base sm:text-xl font-bold flex items-center gap-2 ${isV2 
+            ? "text-gray-900 dark:text-gray-100"
+            : "text-[#FFD700]"
+          }`}>
+            {!isV2 && <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFD700]" />}
+            <span className="hidden sm:inline">Создать новый заказ</span>
+            <span className="sm:hidden">Новый заказ</span>
           </h2>
           <button
             onClick={handleClose}
@@ -437,36 +438,38 @@ export default function CreateOrderModal({
           </Card>
 
             {/* Кнопки внизу */}
-            <div className="flex justify-end gap-3 pt-1 pb-4">
+            <div className="flex justify-end gap-2 sm:gap-3 pt-1 pb-4 px-1">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={isV2 
+                className={`text-sm ${isV2 
                   ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                   : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-                }
+                }`}
               >
                 Отмена
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={isV2 
+                className={`text-sm ${isV2 
                   ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
                   : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold shadow-lg hover:shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-200"
-                }
+                }`}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Создание...
+                    <Loader2 className="mr-1 sm:mr-2 h-4 w-4 animate-spin" />
+                    <span className="hidden sm:inline">Создание...</span>
+                    <span className="sm:hidden">...</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Создать заказ
+                    <Plus className="mr-1 sm:mr-2 h-4 w-4" />
+                    <span className="hidden sm:inline">Создать заказ</span>
+                    <span className="sm:hidden">Создать</span>
                   </>
                 )}
               </Button>

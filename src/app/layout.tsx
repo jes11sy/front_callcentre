@@ -19,8 +19,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lead Schem",
+  title: "LEADS CREATE",
   description: "Система управления лидами",
+  icons: {
+    icon: '/img/logo/favicon.png',
+  },
 };
 
 export default function RootLayout({

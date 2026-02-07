@@ -82,7 +82,7 @@ export function LoadingScreen({
       {/* Логотип/Название */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
-          Lead Schem
+          LEADS CREATE
         </h1>
       </div>
 

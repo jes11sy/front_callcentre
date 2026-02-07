@@ -31,36 +31,35 @@ function FiltersSkeletonV2() {
 // Скелетон для строки таблицы V2
 function CallRowSkeletonV2() {
   return (
-    <div className="flex items-center py-2 sm:py-3 px-2 sm:px-4 border-b border-gray-100 dark:border-gray-700">
+    <div className="flex items-center py-2 sm:py-3 px-2 sm:px-4 border-b border-gray-100 dark:border-gray-700 min-w-[700px]">
       {/* Клиент */}
-      <div className="w-[40%] lg:w-[18%] pr-2 sm:pr-4">
+      <div className="w-[18%] pr-2 sm:pr-4">
         <div className={cn("w-20 sm:w-32 h-4 sm:h-5 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
-        <div className={cn("w-12 sm:w-16 h-3 mt-1 bg-gray-100 dark:bg-gray-600 rounded lg:hidden", shimmerV2)}></div>
       </div>
       
-      {/* Источник - скрыт на мобильных */}
-      <div className="hidden lg:block w-[22%] pr-4 space-y-1">
-        <div className={cn("w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
-        <div className={cn("w-20 h-4 bg-gray-100 dark:bg-gray-600 rounded", shimmerV2)}></div>
+      {/* Источник */}
+      <div className="w-[22%] pr-2 sm:pr-4 space-y-1">
+        <div className={cn("w-16 sm:w-28 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
+        <div className={cn("w-12 sm:w-20 h-3 sm:h-4 bg-gray-100 dark:bg-gray-600 rounded", shimmerV2)}></div>
       </div>
       
       {/* Дата и время */}
-      <div className="w-[30%] lg:w-[18%] pr-2 sm:pr-4 space-y-1">
+      <div className="w-[18%] pr-2 sm:pr-4 space-y-1">
         <div className={cn("w-12 sm:w-24 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         <div className={cn("w-10 sm:w-20 h-2 sm:h-3 bg-gray-100 dark:bg-gray-600 rounded", shimmerV2)}></div>
       </div>
       
-      {/* Оператор - скрыт на мобильных */}
-      <div className="hidden lg:block w-[20%] pr-4 space-y-1">
-        <div className={cn("w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
+      {/* Оператор */}
+      <div className="w-[20%] pr-2 sm:pr-4 space-y-1">
+        <div className={cn("w-16 sm:w-24 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         <div className="flex gap-1">
-          <div className={cn("w-16 h-5 bg-gray-100 dark:bg-gray-600 rounded-full", shimmerV2)}></div>
-          <div className={cn("w-16 h-5 bg-gray-100 dark:bg-gray-600 rounded-full", shimmerV2)}></div>
+          <div className={cn("w-10 sm:w-16 h-4 sm:h-5 bg-gray-100 dark:bg-gray-600 rounded-full", shimmerV2)}></div>
+          <div className={cn("w-10 sm:w-16 h-4 sm:h-5 bg-gray-100 dark:bg-gray-600 rounded-full", shimmerV2)}></div>
         </div>
       </div>
       
       {/* Действия */}
-      <div className="w-[30%] lg:w-[22%] flex justify-end gap-0.5 sm:gap-1">
+      <div className="w-[22%] flex justify-end gap-0.5 sm:gap-1">
         <div className={cn("w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 dark:bg-gray-600 rounded", shimmerV2)}></div>
         <div className={cn("w-7 h-7 sm:w-8 sm:h-8 bg-[#FEC004]/30 rounded", shimmerV2)}></div>
       </div>
@@ -71,26 +70,26 @@ function CallRowSkeletonV2() {
 // Скелетон для таблицы V2
 function CallTableSkeletonV2() {
   return (
-    <div className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-none overflow-hidden">
+    <div className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-none overflow-x-auto">
       {/* Заголовок таблицы */}
-      <div className="flex items-center py-2 sm:py-3 px-2 sm:px-4 bg-gray-50 dark:bg-[#252d3a] border-b border-gray-200 dark:border-gray-700">
-        <div className="w-[40%] lg:w-[18%]">
+      <div className="flex items-center py-2 sm:py-3 px-2 sm:px-4 bg-gray-50 dark:bg-[#252d3a] border-b border-gray-200 dark:border-gray-700 min-w-[700px]">
+        <div className="w-[18%]">
           <div className={cn("w-12 sm:w-16 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         </div>
-        <div className="hidden lg:block w-[22%]">
-          <div className={cn("w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
+        <div className="w-[22%]">
+          <div className={cn("w-14 sm:w-20 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         </div>
-        <div className="w-[30%] lg:w-[18%]">
+        <div className="w-[18%]">
           <div className={cn("w-10 sm:w-24 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         </div>
-        <div className="hidden lg:block w-[20%]">
-          <div className={cn("w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
+        <div className="w-[20%]">
+          <div className={cn("w-14 sm:w-20 h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded", shimmerV2)}></div>
         </div>
-        <div className="w-[30%] lg:w-[22%]"></div>
+        <div className="w-[22%]"></div>
       </div>
       
       {/* Строки таблицы */}
-      <div>
+      <div className="overflow-x-auto">
         {Array.from({ length: 10 }).map((_, index) => (
           <CallRowSkeletonV2 key={index} />
         ))}
@@ -114,7 +113,7 @@ function CallTableSkeletonV2() {
 // V2 скелетон страницы
 function TelephonyPageSkeletonV2() {
   return (
-    <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] overflow-x-hidden">
+    <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
       <FiltersSkeletonV2 />
       <CallTableSkeletonV2 />
     </div>

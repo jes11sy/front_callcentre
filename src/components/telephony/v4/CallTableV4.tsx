@@ -257,36 +257,35 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
         {/* Таблица V2 */}
         <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-none font-myriad">
           <CardContent className="p-2 sm:p-4">
-            <div className="rounded-lg">
-              <Table className="w-full">
+            <div className="overflow-x-auto rounded-lg">
+              <Table className="min-w-[700px] w-full">
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-[#252d3a] border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]">
-                    <TableHead className="w-[40%] lg:w-[18%] py-2 sm:py-3 px-2 sm:px-4">
+                    <TableHead className="w-[18%] py-2 sm:py-3 px-2 sm:px-4">
                       <span className="text-gray-800 dark:text-gray-200 font-medium text-xs sm:text-sm">Клиент</span>
                     </TableHead>
-                    <TableHead className="hidden lg:table-cell w-[22%] py-3 px-4">
+                    <TableHead className="w-[22%] py-2 sm:py-3 px-2 sm:px-4">
                       <button 
                         onClick={() => onSort('city')}
-                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors"
+                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors text-xs sm:text-sm"
                       >
                         Источник
                         <SortIcon field="city" />
                       </button>
                     </TableHead>
-                    <TableHead className="w-[30%] lg:w-[18%] py-2 sm:py-3 px-2 sm:px-4">
+                    <TableHead className="w-[18%] py-2 sm:py-3 px-2 sm:px-4">
                       <button 
                         onClick={() => onSort('createdAt')}
                         className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors text-xs sm:text-sm"
                       >
-                        <span className="hidden sm:inline">Дата и время</span>
-                        <span className="sm:hidden">Время</span>
+                        Дата и время
                         <SortIcon field="createdAt" />
                       </button>
                     </TableHead>
-                    <TableHead className="hidden lg:table-cell w-[20%] py-3 px-4">
-                      <span className="text-gray-800 dark:text-gray-200 font-medium">Оператор</span>
+                    <TableHead className="w-[20%] py-2 sm:py-3 px-2 sm:px-4">
+                      <span className="text-gray-800 dark:text-gray-200 font-medium text-xs sm:text-sm">Оператор</span>
                     </TableHead>
-                    <TableHead className="w-[30%] lg:w-[22%] py-2 sm:py-3 px-2 sm:px-4 text-right">
+                    <TableHead className="w-[22%] py-2 sm:py-3 px-2 sm:px-4 text-right">
                       <span className="text-gray-800 dark:text-gray-200 font-medium"></span>
                     </TableHead>
                   </TableRow>

@@ -447,21 +447,21 @@ export function CreateOrderModal({
   const callsToShow = callGroup.length > 0 ? callGroup : [call];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className={`w-full max-w-5xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col ${
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4">
+      <div className={`w-full h-full lg:h-auto lg:max-w-5xl lg:max-h-[90vh] lg:rounded-xl overflow-hidden flex flex-col ${
         isV2 
-          ? 'bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none' 
-          : 'bg-[#17212b] border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
+          ? 'bg-[#F3F3EE] dark:bg-[#1e2530] lg:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none' 
+          : 'bg-[#17212b] lg:border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
       }`}>
         {/* Header */}
-        <div className={`flex items-center justify-between px-5 py-3 border-b shrink-0 ${
+        <div className={`flex items-center justify-between px-3 sm:px-5 py-3 border-b shrink-0 ${
           isV2 
             ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700' 
             : 'bg-[#0f0f23] border-[#FFD700]/20'
         }`}>
-          <div className="flex items-center gap-4">
-            <h2 className={`text-lg font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Новый заказ</h2>
-            <div className={`flex items-center gap-2 text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <h2 className={`text-base sm:text-lg font-semibold shrink-0 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Новый заказ</h2>
+            <div className={`hidden sm:flex items-center gap-2 text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
               <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>|</span>
               <span className={`font-medium ${isV2 ? 'text-gray-700 dark:text-gray-200' : 'text-white'}`}>{call.phoneClient}</span>
               {call.city && (
@@ -471,47 +471,49 @@ export function CreateOrderModal({
                 </>
               )}
             </div>
+            {/* Mobile phone display */}
+            <span className={`sm:hidden text-xs font-medium truncate ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300'}`}>{call.phoneClient}</span>
           </div>
           <button
             onClick={handleClose}
-            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+            className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
               isV2 
                 ? 'text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700' 
                 : 'text-gray-400 hover:text-white hover:bg-white/10'
             }`}
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5 sm:h-4 sm:w-4" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex flex-1 overflow-hidden max-h-[700px]">
-          {/* Left: History panels */}
-          <div className={`w-[420px] border-r flex flex-col overflow-hidden ${
+        {/* Content - flex-col on mobile, flex-row on desktop */}
+        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden lg:max-h-[700px]">
+          {/* History panels - order-2 on mobile (bottom), order-1 on desktop (left) */}
+          <div className={`order-2 lg:order-1 lg:w-[420px] border-t lg:border-t-0 lg:border-r flex flex-col overflow-hidden ${
             isV2 
               ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2530]' 
               : 'border-[#FFD700]/10 bg-[#0f0f23]/30'
           }`}>
             {/* История звонков (все операторы) */}
-            <div className={`border-b flex flex-col overflow-hidden max-h-[50%] ${
+            <div className={`border-b flex flex-col overflow-hidden lg:max-h-[50%] ${
               isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/10'
             }`}>
               <button 
                 onClick={() => setShowCallHistory(!showCallHistory)}
-                className={`w-full px-3 py-2 flex items-center justify-between text-xs font-medium transition-colors shrink-0 ${
+                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 ${
                   isV2 
                     ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <PhoneCall className="h-3.5 w-3.5" />
+                  <PhoneCall className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                   <span>История звонков ({callHistoryLoading ? '...' : callHistory.length})</span>
                 </div>
-                {showCallHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                {showCallHistory ? <ChevronUp className="h-4 w-4 sm:h-3.5 sm:w-3.5" /> : <ChevronDown className="h-4 w-4 sm:h-3.5 sm:w-3.5" />}
               </button>
               {showCallHistory && (
-                <ScrollArea className="flex-1 max-h-[280px]">
+                <ScrollArea className="flex-1 max-h-[200px] lg:max-h-[280px]">
                   <div className="px-2 pb-2 space-y-1.5">
                     {callHistoryLoading ? (
                       <div className="flex items-center justify-center py-4">
@@ -629,17 +631,17 @@ export function CreateOrderModal({
             <div className="flex-1 overflow-hidden flex flex-col">
               <button 
                 onClick={() => setShowOrderHistory(!showOrderHistory)}
-                className={`w-full px-3 py-2 flex items-center justify-between text-xs font-medium transition-colors shrink-0 ${
+                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 ${
                   isV2 
                     ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <FileText className="h-3.5 w-3.5" />
+                  <FileText className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                   <span>История заказов ({orderHistory.length})</span>
                 </div>
-                {showOrderHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                {showOrderHistory ? <ChevronUp className="h-4 w-4 sm:h-3.5 sm:w-3.5" /> : <ChevronDown className="h-4 w-4 sm:h-3.5 sm:w-3.5" />}
               </button>
               {showOrderHistory && (
                 <ScrollArea className="flex-1">
@@ -741,12 +743,12 @@ export function CreateOrderModal({
             </div>
           </div>
 
-          {/* Right: Form */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Form - order-1 on mobile (top), order-2 on desktop (right) */}
+          <div className="order-1 lg:order-2 flex-1 flex flex-col overflow-hidden">
             <ScrollArea className="flex-1">
-              <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-3">
+              <form key={call?.id} onSubmit={handleSubmit(onSubmit)} className="p-3 sm:p-4 space-y-3">
                 {/* Row 1: РК + Город */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>РК</Label>
                     <Controller
@@ -798,7 +800,7 @@ export function CreateOrderModal({
                 </div>
 
                 {/* Row 2: Источник + Направление */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Источник</Label>
                     <Controller
@@ -852,7 +854,7 @@ export function CreateOrderModal({
                 <div className={`border-t ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/10'}`} />
 
                 {/* Row 3: Клиент + Адрес */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Имя клиента *</Label>
                     <Input
@@ -882,7 +884,7 @@ export function CreateOrderModal({
                 </div>
 
                 {/* Row 4: Тип заказа + Дата встречи */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Тип заказа *</Label>
                     <Controller
@@ -941,7 +943,7 @@ export function CreateOrderModal({
             </ScrollArea>
 
             {/* Footer */}
-            <div className={`px-4 py-3 border-t flex justify-end gap-2 shrink-0 ${
+            <div className={`px-3 sm:px-4 py-3 border-t flex justify-end gap-2 shrink-0 ${
               isV2 
                 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700' 
                 : 'bg-[#0f0f23] border-[#FFD700]/20'
@@ -951,7 +953,7 @@ export function CreateOrderModal({
                 variant="ghost"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={`h-9 px-4 ${
+                className={`h-9 px-3 sm:px-4 text-sm ${
                   isV2 
                     ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700' 
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -963,7 +965,7 @@ export function CreateOrderModal({
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit(onSubmit)}
-                className={`h-9 px-5 font-medium ${
+                className={`h-9 px-4 sm:px-5 font-medium text-sm ${
                   isV2 
                     ? 'bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900' 
                     : 'bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23]'
@@ -972,10 +974,14 @@ export function CreateOrderModal({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Создание...
+                    <span className="hidden sm:inline">Создание...</span>
+                    <span className="sm:hidden">...</span>
                   </>
                 ) : (
-                  'Создать заказ'
+                  <>
+                    <span className="hidden sm:inline">Создать заказ</span>
+                    <span className="sm:hidden">Создать</span>
+                  </>
                 )}
               </Button>
             </div>
@@ -984,7 +990,7 @@ export function CreateOrderModal({
 
         {/* Audio Player - показывается снизу при воспроизведении */}
         {playingCall && (
-          <div className={`border-t-2 px-4 py-3 shrink-0 ${
+          <div className={`border-t-2 px-3 sm:px-4 py-2 sm:py-3 shrink-0 ${
             isV2 
               ? 'border-[#FEC004]/40 bg-white dark:bg-[#252d3a]' 
               : 'border-[#FFD700]/40 bg-gradient-to-r from-[#0f0f23] to-[#17212b]'
@@ -1003,28 +1009,28 @@ export function CreateOrderModal({
               />
             )}
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* Кнопка Play/Pause */}
               <button
                 onClick={togglePlayPause}
                 disabled={audioLoading || !audioUrl}
-                className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors disabled:opacity-50 ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-colors disabled:opacity-50 ${
                   isV2 
                     ? 'bg-[#FEC004] hover:bg-[#e6ac00]' 
                     : 'bg-[#FFD700] hover:bg-[#FFD700]/90'
                 }`}
               >
                 {audioLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-gray-900" />
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-gray-900" />
                 ) : isPlaying ? (
-                  <Pause className="w-5 h-5 text-gray-900" />
+                  <Pause className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" />
                 ) : (
-                  <Play className="w-5 h-5 text-gray-900 ml-0.5" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 ml-0.5" />
                 )}
               </button>
 
-              {/* Информация о звонке */}
-              <div className="min-w-0 w-48">
+              {/* Информация о звонке - скрыта на мобильных */}
+              <div className="hidden sm:block min-w-0 w-48">
                 <div className={`text-sm font-medium truncate ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>
                   {playingCall.operator?.name || 'Оператор'}
                 </div>
@@ -1044,8 +1050,8 @@ export function CreateOrderModal({
               </div>
 
               {/* Прогресс-бар */}
-              <div className="flex-1 flex items-center gap-3">
-                <span className={`text-xs w-10 text-right font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+              <div className="flex-1 flex items-center gap-2 sm:gap-3">
+                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 text-right font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
                   {formatAudioTime(currentTime)}
                 </span>
                 <div className="flex-1 relative">
@@ -1077,7 +1083,7 @@ export function CreateOrderModal({
                     }}
                   />
                 </div>
-                <span className={`text-xs w-10 font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
                   {formatAudioTime(duration)}
                 </span>
               </div>

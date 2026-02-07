@@ -246,13 +246,13 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                   // Callback - звонок от мастера клиенту
                   <div className="flex flex-col">
                     <span className={cn(
-                      "font-semibold font-mono text-xs sm:text-sm truncate",
+                      "font-semibold font-mono text-xs sm:text-sm",
                       isV2 ? "text-gray-900 dark:text-gray-100" : "text-purple-400"
                     )}>
                       {displayPhone}
                     </span>
                     <span className={cn(
-                      "text-[10px] sm:text-xs truncate",
+                      "text-[10px] sm:text-xs",
                       isV2 ? "text-gray-500 dark:text-gray-400" : "text-purple-400/70"
                     )}>
                       {call.masterName 
@@ -265,33 +265,20 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 ) : isOutgoing ? (
                   // Исходящий звонок - показываем номер клиента (куда звонили)
                   <div className="flex flex-col">
-                    <span className="font-semibold text-blue-400 font-mono text-xs sm:text-sm truncate">
+                    <span className="font-semibold text-blue-400 font-mono text-xs sm:text-sm">
                       {displayPhone}
                     </span>
                     <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Исходящий
+                      Исходящий звонок
                     </span>
                   </div>
                 ) : (
                   // Входящий звонок - показываем номер телефона клиента
                   <div className={cn(
-                    "font-semibold font-mono text-xs sm:text-sm truncate",
+                    "font-semibold font-mono text-xs sm:text-sm",
                     isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"
                   )}>
                     {displayPhone}
-                  </div>
-                )}
-                {/* Статус - показываем на мобильных */}
-                {isV2 && (
-                  <div className="flex items-center gap-1 mt-0.5 lg:hidden">
-                    <span className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded",
-                      call.status === 'missed' 
-                        ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                    )}>
-                      {statusConfig.label}
-                    </span>
                   </div>
                 )}
                 {hasMultipleCalls && (
@@ -307,7 +294,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                         : "text-gray-400 hover:text-[#FFD700]"
                     )}
                   >
-                    <span>+{groupCalls.length - 1} <span className="hidden sm:inline">{pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span></span>
+                    <span>+{groupCalls.length - 1} {pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span>
                     {isExpanded ? (
                       <ChevronUp className="w-3 h-3" />
                     ) : (
@@ -332,7 +319,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 )
               )}
               <span className={cn(
-                "text-xs sm:text-sm font-mono truncate",
+                "text-xs sm:text-sm font-mono",
                 isCallback 
                   ? isV2 ? "text-gray-700 dark:text-gray-300" : "text-purple-400"
                   : isOutgoing 
@@ -343,7 +330,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               )}>
                 {displayPhone}
                 {isCallback && (
-                  <span className={cn("text-[10px] sm:text-xs ml-1 hidden sm:inline", isV2 ? "text-gray-500 dark:text-gray-400" : "text-purple-400/60")}>
+                  <span className={cn("text-[10px] sm:text-xs ml-1", isV2 ? "text-gray-500 dark:text-gray-400" : "text-purple-400/60")}>
                     {call.masterName ? `(мастер: ${call.masterName})` : '(от мастера)'}
                   </span>
                 )}
@@ -353,15 +340,15 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         </div>
       </TableCell>
 
-      {/* Колонка 2: Источник - скрыта на мобильных */}
-      <TableCell className="hidden lg:table-cell py-3 px-4">
+      {/* Колонка 2: Источник */}
+      <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
         {isOutgoing ? (
           // Для исходящих звонков показываем "Не указано"
-          <span className="text-sm text-gray-500 dark:text-gray-400">Не указано</span>
+          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Не указано</span>
         ) : (
           // Для входящих звонков показываем город, РК и источник
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-sm">
+            <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm">
               <span className={isV2 ? "text-gray-900 dark:text-gray-100" : "text-white"}>{call.city}</span>
               <span className="text-gray-400">•</span>
               <span className={isV2 ? "text-gray-600 dark:text-gray-400" : "text-gray-400"}>{call.rk}</span>
@@ -370,7 +357,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               <Badge 
                 variant="outline" 
                 className={cn(
-                  "text-xs max-w-[150px] truncate",
+                  "text-[10px] sm:text-xs max-w-[100px] sm:max-w-[150px] truncate",
                   isV2 
                     ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/5 dark:bg-[#FEC004]/10" 
                     : "border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/5"
@@ -401,19 +388,19 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         </div>
       </TableCell>
 
-      {/* Колонка 4: Оператор - скрыта на мобильных */}
-      <TableCell className="hidden lg:table-cell py-3 px-4">
+      {/* Колонка 4: Оператор */}
+      <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-sm">
-            <User className={cn("w-3.5 h-3.5 flex-shrink-0", isV2 ? "text-gray-400" : "text-gray-500")} />
+          <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm">
+            <User className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0", isV2 ? "text-gray-400" : "text-gray-500")} />
             <span className={isV2 ? "text-gray-900 dark:text-gray-100" : "text-white"}>{call.operator.name}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             {/* Направление звонка */}
             <Badge 
               variant="outline" 
               className={cn(
-                "text-xs flex items-center gap-1",
+                "text-[10px] sm:text-xs flex items-center gap-0.5 sm:gap-1",
                 isV2 
                   ? isCallback 
                     ? "border-[#FEC004]/50 text-[#FEC004] bg-[#FEC004]/10" 
@@ -421,14 +408,14 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                   : cn(directionConfig.borderColor, directionConfig.color)
               )}
             >
-              <DirectionIcon className="w-3 h-3" />
-              {directionConfig.label}
+              <DirectionIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              <span className="hidden sm:inline">{directionConfig.label}</span>
             </Badge>
             {/* Статус звонка */}
             <Badge 
               variant="outline" 
               className={cn(
-                "text-xs",
+                "text-[10px] sm:text-xs",
                 isV2 
                   ? "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700"
                   : cn(statusConfig.borderColor, statusConfig.color)

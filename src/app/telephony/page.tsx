@@ -70,7 +70,7 @@ export default function TelephonyPage() {
 
   return (
     <DashboardLayout variant="operator">
-      <div className={`w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen overflow-x-hidden ${version === 'v2' ? 'bg-[#F3F3EE] dark:bg-[#111827]' : 'bg-[#0f0f23]'}`}>
+      <div className={`w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen ${version === 'v2' ? 'bg-[#F3F3EE] dark:bg-[#111827]' : 'bg-[#0f0f23]'}`}>
         <CallTableV4
           calls={calls}
           groupedCalls={groupedCalls}

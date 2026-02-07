@@ -223,7 +223,7 @@ export function Sidebar() {
           {isDropdownOpen && (
             <div 
               ref={isMobile ? notificationsRef : undefined}
-              className={`absolute ${isMobile ? 'left-0 right-0 mx-3 bottom-full mb-2' : 'left-full ml-2 w-80 bottom-0'} bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}
+              className={`absolute ${isMobile ? 'left-0 right-0 mx-3 bottom-full mb-2' : 'left-full ml-2 w-80 bottom-full mb-2'} bg-white dark:bg-[#252d3a] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50`}
             >
               <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>

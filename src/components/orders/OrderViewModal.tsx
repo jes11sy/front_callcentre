@@ -372,31 +372,6 @@ const DocumentsTab = ({ order, formatDate, isV2 }: { order: Order; formatDate: (
       </div>
     </div>
 
-    {/* Системная информация */}
-    <div className={isV2 
-      ? "p-3 bg-white rounded-lg border border-gray-200"
-      : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-    }>
-      <h3 className={`text-xs font-medium ${isV2 ? 'text-gray-500' : 'text-gray-400'} mb-2`}>Системная информация</h3>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
-        <div className="flex justify-between">
-          <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>Создан:</span>
-          <span className={isV2 ? 'text-gray-900' : 'text-white'}>{formatDate(order.createDate)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>Обновлён:</span>
-          <span className={isV2 ? 'text-gray-900' : 'text-white'}>{order.updatedAt ? formatDate(order.updatedAt) : '—'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>ID заказа:</span>
-          <span className={isV2 ? 'text-gray-900' : 'text-white'}>#{order.id}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className={isV2 ? 'text-gray-400' : 'text-gray-500'}>ID оператора:</span>
-          <span className={isV2 ? 'text-gray-900' : 'text-white'}>{order.operatorNameId}</span>
-        </div>
-      </div>
-    </div>
   </div>
 );
 

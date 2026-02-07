@@ -5,6 +5,6 @@ export default function LoginPage() {
 }
 
 export const metadata = {
-  title: 'Вход - Call Centre CRM',
-  description: 'Страница входа в систему управления колл-центром',
+  title: 'Вход - LEADS CREATE',
+  description: 'Страница входа в систему управления звонками',
 };

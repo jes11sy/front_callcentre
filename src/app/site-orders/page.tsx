@@ -205,15 +205,15 @@ export default function SiteOrdersPage() {
               <div className="w-[200px]">
                 <Select value={statusFilter || ''} onValueChange={(val) => setStatusFilter(val === 'all' ? '' : val)}>
                   <SelectTrigger className={isV2 
-                    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
+                    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
                     : "bg-[#0f0f23] border-[#FFD700]/30 text-white [&>span]:text-white"
                   }>
                     <SelectValue placeholder="Все статусы" className={isV2 ? "" : "text-white"} />
                   </SelectTrigger>
                   <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
-                    <SelectItem value="all" className={isV2 ? "text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}>Все статусы</SelectItem>
+                    <SelectItem value="all" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>Все статусы</SelectItem>
                     {STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status} value={status} className={isV2 ? "text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}>
+                      <SelectItem key={status} value={status} className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>
                         {status}
                       </SelectItem>
                     ))}
@@ -307,7 +307,7 @@ export default function SiteOrdersPage() {
                                 <SelectItem 
                                   key={status} 
                                   value={status} 
-                                  className={isV2 ? "text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10" : "text-white hover:bg-[#FFD700]/10"}
+                                  className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}
                                 >
                                   {status}
                                 </SelectItem>

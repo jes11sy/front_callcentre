@@ -30,6 +30,9 @@ export function LoadingScreen({
 
   // ============ V2 DESIGN ============
   if (version === 'v2') {
+    const isDark = theme === 'dark';
+    const bgColor = isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]';
+    
     const contentV2 = (
       <div 
         className="flex flex-col items-center justify-center px-4"
@@ -38,7 +41,7 @@ export function LoadingScreen({
         {/* Logo V2 */}
         <div className="mb-8">
           <Image 
-            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+            src={isDark ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
             alt="Logo" 
             width={200} 
             height={50} 
@@ -57,7 +60,8 @@ export function LoadingScreen({
     if (fullScreen) {
       return (
         <div className={cn(
-          "min-h-screen min-h-[100dvh] flex items-center justify-center bg-[#F3F3EE]",
+          "min-h-screen min-h-[100dvh] flex items-center justify-center transition-colors duration-300",
+          bgColor,
           className
         )}>
           {contentV2}
@@ -66,7 +70,7 @@ export function LoadingScreen({
     }
 
     return (
-      <div className={cn("flex items-center justify-center py-12 bg-[#F3F3EE]", className)}>
+      <div className={cn("flex items-center justify-center py-12 transition-colors duration-300", bgColor, className)}>
         {contentV2}
       </div>
     );
@@ -164,7 +168,8 @@ export function LoadingState({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
+  const isDark = theme === 'dark';
   
   return (
     <div className={cn(
@@ -172,7 +177,12 @@ export function LoadingState({
       className
     )}>
       <LoadingSpinner size={size} />
-      <p className={cn("text-sm", version === 'v2' ? 'text-gray-600' : 'text-[#9CA3AF]')}>{message}</p>
+      <p className={cn(
+        "text-sm", 
+        version === 'v2' 
+          ? isDark ? 'text-gray-400' : 'text-gray-600'
+          : 'text-[#9CA3AF]'
+      )}>{message}</p>
     </div>
   );
 }
@@ -190,7 +200,8 @@ export function LoadingOverlay({
   message?: string;
   children: React.ReactNode;
 }) {
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
+  const isDark = theme === 'dark';
   
   return (
     <div className="relative">
@@ -198,7 +209,9 @@ export function LoadingOverlay({
       {isLoading && (
         <div className={cn(
           "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50",
-          version === 'v2' ? 'bg-[#F3F3EE]/80' : 'bg-[#02111B]/80'
+          version === 'v2' 
+            ? isDark ? 'bg-[#111827]/80' : 'bg-[#F3F3EE]/80'
+            : 'bg-[#02111B]/80'
         )}>
           <LoadingState message={message} />
         </div>

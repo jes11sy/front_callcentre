@@ -65,7 +65,7 @@ export const OrderEditModal = ({
 
   // Стили для V2
   const selectTriggerClass = isV2 
-    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004]"
+    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
     : "h-9 bg-[#17212b] border-[#FFD700]/20 text-white";
   
   const selectContentClass = isV2 
@@ -73,7 +73,7 @@ export const OrderEditModal = ({
     : "bg-[#17212b] border-[#FFD700]/30";
   
   const selectItemClass = isV2 
-    ? "text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10"
+    ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
     : "text-white hover:bg-[#FFD700]/10";
   
   const inputClass = isV2 

@@ -8,9 +8,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useDesignStore } from '@/store/designStore';
 
 const EQUIPMENT_TYPE_COLORS_V2 = {
-  'КП': 'text-blue-600',
-  'БТ': 'text-green-600',
-  'МНЧ': 'text-orange-600'
+  'КП': 'text-gray-700',
+  'БТ': 'text-gray-700',
+  'МНЧ': 'text-gray-700'
 } as const;
 
 interface TimeSlotsTableProps {
@@ -312,7 +312,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   {timeString}
                 </div>
               ))}
-              <div className={`text-sm font-medium ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
+              <div className={`text-sm font-medium ${isV2 ? 'text-gray-700' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200' : 'border-[#FFD700]/20'} pl-2`}>
                 Итого
               </div>
             </div>

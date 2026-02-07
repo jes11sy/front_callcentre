@@ -11,6 +11,8 @@ export interface Call {
   callDirection: 'inbound' | 'outbound' | 'callback';
   /** ID мастера для callback-звонков */
   masterId?: number | null;
+  /** Имя мастера для callback-звонков */
+  masterName?: string | null;
   recordingPath?: string;
   recordingProcessedAt?: string;
   // Поля от Mango Office

@@ -245,11 +245,17 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 {isCallback ? (
                   // Callback - звонок от мастера клиенту
                   <div className="flex flex-col">
-                    <span className="font-semibold text-purple-400 font-mono">
+                    <span className={cn(
+                      "font-semibold font-mono",
+                      isV2 ? "text-gray-900" : "text-purple-400"
+                    )}>
                       {displayPhone}
                     </span>
-                    <span className="text-xs text-purple-400/70">
-                      Мастер → Клиент {call.masterId && `(ID: ${call.masterId})`}
+                    <span className={cn(
+                      "text-xs",
+                      isV2 ? "text-gray-500" : "text-purple-400/70"
+                    )}>
+                      Мастер → Клиент {call.masterName ? `(${call.masterName})` : call.masterId ? `(ID: ${call.masterId})` : ''}
                     </span>
                   </div>
                 ) : isOutgoing ? (
@@ -311,7 +317,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               <span className={cn(
                 "text-sm font-mono",
                 isCallback 
-                  ? "text-purple-400" 
+                  ? isV2 ? "text-gray-700" : "text-purple-400"
                   : isOutgoing 
                     ? "text-blue-400" 
                     : isV2 
@@ -319,7 +325,11 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                       : "text-gray-400"
               )}>
                 {displayPhone}
-                {isCallback && <span className="text-xs ml-1 text-purple-400/60">(от мастера)</span>}
+                {isCallback && (
+                  <span className={cn("text-xs ml-1", isV2 ? "text-gray-500" : "text-purple-400/60")}>
+                    (от мастера{call.masterName ? `: ${call.masterName}` : ''})
+                  </span>
+                )}
               </span>
             </div>
           )}

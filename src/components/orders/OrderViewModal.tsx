@@ -101,10 +101,10 @@ const OrderViewModalComponent = ({
       >
         {/* Header */}
         <div className={isV2 
-          ? "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
+          ? "flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
+          : "flex items-center justify-between px-4 py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
         }>
-          <h2 className={`text-base sm:text-lg font-bold ${isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"}`}>
+          <h2 className={`text-lg font-bold ${isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"}`}>
             Заказ #{order.id}
           </h2>
           <div className="flex items-center gap-1">
@@ -114,11 +114,12 @@ const OrderViewModalComponent = ({
                 size="sm"
                 onClick={onEdit}
                 className={isV2 
-                  ? "h-8 w-8 sm:w-auto sm:px-2 p-0 sm:p-0 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-                  : "h-8 w-8 sm:w-auto sm:px-2 p-0 sm:p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+                  ? "h-9 w-9 p-0 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                  : "h-9 w-9 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
                 }
+                title="Редактировать"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-5 w-5" />
               </Button>
             )}
             <Button
@@ -126,9 +127,10 @@ const OrderViewModalComponent = ({
               size="sm"
               onClick={handleClose}
               className={isV2 
-                ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                : "h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
+                ? "h-9 w-9 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                : "h-9 w-9 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
               }
+              title="Закрыть"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -137,35 +139,35 @@ const OrderViewModalComponent = ({
 
         {/* Tabs */}
         <div className={isV2 
-          ? "flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] px-1 sm:px-2 overflow-x-auto"
-          : "flex border-b border-[#FFD700]/30 bg-[#17212b]/50 px-1 sm:px-2 overflow-x-auto"
+          ? "flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] px-2"
+          : "flex border-b border-[#FFD700]/30 bg-[#17212b]/50 px-2"
         }>
           <button
             onClick={() => setActiveTab('info')}
-            className={`px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'info'
                 ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' : 'text-gray-400 hover:text-gray-200')
+                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
             }`}
           >
             Информация
           </button>
           <button
             onClick={() => setActiveTab('documents')}
-            className={`px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'documents'
                 ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' : 'text-gray-400 hover:text-gray-200')
+                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
             }`}
           >
             Документы
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'history'
                 ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' : 'text-gray-400 hover:text-gray-200')
+                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
             }`}
           >
             История
@@ -226,22 +228,24 @@ const InfoTab = ({
       {/* Две колонки: Заказ | Мастер и финансы */}
       <div className={`grid grid-cols-1 sm:grid-cols-2 sm:divide-x ${isV2 ? 'divide-gray-200 dark:divide-gray-700' : 'divide-[#FFD700]/20'}`}>
         {/* Левая колонка — информация по заказу */}
-        <div className="p-3 sm:p-4 space-y-1.5 sm:space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 sm:mb-3">
-            <h3 className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>Информация по заказу</h3>
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-              <Badge 
-                className={`text-[10px] sm:text-xs ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-gray-800 text-gray-300')}`}
-              >
-                {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
-              </Badge>
-              <Badge variant="outline" className={`text-[10px] sm:text-xs ${isV2 
-                ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10 dark:bg-[#FEC004]/5"
-                : "border-[#FFD700]/30 text-[#FFD700]"
-              }`}>
-                {order.typeEquipment}
-              </Badge>
-            </div>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>Информация по заказу</h3>
+          </div>
+          
+          {/* Бейджи статуса и типа */}
+          <div className="flex items-center gap-2 flex-wrap mb-4">
+            <Badge 
+              className={`text-xs px-2.5 py-1 ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-gray-800 text-gray-300')}`}
+            >
+              {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
+            </Badge>
+            <Badge variant="outline" className={`text-xs px-2.5 py-1 ${isV2 
+              ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10 dark:bg-[#FEC004]/5"
+              : "border-[#FFD700]/30 text-[#FFD700]"
+            }`}>
+              {order.typeEquipment}
+            </Badge>
           </div>
           
           <DataRow label="Тип заявки" value={order.typeOrder} isV2={isV2} />
@@ -256,13 +260,12 @@ const InfoTab = ({
         </div>
 
         {/* Правая колонка — мастер и финансы */}
-        <div className={`p-3 sm:p-4 space-y-1.5 sm:space-y-2 border-t sm:border-t-0 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
-          <h3 className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-2 sm:mb-3`}>Мастер и финансы</h3>
+        <div className={`p-4 space-y-1 border-t sm:border-t-0 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
+          <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-4`}>Мастер и финансы</h3>
           
           <DataRow label="Мастер" value={order.master?.name || 'Не назначен'} muted={!order.master?.name} isV2={isV2} />
-          {order.masterId && <DataRow label="ID мастера" value={String(order.masterId)} isV2={isV2} />}
           
-          <div className="h-1.5 sm:h-2" />
+          <div className="h-3" />
           
           <DataRow label="Итог" value={order.result ? `${order.result.toLocaleString()} ₽` : '—'} muted={!order.result} isV2={isV2} />
           <DataRow label="Расходы" value={order.expenditure ? `${order.expenditure.toLocaleString()} ₽` : '—'} muted={!order.expenditure} isV2={isV2} />
@@ -272,30 +275,29 @@ const InfoTab = ({
 
       {/* Оператор */}
       <div className={isV2 
-        ? "px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] flex items-center"
-        : "px-3 sm:px-4 py-2 sm:py-3 border-t border-[#FFD700]/20 bg-[#17212b]/30 flex items-center justify-between"
+        ? "px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] flex items-center"
+        : "px-4 py-3 border-t border-[#FFD700]/20 bg-[#17212b]/30 flex items-center justify-between"
       }>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Оператор:</span>
-          <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>{order.operator.name}</span>
+        <div className="flex items-center gap-2">
+          <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Оператор:</span>
+          <span className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>{order.operator.name}</span>
         </div>
-        {!isV2 && <span className="text-[10px] sm:text-xs text-gray-500">ID: {order.operatorNameId}</span>}
       </div>
 
       {/* Записи звонков */}
-      <div className={`px-3 sm:px-4 py-2 sm:py-3 border-t ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
-        <h3 className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-2 sm:mb-3`}>Записи звонков</h3>
+      <div className={`px-4 py-3 border-t ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
+        <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-3`}>Записи звонков</h3>
         
         {loadingCalls ? (
           <div className={isV2 
-            ? "flex items-center gap-2 p-2 sm:p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-            : "flex items-center gap-2 p-2 sm:p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
+            ? "flex items-center gap-2 p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
+            : "flex items-center gap-2 p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
           }>
             <LoadingSpinner size="sm" />
-            <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Загрузка...</span>
+            <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Загрузка...</span>
           </div>
         ) : orderCalls.length > 0 ? (
-          <div className="space-y-1.5 sm:space-y-2">
+          <div className="space-y-2">
             {orderCalls.map((call, index) => (
               <CallPlayer
                 key={call.id || index}
@@ -315,10 +317,10 @@ const InfoTab = ({
           </div>
         ) : (
           <div className={isV2 
-            ? "p-2 sm:p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 text-center"
-            : "p-2 sm:p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 text-center"
+            ? "p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 text-center"
+            : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 text-center"
           }>
-            <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>Записи не найдены</span>
+            <span className={`text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>Записи не найдены</span>
           </div>
         )}
       </div>
@@ -558,9 +560,9 @@ const HistoryTab = ({
 // === Вспомогательные компоненты ===
 
 const DataRow = ({ label, value, muted = false, isV2 = false }: { label: string; value: string; muted?: boolean; isV2?: boolean }) => (
-  <div className="flex justify-between items-start gap-2">
-    <span className={`text-[10px] sm:text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'} shrink-0`}>{label}</span>
-    <span className={`text-xs sm:text-sm text-right break-words min-w-0 ${muted ? (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500') : (isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white')}`}>{value}</span>
+  <div className="flex justify-between items-start gap-3 py-1">
+    <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'} shrink-0`}>{label}</span>
+    <span className={`text-sm text-right break-words min-w-0 ${muted ? (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500') : (isV2 ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-white font-medium')}`}>{value}</span>
   </div>
 );
 
@@ -618,14 +620,14 @@ const CallPlayer = ({
 
   return (
     <div className={isV2 
-      ? "p-2 sm:p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-      : "p-2 sm:p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
+      ? "p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
+      : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
     }>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3 min-w-0">
-          <span className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Звонок #{call.id}</span>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col min-w-0">
+          <span className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Звонок #{call.id}</span>
           {callDate && (
-            <span className={`text-[10px] sm:text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>
+            <span className={`text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>
               {new Date(callDate).toLocaleString('ru-RU')}
             </span>
           )}
@@ -635,12 +637,12 @@ const CallPlayer = ({
           size="sm"
           onClick={() => loadRecording(call)}
           className={`shrink-0 ${isV2 
-            ? "h-7 w-7 sm:h-8 sm:w-8 p-0 text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-            : "h-7 w-7 sm:h-8 sm:w-8 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
+            ? "h-10 w-10 p-0 text-[#FEC004] hover:bg-[#FEC004]/10 border border-[#FEC004]/30 rounded-full"
+            : "h-10 w-10 p-0 text-[#FFD700] hover:bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-full"
           }`}
           title="Воспроизвести запись"
         >
-          <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <Play className="h-5 w-5" />
         </Button>
       </div>
     </div>

@@ -166,7 +166,158 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
     )}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
       
-      <div className="max-w-6xl mx-auto px-4 py-3">
+      {/* Мобильный вид */}
+      <div className="sm:hidden px-3 py-2">
+        {/* Верхняя строка: инфо + кнопки */}
+        <div className="flex items-center justify-between gap-2 mb-2">
+          {/* Информация о звонке */}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {!isV2 && (
+              <div className="w-8 h-8 rounded-full bg-[#FFD700]/10 flex items-center justify-center flex-shrink-0">
+                <Phone className="w-4 h-4 text-[#FFD700]" />
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className={cn(
+                "text-xs font-medium truncate",
+                isV2 
+                  ? isDark ? "text-gray-100" : "text-gray-900"
+                  : "text-[#FFD700]"
+              )}>
+                {call.phoneClient}
+              </div>
+              <div className={cn(
+                "text-[10px] truncate",
+                isV2 
+                  ? isDark ? "text-gray-400" : "text-gray-500"
+                  : "text-gray-400"
+              )}>
+                {call.city}
+              </div>
+            </div>
+          </div>
+          
+          {/* Кнопки действий */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDownload(call)}
+              className={cn(
+                "h-8 w-8 p-0",
+                isV2 ? "text-gray-400 active:text-[#FEC004]" : "text-gray-400 active:text-[#FFD700]"
+              )}
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className={cn(
+                "h-8 w-8 p-0",
+                isV2 
+                  ? isDark ? "text-gray-400 active:text-gray-200" : "text-gray-400 active:text-gray-700"
+                  : "text-gray-400 active:text-white"
+              )}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+        
+        {/* Нижняя строка: контролы + прогресс */}
+        <div className="flex items-center gap-2">
+          {/* Кнопки управления */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => skip(-10)}
+            disabled={isLoading}
+            className={cn(
+              "h-8 w-8 p-0 shrink-0",
+              isV2 
+                ? isDark ? "text-gray-400" : "text-gray-400"
+                : "text-gray-400"
+            )}
+          >
+            <SkipBack className="w-4 h-4" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={togglePlayPause}
+            disabled={isLoading}
+            className={cn(
+              "h-10 w-10 p-0 shrink-0",
+              isV2 ? "text-[#FEC004]" : "text-[#FFD700]"
+            )}
+          >
+            {isLoading ? (
+              <div className={cn(
+                "h-5 w-5 animate-spin rounded-full border-2 border-t-transparent",
+                isV2 ? "border-[#FEC004]" : "border-[#FFD700]"
+              )} />
+            ) : isPlaying ? (
+              <Pause className="w-6 h-6" />
+            ) : (
+              <Play className="w-6 h-6" />
+            )}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => skip(10)}
+            disabled={isLoading}
+            className={cn(
+              "h-8 w-8 p-0 shrink-0",
+              isV2 
+                ? isDark ? "text-gray-400" : "text-gray-400"
+                : "text-gray-400"
+            )}
+          >
+            <SkipForward className="w-4 h-4" />
+          </Button>
+
+          {/* Время + прогресс */}
+          <span className={cn(
+            "text-[10px] font-mono w-8 text-center shrink-0",
+            isV2 
+              ? isDark ? "text-gray-400" : "text-gray-500"
+              : "text-gray-400"
+          )}>
+            {formatTime(currentTime)}
+          </span>
+
+          <div className="flex-1 min-w-0">
+            <Slider
+              value={[progressPercentage]}
+              onValueChange={handleSeek}
+              max={100}
+              step={0.1}
+              disabled={isLoading}
+              className={cn(
+                "cursor-pointer",
+                isV2 && "[&_[role=slider]]:bg-[#FEC004] [&_[data-orientation=horizontal]>span:first-child>span]:bg-[#FEC004]"
+              )}
+            />
+          </div>
+
+          <span className={cn(
+            "text-[10px] font-mono w-8 text-center shrink-0",
+            isV2 
+              ? isDark ? "text-gray-400" : "text-gray-500"
+              : "text-gray-400"
+          )}>
+            {formatTime(duration)}
+          </span>
+        </div>
+      </div>
+      
+      {/* Десктопный вид */}
+      <div className="hidden sm:block max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center gap-4">
           {/* Информация о звонке */}
           <div className="flex items-center gap-3 min-w-[200px]">

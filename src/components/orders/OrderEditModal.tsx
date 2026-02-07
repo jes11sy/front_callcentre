@@ -82,8 +82,7 @@ export const OrderEditModal = ({
 
   return (
     <div 
-      className="fixed left-0 right-0 bottom-0 z-50 lg:top-0 lg:flex lg:items-center lg:justify-center lg:bg-black/50 lg:p-4"
-      style={{ top: '64px' }}
+      className="fixed top-16 left-0 right-0 bottom-0 z-50 lg:top-0 lg:flex lg:items-center lg:justify-center lg:bg-black/50 lg:p-4"
       onClick={onClose}
     >
       <div 

@@ -243,7 +243,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     return (
       <>
         {/* Фильтры отдельно для V2 */}
-        <div className="mb-6 bg-white dark:bg-[#1e2530] rounded-xl p-4 shadow-sm dark:shadow-none dark:border dark:border-gray-700">
+        <div className="mb-4 sm:mb-6 bg-white dark:bg-[#1e2530] rounded-xl p-3 sm:p-4 shadow-sm dark:shadow-none dark:border dark:border-gray-700">
           <QuickFilterChips
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
@@ -361,9 +361,9 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
             </div>
 
             {/* Пагинация V2 */}
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 gap-2 sm:gap-0">
               <div className="flex items-center gap-2">
-                <Label className="text-sm text-gray-500 dark:text-gray-400">На странице:</Label>
+                <Label className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">На странице:</Label>
                 <Select
                   value={limit.toString()}
                   onValueChange={(value) => {
@@ -372,7 +372,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   }}
                   disabled={loading}
                 >
-                  <SelectTrigger className="w-16 h-8 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200">
+                  <SelectTrigger className="w-14 sm:w-16 h-7 sm:h-8 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-xs sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-[#1e2530] border-gray-200 dark:border-gray-600">
@@ -394,9 +394,9 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={onPageChange}
-                  showFirstLast={true}
+                  showFirstLast={false}
                   showPrevNext={true}
-                  maxVisiblePages={5}
+                  maxVisiblePages={3}
                   disabled={loading}
                   variant="v2"
                 />

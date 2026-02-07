@@ -134,7 +134,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
               key={filter.id}
               onClick={() => onFilterChange(filter.id)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
                 "border",
                 isV2 ? (
                   isActive
@@ -158,13 +158,13 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                 )
               )}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{filter.label}</span>
+              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">{filter.label}</span>
               {filter.count !== null && filter.count > 0 && (
                 <Badge 
                   variant="secondary" 
                   className={cn(
-                    "ml-0.5 h-5 min-w-[20px] text-xs font-bold",
+                    "ml-0.5 h-4 sm:h-5 min-w-[16px] sm:min-w-[20px] text-[10px] sm:text-xs font-bold",
                     isV2 ? (
                       isActive 
                         ? filter.id === 'missed'

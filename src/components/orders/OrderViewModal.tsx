@@ -89,13 +89,13 @@ const OrderViewModalComponent = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[10000] flex items-center justify-center sm:bg-black/50 sm:p-4"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-0 sm:p-4"
       onClick={handleClose}
     >
       <div 
-        className={`w-screen min-h-screen sm:w-auto sm:min-h-0 sm:h-auto sm:max-h-[85vh] sm:max-w-3xl sm:rounded-lg overflow-hidden flex flex-col ${isV2 
-          ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none sm:border border-gray-200 dark:border-gray-700 font-myriad"
-          : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] sm:border-2 border-[#FFD700]/50"
+        className={`w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg overflow-hidden flex flex-col ${isV2 
+          ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none sm:max-w-3xl sm:border border-gray-200 dark:border-gray-700 font-myriad"
+          : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] sm:max-w-3xl sm:border-2 border-[#FFD700]/50"
         }`}
         onClick={(e) => e.stopPropagation()}
       >

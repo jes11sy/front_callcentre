@@ -82,7 +82,7 @@ export const OrderEditModal = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4"
+      className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 p-0 sm:p-4"
       onClick={onClose}
     >
       <div 

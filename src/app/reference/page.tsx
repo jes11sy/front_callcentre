@@ -49,26 +49,33 @@ export default function ReferencePage() {
     ? "text-xs border-[#FEC004]/30 text-[#FEC004]"
     : "text-xs border-[#FFD700]/30 text-[#FFD700]";
 
-  // V2: Минималистичный вертикальный список
+  // V2: Минималистичный вертикальный список с описаниями
   if (isV2) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] font-myriad">
-          <div className="space-y-1">
-            {referenceSections.map((section, index) => {
-              return (
-                <Link 
-                  key={index} 
-                  href={section.href} 
-                  className="group flex items-center justify-between py-4 border-b border-gray-200 hover:border-[#FEC004] transition-colors"
-                >
-                  <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors font-light">
-                    {section.title}
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all" />
-                </Link>
-              );
-            })}
+        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] font-myriad">
+          <div className="max-w-4xl">
+            <div className="space-y-2">
+              {referenceSections.map((section, index) => {
+                return (
+                  <Link 
+                    key={index} 
+                    href={section.href} 
+                    className="group flex items-center justify-between py-5 border-b border-gray-200 hover:border-[#FEC004] transition-colors"
+                  >
+                    <div>
+                      <div className="text-gray-900 group-hover:text-[#FEC004] transition-colors text-base">
+                        {section.title}
+                      </div>
+                      <div className="text-gray-400 text-sm mt-1">
+                        {section.description}
+                      </div>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-gray-300 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all flex-shrink-0 ml-4" />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </DashboardLayout>

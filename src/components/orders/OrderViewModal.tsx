@@ -93,7 +93,7 @@ const OrderViewModalComponent = ({
       onClick={handleClose}
     >
       <div 
-        className={`absolute top-0 left-0 right-0 bottom-0 m-0 lg:static lg:w-auto lg:h-auto lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col ${isV2 
+        className={`absolute inset-0 lg:static lg:w-auto lg:h-auto lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col ${isV2 
           ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none lg:max-w-3xl lg:border border-gray-200 dark:border-gray-700 font-myriad"
           : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] lg:max-w-3xl lg:border-2 border-[#FFD700]/50"
         }`}

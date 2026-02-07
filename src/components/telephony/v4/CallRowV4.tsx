@@ -398,7 +398,14 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             {/* Направление звонка */}
             <Badge 
               variant="outline" 
-              className={cn("text-xs flex items-center gap-1", directionConfig.borderColor, directionConfig.color)}
+              className={cn(
+                "text-xs flex items-center gap-1",
+                isV2 
+                  ? isCallback 
+                    ? "border-[#FEC004]/50 text-[#FEC004] bg-[#FEC004]/10" 
+                    : "border-gray-300 text-gray-600 bg-gray-100"
+                  : cn(directionConfig.borderColor, directionConfig.color)
+              )}
             >
               <DirectionIcon className="w-3 h-3" />
               {directionConfig.label}
@@ -406,7 +413,12 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             {/* Статус звонка */}
             <Badge 
               variant="outline" 
-              className={cn("text-xs", statusConfig.borderColor, statusConfig.color)}
+              className={cn(
+                "text-xs",
+                isV2 
+                  ? "border-gray-300 text-gray-600 bg-gray-100"
+                  : cn(statusConfig.borderColor, statusConfig.color)
+              )}
             >
               {statusConfig.label}
             </Badge>

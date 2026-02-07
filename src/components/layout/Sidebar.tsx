@@ -93,7 +93,7 @@ export function Sidebar() {
               isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
             }`}
           />
-          <User className={`nav-icon h-5 w-5 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
+          <User className={`nav-icon h-5 w-5 text-gray-600 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
           <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors">
             {user?.name || user?.login || 'Профиль'}
           </span>

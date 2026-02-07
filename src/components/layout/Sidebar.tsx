@@ -46,7 +46,9 @@ export function Sidebar() {
     <aside className="w-56 bg-white h-screen flex flex-col border-r border-gray-200 fixed left-0 top-0 font-myriad">
       {/* Logo */}
       <div className="p-6 pb-16">
-        <Image src="/img/logo/logo_v2.png" alt="Logo" width={160} height={45} className="h-10 w-auto" />
+        <Link href="/telephony">
+          <Image src="/img/logo/logo_v2.png" alt="Logo" width={160} height={45} className="h-10 w-auto cursor-pointer" />
+        </Link>
       </div>
 
       {/* Navigation */}

@@ -2,11 +2,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserCheck, Clock, AlertCircle, CheckCircle, MessageSquare, Phone, Users, FileText, Hash } from 'lucide-react';
+import { UserCheck, Clock, AlertCircle, CheckCircle, MessageSquare, Phone, Users, FileText, Hash, ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
+import { useRouter } from 'next/navigation';
 
 export default function EmployeeRulesPage() {
+  const router = useRouter();
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
   
@@ -22,9 +24,18 @@ export default function EmployeeRulesPage() {
   if (isV2) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
-          <div className="max-w-4xl space-y-10">
+        <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+          <div className="max-w-4xl space-y-8 sm:space-y-10">
             
+            {/* Кнопка назад - только мобилка */}
+            <button
+              onClick={() => router.back()}
+              className="sm:hidden flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 -mb-4"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Назад
+            </button>
+
             {/* Рабочий график */}
             <section>
               <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Рабочий график</h2>
@@ -121,21 +132,26 @@ export default function EmployeeRulesPage() {
   // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
-        <div className="px-4 py-6 sm:px-0">
+      <div className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
+        <div className="py-4 sm:py-6">
+          {/* Кнопка назад - только мобилка */}
+          <button
+            onClick={() => router.back()}
+            className="sm:hidden flex items-center gap-1 text-sm text-gray-400 hover:text-gray-300 mb-4"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Назад
+          </button>
+
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
-                  <UserCheck className="h-8 w-8 mr-3 text-[#FFD700]" />
-                  Правила сотрудника
-                </h1>
-                <p className="mt-2 text-gray-400">
-                  Основные правила и требования для операторов
-                </p>
-              </div>
-            </div>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-3xl font-bold flex items-center text-[#FFD700]">
+              <UserCheck className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-[#FFD700]" />
+              Правила сотрудника
+            </h1>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-400">
+              Основные правила и требования для операторов
+            </p>
           </div>
 
           <div className="grid gap-6">

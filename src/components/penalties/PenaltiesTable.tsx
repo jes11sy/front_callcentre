@@ -72,17 +72,18 @@ export const PenaltiesTable = ({
   if (isLoading) {
     return (
       <Card className={cardClass}>
-        <CardContent className="px-6 pb-6">
-          <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+        <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+          <div className={`flex items-center justify-between mb-4 sm:mb-6 ${isV2 ? 'pt-2' : 'pt-4 sm:pt-6'}`}>
             {!isV2 && (
-              <div className="flex items-center gap-3">
-                <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-                <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <AlertTriangle className={`h-5 w-5 sm:h-6 sm:w-6 ${iconClass}`} />
+                <h2 className={`text-lg sm:text-2xl font-bold ${titleClass}`}>Штрафы</h2>
               </div>
             )}
             <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
               <Plus className="mr-2 h-4 w-4" />
-              Создать
+              <span className="hidden sm:inline">Создать</span>
+              <span className="sm:hidden">Новый</span>
             </Button>
           </div>
           <LoadingState 
@@ -98,22 +99,23 @@ export const PenaltiesTable = ({
   if (penalties?.length === 0) {
     return (
       <Card className={cardClass}>
-        <CardContent className="px-6 pb-6">
-          <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+        <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+          <div className={`flex items-center justify-between mb-4 sm:mb-6 ${isV2 ? 'pt-2' : 'pt-4 sm:pt-6'}`}>
             {!isV2 && (
-              <div className="flex items-center gap-3">
-                <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-                <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <AlertTriangle className={`h-5 w-5 sm:h-6 sm:w-6 ${iconClass}`} />
+                <h2 className={`text-lg sm:text-2xl font-bold ${titleClass}`}>Штрафы</h2>
               </div>
             )}
             <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
               <Plus className="mr-2 h-4 w-4" />
-              Создать
+              <span className="hidden sm:inline">Создать</span>
+              <span className="sm:hidden">Новый</span>
             </Button>
           </div>
           <div className="flex flex-col items-center justify-center py-12">
-            <AlertTriangle className={`h-12 w-12 mb-4 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
-            <p className={`text-lg ${isV2 ? 'text-gray-600' : 'text-white'}`}>Нет штрафов</p>
+            <AlertTriangle className={`h-10 w-10 sm:h-12 sm:w-12 mb-4 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
+            <p className={`text-base sm:text-lg ${isV2 ? 'text-gray-600' : 'text-white'}`}>Нет штрафов</p>
           </div>
         </CardContent>
       </Card>
@@ -122,21 +124,83 @@ export const PenaltiesTable = ({
 
   return (
     <Card className={cardClass}>
-      <CardContent className="px-6 pb-6">
-        <div className={`flex items-center justify-between mb-6 ${isV2 ? 'pt-2' : 'pt-6'}`}>
+      <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+        {/* Header */}
+        <div className={`flex items-center justify-between mb-4 sm:mb-6 ${isV2 ? 'pt-2' : 'pt-4 sm:pt-6'}`}>
           {!isV2 && (
-            <div className="flex items-center gap-3">
-              <AlertTriangle className={`h-6 w-6 ${iconClass}`} />
-              <h2 className={`text-2xl font-bold ${titleClass}`}>Штрафы</h2>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <AlertTriangle className={`h-5 w-5 sm:h-6 sm:w-6 ${iconClass}`} />
+              <h2 className={`text-lg sm:text-2xl font-bold ${titleClass}`}>Штрафы</h2>
             </div>
           )}
           <Button onClick={onCreatePenalty} className={`${createBtnClass} ${isV2 ? 'ml-auto' : ''}`}>
             <Plus className="mr-2 h-4 w-4" />
-            Создать
+            <span className="hidden sm:inline">Создать</span>
+            <span className="sm:hidden">Новый</span>
           </Button>
         </div>
 
-        <div className={`rounded-md border overflow-hidden ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
+        {/* Мобильный вид - карточки */}
+        <div className="sm:hidden space-y-3">
+          {penalties.map((penalty) => (
+            <div 
+              key={penalty.id}
+              className={`p-3 rounded-lg ${isV2 
+                ? 'bg-gray-50 dark:bg-[#252d3a] border border-gray-200 dark:border-gray-700' 
+                : 'bg-[#0f0f23] border border-[#FFD700]/20'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <div className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>
+                    {penalty.city}
+                  </div>
+                  <div className={`text-xs ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                    {formatDate(penalty.dateCreate)}
+                  </div>
+                </div>
+                <div className={`text-base font-bold ${isV2 ? 'text-red-600 dark:text-red-400' : 'text-red-400'}`}>
+                  {formatCurrency(penalty.amount)}
+                </div>
+              </div>
+              
+              <div className={`text-sm mb-3 ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}`}>
+                {penalty.note}
+              </div>
+              
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditPenalty(penalty)}
+                  className={`h-8 px-3 ${isV2 
+                    ? "text-[#FEC004] hover:bg-[#FEC004]/10"
+                    : "text-[#FFD700] hover:bg-[#FFD700]/10"
+                  }`}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Изменить</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm(`Удалить штраф "${penalty.note}"?`)) {
+                      onDeletePenalty(penalty.id);
+                    }
+                  }}
+                  className="h-8 px-3 text-red-400 hover:bg-red-400/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Удалить</span>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Десктопный вид - таблица */}
+        <div className={`hidden sm:block rounded-md border overflow-hidden ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
           <Table>
             <TableHeader>
               <TableRow className={isV2 

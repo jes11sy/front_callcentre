@@ -3,11 +3,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DollarSign, Wrench, Monitor, Home } from 'lucide-react';
+import { DollarSign, Wrench, Monitor, Home, ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
+import { useRouter } from 'next/navigation';
 
 export default function PricingPage() {
+  const router = useRouter();
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
   
@@ -221,9 +223,18 @@ export default function PricingPage() {
   if (isV2) {
     return (
       <DashboardLayout>
-        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
-          <div className="max-w-4xl space-y-10">
+        <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+          <div className="max-w-4xl space-y-8 sm:space-y-10">
             
+            {/* Кнопка назад - только мобилка */}
+            <button
+              onClick={() => router.back()}
+              className="sm:hidden flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 -mb-4"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Назад
+            </button>
+
             {pricingData.map((category, index) => (
               <section key={index}>
                 <h2 className="text-xl text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">{category.category}</h2>
@@ -266,12 +277,21 @@ export default function PricingPage() {
   // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
-        <div className="flex items-center space-x-3 mb-8">
-          <DollarSign className="h-8 w-8 text-[#FFD700]" />
+      <div className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
+        {/* Кнопка назад - только мобилка */}
+        <button
+          onClick={() => router.back()}
+          className="sm:hidden flex items-center gap-1 text-sm text-gray-400 hover:text-gray-300 mb-4"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Назад
+        </button>
+
+        <div className="flex items-center space-x-3 mb-6 sm:mb-8">
+          <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-[#FFD700]" />
           <div>
-            <h1 className="text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
-            <p className="text-gray-400">Актуальные цены на услуги по ремонту</p>
+            <h1 className="text-xl sm:text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
+            <p className="text-sm sm:text-base text-gray-400">Актуальные цены на услуги по ремонту</p>
           </div>
         </div>
 

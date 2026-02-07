@@ -95,8 +95,8 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
 
   // Стили для V2
   const dialogClass = isV2 
-    ? "bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 max-w-md font-myriad"
-    : "bg-[#17212b] border-2 border-[#FFD700]/30 text-white max-w-md";
+    ? "bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 w-[calc(100%-2rem)] sm:max-w-md font-myriad"
+    : "bg-[#17212b] border-2 border-[#FFD700]/30 text-white w-[calc(100%-2rem)] sm:max-w-md";
   
   const selectTriggerClass = isV2 
     ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
@@ -118,7 +118,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className={dialogClass}>
         <DialogHeader>
-          <DialogTitle className={`text-2xl font-bold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
+          <DialogTitle className={`text-xl sm:text-2xl font-bold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
             Создать штраф
           </DialogTitle>
         </DialogHeader>
@@ -130,7 +130,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
               Город *
             </Label>
             <Select value={city} onValueChange={setCity}>
-              <SelectTrigger id="city" className={selectTriggerClass}>
+              <SelectTrigger id="city" className={`h-11 ${selectTriggerClass}`}>
                 <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
               <SelectContent className={selectContentClass}>
@@ -158,7 +158,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
               Причина *
             </Label>
             <Select value={reason} onValueChange={setReason}>
-              <SelectTrigger id="reason" className={selectTriggerClass}>
+              <SelectTrigger id="reason" className={`h-11 ${selectTriggerClass}`}>
                 <SelectValue placeholder="Выберите причину" />
               </SelectTrigger>
               <SelectContent className={selectContentClass}>
@@ -186,7 +186,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 placeholder="Введите номер заказа"
-                className={inputClass}
+                className={`h-11 ${inputClass}`}
               />
               {errors.orderNumber && (
                 <p className="text-sm text-red-400">{errors.orderNumber}</p>
@@ -207,7 +207,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
               placeholder="0"
               min="0"
               step="1"
-              className={inputClass}
+              className={`h-11 ${inputClass}`}
             />
             {errors.amount && (
               <p className="text-sm text-red-400">{errors.amount}</p>
@@ -215,25 +215,26 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 mt-6">
+        {/* Кнопки - на мобильном в колонку */}
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 mt-6">
           <Button
             variant="outline"
             onClick={handleClose}
             disabled={isSaving}
-            className={isV2 
+            className={`h-11 ${isV2 
               ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               : "border-[#FFD700]/30 text-gray-300 hover:bg-[#FFD700]/10"
-            }
+            }`}
           >
             Отмена
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className={isV2 
+            className={`h-11 ${isV2 
               ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
               : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"
-            }
+            }`}
           >
             {isSaving ? (
               <>

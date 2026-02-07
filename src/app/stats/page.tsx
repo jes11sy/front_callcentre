@@ -107,8 +107,9 @@ const DailyStatsList = ({
 export default function StatsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
   const isV2 = version === 'v2';
+  const isDark = theme === 'dark';
   const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
@@ -152,29 +153,43 @@ export default function StatsPage() {
 
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+        <div className={`max-w-3xl mx-auto py-8 px-6 min-h-screen font-myriad transition-colors duration-300 ${
+          isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
+        }`}>
           {/* Date Filter */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div className={`flex items-center justify-between mb-8 pb-4 border-b ${
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             <div className="flex items-center gap-3">
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-[140px] h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm font-light dark:[color-scheme:dark]"
+                className={`w-[140px] h-9 text-sm font-light ${
+                  isDark 
+                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]' 
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}
               />
               <span className="text-gray-400">—</span>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-[140px] h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm font-light dark:[color-scheme:dark]"
+                className={`w-[140px] h-9 text-sm font-light ${
+                  isDark 
+                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]' 
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}
               />
             </div>
             <Button 
               onClick={resetToCurrentPeriod} 
               variant="ghost" 
               size="sm"
-              className="text-gray-500 dark:text-gray-400 hover:text-[#FEC004] font-light"
+              className={`hover:text-[#FEC004] font-light ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Сбросить
@@ -188,12 +203,12 @@ export default function StatsPage() {
               {/* Звонки */}
               <div>
                 <div className="flex items-baseline justify-between mb-3">
-                  <span className="text-gray-800 dark:text-gray-200 font-light">Звонки</span>
-                  <span className="text-2xl font-light text-gray-900 dark:text-gray-100">{stats.calls.total}</span>
+                  <span className={`font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Звонки</span>
+                  <span className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{stats.calls.total}</span>
                 </div>
                 
                 {/* Прогресс-бар */}
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
+                <div className={`h-2 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
                   <div 
                     className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
                     style={{ width: `${acceptanceRate}%` }}
@@ -202,27 +217,27 @@ export default function StatsPage() {
                 
                 {/* Принятые / Пропущенные */}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400 font-light">
-                    Принятые: <span className="text-gray-900 dark:text-gray-100">{stats.calls.accepted}</span>
-                    <span className="text-gray-400 dark:text-gray-500 ml-1">({acceptanceRate}%)</span>
+                  <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Принятые: <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{stats.calls.accepted}</span>
+                    <span className={`ml-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>({acceptanceRate}%)</span>
                   </span>
-                  <span className="text-gray-600 dark:text-gray-400 font-light">
-                    Пропущенные: <span className="text-gray-900 dark:text-gray-100">{stats.calls.missed}</span>
-                    <span className="text-gray-400 dark:text-gray-500 ml-1">({missedRate}%)</span>
+                  <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Пропущенные: <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{stats.calls.missed}</span>
+                    <span className={`ml-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>({missedRate}%)</span>
                   </span>
                 </div>
               </div>
 
               {/* Разделитель */}
-              <div className="border-b border-gray-200 dark:border-gray-700" />
+              <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
 
               {/* Заказы */}
               <div>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-gray-800 dark:text-gray-200 font-light">Заказы</span>
-                  <span className="text-2xl font-light text-gray-900 dark:text-gray-100">{stats.orders.total}</span>
+                  <span className={`font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Заказы</span>
+                  <span className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{stats.orders.total}</span>
                 </div>
-                <p className="text-sm text-gray-400 dark:text-gray-500 font-light mt-1">за период</p>
+                <p className={`text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>за период</p>
               </div>
             </div>
           ) : null}

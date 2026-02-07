@@ -33,8 +33,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
   onClose,
   onDownload
 }) => {
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
   const isV2 = version === 'v2';
+  const isDark = theme === 'dark';
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -158,7 +159,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
       "transform transition-transform duration-300",
       isVisible ? "translate-y-0" : "translate-y-full",
       isV2 
-        ? "bg-white border-t border-gray-200 shadow-lg font-myriad"
+        ? isDark
+          ? "bg-[#1e2530] border-t border-gray-700 shadow-lg font-myriad"
+          : "bg-white border-t border-gray-200 shadow-lg font-myriad"
         : "bg-gradient-to-r from-[#17212b] to-[#1a1a2e] border-t-2 border-[#FFD700]/30 shadow-2xl shadow-black/50"
     )}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
@@ -175,13 +178,17 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
             <div className="min-w-0">
               <div className={cn(
                 "text-sm font-medium truncate",
-                isV2 ? "text-gray-900" : "text-[#FFD700]"
+                isV2 
+                  ? isDark ? "text-gray-100" : "text-gray-900"
+                  : "text-[#FFD700]"
               )}>
                 {call.phoneClient}
               </div>
               <div className={cn(
                 "text-xs truncate",
-                isV2 ? "text-gray-500" : "text-gray-400"
+                isV2 
+                  ? isDark ? "text-gray-400" : "text-gray-500"
+                  : "text-gray-400"
               )}>
                 {call.city} • {call.operator.name}
               </div>
@@ -199,7 +206,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                 disabled={isLoading}
                 className={cn(
                   "h-8 w-8 p-0",
-                  isV2 ? "text-gray-400 hover:text-gray-700" : "text-gray-400 hover:text-white"
+                  isV2 
+                    ? isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-700"
+                    : "text-gray-400 hover:text-white"
                 )}
               >
                 <SkipBack className="w-4 h-4" />
@@ -234,7 +243,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                 disabled={isLoading}
                 className={cn(
                   "h-8 w-8 p-0",
-                  isV2 ? "text-gray-400 hover:text-gray-700" : "text-gray-400 hover:text-white"
+                  isV2 
+                    ? isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-700"
+                    : "text-gray-400 hover:text-white"
                 )}
               >
                 <SkipForward className="w-4 h-4" />
@@ -244,7 +255,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
             {/* Время текущее */}
             <span className={cn(
               "text-xs font-mono min-w-[40px]",
-              isV2 ? "text-gray-500" : "text-gray-400"
+              isV2 
+                ? isDark ? "text-gray-400" : "text-gray-500"
+                : "text-gray-400"
             )}>
               {formatTime(currentTime)}
             </span>
@@ -267,7 +280,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
             {/* Время общее */}
             <span className={cn(
               "text-xs font-mono min-w-[40px]",
-              isV2 ? "text-gray-500" : "text-gray-400"
+              isV2 
+                ? isDark ? "text-gray-400" : "text-gray-500"
+                : "text-gray-400"
             )}>
               {formatTime(duration)}
             </span>
@@ -280,7 +295,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                 onClick={toggleMute}
                 className={cn(
                   "h-8 w-8 p-0",
-                  isV2 ? "text-gray-400 hover:text-gray-700" : "text-gray-400 hover:text-white"
+                  isV2 
+                    ? isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-700"
+                    : "text-gray-400 hover:text-white"
                 )}
               >
                 {isMuted ? (
@@ -323,7 +340,9 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
               onClick={onClose}
               className={cn(
                 "h-8 w-8 p-0",
-                isV2 ? "text-gray-400 hover:text-gray-700" : "text-gray-400 hover:text-white"
+                isV2 
+                  ? isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-700"
+                  : "text-gray-400 hover:text-white"
               )}
               title="Закрыть плеер"
             >

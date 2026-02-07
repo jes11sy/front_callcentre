@@ -108,8 +108,9 @@ export default function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const queryClient = useQueryClient();
   
-  const { version } = useDesignStore();
+  const { version, theme } = useDesignStore();
   const isV2 = version === 'v2';
+  const isDark = theme === 'dark';
 
   // Формы
   const profileForm = useForm<ProfileFormData>({
@@ -302,11 +303,13 @@ export default function ProfilePage() {
     if (isLoading) {
       return (
         <DashboardLayout variant="operator" requiredRole="operator">
-          <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+          <div className={`py-10 px-10 min-h-screen font-myriad transition-colors duration-300 ${
+            isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
+          }`}>
             <div className="max-w-3xl">
               <div className="text-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FEC004]" />
-                <p className="text-gray-500 dark:text-gray-400">Загрузка профиля...</p>
+                <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Загрузка профиля...</p>
               </div>
             </div>
           </div>
@@ -318,7 +321,9 @@ export default function ProfilePage() {
 
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="py-10 px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+        <div className={`py-10 px-10 min-h-screen font-myriad transition-colors duration-300 ${
+          isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
+        }`}>
           <div className="max-w-3xl space-y-8">
             
             {/* Шапка профиля */}
@@ -328,8 +333,8 @@ export default function ProfilePage() {
                   {getInitials(profile.name)}
                 </div>
                 <div>
-                  <h1 className="text-xl text-gray-900">{profile.name}</h1>
-                  <p className="text-gray-500">{profile.login} • {profile.city}</p>
+                  <h1 className={`text-xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.name}</h1>
+                  <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{profile.login} • {profile.city}</p>
                   <Badge className={getStatusColor(profile.status, true) + ' mt-1'}>
                     {getStatusText(profile.status)}
                   </Badge>
@@ -339,13 +344,13 @@ export default function ProfilePage() {
                 <Button 
                   onClick={handleEdit} 
                   variant="ghost"
-                  className="text-gray-500 hover:text-[#FEC004]"
+                  className={`hover:text-[#FEC004] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
               ) : (
                 <div className="flex gap-2">
-                  <Button onClick={handleCancel} variant="ghost" className="text-gray-500">
+                  <Button onClick={handleCancel} variant="ghost" className={isDark ? 'text-gray-400' : 'text-gray-500'}>
                     <X className="h-4 w-4" />
                   </Button>
                   <Button 
@@ -362,95 +367,107 @@ export default function ProfilePage() {
             {/* Статистика (для операторов) */}
             {profile.role === 'operator' && profileStats && (
               <>
-                <div className="border-b border-gray-200" />
+                <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
                 <div className="grid grid-cols-4 gap-4 text-center">
                   <div>
-                    <div className="text-2xl text-gray-900">{profileStats.total.calls}</div>
-                    <div className="text-sm text-gray-500">Звонков</div>
+                    <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.calls}</div>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Звонков</div>
                   </div>
                   <div>
-                    <div className="text-2xl text-gray-900">{profileStats.total.orders}</div>
-                    <div className="text-sm text-gray-500">Заказов</div>
+                    <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.orders}</div>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Заказов</div>
                   </div>
                   <div>
-                    <div className="text-2xl text-gray-900">{profileStats.monthly.calls}</div>
-                    <div className="text-sm text-gray-500">За месяц</div>
+                    <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.monthly.calls}</div>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>За месяц</div>
                   </div>
                   <div>
-                    <div className="text-2xl text-gray-900">{profileStats.today.calls}</div>
-                    <div className="text-sm text-gray-500">Сегодня</div>
+                    <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.today.calls}</div>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Сегодня</div>
                   </div>
                 </div>
               </>
             )}
 
             {/* Информация */}
-            <div className="border-b border-gray-200" />
+            <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
             
             <div className="space-y-4">
               {/* Рабочий статус */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-500">Рабочий статус</span>
+              <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Рабочий статус</span>
                 {isEditing ? (
                   <Select 
                     value={profileForm.watch('statusWork')} 
                     onValueChange={(value) => profileForm.setValue('statusWork', value)}
                   >
-                    <SelectTrigger className="w-32 bg-white border-gray-200 text-gray-900">
+                    <SelectTrigger className={`w-32 ${
+                      isDark 
+                        ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                        : 'bg-white border-gray-200 text-gray-900'
+                    }`}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white border-gray-200">
-                      <SelectItem value="offline" className="text-gray-900">Оффлайн</SelectItem>
-                      <SelectItem value="online" className="text-gray-900">В сети</SelectItem>
-                      <SelectItem value="break" className="text-gray-900">Перерыв</SelectItem>
+                    <SelectContent className={isDark ? 'bg-[#1e2530] border-gray-600' : 'bg-white border-gray-200'}>
+                      <SelectItem value="offline" className={isDark ? 'text-gray-100' : 'text-gray-900'}>Оффлайн</SelectItem>
+                      <SelectItem value="online" className={isDark ? 'text-gray-100' : 'text-gray-900'}>В сети</SelectItem>
+                      <SelectItem value="break" className={isDark ? 'text-gray-100' : 'text-gray-900'}>Перерыв</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  <span className="text-gray-900">{getWorkStatusText(profile.statusWork)}</span>
+                  <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.statusWork)}</span>
                 )}
               </div>
 
               {/* Город (редактируемый) */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-500">Город</span>
+              <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Город</span>
                 {isEditing ? (
                   <Input
                     {...profileForm.register('city')}
-                    className="w-40 bg-white border-gray-200 text-gray-900 text-right"
+                    className={`w-40 text-right ${
+                      isDark 
+                        ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                        : 'bg-white border-gray-200 text-gray-900'
+                    }`}
                   />
                 ) : (
-                  <span className="text-gray-900">{profile.city}</span>
+                  <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{profile.city}</span>
                 )}
               </div>
 
               {/* Дата начала */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-500">Дата начала</span>
-                <span className="text-gray-900">{formatDate(profile.dateCreate)}</span>
+              <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
+                <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.dateCreate)}</span>
               </div>
 
               {/* Примечание */}
-              <div className="flex justify-between items-start py-2 border-b border-gray-100">
-                <span className="text-gray-500">Примечание</span>
+              <div className={`flex justify-between items-start py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Примечание</span>
                 {isEditing ? (
                   <Textarea
                     {...profileForm.register('note')}
-                    className="w-64 bg-white border-gray-200 text-gray-900"
+                    className={`w-64 ${
+                      isDark 
+                        ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                        : 'bg-white border-gray-200 text-gray-900'
+                    }`}
                     rows={2}
                   />
                 ) : (
-                  <span className="text-gray-900 text-right max-w-xs">{profile.note || 'Не указано'}</span>
+                  <span className={`text-right max-w-xs ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.note || 'Не указано'}</span>
                 )}
               </div>
             </div>
 
             {/* Смена пароля */}
-            <div className="border-b border-gray-200" />
+            <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
             
             <div>
               <button
                 onClick={() => setIsChangingPassword(!isChangingPassword)}
-                className="text-gray-500 hover:text-[#FEC004] transition-colors"
+                className={`hover:text-[#FEC004] transition-colors ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
               >
                 {isChangingPassword ? 'Отмена' : 'Сменить пароль'}
               </button>
@@ -458,12 +475,16 @@ export default function ProfilePage() {
               {isChangingPassword && (
                 <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="mt-4 space-y-4">
                   <div className="space-y-1">
-                    <Label className="text-gray-500 text-sm">Текущий пароль</Label>
+                    <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Текущий пароль</Label>
                     <div className="relative">
                       <Input
                         type={showCurrentPassword ? 'text' : 'password'}
                         {...passwordForm.register('currentPassword')}
-                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                        className={`pr-10 ${
+                          isDark 
+                            ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                            : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                       />
                       <button
                         type="button"
@@ -476,12 +497,16 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-gray-500 text-sm">Новый пароль</Label>
+                    <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Новый пароль</Label>
                     <div className="relative">
                       <Input
                         type={showNewPassword ? 'text' : 'password'}
                         {...passwordForm.register('newPassword')}
-                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                        className={`pr-10 ${
+                          isDark 
+                            ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                            : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                       />
                       <button
                         type="button"
@@ -494,12 +519,16 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-gray-500 text-sm">Подтвердите пароль</Label>
+                    <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Подтвердите пароль</Label>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? 'text' : 'password'}
                         {...passwordForm.register('confirmPassword')}
-                        className="bg-white border-gray-200 text-gray-900 pr-10"
+                        className={`pr-10 ${
+                          isDark 
+                            ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
+                            : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                       />
                       <button
                         type="button"

@@ -59,17 +59,28 @@ const OrdersTableComponent = ({
     return (
       <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
         <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-4">
-            <div className="flex-1 w-full sm:w-auto">
+          {/* Мобильный вид */}
+          <div className="flex flex-col gap-2 sm:hidden mb-4">
+            {filtersComponent}
+            <Button 
+              onClick={onCreateOrder}
+              className={`w-full ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Новый
+            </Button>
+          </div>
+          {/* Десктопный вид */}
+          <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
+            <div className="flex-1">
               {filtersComponent}
             </div>
             <Button 
               onClick={onCreateOrder}
-              className={`w-full sm:w-auto ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] shrink-0" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"}`}
+              className={`shrink-0 ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
             >
               <Plus className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Создать заказ</span>
-              <span className="sm:hidden">Новый</span>
+              Создать заказ
             </Button>
           </div>
           <LoadingState 
@@ -86,17 +97,28 @@ const OrdersTableComponent = ({
     return (
       <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
         <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-4">
-            <div className="flex-1 w-full sm:w-auto">
+          {/* Мобильный вид */}
+          <div className="flex flex-col gap-2 sm:hidden mb-4">
+            {filtersComponent}
+            <Button 
+              onClick={onCreateOrder}
+              className={`w-full ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Новый
+            </Button>
+          </div>
+          {/* Десктопный вид */}
+          <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
+            <div className="flex-1">
               {filtersComponent}
             </div>
             <Button 
               onClick={onCreateOrder}
-              className={`w-full sm:w-auto ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] shrink-0" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"}`}
+              className={`shrink-0 ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
             >
               <Plus className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Создать заказ</span>
-              <span className="sm:hidden">Новый</span>
+              Создать заказ
             </Button>
           </div>
           <EmptyState
@@ -113,17 +135,29 @@ const OrdersTableComponent = ({
   return (
     <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
       <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-4">
-          <div className="flex-1 w-full sm:w-auto">
+        {/* Мобильный вид: кнопки в колонку на всю ширину */}
+        <div className="flex flex-col gap-2 sm:hidden mb-4">
+          {filtersComponent}
+          <Button 
+            onClick={onCreateOrder}
+            className={`w-full ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Новый
+          </Button>
+        </div>
+        
+        {/* Десктопный вид: кнопки в строку */}
+        <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
+          <div className="flex-1">
             {filtersComponent}
           </div>
           <Button 
             onClick={onCreateOrder}
-            className={`w-full sm:w-auto ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] shrink-0" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90 shrink-0"}`}
+            className={`shrink-0 ${isV2 ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]" : "bg-[#FFD700] text-[#02111B] hover:bg-[#FFD700]/90"}`}
           >
             <Plus className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Создать заказ</span>
-            <span className="sm:hidden">Новый</span>
+            Создать заказ
           </Button>
         </div>
         {ordersData?.orders && ordersData.orders.length > 0 ? (

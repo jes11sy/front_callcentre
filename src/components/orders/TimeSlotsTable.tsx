@@ -1,10 +1,10 @@
 'use client';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { Order } from '@/types/orders';
 import { TIME_SLOTS, EQUIPMENT_TYPE_COLORS } from '@/constants/orders';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { useDesignStore } from '@/store/designStore';
 
 const EQUIPMENT_TYPE_COLORS_V2 = {
@@ -24,7 +24,7 @@ interface TimeSlotsTableProps {
 const ACTIVE_STATUSES = ['Ожидает', 'Принял', 'В пути'];
 
 // Хелпер для форматирования даты
-const formatDateLabel = (date: Date): string => {
+const formatDateLabel = (date: Date, short = false): string => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -40,6 +40,13 @@ const formatDateLabel = (date: Date): string => {
   if (isToday) return 'Сегодня';
   if (isTomorrow) return 'Завтра';
   
+  if (short) {
+    return date.toLocaleDateString('ru-RU', { 
+      day: 'numeric', 
+      month: 'short'
+    });
+  }
+  
   return date.toLocaleDateString('ru-RU', { 
     day: 'numeric', 
     month: 'long',
@@ -47,11 +54,62 @@ const formatDateLabel = (date: Date): string => {
   });
 };
 
+// Получить индекс текущего временного слота
+const getCurrentTimeSlotIndex = (): number => {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  
+  // TIME_SLOTS начинается с 10:00, шаг 30 минут
+  // Индекс = (час - 10) * 2 + (минуты >= 30 ? 1 : 0)
+  if (currentHour < 10) return 0;
+  if (currentHour > 22 || (currentHour === 22 && currentMinute > 0)) return TIME_SLOTS.length - 1;
+  
+  return (currentHour - 10) * 2 + (currentMinute >= 30 ? 1 : 0);
+};
+
 const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityClick }: TimeSlotsTableProps) => {
   const [activeCity, setActiveCity] = useState<string>('all');
+  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { version } = useDesignStore();
   const isV2 = version === 'v2';
   const equipmentColors = isV2 ? EQUIPMENT_TYPE_COLORS_V2 : EQUIPMENT_TYPE_COLORS;
+  
+  // Текущий временной слот для выделения
+  const currentTimeSlotIndex = useMemo(() => getCurrentTimeSlotIndex(), []);
+  
+  // Проверка, является ли выбранная дата сегодняшней
+  const isSelectedToday = useMemo(() => {
+    const today = new Date();
+    return selectedDate.getDate() === today.getDate() && 
+           selectedDate.getMonth() === today.getMonth() && 
+           selectedDate.getFullYear() === today.getFullYear();
+  }, [selectedDate]);
+  
+  // Автоскролл к текущему времени при загрузке (только для сегодня)
+  useEffect(() => {
+    if (isSelectedToday && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      // Ширина одной колонки примерно 40-50px, первая колонка - тип техники
+      const columnWidth = 48;
+      const scrollPosition = (currentTimeSlotIndex + 1) * columnWidth - container.clientWidth / 2;
+      container.scrollTo({ left: Math.max(0, scrollPosition), behavior: 'smooth' });
+    }
+  }, [isSelectedToday, currentTimeSlotIndex]);
+  
+  // Закрытие dropdown при клике вне
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCityDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Хелпер для проверки совпадения даты
   // Сравниваем даты в локальном времени (orderDate конвертируется из UTC в локальное)
@@ -167,9 +225,13 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
         <div className={`text-xs sm:text-sm font-medium ${colorClass} text-center`}>{label}</div>
         {TIME_SLOTS.map(({ hour, minute, index: _index }) => {
           const count = getOrdersForTimeSlot(hour, minute, typeEquipment);
+          const isCurrentSlot = isSelectedToday && _index === currentTimeSlotIndex;
           
           return (
-            <div key={`${typeEquipment}-${_index}`} className="text-center">
+            <div 
+              key={`${typeEquipment}-${_index}`} 
+              className={`text-center ${isCurrentSlot ? (isV2 ? 'bg-[#FEC004]/20 rounded' : 'bg-[#FFD700]/20 rounded') : ''}`}
+            >
               <div className={`text-sm sm:text-lg font-bold ${
                 count > 0 ? colorClass : (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
               }`}>
@@ -183,107 +245,140 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
         </div>
       </div>
     );
-  }, [getOrdersForTimeSlot, getEquipmentTotal, isV2]);
+  }, [getOrdersForTimeSlot, getEquipmentTotal, isV2, isSelectedToday, currentTimeSlotIndex]);
 
-  // Проверка, является ли выбранная дата сегодняшней
-  const isSelectedToday = useMemo(() => {
-    const today = new Date();
-    return selectedDate.getDate() === today.getDate() && 
-           selectedDate.getMonth() === today.getMonth() && 
-           selectedDate.getFullYear() === today.getFullYear();
-  }, [selectedDate]);
+  // Название активного города для отображения
+  const activeCityLabel = activeCity === 'all' 
+    ? 'Все города' 
+    : activeCity;
 
   return (
     <Card className={isV2 ? "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad" : "bg-[#17212b] border-2 border-[#FFD700]/30"}>
       <CardHeader className="pb-2 px-3 sm:px-6">
-        {/* Навигация по датам */}
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={goToPrevDay}
-            className={isV2 
-              ? "p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
-              : "p-1.5 sm:p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
-            }
-            title="Предыдущий день"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          
-          <button
-            onClick={goToToday}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-              isSelectedToday
-                ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
-                : (isV2 
-                    ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
-                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
-                  )
-            }`}
-          >
-            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            <span className="hidden sm:inline">{formatDateLabel(selectedDate)}</span>
-            <span className="sm:hidden">{formatDateLabel(selectedDate).slice(0, 7)}</span>
-          </button>
-          
-          <input
-            type="date"
-            value={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`}
-            onChange={(e) => {
-              const [year, month, day] = e.target.value.split('-').map(Number);
-              const newDate = new Date(year, month - 1, day);
-              if (!isNaN(newDate.getTime())) {
-                onDateChange(newDate);
+        {/* Мобильный вид: одна строка */}
+        <div className="flex sm:hidden items-center justify-between gap-2">
+          {/* Левая часть: навигация по датам */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={goToPrevDay}
+              className={isV2 
+                ? "p-1.5 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 active:bg-[#FEC004]/20 border border-gray-200 dark:border-gray-600"
+                : "p-1.5 rounded-lg bg-[#0f0f23] text-gray-300 active:bg-[#FFD700]/20 border border-[#FFD700]/30"
               }
-            }}
-            className={`w-[130px] sm:w-auto ${isV2 
-              ? "px-2 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
-              : "px-2 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
-            }`}
-          />
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            
+            <button
+              onClick={goToToday}
+              className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                isSelectedToday
+                  ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                  : (isV2 
+                      ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                      : 'bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30'
+                    )
+              }`}
+            >
+              {formatDateLabel(selectedDate, true)}
+            </button>
+            
+            <button
+              onClick={goToNextDay}
+              className={isV2 
+                ? "p-1.5 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 active:bg-[#FEC004]/20 border border-gray-200 dark:border-gray-600"
+                : "p-1.5 rounded-lg bg-[#0f0f23] text-gray-300 active:bg-[#FFD700]/20 border border-[#FFD700]/30"
+              }
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
           
-          <button
-            onClick={goToNextDay}
-            className={isV2 
-              ? "p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
-              : "p-1.5 sm:p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
-            }
-            title="Следующий день"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          {/* Правая часть: dropdown городов */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                isV2 
+                  ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                  : 'bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30'
+              }`}
+            >
+              <span className="max-w-[80px] truncate">{activeCityLabel}</span>
+              <span className={`px-1 py-0.5 rounded text-[10px] ${
+                isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]'
+              }`}>
+                {cityCounts[activeCity] || cityCounts.all || 0}
+              </span>
+              <ChevronDown className={`h-3 w-3 transition-transform ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Dropdown menu */}
+            {isCityDropdownOpen && (
+              <div className={`absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg shadow-lg border ${
+                isV2 
+                  ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600'
+                  : 'bg-[#17212b] border-[#FFD700]/30'
+              }`}>
+                <button
+                  onClick={() => {
+                    handleCityClick('all');
+                    setIsCityDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
+                    activeCity === 'all'
+                      ? (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
+                      : (isV2 ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]' : 'text-gray-300 hover:bg-[#0f0f23]')
+                  }`}
+                >
+                  <span>Все города</span>
+                  <span className={`px-1 py-0.5 rounded text-[10px] ${
+                    isV2 ? 'bg-[#FEC004]/20' : 'bg-[#FFD700]/20'
+                  }`}>{cityCounts.all || 0}</span>
+                </button>
+                {cities.map(city => (
+                  <button
+                    key={city}
+                    onClick={() => {
+                      handleCityClick(city);
+                      setIsCityDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
+                      activeCity === city
+                        ? (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
+                        : (isV2 ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]' : 'text-gray-300 hover:bg-[#0f0f23]')
+                    }`}
+                  >
+                    <span>{city}</span>
+                    <span className={`px-1 py-0.5 rounded text-[10px] ${
+                      isV2 ? 'bg-[#FEC004]/20' : 'bg-[#FFD700]/20'
+                    }`}>{cityCounts[city] || 0}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
-        {/* Табы городов */}
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
-          <button
-            onClick={() => handleCityClick('all')}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-              activeCity === 'all'
-                ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
-                : (isV2 
-                    ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
-                    : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
-                  )
-            }`}
-          >
-            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            <span className="hidden sm:inline">Все города</span>
-            <span className="sm:hidden">Все</span>
-            <span className={`ml-0.5 sm:ml-1 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs ${
-              activeCity === 'all' 
-                ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
-                : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
-            }`}>
-              {cityCounts.all || 0}
-            </span>
-          </button>
-          
-          {cities.map(city => (
+        {/* Десктопный вид: оригинальная разметка */}
+        <div className="hidden sm:block">
+          {/* Навигация по датам */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              key={city}
-              onClick={() => handleCityClick(city)}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                activeCity === city
+              onClick={goToPrevDay}
+              className={isV2 
+                ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
+                : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              }
+              title="Предыдущий день"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            
+            <button
+              onClick={goToToday}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                isSelectedToday
                   ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
                   : (isV2 
                       ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
@@ -291,29 +386,110 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                     )
               }`}
             >
-              {city}
-              <span className={`ml-0.5 sm:ml-1 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs ${
-                activeCity === city 
+              {formatDateLabel(selectedDate)}
+            </button>
+            
+            <input
+              type="date"
+              value={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`}
+              onChange={(e) => {
+                const [year, month, day] = e.target.value.split('-').map(Number);
+                const newDate = new Date(year, month - 1, day);
+                if (!isNaN(newDate.getTime())) {
+                  onDateChange(newDate);
+                }
+              }}
+              className={isV2 
+                ? "px-2 py-1.5 rounded-lg text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
+                : "px-2 py-1.5 rounded-lg text-sm bg-[#0f0f23] text-gray-300 border border-[#FFD700]/30 hover:border-[#FFD700]/50 focus:border-[#FFD700] focus:outline-none [color-scheme:dark]"
+              }
+            />
+            
+            <button
+              onClick={goToNextDay}
+              className={isV2 
+                ? "p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
+                : "p-2 rounded-lg bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30 transition-all"
+              }
+              title="Следующий день"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+          
+          {/* Табы городов */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            <button
+              onClick={() => handleCityClick('all')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                activeCity === 'all'
+                  ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                  : (isV2 
+                      ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
+                      : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                    )
+              }`}
+            >
+              Все города
+              <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
+                activeCity === 'all' 
                   ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
                   : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
               }`}>
-                {cityCounts[city] || 0}
+                {cityCounts.all || 0}
               </span>
             </button>
-          ))}
+            
+            {cities.map(city => (
+              <button
+                key={city}
+                onClick={() => handleCityClick(city)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  activeCity === city
+                    ? (isV2 ? 'bg-[#FEC004] text-gray-900' : 'bg-[#FFD700] text-[#02111B]')
+                    : (isV2 
+                        ? 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
+                        : 'bg-[#0f0f23] text-gray-300 hover:bg-[#FFD700]/20 hover:text-[#FFD700] border border-[#FFD700]/30'
+                      )
+                }`}
+              >
+                {city}
+                <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
+                  activeCity === city 
+                    ? (isV2 ? 'bg-gray-900/10' : 'bg-[#02111B]/20')
+                    : (isV2 ? 'bg-[#FEC004]/20 text-[#FEC004]' : 'bg-[#FFD700]/20 text-[#FFD700]')
+                }`}>
+                  {cityCounts[city] || 0}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="px-3 sm:px-6">
-        <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+        <div 
+          ref={scrollContainerRef}
+          className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0 scrollbar-thin"
+        >
           <div className="space-y-2 sm:space-y-4 min-w-[600px]">
             {/* Header with time slots */}
             <div className="grid gap-1 sm:gap-2 min-w-max grid-time-slots-with-total">
               <div className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>Тип</div>
-              {TIME_SLOTS.map(({ timeString }) => (
-                <div key={timeString} className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'} text-center`}>
-                  {timeString}
-                </div>
-              ))}
+              {TIME_SLOTS.map(({ timeString, index: slotIndex }) => {
+                const isCurrentSlot = isSelectedToday && slotIndex === currentTimeSlotIndex;
+                return (
+                  <div 
+                    key={timeString} 
+                    className={`text-xs sm:text-sm font-medium text-center ${
+                      isCurrentSlot 
+                        ? (isV2 ? 'text-[#FEC004] bg-[#FEC004]/20 rounded px-1' : 'text-[#FFD700] bg-[#FFD700]/20 rounded px-1')
+                        : (isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300')
+                    }`}
+                  >
+                    {timeString}
+                  </div>
+                );
+              })}
               <div className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-[#FFD700]'} text-center border-l ${isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-[#FFD700]/20'} pl-1 sm:pl-2`}>
                 Итого
               </div>

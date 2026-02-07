@@ -56,19 +56,15 @@ export default function ReferencePage() {
         <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] font-myriad">
           <div className="space-y-1">
             {referenceSections.map((section, index) => {
-              const Icon = section.icon;
               return (
                 <Link 
                   key={index} 
                   href={section.href} 
                   className="group flex items-center justify-between py-4 border-b border-gray-200 hover:border-[#FEC004] transition-colors"
                 >
-                  <div className="flex items-center gap-4">
-                    <Icon className="h-5 w-5 text-gray-400 group-hover:text-[#FEC004] transition-colors" />
-                    <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors font-light">
-                      {section.title}
-                    </span>
-                  </div>
+                  <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors font-light">
+                    {section.title}
+                  </span>
                   <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-[#FEC004] group-hover:translate-x-1 transition-all" />
                 </Link>
               );

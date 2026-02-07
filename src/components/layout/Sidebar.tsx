@@ -57,12 +57,14 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors border-l-[3px] rounded-l-md ${
-                active 
-                  ? 'border-[#FEC004] text-gray-800' 
-                  : 'border-transparent text-gray-800 hover:text-[#FEC004]'
-              }`}
+              className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
             >
+              {/* Индикатор активной вкладки */}
+              <span 
+                className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full transition-all ${
+                  active ? 'bg-[#FEC004]' : 'bg-transparent'
+                }`}
+              />
               <Image 
                 src={item.icon} 
                 alt={item.name} 
@@ -70,7 +72,9 @@ export function Sidebar() {
                 height={20} 
                 className={`nav-icon w-5 h-5 transition-all ${active ? 'nav-icon-active' : ''}`}
               />
-              {item.name}
+              <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors">
+                {item.name}
+              </span>
             </Link>
           );
         })}
@@ -81,20 +85,24 @@ export function Sidebar() {
         {/* Profile with user name */}
         <Link
           href="/profile"
-          className={`nav-icon-hover flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors border-l-[3px] rounded-l-md ${
-            isActive('/profile') 
-              ? 'border-[#FEC004] text-gray-800' 
-              : 'border-transparent text-gray-800 hover:text-[#FEC004]'
-          }`}
+          className="nav-icon-hover relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal transition-colors group"
         >
+          {/* Индикатор активной вкладки */}
+          <span 
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full transition-all ${
+              isActive('/profile') ? 'bg-[#FEC004]' : 'bg-transparent'
+            }`}
+          />
           <User className={`nav-icon h-5 w-5 ${isActive('/profile') ? 'nav-icon-active' : ''}`} />
-          {user?.name || user?.login || 'Профиль'}
+          <span className="text-gray-800 group-hover:text-[#FEC004] transition-colors">
+            {user?.name || user?.login || 'Профиль'}
+          </span>
         </Link>
 
         {/* Version Toggle */}
         <button
           onClick={toggleVersion}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-light text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
+          className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full group"
         >
           <Palette className="h-5 w-5" />
           Дизайн: {version.toUpperCase()}
@@ -103,7 +111,7 @@ export function Sidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-light text-gray-800 hover:text-[#FEC004] transition-colors w-full border-l-[3px] border-transparent rounded-l-md"
+          className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 hover:text-[#FEC004] transition-colors w-full group"
         >
           <LogOut className="h-5 w-5" />
           Выйти

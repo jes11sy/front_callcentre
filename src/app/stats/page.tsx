@@ -158,36 +158,121 @@ export default function StatsPage() {
     );
   }
 
-  return (
-    <DashboardLayout variant="operator" requiredRole="operator">
-      <div className={`max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen ${isV2 ? 'bg-[#F3F3EE] font-myriad' : 'bg-[#0f0f23]'}`}>
-        <div className="px-4 py-6 sm:px-0">
-          {/* Header */}
-          {!isV2 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
-                    <BarChart3 className="h-8 w-8 mr-3 text-[#FFD700]" />
-                    Моя статистика
-                  </h1>
+  // V2: Минималистичный дизайн с горизонтальными прогресс-барами
+  if (isV2) {
+    const acceptanceRate = stats?.calls.total ? Math.round((stats.calls.accepted / stats.calls.total) * 100) : 0;
+    const missedRate = stats?.calls.total ? Math.round((stats.calls.missed / stats.calls.total) * 100) : 0;
+
+    return (
+      <DashboardLayout variant="operator" requiredRole="operator">
+        <div className="max-w-3xl mx-auto py-8 px-6 min-h-screen bg-[#F3F3EE] font-myriad">
+          {/* Date Filter */}
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-[140px] h-9 bg-white border-gray-200 text-gray-900 text-sm font-light"
+              />
+              <span className="text-gray-400">—</span>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-[140px] h-9 bg-white border-gray-200 text-gray-900 text-sm font-light"
+              />
+            </div>
+            <Button 
+              onClick={resetToCurrentPeriod} 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-500 hover:text-[#FEC004] font-light"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Сбросить
+            </Button>
+          </div>
+
+          {isLoading ? (
+            <LoadingState message="Загрузка статистики..." className="py-12" />
+          ) : stats ? (
+            <div className="space-y-8">
+              {/* Звонки */}
+              <div>
+                <div className="flex items-baseline justify-between mb-3">
+                  <span className="text-gray-800 font-light">Звонки</span>
+                  <span className="text-2xl font-light text-gray-900">{stats.calls.total}</span>
+                </div>
+                
+                {/* Прогресс-бар */}
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+                  <div 
+                    className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
+                    style={{ width: `${acceptanceRate}%` }}
+                  />
+                </div>
+                
+                {/* Принятые / Пропущенные */}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 font-light">
+                    Принятые: <span className="text-gray-900">{stats.calls.accepted}</span>
+                    <span className="text-gray-400 ml-1">({acceptanceRate}%)</span>
+                  </span>
+                  <span className="text-gray-600 font-light">
+                    Пропущенные: <span className="text-gray-900">{stats.calls.missed}</span>
+                    <span className="text-gray-400 ml-1">({missedRate}%)</span>
+                  </span>
                 </div>
               </div>
+
+              {/* Разделитель */}
+              <div className="border-b border-gray-200" />
+
+              {/* Заказы */}
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-gray-800 font-light">Заказы</span>
+                  <span className="text-2xl font-light text-gray-900">{stats.orders.total}</span>
+                </div>
+                <p className="text-sm text-gray-400 font-light mt-1">за период</p>
+              </div>
             </div>
-          )}
+          ) : null}
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // V1: Оригинальный дизайн с карточками
+  return (
+    <DashboardLayout variant="operator" requiredRole="operator">
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
+        <div className="px-4 py-6 sm:px-0">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center text-[#FFD700]">
+                  <BarChart3 className="h-8 w-8 mr-3 text-[#FFD700]" />
+                  Моя статистика
+                </h1>
+              </div>
+            </div>
+          </div>
 
           {/* Date Filter */}
           <Card className={`mb-8 ${cardClass}`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between gap-6">
                 <div className="flex items-center gap-2">
-                  <Calendar className={`h-5 w-5 shrink-0 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
-                  <span className={`text-lg font-semibold shrink-0 ${isV2 ? 'text-gray-900' : 'text-white'}`}>Период анализа</span>
+                  <Calendar className="h-5 w-5 shrink-0 text-[#FFD700]" />
+                  <span className="text-lg font-semibold shrink-0 text-white">Период анализа</span>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="space-y-1">
-                    <Label htmlFor="startDate" className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>С</Label>
+                    <Label htmlFor="startDate" className="text-xs text-gray-400">С</Label>
                     <Input
                       id="startDate"
                       type="date"
@@ -198,11 +283,11 @@ export default function StatsPage() {
                   </div>
                   
                   <div className="pt-5">
-                    <span className={isV2 ? 'text-gray-400' : 'text-gray-400'}>—</span>
+                    <span className="text-gray-400">—</span>
                   </div>
                   
                   <div className="space-y-1">
-                    <Label htmlFor="endDate" className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>По</Label>
+                    <Label htmlFor="endDate" className="text-xs text-gray-400">По</Label>
                     <Input
                       id="endDate"
                       type="date"
@@ -216,10 +301,7 @@ export default function StatsPage() {
                     onClick={resetToCurrentPeriod} 
                     variant="outline" 
                     size="sm"
-                    className={isV2 
-                      ? "h-9 mt-5 border-gray-200 text-gray-600 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004]"
-                      : "h-9 mt-5 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
-                    }
+                    className="h-9 mt-5 border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:text-[#FFD700]"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Сбросить
@@ -240,38 +322,34 @@ export default function StatsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className={cardClass}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-white'}`}>Всего звонков</CardTitle>
-                    <Phone className={`h-4 w-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                    <CardTitle className="text-sm font-medium text-white">Всего звонков</CardTitle>
+                    <Phone className="h-4 w-4 text-[#FFD700]" />
                   </CardHeader>
                   <CardContent>
-                    <div className={`text-2xl font-bold ${isV2 ? 'text-gray-900' : 'text-white'}`}>{stats.calls.total}</div>
-                    <p className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
-                      за период
-                    </p>
+                    <div className="text-2xl font-bold text-white">{stats.calls.total}</div>
+                    <p className="text-xs text-gray-400">за период</p>
                   </CardContent>
                 </Card>
 
                 <Card className={cardClass}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-white'}`}>Принятые звонки</CardTitle>
-                    <PhoneCall className={`h-4 w-4 ${isV2 ? 'text-green-600' : 'text-green-400'}`} />
+                    <CardTitle className="text-sm font-medium text-white">Принятые звонки</CardTitle>
+                    <PhoneCall className="h-4 w-4 text-green-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className={`text-2xl font-bold ${isV2 ? 'text-green-600' : 'text-green-400'}`}>{stats.calls.accepted}</div>
-                    <p className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
-                      {stats.calls.acceptanceRate}% от общего числа
-                    </p>
+                    <div className="text-2xl font-bold text-green-400">{stats.calls.accepted}</div>
+                    <p className="text-xs text-gray-400">{stats.calls.acceptanceRate}% от общего числа</p>
                   </CardContent>
                 </Card>
 
                 <Card className={cardClass}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-white'}`}>Пропущенные звонки</CardTitle>
-                    <PhoneOff className={`h-4 w-4 ${isV2 ? 'text-red-600' : 'text-red-400'}`} />
+                    <CardTitle className="text-sm font-medium text-white">Пропущенные звонки</CardTitle>
+                    <PhoneOff className="h-4 w-4 text-red-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className={`text-2xl font-bold ${isV2 ? 'text-red-600' : 'text-red-400'}`}>{stats.calls.missed}</div>
-                    <p className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <div className="text-2xl font-bold text-red-400">{stats.calls.missed}</div>
+                    <p className="text-xs text-gray-400">
                       {stats.calls.total > 0 ? Math.round((stats.calls.missed / stats.calls.total) * 100) : 0}% от общего числа
                     </p>
                   </CardContent>
@@ -279,14 +357,12 @@ export default function StatsPage() {
 
                 <Card className={cardClass}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={`text-sm font-medium ${isV2 ? 'text-gray-600' : 'text-white'}`}>Созданные заказы</CardTitle>
-                    <ShoppingCart className={`h-4 w-4 ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`} />
+                    <CardTitle className="text-sm font-medium text-white">Созданные заказы</CardTitle>
+                    <ShoppingCart className="h-4 w-4 text-[#FFD700]" />
                   </CardHeader>
                   <CardContent>
-                    <div className={`text-2xl font-bold ${isV2 ? 'text-[#FEC004]' : 'text-[#FFD700]'}`}>{stats.orders.total}</div>
-                    <p className={`text-xs ${isV2 ? 'text-gray-500' : 'text-gray-400'}`}>
-                      за период
-                    </p>
+                    <div className="text-2xl font-bold text-[#FFD700]">{stats.orders.total}</div>
+                    <p className="text-xs text-gray-400">за период</p>
                   </CardContent>
                 </Card>
               </div>
@@ -294,16 +370,15 @@ export default function StatsPage() {
               {/* Daily Stats */}
               <Card className={cardClass}>
                 <CardHeader>
-                  <CardTitle className={isV2 ? 'text-gray-900' : 'text-white'}>Активность по дням</CardTitle>
-                  <CardDescription className={isV2 ? 'text-gray-500' : 'text-gray-400'}>
+                  <CardTitle className="text-white">Активность по дням</CardTitle>
+                  <CardDescription className="text-gray-400">
                     Количество звонков за последние 7 дней
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <DailyStatsList processedStats={processedDailyStats} formatDate={formatDate} isV2={isV2} />
+                  <DailyStatsList processedStats={processedDailyStats} formatDate={formatDate} isV2={false} />
                 </CardContent>
               </Card>
-
             </div>
           ) : null}
         </div>

@@ -89,11 +89,11 @@ const OrderViewModalComponent = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[10000] sm:flex sm:items-center sm:justify-center sm:bg-black/50 sm:p-4"
+      className="fixed top-0 left-0 right-0 bottom-0 z-[10000] sm:flex sm:items-center sm:justify-center sm:bg-black/50 sm:p-4"
       onClick={handleClose}
     >
       <div 
-        className={`w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg overflow-hidden flex flex-col ${isV2 
+        className={`absolute inset-0 sm:relative sm:inset-auto sm:h-auto sm:max-h-[85vh] sm:rounded-lg overflow-hidden flex flex-col ${isV2 
           ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none sm:max-w-3xl sm:border border-gray-200 dark:border-gray-700 font-myriad"
           : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] sm:max-w-3xl sm:border-2 border-[#FFD700]/50"
         }`}

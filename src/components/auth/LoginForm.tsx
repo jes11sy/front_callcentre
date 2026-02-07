@@ -151,25 +151,20 @@ export function LoginForm() {
     </Button>
   );
 
-  // Переключатель темы - только для V2
+  // Переключатель темы - маленькая иконка в углу карточки (только для V2)
   const ThemeToggle = () => (
     version === 'v2' ? (
-      <div className="absolute top-4 right-28 z-20 flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-300 dark:border-gray-600">
-        <Sun className={`h-4 w-4 transition-colors ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-        <button
-          onClick={toggleTheme}
-          className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${
-            theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
-              theme === 'dark' ? 'translate-x-5' : 'translate-x-0'
-            }`}
-          />
-        </button>
-        <Moon className={`h-4 w-4 transition-colors ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-      </div>
+      <button
+        onClick={toggleTheme}
+        className={`absolute top-4 right-4 p-2 rounded-lg transition-colors ${
+          theme === 'dark' 
+            ? 'text-[#FEC004] hover:bg-gray-700/50' 
+            : 'text-gray-500 hover:bg-gray-100'
+        }`}
+        title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+      >
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
     ) : null
   );
 
@@ -190,12 +185,12 @@ export function LoginForm() {
         theme === 'dark' ? 'bg-[#1e2530]' : 'bg-[#F3F3EE]'
       }`} style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
         <VersionToggle />
-        <ThemeToggle />
 
         {/* Login Card V2 */}
         <div className={`w-full max-w-md rounded-2xl p-10 shadow-xl relative z-10 transition-colors duration-300 ${
           theme === 'dark' ? 'bg-[#2a3441]' : 'bg-white'
         }`}>
+          <ThemeToggle />
           {/* Logo V2 */}
           <div className="flex justify-center mb-6">
             <Image 

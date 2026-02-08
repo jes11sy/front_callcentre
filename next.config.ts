@@ -16,7 +16,8 @@ const withPWA = withPWAInit({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   // Кастомный service worker для push-уведомлений
-  customWorkerSrc: 'public',
+  // Файл worker/index.ts будет объединён с автогенерируемым SW
+  customWorkerSrc: 'worker',
   customWorkerDest: 'public',
   customWorkerPrefix: 'sw',
   // Кеширование

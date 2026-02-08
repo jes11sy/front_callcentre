@@ -94,6 +94,20 @@ export function LoginForm() {
       await authApi.saveTokens(response.data.accessToken || '', response.data.refreshToken || '', true);
       await authApi.saveUser(response.data.user, true);
       
+      // ✅ FIX: Записываем auth-storage напрямую перед редиректом
+      // Без этого zustand persist перезапишет store стухшими данными { user: null }
+      // при полной перезагрузке страницы, что вызывает мерцание
+      const u = response.data.user;
+      try {
+        localStorage.setItem('auth-storage', JSON.stringify({
+          state: {
+            user: { id: u.id, login: u.login, name: u.name || '', role: u.role, cities: (u as any).cities },
+            isAuthenticated: true,
+          },
+          version: 0,
+        }));
+      } catch {}
+      
       // Use window.location for hard redirect to ensure cookies are sent
       window.location.href = '/telephony';
       

@@ -130,6 +130,22 @@ export const useAuthStore = create<AuthState>()(
         user: sanitizeUserForStorage(state.user),
         isAuthenticated: state.isAuthenticated,
       }),
+      // ✅ FIX: Custom merge — если getInitialUser() нашёл user в localStorage,
+      // а в auth-storage лежат протухшие данные (user: null), оставляем актуального user
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<AuthState> | undefined;
+        const merged = { ...currentState, ...(persisted || {}) };
+        
+        // Если текущее состояние (из getInitialUser) имеет user,
+        // а persist его не имеет — оставляем актуального
+        if (currentState.user && !persisted?.user) {
+          merged.user = currentState.user;
+          merged.isAuthenticated = true;
+          merged.isLoading = false;
+        }
+        
+        return merged;
+      },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

@@ -324,31 +324,31 @@ export function Sidebar() {
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    {/* Push notifications button */}
-                    {!isPushLoading && isPushSupported && pushPermission !== 'denied' && (
-                      <button
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          console.log('[Sidebar] Push кнопка нажата', { isPushSubscribed, isPushSubscribing });
-                          // Вызываем subscribe даже если уже подписан - хук сам разберётся
-                          subscribePush(); 
-                        }}
-                        disabled={isPushSubscribing}
-                        className={`text-xs hover:underline ${
-                          isPushSubscribed 
-                            ? 'text-green-500' 
-                            : 'text-[#FEC004]'
-                        } disabled:opacity-50`}
-                      >
-                        {isPushSubscribing 
+                    {/* Push notifications button - всегда показываем, как debug кнопка */}
+                    <button
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        subscribePush(); 
+                      }}
+                      disabled={isPushSubscribing}
+                      className={`text-xs hover:underline ${
+                        isPushSubscribed 
+                          ? 'text-green-500' 
+                          : 'text-[#FEC004]'
+                      } disabled:opacity-50`}
+                    >
+                      {isPushLoading 
+                        ? 'Загрузка...'
+                        : isPushSubscribing 
                           ? 'Подключение...' 
                           : isPushSubscribed 
                             ? 'Push включен' 
-                            : 'Включить push'
-                        }
-                      </button>
-                    )}
+                            : pushPermission === 'denied'
+                              ? 'Push заблокирован'
+                              : 'Включить push'
+                      }
+                    </button>
                     {unreadCount > 0 && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
@@ -482,29 +482,27 @@ export function Sidebar() {
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">
-                    {/* Push notifications button - mobile */}
-                    {!isPushLoading && isPushSupported && pushPermission !== 'denied' && (
-                      <button
-                        onClick={() => {
-                          console.log('[Sidebar Mobile] Push кнопка нажата', { isPushSubscribed, isPushSubscribing });
-                          // Вызываем subscribe - хук сам разберётся с состоянием
-                          subscribePush();
-                        }}
-                        disabled={isPushSubscribing}
-                        className={`text-xs hover:underline ${
-                          isPushSubscribed 
-                            ? 'text-green-500' 
-                            : 'text-[#FEC004]'
-                        } disabled:opacity-50`}
-                      >
-                        {isPushSubscribing 
+                    {/* Push notifications button - mobile, всегда показываем */}
+                    <button
+                      onClick={() => subscribePush()}
+                      disabled={isPushSubscribing}
+                      className={`text-xs hover:underline ${
+                        isPushSubscribed 
+                          ? 'text-green-500' 
+                          : 'text-[#FEC004]'
+                      } disabled:opacity-50`}
+                    >
+                      {isPushLoading 
+                        ? 'Загрузка...'
+                        : isPushSubscribing 
                           ? 'Подключение...' 
                           : isPushSubscribed 
                             ? 'Push включен' 
-                            : 'Включить push'
-                        }
-                      </button>
-                    )}
+                            : pushPermission === 'denied'
+                              ? 'Push заблокирован'
+                              : 'Включить push'
+                      }
+                    </button>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}

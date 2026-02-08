@@ -2,7 +2,113 @@
 
 import { useEffect, useState } from 'react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { Bell, BellOff, BellRing, Settings, X, Check } from 'lucide-react';
+import { Bell, BellOff, BellRing, Settings, X, Check, Bug } from 'lucide-react';
+
+/**
+ * Debug компонент для диагностики push на iOS
+ * ВРЕМЕННЫЙ - удалить после отладки
+ */
+export function PushDebugPanel() {
+  const {
+    isSupported,
+    isSubscribed,
+    permission,
+    isLoading,
+    error,
+    isIOSPWARequired,
+    isStandalone,
+    isIOS,
+    iosVersion,
+    subscribe,
+    isSubscribing,
+  } = usePushNotifications();
+  
+  const [swStatus, setSwStatus] = useState<string>('checking...');
+  const [showDebug, setShowDebug] = useState(false);
+  const [lastClick, setLastClick] = useState<string>('');
+  
+  useEffect(() => {
+    // Проверяем Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration()
+        .then(reg => {
+          if (reg) {
+            setSwStatus(`OK: ${reg.scope}`);
+          } else {
+            setSwStatus('NOT REGISTERED');
+          }
+        })
+        .catch(err => setSwStatus(`ERROR: ${err.message}`));
+    } else {
+      setSwStatus('NOT SUPPORTED');
+    }
+  }, []);
+  
+  const handleTestSubscribe = () => {
+    setLastClick(new Date().toISOString());
+    subscribe();
+  };
+
+  return (
+    <>
+      {/* Кнопка для открытия debug панели */}
+      <button
+        onClick={() => setShowDebug(!showDebug)}
+        className="fixed bottom-4 left-4 z-[9999] p-3 bg-purple-600 text-white rounded-full shadow-lg"
+      >
+        <Bug size={20} />
+      </button>
+      
+      {showDebug && (
+        <div className="fixed inset-4 z-[9999] bg-black/95 text-green-400 p-4 rounded-xl overflow-auto font-mono text-xs">
+          <button
+            onClick={() => setShowDebug(false)}
+            className="absolute top-2 right-2 text-white"
+          >
+            <X size={20} />
+          </button>
+          
+          <h2 className="text-lg font-bold mb-4 text-white">Push Debug Panel</h2>
+          
+          <div className="space-y-2">
+            <div><span className="text-gray-400">isLoading:</span> {String(isLoading)}</div>
+            <div><span className="text-gray-400">isSupported:</span> <span className={isSupported ? 'text-green-400' : 'text-red-400'}>{String(isSupported)}</span></div>
+            <div><span className="text-gray-400">isSubscribed:</span> {String(isSubscribed)}</div>
+            <div><span className="text-gray-400">permission:</span> {permission}</div>
+            <div><span className="text-gray-400">isIOS:</span> {String(isIOS)}</div>
+            <div><span className="text-gray-400">iosVersion:</span> {iosVersion || 'null'}</div>
+            <div><span className="text-gray-400">isStandalone:</span> <span className={isStandalone ? 'text-green-400' : 'text-red-400'}>{String(isStandalone)}</span></div>
+            <div><span className="text-gray-400">isIOSPWARequired:</span> {String(isIOSPWARequired)}</div>
+            <div><span className="text-gray-400">isSubscribing:</span> {String(isSubscribing)}</div>
+            <div><span className="text-gray-400">error:</span> <span className="text-red-400">{error || 'null'}</span></div>
+            <div><span className="text-gray-400">SW status:</span> {swStatus}</div>
+            <div><span className="text-gray-400">lastClick:</span> {lastClick || 'none'}</div>
+            
+            <div className="border-t border-gray-700 pt-3 mt-3">
+              <div className="text-gray-400 mb-2">Browser Info:</div>
+              <div className="text-[10px] break-all">{typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'}</div>
+            </div>
+            
+            <div className="border-t border-gray-700 pt-3 mt-3">
+              <div className="text-gray-400 mb-2">APIs:</div>
+              <div><span className="text-gray-400">Notification:</span> {typeof Notification !== 'undefined' ? 'YES' : 'NO'}</div>
+              <div><span className="text-gray-400">PushManager:</span> {typeof PushManager !== 'undefined' ? 'YES' : 'NO'}</div>
+              <div><span className="text-gray-400">serviceWorker:</span> {'serviceWorker' in navigator ? 'YES' : 'NO'}</div>
+            </div>
+            
+            <button
+              onClick={handleTestSubscribe}
+              disabled={isSubscribing}
+              className="mt-4 w-full py-3 bg-green-600 text-white rounded-lg font-bold disabled:opacity-50"
+            >
+              {isSubscribing ? 'Subscribing...' : 'TEST SUBSCRIBE'}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 interface PushNotificationManagerProps {
   /** Показывать как компактную кнопку */

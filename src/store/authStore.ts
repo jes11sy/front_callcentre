@@ -32,12 +32,6 @@ function sanitizeUserForStorage(user: User | null): SafeUserData | null {
   };
 }
 
-// ВАЖНО: НЕ читаем из localStorage при инициализации store!
-// Это вызывает ошибку гидратации React #418, т.к. на сервере user=null,
-// а на клиенте user может быть из localStorage.
-// Zustand persist сам восстановит данные после гидратации через onRehydrateStorage.
-const initialUser: User | null = null;
-
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -54,11 +48,10 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // Начинаем с null - данные восстановятся из localStorage после гидратации
-      user: initialUser,
+      // Начальные значения - одинаковые на сервере и клиенте
+      user: null,
       isAuthenticated: false,
-      // Показываем loading пока не произойдёт гидратация
-      isLoading: true,
+      isLoading: false, // НЕ true! Иначе бесконечный loading
       _hasHydrated: false,
 
       setUser: (user) =>
@@ -89,29 +82,14 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      // ✅ PWA FIX: Используем localStorage вместо sessionStorage
-      // sessionStorage очищается в iOS PWA между запусками
       storage: createJSONStorage(() => localStorage),
-      // БЕЗОПАСНОСТЬ: Сохраняем только безопасные данные
+      // Сохраняем только безопасные данные
       partialize: (state) => ({
-        // Сохраняем только минимальные данные для UI, без чувствительной информации
         user: sanitizeUserForStorage(state.user),
         isAuthenticated: state.isAuthenticated,
       }),
-      // Merge persisted state with current state after hydration
-      merge: (persistedState, currentState) => {
-        const persisted = persistedState as Partial<AuthState> | undefined;
-        
-        return {
-          ...currentState,
-          ...(persisted || {}),
-          // После гидратации выключаем loading
-          isLoading: false,
-          // isAuthenticated зависит от наличия user
-          isAuthenticated: !!(persisted?.user),
-        };
-      },
       onRehydrateStorage: () => (state) => {
+        // Вызывается после восстановления данных из localStorage
         state?.setHasHydrated(true);
       },
     }

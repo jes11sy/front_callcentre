@@ -1,31 +1,33 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const router = useRouter();
-  const { user, isLoading, _hasHydrated } = useAuthStore();
+  const { user, _hasHydrated } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  // Ждём монтирования на клиенте
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    // Ждём гидратации store
-    if (!_hasHydrated) return;
+    // Ждём монтирования и гидратации store
+    if (!mounted || !_hasHydrated) return;
     
     // Если есть user - на телефонию
     if (user) {
       router.replace('/telephony');
-      return;
-    }
-    
-    // Если нет user и loading закончился - на логин
-    if (!isLoading && !user) {
+    } else {
+      // Нет user - на логин
       router.replace('/login');
     }
-  }, [user, isLoading, router, _hasHydrated]);
+  }, [user, router, _hasHydrated, mounted]);
 
-  // Всегда показываем одинаковый UI при первом рендере (для гидратации)
-  // Используем только статичные классы без dark: модификаторов
+  // Статичный UI для SSR - без условий
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#02111B]">
       <div className="text-center">

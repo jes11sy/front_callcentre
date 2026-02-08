@@ -254,7 +254,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     </span>
                   </div>
                 ) : isOutgoing ? (
-                  // Исходящий звонок - показываем номер клиента (куда звонили)
                   <div className="flex flex-col">
                     <span className="font-semibold text-blue-400 font-mono text-xs sm:text-sm">
                       {displayPhone}
@@ -264,7 +263,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     </span>
                   </div>
                 ) : (
-                  // Входящий звонок - показываем номер телефона клиента
                   <div className={cn(
                     "font-semibold font-mono text-xs sm:text-sm",
                     "text-gray-900 dark:text-gray-100"
@@ -330,10 +328,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
       {/* Колонка 2: Источник */}
       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
         {isOutgoing ? (
-          // Для исходящих звонков показываем "Не указано"
           <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Не указано</span>
         ) : (
-          // Для входящих звонков показываем город, РК и источник
           <div className="space-y-1">
             <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm">
               <span className="text-gray-900 dark:text-gray-100">{call.city}</span>

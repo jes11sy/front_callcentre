@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -20,8 +20,15 @@ import {
   PhoneMissed,
   PhoneOutgoing,
   FileText,
-  Info
+  Info,
+  GripHorizontal
 } from 'lucide-react';
+
+// Ключ для localStorage
+const NOTIFICATIONS_POSITION_KEY = 'notifications-panel-position';
+
+// Дефолтная позиция
+const DEFAULT_POSITION = { x: 240, y: 100 }; // left-60 = 240px
 
 export function Sidebar() {
   const { user } = useAuthStore();
@@ -30,6 +37,69 @@ export function Sidebar() {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const notificationsPanelRef = useRef<HTMLDivElement>(null);
+  
+  // Позиция окна уведомлений
+  const [panelPosition, setPanelPosition] = useState(DEFAULT_POSITION);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  
+  // Загружаем позицию из localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(NOTIFICATIONS_POSITION_KEY);
+    if (saved) {
+      try {
+        const pos = JSON.parse(saved);
+        setPanelPosition(pos);
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  // Сохраняем позицию в localStorage
+  const savePosition = useCallback((pos: { x: number; y: number }) => {
+    localStorage.setItem(NOTIFICATIONS_POSITION_KEY, JSON.stringify(pos));
+  }, []);
+
+  // Обработчики drag
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const panel = notificationsPanelRef.current;
+    if (panel) {
+      const rect = panel.getBoundingClientRect();
+      dragOffset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    let lastPos = panelPosition;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newX = Math.max(0, Math.min(window.innerWidth - 384, e.clientX - dragOffset.current.x));
+      const newY = Math.max(0, Math.min(window.innerHeight - 200, e.clientY - dragOffset.current.y));
+      lastPos = { x: newX, y: newY };
+      setPanelPosition(lastPos);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      savePosition(lastPos);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, savePosition]);
   
   // Реальные уведомления из хука
   const {
@@ -242,12 +312,22 @@ export function Sidebar() {
 
             {/* Notifications Dropdown */}
             {isDropdownOpen && (
-              <div className="fixed left-60 bottom-24 w-96 max-h-96 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 flex flex-col bg-white dark:bg-[#1e2736]">
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0">
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+              <div 
+                ref={notificationsPanelRef}
+                className="fixed w-96 max-h-96 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 flex flex-col bg-white dark:bg-[#1e2736]"
+                style={{ left: panelPosition.x, top: panelPosition.y }}
+              >
+                <div 
+                  className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0 cursor-move select-none"
+                  onMouseDown={handleDragStart}
+                >
+                  <div className="flex items-center gap-2">
+                    <GripHorizontal className="h-4 w-4 text-gray-400" />
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
+                  </div>
                   {unreadCount > 0 && (
                     <button
-                      onClick={markAllAsRead}
+                      onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
                       className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
                     >
                       <Check className="h-3 w-3" />

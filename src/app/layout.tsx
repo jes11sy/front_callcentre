@@ -67,9 +67,23 @@ export default function RootLayout({
               <SocketProviders />
               {children}
             </AuthProvider>
+            <Toaster 
+              position="top-right" 
+              theme="system"
+              toastOptions={{
+                classNames: {
+                  toast: 'bg-white dark:bg-[#1e2736] border-gray-200 dark:border-gray-700',
+                  title: 'text-gray-900 dark:text-gray-100',
+                  description: 'text-gray-500 dark:text-gray-400',
+                  success: 'bg-white dark:bg-[#1e2736] text-green-600 dark:text-green-400',
+                  error: 'bg-white dark:bg-[#1e2736] text-red-600 dark:text-red-400',
+                  warning: 'bg-white dark:bg-[#1e2736] text-yellow-600 dark:text-yellow-400',
+                  info: 'bg-white dark:bg-[#1e2736] text-blue-600 dark:text-blue-400',
+                },
+              }}
+            />
           </ThemeProvider>
         </QueryProvider>
-        <Toaster position="top-right" />
         <WebVitalsScript />
       </body>
     </html>

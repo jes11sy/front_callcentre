@@ -335,6 +335,7 @@ export function Sidebar() {
                   </div>
                   {unreadCount > 0 && (
                     <button
+                      onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
                       className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
                     >

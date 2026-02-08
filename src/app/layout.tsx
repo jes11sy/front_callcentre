@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
+import { PushPermissionBanner } from "@/components/push/PushNotificationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,21 @@ export const metadata: Metadata = {
   description: "Система управления лидами",
   icons: {
     icon: '/img/logo/favicon.png',
+    apple: '/img/logo/logo_v2.png',
   },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'LEADS CC',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 };
 
 export default function RootLayout({
@@ -66,6 +81,7 @@ export default function RootLayout({
             <AuthProvider>
               <SocketProviders />
               {children}
+              <PushPermissionBanner />
             </AuthProvider>
             <Toaster 
               position="top-right" 

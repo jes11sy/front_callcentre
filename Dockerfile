@@ -21,10 +21,12 @@ COPY . .
 # Build arguments для переменных окружения
 ARG NEXT_PUBLIC_API_URL=https://api.test-shem.ru/api/v1
 ARG NEXT_PUBLIC_SOCKET_URL=wss://realtime.test-shem.ru
+ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
 # Устанавливаем как ENV для использования в сборке
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
 # Следующая строка отключает telemetry во время сборки.
 # https://nextjs.org/docs/advanced-features/telemetry

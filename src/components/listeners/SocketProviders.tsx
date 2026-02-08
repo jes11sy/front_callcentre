@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { AvitoNotificationListener } from './AvitoNotificationListener';
 import { SocketAuthListener } from './SocketAuthListener';
+import { CallPushListener } from './CallPushListener';
 
 export function SocketProviders() {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -24,6 +25,7 @@ export function SocketProviders() {
     <>
       <AvitoNotificationListener />
       <SocketAuthListener />
+      <CallPushListener />
     </>
   );
 }

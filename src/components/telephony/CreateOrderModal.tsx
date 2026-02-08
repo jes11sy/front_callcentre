@@ -131,9 +131,8 @@ export function CreateOrderModal({
   const [duration, setDuration] = useState(0);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { user } = useAuthStore();
-  const { version, theme } = useDesignStore();
-  const isV2 = version === 'v2';
-  const isDark = isV2 && theme === 'dark';
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
 
   // Загрузка источников и РК из БД
   useEffect(() => {
@@ -448,39 +447,27 @@ export function CreateOrderModal({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4">
-      <div className={`w-full h-full lg:h-auto lg:max-w-5xl lg:max-h-[90vh] lg:rounded-xl overflow-hidden flex flex-col ${
-        isV2 
-          ? 'bg-[#F3F3EE] dark:bg-[#1e2530] lg:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none' 
-          : 'bg-[#17212b] lg:border border-[#FFD700]/40 shadow-[0_0_40px_rgba(255,215,0,0.15)]'
-      }`}>
+      <div className={`w-full h-full lg:h-auto lg:max-w-5xl lg:max-h-[90vh] lg:rounded-xl overflow-hidden flex flex-col bg-[#F3F3EE] dark:bg-[#1e2530] lg:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none`}>
         {/* Header */}
-        <div className={`flex items-center justify-between px-3 sm:px-5 py-3 border-b shrink-0 ${
-          isV2 
-            ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700' 
-            : 'bg-[#0f0f23] border-[#FFD700]/20'
-        }`}>
+        <div className={`flex items-center justify-between px-3 sm:px-5 py-3 border-b shrink-0 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700`}>
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-            <h2 className={`text-base sm:text-lg font-semibold shrink-0 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Новый заказ</h2>
-            <div className={`hidden sm:flex items-center gap-2 text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
-              <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>|</span>
-              <span className={`font-medium ${isV2 ? 'text-gray-700 dark:text-gray-200' : 'text-white'}`}>{call.phoneClient}</span>
+            <h2 className={`text-base sm:text-lg font-semibold shrink-0 text-gray-900 dark:text-gray-100`}>Новый заказ</h2>
+            <div className={`hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400`}>
+              <span className="text-gray-300 dark:text-gray-600">|</span>
+              <span className={`font-medium text-gray-700 dark:text-gray-200`}>{call.phoneClient}</span>
               {call.city && (
                 <>
-                  <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span>{call.city}</span>
                 </>
               )}
             </div>
             {/* Mobile phone display */}
-            <span className={`sm:hidden text-xs font-medium truncate ${isV2 ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300'}`}>{call.phoneClient}</span>
+            <span className={`sm:hidden text-xs font-medium truncate text-gray-600 dark:text-gray-300`}>{call.phoneClient}</span>
           </div>
           <button
             onClick={handleClose}
-            className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
-              isV2 
-                ? 'text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700' 
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
-            }`}
+            className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors shrink-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700`}
           >
             <X className="h-5 w-5 sm:h-4 sm:w-4" />
           </button>
@@ -489,22 +476,12 @@ export function CreateOrderModal({
         {/* Content - flex-col on mobile, flex-row on desktop */}
         <div className="flex flex-col lg:flex-row flex-1 overflow-hidden lg:max-h-[700px]">
           {/* History panels - order-2 on mobile (bottom), order-1 on desktop (left) */}
-          <div className={`order-2 lg:order-1 lg:w-[420px] border-t lg:border-t-0 lg:border-r flex flex-col overflow-hidden ${
-            isV2 
-              ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2530]' 
-              : 'border-[#FFD700]/10 bg-[#0f0f23]/30'
-          }`}>
+          <div className={`order-2 lg:order-1 lg:w-[420px] border-t lg:border-t-0 lg:border-r flex flex-col overflow-hidden border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2530]`}>
             {/* История звонков (все операторы) */}
-            <div className={`border-b flex flex-col overflow-hidden lg:max-h-[50%] ${
-              isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/10'
-            }`}>
+            <div className={`border-b flex flex-col overflow-hidden lg:max-h-[50%] border-gray-200 dark:border-gray-700`}>
               <button 
                 onClick={() => setShowCallHistory(!showCallHistory)}
-                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 ${
-                  isV2 
-                    ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
+                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100`}
               >
                 <div className="flex items-center gap-2">
                   <PhoneCall className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
@@ -533,29 +510,17 @@ export function CreateOrderModal({
                           <div 
                             key={c.id} 
                             className={`p-2.5 rounded-lg text-xs transition-colors ${
-                              isV2 
-                                ? isCurrentCall 
-                                  ? 'bg-[#FEC004]/10 border border-[#FEC004]/30' 
-                                  : 'bg-gray-50 dark:bg-[#252d3a] hover:bg-gray-100 dark:hover:bg-[#2d3748]'
-                                : isCurrentCall 
-                                  ? 'bg-[#FFD700]/10 border border-[#FFD700]/30' 
-                                  : 'bg-[#17212b]/50 hover:bg-[#17212b]'
+                              isCurrentCall 
+                                ? 'bg-[#FEC004]/10 border border-[#FEC004]/30' 
+                                : 'bg-gray-50 dark:bg-[#252d3a] hover:bg-gray-100 dark:hover:bg-[#2d3748]'
                             }`}
                           >
                             {/* Строка 1: Дата/время + Направление + Статус */}
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className={`font-medium ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}`}>{formatDate(c.createdAt)}</span>
+                                <span className={`font-medium text-gray-700 dark:text-gray-300`}>{formatDate(c.createdAt)}</span>
                                 {/* Направление */}
-                                <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
-                                  isV2 
-                                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                                    : isCallback
-                                      ? 'bg-purple-500/10 text-purple-400'
-                                      : isOutgoing 
-                                        ? 'bg-blue-500/10 text-blue-400' 
-                                        : 'bg-emerald-500/10 text-emerald-400'
-                                }`}>
+                                <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300`}>
                                   {isOutgoing ? <PhoneOutgoing className="h-2.5 w-2.5" /> : <PhoneIncoming className="h-2.5 w-2.5" />}
                                   {isCallback ? 'От мастера' : isOutgoing ? 'Исход.' : 'Вход.'}
                                 </span>
@@ -563,8 +528,8 @@ export function CreateOrderModal({
                               {/* Статус */}
                               <span className={`flex items-center gap-1 ${
                                 c.status === 'answered' 
-                                  ? isV2 ? 'text-gray-600' : 'text-green-400' 
-                                  : isV2 ? 'text-red-500' : 'text-red-400'
+                                  ? 'text-gray-600' 
+                                  : 'text-red-500'
                               }`}>
                                 {c.status === 'answered' ? (
                                   <PhoneCall className="h-3 w-3" />
@@ -576,26 +541,26 @@ export function CreateOrderModal({
                             </div>
                             
                             {/* Строка 2: Оператор + РК + Источник + Город */}
-                            <div className={`flex items-center gap-2 mb-1.5 text-[11px] ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                            <div className={`flex items-center gap-2 mb-1.5 text-[11px] text-gray-500 dark:text-gray-400`}>
                               <div className="flex items-center gap-1 min-w-0">
                                 <User className="h-3 w-3 shrink-0" />
                                 <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
                               </div>
-                              <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>
-                              <span className={`shrink-0 ${isV2 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-[#FFD700]'}`}>{c.rk || '—'}</span>
+                              <span className="text-gray-300 dark:text-gray-600">•</span>
+                              <span className={`shrink-0 text-gray-700 dark:text-gray-300 font-medium`}>{c.rk || '—'}</span>
                               {c.avitoName && (
                                 <>
-                                  <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>
-                                  <span className={`shrink-0 ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-purple-400'}`}>{c.avitoName}</span>
+                                  <span className="text-gray-300 dark:text-gray-600">•</span>
+                                  <span className={`shrink-0 text-gray-600 dark:text-gray-400`}>{c.avitoName}</span>
                                 </>
                               )}
-                              <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>
+                              <span className="text-gray-300 dark:text-gray-600">•</span>
                               <span className="shrink-0">{c.city || '—'}</span>
                             </div>
                             
                             {/* Строка 3: Номер клиента + Запись */}
                             <div className="flex items-center justify-between">
-                              <div className={`flex items-center gap-1 ${isV2 ? 'text-gray-500' : 'text-gray-500'}`}>
+                              <div className={`flex items-center gap-1 text-gray-500`}>
                                 <Phone className="h-3 w-3" />
                                 <span className="font-mono text-[11px]">{formatPhoneDisplay(c.phoneClient)}</span>
                               </div>
@@ -604,13 +569,9 @@ export function CreateOrderModal({
                                 <button
                                   onClick={() => handlePlayRecording(c)}
                                   className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-colors ${
-                                    isV2 
-                                      ? playingCallId === c.id 
-                                        ? 'bg-[#FEC004]/20 text-[#FEC004]' 
-                                        : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10'
-                                      : playingCallId === c.id 
-                                        ? 'bg-[#FFD700]/20 text-[#FFD700]' 
-                                        : 'bg-gray-700/50 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10'
+                                    playingCallId === c.id 
+                                      ? 'bg-[#FEC004]/20 text-[#FEC004]' 
+                                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10'
                                   }`}
                                 >
                                   <Play className="h-3 w-3" />
@@ -631,11 +592,7 @@ export function CreateOrderModal({
             <div className="flex-1 overflow-hidden flex flex-col">
               <button 
                 onClick={() => setShowOrderHistory(!showOrderHistory)}
-                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 ${
-                  isV2 
-                    ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
+                className={`w-full px-3 py-2.5 sm:py-2 flex items-center justify-between text-xs sm:text-sm lg:text-xs font-medium transition-colors shrink-0 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100`}
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
@@ -656,67 +613,55 @@ export function CreateOrderModal({
                       </div>
                     ) : (
                       orderHistory.map((order) => (
-                        <div key={order.id} className={`p-2.5 rounded-lg text-xs space-y-1.5 ${
-                          isV2 ? 'bg-gray-50 dark:bg-[#252d3a]' : 'bg-[#17212b]/50'
-                        }`}>
+                        <div key={order.id} className={`p-2.5 rounded-lg text-xs space-y-1.5 bg-gray-50 dark:bg-[#252d3a]`}>
                           {/* Строка 1: ID + Тип заказа + Статус */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className={`font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>#{order.id}</span>
+                              <span className={`font-semibold text-gray-900 dark:text-gray-100`}>#{order.id}</span>
                               {order.typeOrder && (
-                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${
-                                  isV2 
-                                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600' 
-                                    : 'bg-purple-500/10 text-purple-400 border-purple-500/30'
-                                }`}>
+                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600`}>
                                   {order.typeOrder}
                                 </Badge>
                               )}
                             </div>
-                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 ${
-                              isV2 
-                                ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600' 
-                                : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                            }`}>
+                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600`}>
                               {(order as any).status || order.statusOrder || 'Нет статуса'}
                             </Badge>
                           </div>
                           
                           {/* Строка 2: РК + Источник */}
-                          <div className={`flex items-center gap-2 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                          <div className={`flex items-center gap-2 text-gray-500 dark:text-gray-400`}>
                             {order.rk && (
-                              <span className={isV2 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-[#FFD700]'}>{order.rk}</span>
+                              <span className="text-gray-700 dark:text-gray-300 font-medium">{order.rk}</span>
                             )}
-                            {order.rk && order.avitoName && <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>}
+                            {order.rk && order.avitoName && <span className="text-gray-300 dark:text-gray-600">•</span>}
                             {order.avitoName && (
-                              <span className={isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-purple-400'}>{order.avitoName}</span>
+                              <span className="text-gray-600 dark:text-gray-400">{order.avitoName}</span>
                             )}
                           </div>
                           
                           {/* Строка 3: Имя клиента */}
                           <div className="flex items-center gap-1.5">
-                            <User className={`h-3 w-3 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
-                            <span className={`truncate ${isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}`}>{order.clientName}</span>
+                            <User className={`h-3 w-3 text-gray-400`} />
+                            <span className={`truncate text-gray-700 dark:text-gray-300`}>{order.clientName}</span>
                           </div>
                           
                           {/* Строка 4: Адрес */}
                           {order.address && (
                             <div className="flex items-center gap-1.5">
-                              <MapPin className={`h-3 w-3 ${isV2 ? 'text-gray-400' : 'text-gray-500'}`} />
-                              <span className={`truncate ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>{order.address}</span>
+                              <MapPin className={`h-3 w-3 text-gray-400`} />
+                              <span className={`truncate text-gray-500 dark:text-gray-400`}>{order.address}</span>
                             </div>
                           )}
                           
                           {/* Строка 5: Мастер + Итог */}
-                          <div className={`flex items-center justify-between pt-1 border-t ${
-                            isV2 ? 'border-gray-200 dark:border-gray-600' : 'border-gray-700/50'
-                          }`}>
-                            <div className={`flex items-center gap-1.5 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                          <div className={`flex items-center justify-between pt-1 border-t border-gray-200 dark:border-gray-600`}>
+                            <div className={`flex items-center gap-1.5 text-gray-500 dark:text-gray-400`}>
                               <span>Мастер:</span>
-                              <span className={isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}>{order.master?.name || '—'}</span>
+                              <span className="text-gray-700 dark:text-gray-300">{order.master?.name || '—'}</span>
                             </div>
                             {order.result !== undefined && order.result !== null && (
-                              <span className={`font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-green-400'}`}>{order.result.toLocaleString('ru-RU')} ₽</span>
+                              <span className={`font-medium text-gray-900 dark:text-gray-100`}>{order.result.toLocaleString('ru-RU')} ₽</span>
                             )}
                           </div>
                           
@@ -725,11 +670,7 @@ export function CreateOrderModal({
                             variant="outline"
                             size="sm"
                             onClick={() => window.open(`/orders?orderId=${order.id}`, '_blank')}
-                            className={`w-full mt-2 h-6 text-[10px] ${
-                              isV2 
-                                ? 'text-[#FEC004] border-[#FEC004]/30 hover:bg-[#FEC004]/10 hover:border-[#FEC004]'
-                                : 'text-[#FFD700] border-[#FFD700]/30 hover:bg-[#FFD700]/10 hover:border-[#FFD700]'
-                            }`}
+                            className={`w-full mt-2 h-6 text-[10px] text-[#FEC004] border-[#FEC004]/30 hover:bg-[#FEC004]/10 hover:border-[#FEC004]`}
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Открыть заказ
@@ -750,23 +691,19 @@ export function CreateOrderModal({
                 {/* Row 1: РК + Город */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>РК</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>РК</Label>
                     <Controller
                       name="rk"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={`h-9 text-sm ${
-                            isV2 
-                              ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0' 
-                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                          }`}>
+                          <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
-                            <SelectItem value="Не указано" className={isV2 ? 'text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10' : 'text-gray-400'}>Не указано</SelectItem>
+                          <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
+                            <SelectItem value="Не указано" className="text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10">Не указано</SelectItem>
                             {campaigns.map((option) => (
-                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
+                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -774,22 +711,18 @@ export function CreateOrderModal({
                     />
                   </div>
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Город *</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Город *</Label>
                     <Controller
                       name="city"
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={`h-9 text-sm ${
-                            isV2 
-                              ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0' 
-                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                          }`}>
+                          <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите город</span>} />
                           </SelectTrigger>
-                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
+                          <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
                             {CITY_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
+                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -802,23 +735,19 @@ export function CreateOrderModal({
                 {/* Row 2: Источник + Направление */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Источник</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Источник</Label>
                     <Controller
                       name="avitoName"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={`h-9 text-sm ${
-                            isV2 
-                              ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0' 
-                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                          }`}>
+                          <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={`z-[10000] max-h-60 ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
-                            <SelectItem value="Не указано" className={isV2 ? 'text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10' : 'text-gray-400'}>Не указано</SelectItem>
+                          <SelectContent className={`z-[10000] max-h-60 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
+                            <SelectItem value="Не указано" className="text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10">Не указано</SelectItem>
                             {sources.map((option) => (
-                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
+                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -826,22 +755,18 @@ export function CreateOrderModal({
                     />
                   </div>
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Направление</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Направление</Label>
                     <Controller
                       name="typeEquipment"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={`h-9 text-sm ${
-                            isV2 
-                              ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0' 
-                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                          }`}>
+                          <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
+                          <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
                             {DIRECTION_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>{option}</SelectItem>
+                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -851,33 +776,25 @@ export function CreateOrderModal({
                 </div>
 
                 {/* Divider */}
-                <div className={`border-t ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/10'}`} />
+                <div className={`border-t border-gray-200 dark:border-gray-700`} />
 
                 {/* Row 3: Клиент + Адрес */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Имя клиента *</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Имя клиента *</Label>
                     <Input
                       {...register('clientName')}
                       placeholder="Введите имя"
-                      className={`h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
-                        isV2 
-                          ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
-                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                      }`}
+                      className={`h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30`}
                     />
                     {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
                   </div>
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Адрес *</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Адрес *</Label>
                     <Input
                       {...register('address')}
                       placeholder="Введите адрес"
-                      className={`h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
-                        isV2 
-                          ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
-                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                      }`}
+                      className={`h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30`}
                     />
                     {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
                   </div>
@@ -886,23 +803,19 @@ export function CreateOrderModal({
                 {/* Row 4: Тип заказа + Дата встречи */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Тип заказа *</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Тип заказа *</Label>
                     <Controller
                       name="typeOrder"
                       control={form.control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={`h-9 text-sm ${
-                            isV2 
-                              ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0' 
-                              : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                          }`}>
+                          <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder="Выберите тип" />
                           </SelectTrigger>
-                          <SelectContent className={`z-[10000] ${isV2 ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600' : 'bg-[#17212b] border-[#FFD700]/30'}`}>
-                            <SelectItem value="Впервые" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Впервые</SelectItem>
-                            <SelectItem value="Повтор" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Повтор</SelectItem>
-                            <SelectItem value="Гарантия" className={isV2 ? 'text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100' : 'text-white'}>Гарантия</SelectItem>
+                          <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
+                            <SelectItem value="Впервые" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Впервые</SelectItem>
+                            <SelectItem value="Повтор" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Повтор</SelectItem>
+                            <SelectItem value="Гарантия" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Гарантия</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -910,15 +823,11 @@ export function CreateOrderModal({
                     {errors.typeOrder && <p className="text-xs text-red-400 mt-1">{errors.typeOrder.message}</p>}
                   </div>
                   <div>
-                    <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Дата встречи *</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Дата встречи *</Label>
                     <Input
                       type="datetime-local"
                       {...register('dateMeeting')}
-                      className={`h-9 text-sm ${
-                        isV2 
-                          ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30 dark:[color-scheme:dark]' 
-                          : 'bg-[#0f0f23] border-[#FFD700]/20 text-white [&::-webkit-calendar-picker-indicator]:invert'
-                      }`}
+                      className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30 dark:[color-scheme:dark]`}
                     />
                     {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
                   </div>
@@ -926,16 +835,12 @@ export function CreateOrderModal({
 
                 {/* Row 5: Проблема */}
                 <div>
-                  <Label className={`text-xs mb-1 block ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>Проблема *</Label>
+                  <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Проблема *</Label>
                   <Textarea
                     {...register('problem')}
                     placeholder="Опишите проблему клиента..."
                     rows={3}
-                    className={`text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none ${
-                      isV2 
-                        ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30' 
-                        : 'bg-[#0f0f23] border-[#FFD700]/20 text-white'
-                    }`}
+                    className={`text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30`}
                   />
                   {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
                 </div>
@@ -943,21 +848,13 @@ export function CreateOrderModal({
             </ScrollArea>
 
             {/* Footer */}
-            <div className={`px-3 sm:px-4 py-3 border-t flex justify-end gap-2 shrink-0 ${
-              isV2 
-                ? 'bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700' 
-                : 'bg-[#0f0f23] border-[#FFD700]/20'
-            }`}>
+            <div className={`px-3 sm:px-4 py-3 border-t flex justify-end gap-2 shrink-0 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700`}>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={`h-9 px-3 sm:px-4 text-sm ${
-                  isV2 
-                    ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
+                className={`h-9 px-3 sm:px-4 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700`}
               >
                 Отмена
               </Button>
@@ -965,11 +862,7 @@ export function CreateOrderModal({
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit(onSubmit)}
-                className={`h-9 px-4 sm:px-5 font-medium text-sm ${
-                  isV2 
-                    ? 'bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900' 
-                    : 'bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23]'
-                }`}
+                className={`h-9 px-4 sm:px-5 font-medium text-sm bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900`}
               >
                 {isSubmitting ? (
                   <>
@@ -990,11 +883,7 @@ export function CreateOrderModal({
 
         {/* Audio Player - показывается снизу при воспроизведении */}
         {playingCall && (
-          <div className={`border-t-2 px-3 sm:px-4 py-2 sm:py-3 shrink-0 ${
-            isV2 
-              ? 'border-[#FEC004]/40 bg-white dark:bg-[#252d3a]' 
-              : 'border-[#FFD700]/40 bg-gradient-to-r from-[#0f0f23] to-[#17212b]'
-          }`}>
+          <div className={`border-t-2 px-3 sm:px-4 py-2 sm:py-3 shrink-0 border-[#FEC004]/40 bg-white dark:bg-[#252d3a]`}>
             {/* Скрытый audio элемент */}
             {audioUrl && (
               <audio
@@ -1014,11 +903,7 @@ export function CreateOrderModal({
               <button
                 onClick={togglePlayPause}
                 disabled={audioLoading || !audioUrl}
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-colors disabled:opacity-50 ${
-                  isV2 
-                    ? 'bg-[#FEC004] hover:bg-[#e6ac00]' 
-                    : 'bg-[#FFD700] hover:bg-[#FFD700]/90'
-                }`}
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-colors disabled:opacity-50 bg-[#FEC004] hover:bg-[#e6ac00]`}
               >
                 {audioLoading ? (
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-gray-900" />
@@ -1031,12 +916,12 @@ export function CreateOrderModal({
 
               {/* Информация о звонке - скрыта на мобильных */}
               <div className="hidden sm:block min-w-0 w-48">
-                <div className={`text-sm font-medium truncate ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>
+                <div className={`text-sm font-medium truncate text-gray-900 dark:text-gray-100`}>
                   {playingCall.operator?.name || 'Оператор'}
                 </div>
-                <div className={`text-xs flex items-center gap-1.5 truncate ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                <div className={`text-xs flex items-center gap-1.5 truncate text-gray-500 dark:text-gray-400`}>
                   <span>{formatDate(playingCall.createdAt)}</span>
-                  <span className={isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}>•</span>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span className={
                     playingCall.callDirection === 'callback' 
                       ? 'text-purple-400' 
@@ -1051,7 +936,7 @@ export function CreateOrderModal({
 
               {/* Прогресс-бар */}
               <div className="flex-1 flex items-center gap-2 sm:gap-3">
-                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 text-right font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 text-right font-mono text-gray-500 dark:text-gray-400`}>
                   {formatAudioTime(currentTime)}
                 </span>
                 <div className="flex-1 relative">
@@ -1072,18 +957,13 @@ export function CreateOrderModal({
                       [&::-moz-range-thumb]:rounded-full
                       [&::-moz-range-thumb]:border-0
                       [&::-moz-range-thumb]:cursor-pointer
-                      ${isV2 
-                        ? 'bg-gray-200 dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-[#FEC004] [&::-moz-range-thumb]:bg-[#FEC004]' 
-                        : 'bg-gray-700 [&::-webkit-slider-thumb]:bg-[#FFD700] [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(255,215,0,0.5)] [&::-moz-range-thumb]:bg-[#FFD700]'
-                      }`}
+                      bg-gray-200 dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-[#FEC004] [&::-moz-range-thumb]:bg-[#FEC004]`}
                     style={{
-                      background: isV2 
-                        ? `linear-gradient(to right, #FEC004 0%, #FEC004 ${(currentTime / (duration || 1)) * 100}%, ${isDark ? '#374151' : '#e5e7eb'} ${(currentTime / (duration || 1)) * 100}%, ${isDark ? '#374151' : '#e5e7eb'} 100%)`
-                        : `linear-gradient(to right, #FFD700 0%, #FFD700 ${(currentTime / (duration || 1)) * 100}%, #374151 ${(currentTime / (duration || 1)) * 100}%, #374151 100%)`
+                      background: `linear-gradient(to right, #FEC004 0%, #FEC004 ${(currentTime / (duration || 1)) * 100}%, ${isDark ? '#374151' : '#e5e7eb'} ${(currentTime / (duration || 1)) * 100}%, ${isDark ? '#374151' : '#e5e7eb'} 100%)`
                     }}
                   />
                 </div>
-                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 font-mono ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                <span className={`text-[10px] sm:text-xs w-8 sm:w-10 font-mono text-gray-500 dark:text-gray-400`}>
                   {formatAudioTime(duration)}
                 </span>
               </div>
@@ -1091,11 +971,7 @@ export function CreateOrderModal({
               {/* Кнопка закрытия */}
               <button
                 onClick={handleClosePlayer}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
-                  isV2 
-                    ? 'text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-white hover:bg-white/10'
-                }`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700`}
               >
                 <X className="w-4 h-4" />
               </button>

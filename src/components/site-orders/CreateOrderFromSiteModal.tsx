@@ -86,8 +86,8 @@ export default function CreateOrderFromSiteModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -186,48 +186,30 @@ export default function CreateOrderFromSiteModal({
 
   if (!open) return null;
 
-  // Стили для V2
-  const selectTriggerClass = isV2 
-    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-    : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400";
+  // Стили
+  const selectTriggerClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
   
-  const selectContentClass = isV2 
-    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600"
-    : "bg-[#0f0f23] border-[#FFD700]/30";
+  const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
   
-  const selectItemClass = isV2 
-    ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
-    : "text-white hover:bg-[#FFD700]/10";
+  const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
   
-  const inputClass = isV2 
-    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-    : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20";
+  const inputClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className={isV2 
-        ? "bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg font-myriad"
-        : "bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg"
-      }>
-        <div className={isV2 
-          ? "flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between p-4 border-b border-[#FFD700]/30"
-        }>
-          <h2 className={`text-xl font-bold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-            {!isV2 && <Plus className="h-5 w-5 text-[#FFD700]" />}
+      <div className="bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg font-myriad">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
+          <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
             Создать заказ из заявки сайта
             {siteOrder && (
-              <span className={`text-sm font-normal ml-2 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+              <span className="text-sm font-normal ml-2 text-gray-500 dark:text-gray-400">
                 (Заявка #{siteOrder.id})
               </span>
             )}
           </h2>
           <button
             onClick={handleClose}
-            className={isV2 
-              ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center"
-              : "h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10 rounded flex items-center justify-center"
-            }
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center"
           >
             <X className="h-4 w-4" />
           </button>
@@ -236,17 +218,17 @@ export default function CreateOrderFromSiteModal({
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
             {/* Основная информация */}
-            <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
               <CardHeader className="pb-1">
-                <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                  <FileText className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                  <FileText className="h-5 w-5 text-[#FEC004]" />
                   Основная информация
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="rk" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Рекламная Компания *</Label>
+                    <Label htmlFor="rk" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
                     <Controller
                       name="rk"
                       control={form.control}
@@ -270,7 +252,7 @@ export default function CreateOrderFromSiteModal({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Город *</Label>
+                    <Label htmlFor="city" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
                     <Controller
                       name="city"
                       control={form.control}
@@ -294,7 +276,7 @@ export default function CreateOrderFromSiteModal({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="avitoName" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Источник</Label>
+                    <Label htmlFor="avitoName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Источник</Label>
                     <Controller
                       name="avitoName"
                       control={form.control}
@@ -319,17 +301,17 @@ export default function CreateOrderFromSiteModal({
             </Card>
 
             {/* Информация о клиенте */}
-            <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
               <CardHeader className="pb-1">
-                <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                  <User className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                  <User className="h-5 w-5 text-[#FEC004]" />
                   Информация о клиенте
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="clientName" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Имя клиента *</Label>
+                    <Label htmlFor="clientName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Имя клиента *</Label>
                     <Input
                       id="clientName"
                       {...register('clientName')}
@@ -341,7 +323,7 @@ export default function CreateOrderFromSiteModal({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Телефон *</Label>
+                    <Label htmlFor="phone" className="text-sm font-medium text-gray-600 dark:text-gray-400">Телефон *</Label>
                     <Controller
                       name="phone"
                       control={form.control}
@@ -378,7 +360,7 @@ export default function CreateOrderFromSiteModal({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Адрес *</Label>
+                  <Label htmlFor="address" className="text-sm font-medium text-gray-600 dark:text-gray-400">Адрес *</Label>
                   <Input
                     id="address"
                     {...register('address')}
@@ -393,17 +375,17 @@ export default function CreateOrderFromSiteModal({
             </Card>
 
             {/* Детали заказа */}
-            <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
               <CardHeader className="pb-1">
-                <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                  <Settings className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                  <Settings className="h-5 w-5 text-[#FEC004]" />
                   Детали заказа
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="typeOrder" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Тип заказа *</Label>
+                    <Label htmlFor="typeOrder" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип заказа *</Label>
                     <Controller
                       name="typeOrder"
                       control={form.control}
@@ -425,7 +407,7 @@ export default function CreateOrderFromSiteModal({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="typeEquipment" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Тип техники *</Label>
+                    <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
                     <Controller
                       name="typeEquipment"
                       control={form.control}
@@ -448,28 +430,25 @@ export default function CreateOrderFromSiteModal({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="dateMeeting" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Дата встречи *</Label>
+                  <Label htmlFor="dateMeeting" className="text-sm font-medium text-gray-600 dark:text-gray-400">Дата встречи *</Label>
                   <Input
                     id="dateMeeting"
                     type="datetime-local"
                     {...register('dateMeeting')}
-                    className={`${inputClass} ${isV2 ? 'dark:[color-scheme:dark]' : ''}`}
+                    className={`${inputClass} dark:[color-scheme:dark]`}
                   />
                   {errors.dateMeeting && (
                     <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="problem" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Описание проблемы *</Label>
+                  <Label htmlFor="problem" className="text-sm font-medium text-gray-600 dark:text-gray-400">Описание проблемы *</Label>
                   <Textarea
                     id="problem"
                     {...register('problem')}
                     placeholder="Опишите проблему"
                     rows={2}
-                    className={isV2 
-                      ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
-                      : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20 resize-none"
-                    }
+                    className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
                   />
                   {errors.problem && (
                     <p className="text-sm text-red-400">{errors.problem.message}</p>
@@ -485,20 +464,14 @@ export default function CreateOrderFromSiteModal({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={isV2 
-                  ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-                }
+                className="border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Отмена
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={isV2 
-                  ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
-                  : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold shadow-lg hover:shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-200"
-                }
+                className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
               >
                 {isSubmitting ? (
                   <>

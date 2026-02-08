@@ -11,8 +11,6 @@ interface LoadingScreenProps {
   fullScreen?: boolean;
   /** Дополнительные классы */
   className?: string;
-  /** Принудительно показать V1 дизайн (для SSR) */
-  forceV1?: boolean;
 }
 
 /**
@@ -21,94 +19,40 @@ interface LoadingScreenProps {
  * - AuthProvider (проверка сессии)
  * - Suspense fallback
  * - Любые полноэкранные загрузки
- * Поддерживает V1 и V2 дизайн
- * 
- * ВАЖНО: До гидратации всегда показывает V1 дизайн для предотвращения ошибки React #418
+ * Поддерживает светлую и тёмную тему
  */
 export function LoadingScreen({ 
   message, 
   fullScreen = true,
-  className,
-  forceV1 = false
+  className
 }: LoadingScreenProps) {
-  const { version, theme, isHydrated } = useDesignStoreHydrated();
+  const { theme, isHydrated } = useDesignStoreHydrated();
   
-  // До гидратации или если forceV1 - всегда показываем V1 дизайн
-  // Это предотвращает ошибку гидратации React #418
-  const effectiveVersion = (!isHydrated || forceV1) ? 'v1' : version;
-  const effectiveTheme = (!isHydrated || forceV1) ? 'light' : theme;
-
-  // ============ V2 DESIGN ============
-  if (effectiveVersion === 'v2') {
-    const isDark = effectiveTheme === 'dark';
-    const bgColor = isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]';
-    
-    const contentV2 = (
-      <div 
-        className="flex flex-col items-center justify-center px-4"
-        style={{ fontFamily: "'Myriad Pro', sans-serif" }}
-      >
-        {/* Logo V2 */}
-        <div className="mb-8">
-          <Image 
-            src={isDark ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
-            alt="Logo" 
-            width={200} 
-            height={50} 
-            className="h-12 w-auto" 
-          />
-        </div>
-
-        {/* Spinner V2 */}
-        <div className="relative w-12 h-12">
-          <div className="w-full h-full rounded-full border-4 border-[#FEC004]/20" />
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#FEC004] animate-spin" />
-        </div>
-      </div>
-    );
-
-    if (fullScreen) {
-      return (
-        <div className={cn(
-          "min-h-screen min-h-[100dvh] flex items-center justify-center transition-colors duration-300",
-          bgColor,
-          className
-        )}>
-          {contentV2}
-        </div>
-      );
-    }
-
-    return (
-      <div className={cn("flex items-center justify-center py-12 transition-colors duration-300", bgColor, className)}>
-        {contentV2}
-      </div>
-    );
-  }
-
-  // ============ V1 DESIGN ============
-  const contentV1 = (
-    <div className="flex flex-col items-center justify-center px-4">
-      {/* Логотип/Название */}
+  // До гидратации - показываем светлую тему
+  const effectiveTheme = isHydrated ? theme : 'light';
+  const isDark = effectiveTheme === 'dark';
+  const bgColor = isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]';
+  
+  const content = (
+    <div 
+      className="flex flex-col items-center justify-center px-4"
+      style={{ fontFamily: "'Myriad Pro', sans-serif" }}
+    >
+      {/* Logo */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
-          LEADS CREATE
-        </h1>
+        <Image 
+          src={isDark ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+          alt="Logo" 
+          width={200} 
+          height={50} 
+          className="h-12 w-auto" 
+        />
       </div>
 
-      {/* Спиннер */}
-      <div className="relative w-14 h-14">
-        {/* Внешнее кольцо */}
-        <div className="w-full h-full rounded-full border-4 border-[#FFD700]/20" />
-        
-        {/* Вращающееся кольцо */}
-        <div className="absolute inset-0 rounded-full border-4 border-transparent 
-                        border-t-[#FFD700] border-r-[#FFA500]/50 animate-spin" />
-        
-        {/* Внутреннее кольцо (вращается в другую сторону) */}
-        <div className="absolute top-2 left-2 w-10 h-10 rounded-full 
-                        border-4 border-transparent border-b-[#FFD700]/70 border-l-[#FFA500]/30 animate-spin"
-             style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+      {/* Spinner */}
+      <div className="relative w-12 h-12">
+        <div className="w-full h-full rounded-full border-4 border-[#FEC004]/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#FEC004] animate-spin" />
       </div>
     </div>
   );
@@ -116,24 +60,24 @@ export function LoadingScreen({
   if (fullScreen) {
     return (
       <div className={cn(
-        "min-h-screen min-h-[100dvh] flex items-center justify-center bg-[#02111B]",
+        "min-h-screen min-h-[100dvh] flex items-center justify-center transition-colors duration-300",
+        bgColor,
         className
       )}>
-        {contentV1}
+        {content}
       </div>
     );
   }
 
   return (
-    <div className={cn("flex items-center justify-center py-12", className)}>
-      {contentV1}
+    <div className={cn("flex items-center justify-center py-12 transition-colors duration-300", bgColor, className)}>
+      {content}
     </div>
   );
 }
 
 /**
  * Минимальный спиннер для использования внутри компонентов
- * Поддерживает V1 и V2 дизайн
  */
 export function LoadingSpinner({ 
   size = 'md', 
@@ -142,23 +86,17 @@ export function LoadingSpinner({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { version, isHydrated } = useDesignStoreHydrated();
-  const effectiveVersion = isHydrated ? version : 'v1';
-  
   const sizeClasses = {
     sm: 'w-5 h-5',
     md: 'w-8 h-8',
     lg: 'w-12 h-12'
   };
 
-  const borderBgColor = effectiveVersion === 'v2' ? 'border-[#FEC004]/20' : 'border-[#FFD700]/20';
-
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
-      <div className={cn(sizeClasses[size], "rounded-full border-2", borderBgColor)} />
+      <div className={cn(sizeClasses[size], "rounded-full border-2 border-[#FEC004]/20")} />
       <div className={cn(
-        "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin",
-        effectiveVersion === 'v2' ? 'border-t-[#FEC004]' : 'border-t-[#FFD700] border-r-[#FFA500]/50',
+        "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin border-t-[#FEC004]",
         sizeClasses[size]
       )} />
     </div>
@@ -167,7 +105,6 @@ export function LoadingSpinner({
 
 /**
  * Состояние загрузки для контента (таблицы, списки и т.д.)
- * Поддерживает V1 и V2 дизайн
  */
 export function LoadingState({ 
   message = 'Загрузка...', 
@@ -178,8 +115,7 @@ export function LoadingState({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { version, theme, isHydrated } = useDesignStoreHydrated();
-  const effectiveVersion = isHydrated ? version : 'v1';
+  const { theme, isHydrated } = useDesignStoreHydrated();
   const isDark = isHydrated ? theme === 'dark' : false;
   
   return (
@@ -190,9 +126,7 @@ export function LoadingState({
       <LoadingSpinner size={size} />
       <p className={cn(
         "text-sm", 
-        effectiveVersion === 'v2' 
-          ? isDark ? 'text-gray-400' : 'text-gray-600'
-          : 'text-[#9CA3AF]'
+        isDark ? 'text-gray-400' : 'text-gray-600'
       )}>{message}</p>
     </div>
   );
@@ -200,7 +134,6 @@ export function LoadingState({
 
 /**
  * Оверлей загрузки поверх контента
- * Поддерживает V1 и V2 дизайн
  */
 export function LoadingOverlay({ 
   isLoading, 
@@ -211,8 +144,7 @@ export function LoadingOverlay({
   message?: string;
   children: React.ReactNode;
 }) {
-  const { version, theme, isHydrated } = useDesignStoreHydrated();
-  const effectiveVersion = isHydrated ? version : 'v1';
+  const { theme, isHydrated } = useDesignStoreHydrated();
   const isDark = isHydrated ? theme === 'dark' : false;
   
   return (
@@ -221,9 +153,7 @@ export function LoadingOverlay({
       {isLoading && (
         <div className={cn(
           "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50",
-          effectiveVersion === 'v2' 
-            ? isDark ? 'bg-[#111827]/80' : 'bg-[#F3F3EE]/80'
-            : 'bg-[#02111B]/80'
+          isDark ? 'bg-[#111827]/80' : 'bg-[#F3F3EE]/80'
         )}>
           <LoadingState message={message} />
         </div>

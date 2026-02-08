@@ -49,8 +49,7 @@ const OrderViewModalComponent = ({
   const [activeTab, setActiveTab] = useState<ViewTab>('info');
   const [history, setHistory] = useState<OrderHistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
+  const { theme } = useDesignStore();
 
   // Сброс состояния при смене заказа
   useEffect(() => {
@@ -93,18 +92,12 @@ const OrderViewModalComponent = ({
       onClick={handleClose}
     >
       <div 
-        className={`w-full h-[calc(100vh-64px)] lg:h-auto lg:w-[768px] lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col ${isV2 
-          ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none lg:border border-gray-200 dark:border-gray-700 font-myriad"
-          : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] lg:border-2 border-[#FFD700]/50"
-        }`}
+        className="w-full h-[calc(100vh-64px)] lg:h-auto lg:w-[768px] lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none lg:border border-gray-200 dark:border-gray-700 font-myriad"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={isV2 
-          ? "flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between px-4 py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
-        }>
-          <h2 className={`text-lg font-bold ${isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"}`}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
             Заказ #{order.id}
           </h2>
           <div className="flex items-center gap-1">
@@ -113,10 +106,7 @@ const OrderViewModalComponent = ({
                 variant="ghost"
                 size="sm"
                 onClick={onEdit}
-                className={isV2 
-                  ? "h-9 w-9 p-0 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-                  : "h-9 w-9 p-0 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
-                }
+                className="h-9 w-9 p-0 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
                 title="Редактировать"
               >
                 <Edit className="h-5 w-5" />
@@ -126,10 +116,7 @@ const OrderViewModalComponent = ({
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className={isV2 
-                ? "h-9 w-9 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                : "h-9 w-9 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
-              }
+              className="h-9 w-9 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               title="Закрыть"
             >
               <X className="h-5 w-5" />
@@ -138,16 +125,13 @@ const OrderViewModalComponent = ({
         </div>
 
         {/* Tabs */}
-        <div className={isV2 
-          ? "flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] px-2"
-          : "flex border-b border-[#FFD700]/30 bg-[#17212b]/50 px-2"
-        }>
+        <div className="flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] px-2">
           <button
             onClick={() => setActiveTab('info')}
             className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'info'
-                ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
+                ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px'
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             Информация
@@ -156,8 +140,8 @@ const OrderViewModalComponent = ({
             onClick={() => setActiveTab('documents')}
             className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'documents'
-                ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
+                ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px'
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             Документы
@@ -166,8 +150,8 @@ const OrderViewModalComponent = ({
             onClick={() => setActiveTab('history')}
             className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'history'
-                ? (isV2 ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px' : 'text-[#FFD700] border-b-2 border-[#FFD700] -mb-px')
-                : (isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400')
+                ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px'
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             История
@@ -183,12 +167,11 @@ const OrderViewModalComponent = ({
               loadingCalls={loadingCalls}
               loadRecording={loadRecording}
               formatDate={formatDate}
-              isV2={isV2}
             />
           )}
 
           {activeTab === 'documents' && (
-            <DocumentsTab order={order} formatDate={formatDate} isV2={isV2} />
+            <DocumentsTab order={order} formatDate={formatDate} />
           )}
 
           {activeTab === 'history' && (
@@ -196,7 +179,6 @@ const OrderViewModalComponent = ({
               history={history} 
               loading={loadingHistory} 
               onRefresh={loadHistory}
-              isV2={isV2} 
             />
           )}
         </div>
@@ -211,90 +193,79 @@ const InfoTab = ({
   orderCalls,
   loadingCalls,
   loadRecording,
-  formatDate,
-  isV2
+  formatDate
 }: { 
   order: Order;
   orderCalls: Call[];
   loadingCalls: boolean;
   loadRecording: (call: Call) => void;
   formatDate: (date: string | number) => string;
-  isV2: boolean;
 }) => {
-  const statusColors = isV2 ? STATUS_COLORS_V2 : STATUS_COLORS;
+  const statusColors = STATUS_COLORS_V2;
   
   return (
     <div className="flex flex-col">
       {/* Две колонки: Заказ | Мастер и финансы */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 sm:divide-x ${isV2 ? 'divide-gray-200 dark:divide-gray-700' : 'divide-[#FFD700]/20'}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-gray-200 dark:divide-gray-700">
         {/* Левая колонка — информация по заказу */}
         <div className="p-4 space-y-1">
           <div className="flex items-center justify-between gap-2 mb-4">
-            <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>Информация по заказу</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Информация по заказу</h3>
           </div>
           
           {/* Бейджи статуса и типа */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
             <Badge 
-              className={`text-xs px-2.5 py-1 ${statusColors[order.statusOrder as keyof typeof statusColors] || (isV2 ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-gray-800 text-gray-300')}`}
+              className={`text-xs px-2.5 py-1 ${statusColors[order.statusOrder as keyof typeof statusColors] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
             >
               {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
             </Badge>
-            <Badge variant="outline" className={`text-xs px-2.5 py-1 ${isV2 
-              ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10 dark:bg-[#FEC004]/5"
-              : "border-[#FFD700]/30 text-[#FFD700]"
-            }`}>
+            <Badge variant="outline" className="text-xs px-2.5 py-1 border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10 dark:bg-[#FEC004]/5">
               {order.typeEquipment}
             </Badge>
           </div>
           
-          <DataRow label="Тип заявки" value={order.typeOrder} isV2={isV2} />
-          <DataRow label="РК" value={order.rk} isV2={isV2} />
-          <DataRow label="Источник" value={order.avitoName || '—'} muted={!order.avitoName} isV2={isV2} />
-          <DataRow label="Город" value={order.city} isV2={isV2} />
-          <DataRow label="Клиент" value={order.clientName} isV2={isV2} />
-          <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} isV2={isV2} />
-          <DataRow label="Дата встречи" value={formatDate(order.dateMeeting)} isV2={isV2} />
-          <DataRow label="Адрес" value={order.address} isV2={isV2} />
-          <DataRow label="Проблема" value={order.problem} isV2={isV2} />
+          <DataRow label="Тип заявки" value={order.typeOrder} />
+          <DataRow label="РК" value={order.rk} />
+          <DataRow label="Источник" value={order.avitoName || '—'} muted={!order.avitoName} />
+          <DataRow label="Город" value={order.city} />
+          <DataRow label="Клиент" value={order.clientName} />
+          <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} />
+          <DataRow label="Дата встречи" value={formatDate(order.dateMeeting)} />
+          <DataRow label="Адрес" value={order.address} />
+          <DataRow label="Проблема" value={order.problem} />
         </div>
 
         {/* Правая колонка — мастер и финансы */}
-        <div className={`p-4 space-y-1 border-t sm:border-t-0 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
-          <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-4`}>Мастер и финансы</h3>
+        <div className="p-4 space-y-1 border-t sm:border-t-0 border-gray-200 dark:border-gray-700">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Мастер и финансы</h3>
           
-          <DataRow label="Мастер" value={order.master?.name || 'Не назначен'} muted={!order.master?.name} isV2={isV2} />
+          <DataRow label="Мастер" value={order.master?.name || 'Не назначен'} muted={!order.master?.name} />
           
           <div className="h-3" />
           
-          <DataRow label="Итог" value={order.result ? `${order.result.toLocaleString()} ₽` : '—'} muted={!order.result} isV2={isV2} />
-          <DataRow label="Расходы" value={order.expenditure ? `${order.expenditure.toLocaleString()} ₽` : '—'} muted={!order.expenditure} isV2={isV2} />
-          <DataRow label="Чистая" value={order.clean ? `${order.clean.toLocaleString()} ₽` : '—'} muted={!order.clean} isV2={isV2} />
+          <DataRow label="Итог" value={order.result ? `${order.result.toLocaleString()} ₽` : '—'} muted={!order.result} />
+          <DataRow label="Расходы" value={order.expenditure ? `${order.expenditure.toLocaleString()} ₽` : '—'} muted={!order.expenditure} />
+          <DataRow label="Чистая" value={order.clean ? `${order.clean.toLocaleString()} ₽` : '—'} muted={!order.clean} />
         </div>
       </div>
 
       {/* Оператор */}
-      <div className={isV2 
-        ? "px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] flex items-center"
-        : "px-4 py-3 border-t border-[#FFD700]/20 bg-[#17212b]/30 flex items-center justify-between"
-      }>
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] flex items-center">
         <div className="flex items-center gap-2">
-          <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Оператор:</span>
-          <span className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>{order.operator.name}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Оператор:</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.operator.name}</span>
         </div>
       </div>
 
       {/* Записи звонков */}
-      <div className={`px-4 py-3 border-t ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
-        <h3 className={`text-base font-semibold ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-3`}>Записи звонков</h3>
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">Записи звонков</h3>
         
         {loadingCalls ? (
-          <div className={isV2 
-            ? "flex items-center gap-2 p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-            : "flex items-center gap-2 p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-          }>
+          <div className="flex items-center gap-2 p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
             <LoadingSpinner size="sm" />
-            <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>Загрузка...</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Загрузка...</span>
           </div>
         ) : orderCalls.length > 0 ? (
           <div className="space-y-2">
@@ -311,16 +282,12 @@ const InfoTab = ({
                 setVolume={() => {}}
                 stopPlayback={() => {}}
                 formatTime={() => ''}
-                isV2={isV2}
               />
             ))}
           </div>
         ) : (
-          <div className={isV2 
-            ? "p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 text-center"
-            : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 text-center"
-          }>
-            <span className={`text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>Записи не найдены</span>
+          <div className="p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 text-center">
+            <span className="text-sm text-gray-400 dark:text-gray-500">Записи не найдены</span>
           </div>
         )}
       </div>
@@ -329,46 +296,40 @@ const InfoTab = ({
 };
 
 // Вкладка "Документы"
-const DocumentsTab = ({ order, formatDate, isV2 }: { order: Order; formatDate: (date: string) => string; isV2: boolean }) => (
+const DocumentsTab = ({ order, formatDate }: { order: Order; formatDate: (date: string) => string }) => (
   <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
     {/* Документы в 2 колонки на десктопе, 1 на мобильных */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
       <div>
-        <h3 className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-2 sm:mb-3`}>
+        <h3 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
           БСО документы {order.bsoDoc?.length ? `(${order.bsoDoc.length})` : ''}
         </h3>
         {order.bsoDoc && order.bsoDoc.length > 0 ? (
           <div className="space-y-1.5 sm:space-y-2">
             {order.bsoDoc.map((doc, index) => (
-              <DocumentPreview key={index} fileKey={doc} index={index} isV2={isV2} />
+              <DocumentPreview key={index} fileKey={doc} index={index} />
             ))}
           </div>
         ) : (
-          <div className={isV2 
-            ? "flex items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#252d3a] rounded-lg border border-dashed border-gray-300 dark:border-gray-600"
-            : "flex items-center justify-center p-4 sm:p-6 bg-[#17212b] rounded-lg border border-dashed border-gray-700"
-          }>
-            <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>Нет документов</span>
+          <div className="flex items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#252d3a] rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+            <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500">Нет документов</span>
           </div>
         )}
       </div>
 
       <div>
-        <h3 className={`text-xs sm:text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'} mb-2 sm:mb-3`}>
+        <h3 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
           Документы расходов {order.expenditureDoc?.length ? `(${order.expenditureDoc.length})` : ''}
         </h3>
         {order.expenditureDoc && order.expenditureDoc.length > 0 ? (
           <div className="space-y-1.5 sm:space-y-2">
             {order.expenditureDoc.map((doc, index) => (
-              <DocumentPreview key={index} fileKey={doc} index={index} isV2={isV2} />
+              <DocumentPreview key={index} fileKey={doc} index={index} />
             ))}
           </div>
         ) : (
-          <div className={isV2 
-            ? "flex items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#252d3a] rounded-lg border border-dashed border-gray-300 dark:border-gray-600"
-            : "flex items-center justify-center p-4 sm:p-6 bg-[#17212b] rounded-lg border border-dashed border-gray-700"
-          }>
-            <span className={`text-xs sm:text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>Нет документов</span>
+          <div className="flex items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#252d3a] rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+            <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500">Нет документов</span>
           </div>
         )}
       </div>
@@ -381,13 +342,11 @@ const DocumentsTab = ({ order, formatDate, isV2 }: { order: Order; formatDate: (
 const HistoryTab = ({ 
   history, 
   loading, 
-  onRefresh,
-  isV2 
+  onRefresh
 }: { 
   history: OrderHistoryItem[]; 
   loading: boolean;
   onRefresh: () => void;
-  isV2: boolean;
 }) => {
   const getEventLabel = (eventType: string) => {
     const labels: Record<string, { text: string }> = {
@@ -407,10 +366,10 @@ const HistoryTab = ({
     // Изменение статуса
     if (metadata.oldStatus && metadata.newStatus) {
       changes.push(
-        <span key="status" className={isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}>
-          Статус: <span className={isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}>{metadata.oldStatus}</span>
+        <span key="status" className="text-gray-700 dark:text-gray-300">
+          Статус: <span className="text-gray-400 dark:text-gray-500">{metadata.oldStatus}</span>
           {' → '}
-          <span className={isV2 ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-white font-medium'}>{metadata.newStatus}</span>
+          <span className="text-gray-900 dark:text-gray-100 font-medium">{metadata.newStatus}</span>
         </span>
       );
     }
@@ -418,8 +377,8 @@ const HistoryTab = ({
     // Закрытие заказа
     if (metadata.result) {
       changes.push(
-        <span key="result" className={isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}>
-          Итог: <span className={isV2 ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-white font-medium'}>{metadata.result} ₽</span>
+        <span key="result" className="text-gray-700 dark:text-gray-300">
+          Итог: <span className="text-gray-900 dark:text-gray-100 font-medium">{metadata.result} ₽</span>
         </span>
       );
     }
@@ -451,10 +410,10 @@ const HistoryTab = ({
           }
 
           changes.push(
-            <span key={field} className={isV2 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'}>
-              {label}: <span className={isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}>{String(oldVal)}</span>
+            <span key={field} className="text-gray-700 dark:text-gray-300">
+              {label}: <span className="text-gray-400 dark:text-gray-500">{String(oldVal)}</span>
               {' → '}
-              <span className={isV2 ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-white font-medium'}>{String(newVal)}</span>
+              <span className="text-gray-900 dark:text-gray-100 font-medium">{String(newVal)}</span>
             </span>
           );
         }
@@ -478,7 +437,7 @@ const HistoryTab = ({
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
           История изменений
         </h3>
         <Button
@@ -486,29 +445,20 @@ const HistoryTab = ({
           size="sm"
           onClick={onRefresh}
           disabled={loading}
-          className={isV2 
-            ? "h-8 px-2 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-            : "h-8 px-2 text-gray-400 hover:text-[#FFD700] hover:bg-[#FFD700]/10"
-          }
+          className="h-8 px-2 text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
       {loading ? (
-        <div className={isV2 
-          ? "flex items-center justify-center py-8 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-          : "flex items-center justify-center py-8 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-        }>
+        <div className="flex items-center justify-center py-8 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
           <LoadingSpinner size="md" />
         </div>
       ) : history.length === 0 ? (
-        <div className={isV2 
-          ? "flex flex-col items-center justify-center py-8 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-          : "flex flex-col items-center justify-center py-8 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-        }>
-          <History className={`w-8 h-8 mb-2 ${isV2 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600'}`} />
-          <span className={`text-sm ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>История пуста</span>
+        <div className="flex flex-col items-center justify-center py-8 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
+          <History className="w-8 h-8 mb-2 text-gray-300 dark:text-gray-600" />
+          <span className="text-sm text-gray-400 dark:text-gray-500">История пуста</span>
         </div>
       ) : (
         <div className="space-y-3">
@@ -519,14 +469,11 @@ const HistoryTab = ({
             return (
               <div 
                 key={item.id}
-                className={isV2 
-                  ? "p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-                  : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-                }
+                className="p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {eventConfig.text}
                     </div>
                     {changes && (
@@ -538,11 +485,11 @@ const HistoryTab = ({
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <div className={`text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">
                       {formatDateTime(item.timestamp)}
                     </div>
                     {(item.userName || item.login) && (
-                      <div className={`text-xs mt-0.5 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>
+                      <div className="text-xs mt-0.5 text-gray-500 dark:text-gray-400">
                         {item.userName || item.login}
                       </div>
                     )}
@@ -559,22 +506,19 @@ const HistoryTab = ({
 
 // === Вспомогательные компоненты ===
 
-const DataRow = ({ label, value, muted = false, isV2 = false }: { label: string; value: string; muted?: boolean; isV2?: boolean }) => (
+const DataRow = ({ label, value, muted = false }: { label: string; value: string; muted?: boolean }) => (
   <div className="flex justify-between items-start gap-3 py-1">
-    <span className={`text-sm ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'} shrink-0`}>{label}</span>
-    <span className={`text-sm text-right break-words min-w-0 ${muted ? (isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500') : (isV2 ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-white font-medium')}`}>{value}</span>
+    <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">{label}</span>
+    <span className={`text-sm text-right break-words min-w-0 ${muted ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>{value}</span>
   </div>
 );
 
-const DocumentPreview = ({ fileKey, index, isV2 = false }: { fileKey: string; index: number; isV2?: boolean }) => {
+const DocumentPreview = ({ fileKey, index }: { fileKey: string; index: number }) => {
   const { url, loading } = useFileUrl(fileKey);
   
   if (loading) {
     return (
-      <div className={isV2 
-        ? "flex items-center justify-center p-4 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-        : "flex items-center justify-center p-4 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-      }>
+      <div className="flex items-center justify-center p-4 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
         <LoadingSpinner size="sm" />
       </div>
     );
@@ -585,14 +529,11 @@ const DocumentPreview = ({ fileKey, index, isV2 = false }: { fileKey: string; in
       href={url || '#'} 
       target="_blank" 
       rel="noopener noreferrer"
-      className={isV2 
-        ? "flex items-center gap-3 p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004]/30 transition-colors"
-        : "flex items-center gap-3 p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20 hover:bg-[#FFD700]/10 transition-colors"
-      }
+      className="flex items-center gap-3 p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-[#FEC004]/10 hover:border-[#FEC004]/30 transition-colors"
     >
-      <FileText className={isV2 ? "h-5 w-5 text-[#FEC004]" : "h-5 w-5 text-[#FFD700]"} />
-      <span className={`text-sm flex-1 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Документ #{index + 1}</span>
-      <span className={`text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>↗</span>
+      <FileText className="h-5 w-5 text-[#FEC004]" />
+      <span className="text-sm flex-1 text-gray-900 dark:text-gray-100">Документ #{index + 1}</span>
+      <span className="text-xs text-gray-400 dark:text-gray-500">↗</span>
     </a>
   );
 };
@@ -600,7 +541,6 @@ const DocumentPreview = ({ fileKey, index, isV2 = false }: { fileKey: string; in
 const CallPlayer = ({
   call,
   loadRecording,
-  isV2 = false,
 }: {
   call: Call;
   audioPlayer: unknown;
@@ -612,22 +552,18 @@ const CallPlayer = ({
   setVolume: (volume: number) => void;
   stopPlayback: () => void;
   formatTime: (time: number) => string;
-  isV2?: boolean;
 }) => {
   // Format date - handle both createdAt and dateCreate
   const callDate = (call as unknown as { createdAt?: string; dateCreate?: string }).createdAt || 
                    (call as unknown as { dateCreate?: string }).dateCreate;
 
   return (
-    <div className={isV2 
-      ? "p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
-      : "p-3 bg-[#17212b] rounded-lg border border-[#FFD700]/20"
-    }>
+    <div className="p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col min-w-0">
-          <span className={`text-sm font-medium ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-white'}`}>Звонок #{call.id}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Звонок #{call.id}</span>
           {callDate && (
-            <span className={`text-xs ${isV2 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500'}`}>
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               {new Date(callDate).toLocaleString('ru-RU')}
             </span>
           )}
@@ -636,10 +572,7 @@ const CallPlayer = ({
           variant="ghost"
           size="sm"
           onClick={() => loadRecording(call)}
-          className={`shrink-0 ${isV2 
-            ? "h-10 w-10 p-0 text-[#FEC004] hover:bg-[#FEC004]/10 border border-[#FEC004]/30 rounded-full"
-            : "h-10 w-10 p-0 text-[#FFD700] hover:bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-full"
-          }`}
+          className="shrink-0 h-10 w-10 p-0 text-[#FEC004] hover:bg-[#FEC004]/10 border border-[#FEC004]/30 rounded-full"
           title="Воспроизвести запись"
         >
           <Play className="h-5 w-5" />

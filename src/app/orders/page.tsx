@@ -14,7 +14,6 @@ import {
   OrderEditModal 
 } from '@/components/orders';
 import { useOrders } from '@/hooks/useOrders';
-import { useDesignStore } from '@/store/designStore';
 import { StickyAudioPlayer } from '@/components/telephony/v2/StickyAudioPlayer';
 import { Call } from '@/types/orders';
 import { toast } from 'sonner';
@@ -24,8 +23,6 @@ function OrdersContent() {
   const searchParams = useSearchParams();
   const orderIdFromUrl = searchParams.get('orderId');
   const openedRef = useRef(false);
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
   
   // Audio player state
   const [playingCall, setPlayingCall] = useState<Call | null>(null);
@@ -155,7 +152,7 @@ function OrdersContent() {
 
   return (
     <DashboardLayout>
-      <div className={`w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen custom-scrollbar ${isV2 ? 'bg-[#F3F3EE] dark:bg-[#111827]' : 'bg-[#0f0f23]'}`}>
+      <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen custom-scrollbar bg-[#F3F3EE] dark:bg-[#111827]">
         <div className="w-full">
           <div className="space-y-4 w-full">
             {/* Time Slots Table */}

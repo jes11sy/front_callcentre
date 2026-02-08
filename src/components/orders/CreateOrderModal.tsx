@@ -77,8 +77,7 @@ export default function CreateOrderModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuthStore(); // 🍪 Получаем user из store
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
+  const { theme } = useDesignStore();
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -134,28 +133,15 @@ export default function CreateOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-0 sm:p-4">
-      <div className={`w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg flex flex-col ${isV2 
-        ? "bg-[#F3F3EE] dark:bg-[#1e2530] sm:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none sm:max-w-2xl font-myriad"
-        : "bg-[#0f0f23] sm:border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] sm:max-w-2xl"
-      }`}>
-        <div className={isV2 
-          ? "flex items-center justify-between px-3 sm:p-4 py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between px-3 sm:p-4 py-2 sm:py-4 border-b border-[#FFD700]/30"
-        }>
-          <h2 className={`text-base sm:text-xl font-bold flex items-center gap-2 ${isV2 
-            ? "text-gray-900 dark:text-gray-100"
-            : "text-[#FFD700]"
-          }`}>
-            {!isV2 && <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFD700]" />}
+      <div className="w-full h-full sm:h-auto sm:max-h-[85vh] sm:rounded-lg flex flex-col bg-[#F3F3EE] dark:bg-[#1e2530] sm:border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-none sm:max-w-2xl font-myriad">
+        <div className="flex items-center justify-between px-3 sm:p-4 py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
+          <h2 className="text-base sm:text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <span className="hidden sm:inline">Создать новый заказ</span>
             <span className="sm:hidden">Новый заказ</span>
           </h2>
           <button
             onClick={handleClose}
-            className={isV2 
-              ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center"
-              : "h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10 rounded flex items-center justify-center"
-            }
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -166,31 +152,28 @@ export default function CreateOrderModal({
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
           {/* Основная информация */}
-          <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+          <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-1">
-              <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                <FileText className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                <FileText className="h-5 w-5 text-[#FEC004]" />
                 Основная информация
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="rk" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Рекламная Компания *</Label>
+                  <Label htmlFor="rk" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
                   <Controller
                     name="rk"
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400"
-                        }>
+                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
-                        <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
+                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
                           {RK_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>
+                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
                               {option}
                             </SelectItem>
                           ))}
@@ -203,21 +186,18 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Город *</Label>
+                  <Label htmlFor="city" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
                   <Controller
                     name="city"
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400"
-                        }>
+                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите город" />
                         </SelectTrigger>
-                        <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
+                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
                           {CITY_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>
+                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
                               {option}
                             </SelectItem>
                           ))}
@@ -230,21 +210,18 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="avitoName" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Источник</Label>
+                  <Label htmlFor="avitoName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Источник</Label>
                   <Controller
                     name="avitoName"
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400"
-                        }>
+                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите источник" />
                         </SelectTrigger>
-                        <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
+                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
                           {SOURCE_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>
+                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
                               {option}
                             </SelectItem>
                           ))}
@@ -258,32 +235,29 @@ export default function CreateOrderModal({
           </Card>
 
           {/* Информация о клиенте */}
-          <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+          <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-1">
-              <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                <User className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                <User className="h-5 w-5 text-[#FEC004]" />
                 Информация о клиенте
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="clientName" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Имя клиента *</Label>
+                  <Label htmlFor="clientName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Имя клиента *</Label>
                   <Input
                     id="clientName"
                     {...register('clientName')}
                     placeholder="Введите имя клиента"
-                    className={isV2 
-                      ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-                      : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                    }
+                    className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
                   />
                   {errors.clientName && (
                     <p className="text-sm text-red-400">{errors.clientName.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Телефон *</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium text-gray-600 dark:text-gray-400">Телефон *</Label>
                   <Controller
                     name="phone"
                     control={form.control}
@@ -312,10 +286,7 @@ export default function CreateOrderModal({
                           field.onChange(input);
                         }}
                         placeholder="Введите номер телефона"
-                        className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                        }
+                        className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
                       />
                     )}
                   />
@@ -325,15 +296,12 @@ export default function CreateOrderModal({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Адрес *</Label>
+                <Label htmlFor="address" className="text-sm font-medium text-gray-600 dark:text-gray-400">Адрес *</Label>
                 <Input
                   id="address"
                   {...register('address')}
                   placeholder="Введите адрес"
-                  className={isV2 
-                    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
-                    : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                  }
+                  className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20"
                 />
                 {errors.address && (
                   <p className="text-sm text-red-400">{errors.address.message}</p>
@@ -343,32 +311,29 @@ export default function CreateOrderModal({
           </Card>
 
           {/* Детали заказа */}
-          <Card className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700" : "bg-[#17212b] border-[#FFD700]/30"}>
+          <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-1">
-              <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isV2 ? 'text-gray-900 dark:text-gray-100' : 'text-[#FFD700]'}`}>
-                <Settings className={`h-5 w-5 ${isV2 ? 'text-[#FEC004]' : ''}`} />
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                <Settings className="h-5 w-5 text-[#FEC004]" />
                 Детали заказа
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="typeOrder" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Тип заказа *</Label>
+                  <Label htmlFor="typeOrder" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип заказа *</Label>
                   <Controller
                     name="typeOrder"
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400"
-                        }>
+                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите тип заказа" />
                         </SelectTrigger>
-                        <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
-                          <SelectItem value="Впервые" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>Впервые</SelectItem>
-                          <SelectItem value="Повтор" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>Повтор</SelectItem>
-                          <SelectItem value="Гарантия" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>Гарантия</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                          <SelectItem value="Впервые" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Впервые</SelectItem>
+                          <SelectItem value="Повтор" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Повтор</SelectItem>
+                          <SelectItem value="Гарантия" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Гарантия</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -378,22 +343,19 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="typeEquipment" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Тип техники *</Label>
+                  <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
                   <Controller
                     name="typeEquipment"
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={isV2 
-                          ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-                          : "bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400"
-                        }>
+                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите тип техники" />
                         </SelectTrigger>
-                        <SelectContent className={isV2 ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600" : "bg-[#0f0f23] border-[#FFD700]/30"}>
-                          <SelectItem value="КП" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>КП</SelectItem>
-                          <SelectItem value="БТ" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>БТ</SelectItem>
-                          <SelectItem value="МНЧ" className={isV2 ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100" : "text-white hover:bg-[#FFD700]/10"}>МНЧ</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                          <SelectItem value="КП" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">КП</SelectItem>
+                          <SelectItem value="БТ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">БТ</SelectItem>
+                          <SelectItem value="МНЧ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">МНЧ</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -404,31 +366,25 @@ export default function CreateOrderModal({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dateMeeting" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Дата встречи *</Label>
+                <Label htmlFor="dateMeeting" className="text-sm font-medium text-gray-600 dark:text-gray-400">Дата встречи *</Label>
                 <Input
                   id="dateMeeting"
                   type="datetime-local"
                   {...register('dateMeeting')}
-                  className={isV2 
-                    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 dark:[color-scheme:dark]"
-                    : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
-                  }
+                  className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 dark:[color-scheme:dark]"
                 />
                 {errors.dateMeeting && (
                   <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="problem" className={`text-sm font-medium ${isV2 ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>Описание проблемы *</Label>
+                <Label htmlFor="problem" className="text-sm font-medium text-gray-600 dark:text-gray-400">Описание проблемы *</Label>
                 <Textarea
                   id="problem"
                   {...register('problem')}
                   placeholder="Опишите проблему"
                   rows={2}
-                  className={isV2 
-                    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
-                    : "bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20 resize-none"
-                  }
+                  className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
                 />
                 {errors.problem && (
                   <p className="text-sm text-red-400">{errors.problem.message}</p>
@@ -444,20 +400,14 @@ export default function CreateOrderModal({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={`text-sm ${isV2 
-                  ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10"
-                }`}
+                className="text-sm border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Отмена
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={`text-sm ${isV2 
-                  ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
-                  : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFC700] hover:to-[#FF8C00] text-[#0f0f23] font-semibold shadow-lg hover:shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-200"
-                }`}
+                className="text-sm bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
               >
                 {isSubmitting ? (
                   <>

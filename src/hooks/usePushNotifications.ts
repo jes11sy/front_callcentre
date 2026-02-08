@@ -91,6 +91,24 @@ export const usePushNotifications = () => {
     retry: false,
   });
 
+  // Обработка сообщения от SW о смене подписки
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'PUSH_SUBSCRIPTION_CHANGED') {
+        console.log('[Push] Подписка изменилась, переподписываемся...');
+        // Автоматически переподписываемся
+        subscribeMutation.mutate();
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('message', handleMessage);
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleMessage);
+    };
+  }, [subscribeMutation]);
+
   // Проверка поддержки и текущего состояния
   useEffect(() => {
     const checkSupport = async () => {

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useDesignStoreHydrated } from '@/store/designStore';
+import { useDesignStore } from '@/store/designStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { 
@@ -34,7 +34,7 @@ const DEFAULT_POSITION = { x: 240, y: 100 }; // left-60 = 240px
 
 export function Sidebar() {
   const { user } = useAuthStore();
-  const { version, toggleVersion, theme, toggleTheme } = useDesignStoreHydrated();
+  const { theme, toggleTheme } = useDesignStore();
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -269,41 +269,23 @@ export function Sidebar() {
 
       {/* Bottom Section */}
       <div className={`px-5 ${isMobile ? 'space-y-4 pb-16' : 'space-y-3 pb-6'}`}>
-        {/* Version Toggle - только для V1 */}
-        {version === 'v1' && (
-          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
-            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} text-[#FEC004]`}>V1</span>
-            <button
-              onClick={toggleVersion}
-              className="relative w-12 h-6 rounded-full transition-colors duration-300 bg-gray-300 dark:bg-gray-600"
-            >
-              <span
-                className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 translate-x-0"
-              />
-            </button>
-            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} text-gray-400`}>V2</span>
-          </div>
-        )}
-
-        {/* Theme Toggle - только для V2 */}
-        {version === 'v2' && (
-          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
-            <Sun className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-            <button
-              onClick={toggleTheme}
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
+        {/* Theme Toggle */}
+        <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
+          <Sun className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+          <button
+            onClick={toggleTheme}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+              theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
+                theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
               }`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
-                  theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-            <Moon className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-          </div>
-        )}
+            />
+          </button>
+          <Moon className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
+        </div>
 
         {/* Notifications - только для десктопа */}
         {!isMobile && (

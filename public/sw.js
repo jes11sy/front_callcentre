@@ -115,24 +115,23 @@ self.addEventListener('notificationclose', (event) => {
 });
 
 // Обработка изменения подписки на push
+// При изменении подписки оповещаем клиент для повторной подписки с VAPID ключом
 self.addEventListener('pushsubscriptionchange', (event) => {
-  console.log('[SW] Push подписка изменилась');
+  console.log('[SW] Push подписка изменилась, оповещаем клиент');
 
   event.waitUntil(
-    self.registration.pushManager
-      .subscribe({
-        userVisibleOnly: true,
-      })
-      .then((subscription) => {
-        // Отправляем новую подписку на сервер
-        return fetch('/api/push/resubscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(subscription),
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: 'PUSH_SUBSCRIPTION_CHANGED',
+            oldSubscription: event.oldSubscription ? event.oldSubscription.toJSON() : null,
+            newSubscription: event.newSubscription ? event.newSubscription.toJSON() : null,
+          });
         });
       })
       .catch((error) => {
-        console.error('[SW] Ошибка переподписки:', error);
+        console.error('[SW] Ошибка оповещения клиента:', error);
       })
   );
 });

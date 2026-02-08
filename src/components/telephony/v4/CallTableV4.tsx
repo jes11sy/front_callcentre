@@ -92,7 +92,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLimitChange,
   stats
 }) => {
-  const { version } = useDesignStore();
+  const { theme } = useDesignStore();
   
   // Local state
   const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
@@ -115,41 +115,24 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
     const todayCalls = calls.filter(c => isToday(c.createdAt)).length;
     
     if (stats) {
-      // Для V2: показываем только за сегодня
-      if (version === 'v2') {
-        return {
-          all: stats.todayCalls,
-          missed: missedToday,
-          answered: stats.answeredCalls,
-          today: stats.todayCalls
-        };
-      }
+      // Показываем только за сегодня
       return {
-        all: stats.totalCalls,
-        missed: stats.missedCalls,
+        all: stats.todayCalls,
+        missed: missedToday,
         answered: stats.answeredCalls,
         today: stats.todayCalls
       };
     }
     
     // Fallback на локальный подсчёт
-    // Для V2: показываем только за сегодня
-    if (version === 'v2') {
-      return {
-        all: todayCalls,
-        missed: missedToday,
-        answered: calls.filter(c => c.status === 'answered' && isToday(c.createdAt)).length,
-        today: todayCalls
-      };
-    }
-    
+    // Показываем только за сегодня
     return {
-      all: totalCalls,
-      missed: calls.filter(c => c.status === 'missed').length,
-      answered: calls.filter(c => c.status === 'answered').length,
+      all: todayCalls,
+      missed: missedToday,
+      answered: calls.filter(c => c.status === 'answered' && isToday(c.createdAt)).length,
       today: todayCalls
     };
-  }, [stats, calls, totalCalls, version]);
+  }, [stats, calls, totalCalls]);
 
   // Локальная фильтрация для поиска и быстрых фильтров
   // Серверная пагинация уже применена, здесь только дополнительная фильтрация на клиенте
@@ -239,8 +222,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   }
 
   // V2 Design
-  if (version === 'v2') {
-    return (
+  return (
       <>
         {/* Фильтры отдельно для V2 */}
         <div className="mb-4 sm:mb-6 bg-white dark:bg-[#1e2530] rounded-xl p-3 sm:p-4 shadow-sm dark:shadow-none dark:border dark:border-gray-700">
@@ -417,184 +399,6 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
         {isStickyPlayerVisible && <div className="h-20" />}
       </>
     );
-  }
-
-  // V1 Design (original)
-  return (
-    <>
-      <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="p-4">
-          {/* Быстрые фильтры */}
-          <div className="mb-4">
-            <QuickFilterChips
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              counts={filterCounts}
-            />
-          </div>
-
-          {/* Таблица */}
-          <div className="overflow-x-auto rounded-lg border border-[#FFD700]/20">
-            <Table className="table-fixed w-full">
-              <TableHeader>
-                <TableRow className="bg-[#0f0f23] border-[#FFD700]/20 hover:bg-[#0f0f23]">
-                  <TableHead className="w-[18%] py-3 px-4">
-                    <span className="text-white font-medium">Клиент</span>
-                  </TableHead>
-                  <TableHead className="w-[22%] py-3 px-4">
-                    <button 
-                      onClick={() => onSort('city')}
-                      className="flex items-center text-white font-medium hover:text-[#FFD700] transition-colors"
-                    >
-                      Источник
-                      <SortIcon field="city" />
-                    </button>
-                  </TableHead>
-                  <TableHead className="w-[18%] py-3 px-4">
-                    <button 
-                      onClick={() => onSort('createdAt')}
-                      className="flex items-center text-white font-medium hover:text-[#FFD700] transition-colors"
-                    >
-                      Дата и время
-                      <SortIcon field="createdAt" />
-                    </button>
-                  </TableHead>
-                  <TableHead className="w-[20%] py-3 px-4">
-                    <span className="text-white font-medium">Оператор</span>
-                  </TableHead>
-                  <TableHead className="w-[22%] py-3 px-4 text-right">
-                    <span className="text-white font-medium"></span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <td colSpan={5} className="text-center py-12">
-                      <LoadingState message="Загрузка звонков..." size="md" />
-                    </td>
-                  </TableRow>
-                ) : displayedGroupsCount === 0 ? (
-                  <TableRow>
-                    <td colSpan={5} className="text-center py-12">
-                      <EmptyState
-                        title="Звонки не найдены"
-                        description={searchTerm || activeFilter !== 'all' 
-                          ? "Попробуйте изменить параметры фильтрации" 
-                          : "Нет данных для отображения"
-                        }
-                      />
-                    </td>
-                  </TableRow>
-                ) : (
-                  Object.entries(filteredGroupedCalls).map(([phoneClient, groupCalls]) => {
-                    const isExpanded = expandedGroups.has(phoneClient);
-                    const latestCall = groupCalls[0];
-                    const hasMultipleCalls = groupCalls.length > 1;
-                    
-                    return (
-                      <React.Fragment key={phoneClient}>
-                        <CallRowV4
-                          call={latestCall}
-                          phoneClient={phoneClient}
-                          groupCalls={groupCalls}
-                          hasMultipleCalls={hasMultipleCalls}
-                          isExpanded={isExpanded}
-                          isMainRow={true}
-                          onToggleGroup={onToggleGroup}
-                          onCreateOrder={onCreateOrder}
-                          onLoadOrderHistory={onLoadOrderHistory}
-                          onPlayRecording={handlePlayRecording}
-                          onDownloadRecording={onDownloadRecording}
-                          isPlaying={playingCall === latestCall.id}
-                          orderHistoryLoading={orderHistoryLoading}
-                        />
-                        
-                        {isExpanded && groupCalls.slice(1).map((call) => (
-                          <CallRowV4
-                            key={call.id}
-                            call={call}
-                            phoneClient={phoneClient}
-                            groupCalls={groupCalls}
-                            hasMultipleCalls={false}
-                            isExpanded={false}
-                            isMainRow={false}
-                            onToggleGroup={onToggleGroup}
-                            onCreateOrder={onCreateOrder}
-                            onLoadOrderHistory={onLoadOrderHistory}
-                            onPlayRecording={handlePlayRecording}
-                            onDownloadRecording={onDownloadRecording}
-                            isPlaying={playingCall === call.id}
-                            orderHistoryLoading={orderHistoryLoading}
-                          />
-                        ))}
-                      </React.Fragment>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Пагинация */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm text-gray-500">На странице:</Label>
-              <Select
-                value={limit.toString()}
-                onValueChange={(value) => {
-                  onLimitChange(parseInt(value));
-                  onPageChange(1);
-                }}
-                disabled={loading}
-              >
-                <SelectTrigger className="w-16 h-8 bg-[#0f0f23] border-[#FFD700]/20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                  {GROUP_SIZES.map((size) => (
-                    <SelectItem 
-                      key={size.value} 
-                      value={size.value}
-                      className="text-white focus:bg-[#FFD700]/20"
-                    >
-                      {size.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {totalPages > 1 && (
-              <OptimizedPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-                showFirstLast={true}
-                showPrevNext={true}
-                maxVisiblePages={5}
-                disabled={loading}
-              />
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Sticky Audio Player */}
-      <StickyAudioPlayer
-        call={stickyPlayerCall}
-        audioUrl={currentAudioUrl}
-        isVisible={isStickyPlayerVisible}
-        onClose={handleCloseStickyPlayer}
-        onDownload={onDownloadRecording}
-      />
-
-      {/* Spacer for sticky player */}
-      {isStickyPlayerVisible && <div className="h-20" />}
-    </>
-  );
 };
 
 CallTableV4.displayName = 'CallTableV4';

@@ -59,11 +59,11 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var stored = localStorage.getItem('design-store');
+                  var stored = localStorage.getItem('design-storage');
                   if (stored) {
                     var parsed = JSON.parse(stored);
                     var state = parsed.state || parsed;
-                    if (state.version === 'v2' && state.theme === 'dark') {
+                    if (state.theme === 'dark') {
                       document.documentElement.classList.add('dark');
                     }
                   }

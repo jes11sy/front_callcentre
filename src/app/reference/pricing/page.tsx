@@ -10,16 +10,8 @@ import { useRouter } from 'next/navigation';
 
 export default function PricingPage() {
   const router = useRouter();
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
-  
-  const cardClass = isV2 
-    ? "border border-gray-200 bg-white font-myriad"
-    : "border-2 border-[#FFD700]/30 bg-[#17212b]";
-  
-  const badgeClass = isV2 
-    ? "font-semibold border-[#FEC004]/30 text-[#FEC004]"
-    : "font-semibold border-[#FFD700]/30 text-[#FFD700]";
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
   const pricingData = [
     {
       category: 'КП (Компьютеры)',
@@ -219,163 +211,54 @@ export default function PricingPage() {
     }
   ];
 
-  // V2: Минималистичная версия
-  if (isV2) {
-    return (
-      <DashboardLayout>
-        <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
-          <div className="max-w-4xl space-y-8 sm:space-y-10">
-            
-            {/* Кнопка назад - только мобилка */}
-            <button
-              onClick={() => router.back()}
-              className="sm:hidden flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 -mb-4"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Назад
-            </button>
-
-            {pricingData.map((category, index) => (
-              <section key={index}>
-                <h2 className="text-xl text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">{category.category}</h2>
-                
-                <div className="space-y-8">
-                  {category.subcategories.map((subcategory, subIndex) => (
-                    <div key={subIndex}>
-                      <h3 className="text-base text-gray-700 dark:text-gray-300 mb-3">{subcategory.name}</h3>
-                      <div className="space-y-1">
-                        {subcategory.services.map((service, serviceIndex) => (
-                          <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                            <span className="text-gray-700 dark:text-gray-300">{service.name}</span>
-                            <span className="text-[#FEC004] font-medium">{service.price}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-
-            {/* Доп информация */}
-            <section className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border border-orange-200 dark:border-orange-500/30">
-              <h2 className="text-lg text-orange-700 dark:text-orange-400 mb-4">Дополнительная информация</h2>
-              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>Гарантия на все виды работ — 3-6 месяцев</li>
-                <li>Оплата производится после выполнения работ</li>
-                <li>Постоянным клиентам скидки до 15%</li>
-                <li>Выезд мастера: 500₽ (засчитывается в стоимость ремонта)</li>
-              </ul>
-            </section>
-
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  // V1: Оригинальный дизайн с карточками
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-6 lg:px-8 min-h-screen bg-[#0f0f23]">
-        {/* Кнопка назад - только мобилка */}
-        <button
-          onClick={() => router.back()}
-          className="sm:hidden flex items-center gap-1 text-sm text-gray-400 hover:text-gray-300 mb-4"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Назад
-        </button>
+      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+        <div className="max-w-4xl space-y-8 sm:space-y-10">
+          
+          {/* Кнопка назад - только мобилка */}
+          <button
+            onClick={() => router.back()}
+            className="sm:hidden flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 -mb-4"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Назад
+          </button>
 
-        <div className="flex items-center space-x-3 mb-6 sm:mb-8">
-          <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-[#FFD700]" />
-          <div>
-            <h1 className="text-xl sm:text-3xl font-bold text-[#FFD700]">Прайс-лист</h1>
-            <p className="text-sm sm:text-base text-gray-400">Актуальные цены на услуги по ремонту</p>
-          </div>
-        </div>
-
-      <div className="space-y-8">
-        {pricingData.map((category, index) => {
-          const Icon = category.icon;
-          return (
-            <div key={index} className="space-y-6">
-              <Card className={cardClass}>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-white">
-                    <Icon className="h-6 w-6 text-[#FFD700]" />
-                    <span>{category.category}</span>
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">Услуги по ремонту {category.category.toLowerCase()}</CardDescription>
-                </CardHeader>
-              </Card>
+          {pricingData.map((category, index) => (
+            <section key={index}>
+              <h2 className="text-xl text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">{category.category}</h2>
               
-              <div className="grid gap-6">
+              <div className="space-y-8">
                 {category.subcategories.map((subcategory, subIndex) => (
-                  <Card key={subIndex} className={`ml-4 ${cardClass}`}>
-                    <CardHeader>
-                      <CardTitle className="text-lg text-white">{subcategory.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-white">Услуга</TableHead>
-                            <TableHead className="text-right text-white">Цена</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {subcategory.services.map((service, serviceIndex) => (
-                            <TableRow key={serviceIndex}>
-                              <TableCell className="font-medium text-white">{service.name}</TableCell>
-                              <TableCell className="text-right">
-                                <Badge variant="outline" className={badgeClass}>
-                                  {service.price}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
+                  <div key={subIndex}>
+                    <h3 className="text-base text-gray-700 dark:text-gray-300 mb-3">{subcategory.name}</h3>
+                    <div className="space-y-1">
+                      {subcategory.services.map((service, serviceIndex) => (
+                        <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                          <span className="text-gray-700 dark:text-gray-300">{service.name}</span>
+                          <span className="text-[#FEC004] font-medium">{service.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-          );
-        })}
-      </div>
+            </section>
+          ))}
 
-        <Card className="border-2 border-orange-500/30 bg-orange-900/20">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-orange-300">
-              <Badge variant="outline" className="border-orange-500/30 text-orange-300">
-                Важно
-              </Badge>
-              <span>Дополнительная информация</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid gap-2 text-sm">
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Гарантия</Badge>
-                <span className="text-white">На все виды работ предоставляется гарантия 3-6 месяцев</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Оплата</Badge>
-                <span className="text-white">Оплата производится после выполнения работ</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Скидки</Badge>
-                <span className="text-white">Постоянным клиентам предоставляются скидки до 15%</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-[#FFD700]/30 text-[#FFD700]">Выезд</Badge>
-                <span className="text-white">Выезд мастера на дом: 500₽ (засчитывается в стоимость ремонта)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Доп информация */}
+          <section className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border border-orange-200 dark:border-orange-500/30">
+            <h2 className="text-lg text-orange-700 dark:text-orange-400 mb-4">Дополнительная информация</h2>
+            <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+              <li>Гарантия на все виды работ — 3-6 месяцев</li>
+              <li>Оплата производится после выполнения работ</li>
+              <li>Постоянным клиентам скидки до 15%</li>
+              <li>Выезд мастера: 500₽ (засчитывается в стоимость ремонта)</li>
+            </ul>
+          </section>
+
+        </div>
       </div>
     </DashboardLayout>
   );

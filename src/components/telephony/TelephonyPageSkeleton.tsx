@@ -270,11 +270,5 @@ function TelephonyPageSkeletonV1() {
 
 // Основной скелетон страницы телефонии
 export function TelephonyPageSkeleton() {
-  const { version } = useDesignStore();
-  
-  if (version === 'v2') {
-    return <TelephonyPageSkeletonV2 />;
-  }
-  
-  return <TelephonyPageSkeletonV1 />;
+  return <TelephonyPageSkeletonV2 />;
 }

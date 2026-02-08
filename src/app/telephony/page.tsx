@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useDesignStore } from '@/store/designStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTelephony } from '@/hooks/useTelephony';
 import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
@@ -22,7 +21,6 @@ const CallTableV4 = dynamic(() => import('@/components/telephony/v4/CallTableV4'
 export default function TelephonyPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { version } = useDesignStore();
 
   const {
     // States
@@ -70,7 +68,7 @@ export default function TelephonyPage() {
 
   return (
     <DashboardLayout variant="operator">
-      <div className={`w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen ${version === 'v2' ? 'bg-[#F3F3EE] dark:bg-[#111827]' : 'bg-[#0f0f23]'}`}>
+      <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
         <CallTableV4
           calls={calls}
           groupedCalls={groupedCalls}

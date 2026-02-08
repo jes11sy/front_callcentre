@@ -34,8 +34,7 @@ export const OrderEditModal = ({
   onOrderChange 
 }: OrderEditModalProps) => {
   const [sources, setSources] = useState<string[]>([]);
-  const { version } = useDesignStore();
-  const isV2 = version === 'v2';
+  const { theme } = useDesignStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -64,21 +63,13 @@ export const OrderEditModal = ({
   };
 
   // Стили для V2
-  const selectTriggerClass = isV2 
-    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0"
-    : "h-9 bg-[#17212b] border-[#FFD700]/20 text-white";
+  const selectTriggerClass = "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
   
-  const selectContentClass = isV2 
-    ? "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600"
-    : "bg-[#17212b] border-[#FFD700]/30";
+  const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
   
-  const selectItemClass = isV2 
-    ? "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
-    : "text-white hover:bg-[#FFD700]/10";
+  const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
   
-  const inputClass = isV2 
-    ? "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004] focus-visible:border-[#FEC004]"
-    : "h-9 bg-[#17212b] border-[#FFD700]/20 text-white";
+  const inputClass = "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004] focus-visible:border-[#FEC004]";
 
   return (
     <div 
@@ -86,28 +77,19 @@ export const OrderEditModal = ({
       onClick={onClose}
     >
       <div 
-        className={`w-full h-[calc(100vh-64px)] lg:h-auto lg:w-[672px] lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col ${isV2 
-          ? "bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none lg:border border-gray-200 dark:border-gray-700 font-myriad"
-          : "bg-[#0f0f23] shadow-[0_0_30px_rgba(255,215,0,0.2)] lg:border-2 border-[#FFD700]/50"
-        }`}
+        className="w-full h-[calc(100vh-64px)] lg:h-auto lg:w-[672px] lg:max-h-[85vh] lg:rounded-lg overflow-hidden flex flex-col bg-[#F3F3EE] dark:bg-[#1e2530] shadow-xl dark:shadow-none lg:border border-gray-200 dark:border-gray-700 font-myriad"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={isV2 
-          ? "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-[#FFD700]/30 bg-[#17212b]"
-        }>
-          <h2 className={`text-base sm:text-lg font-bold ${isV2 ? "text-gray-900 dark:text-gray-100" : "text-[#FFD700]"}`}>
+        <div className="flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
             Редактирование #{order.id}
           </h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className={isV2 
-              ? "h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-              : "h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#FFD700]/10"
-            }
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -119,9 +101,9 @@ export const OrderEditModal = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Левая колонка — Информация по заказу */}
             <div className="space-y-3">
-              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Информация по заказу</h3>
+              <h3 className="text-sm font-medium pb-2 border-b text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700">Информация по заказу</h3>
               
-              <Row label="Тип заявки" isV2={isV2}>
+              <Row label="Тип заявки">
                 <Select value={order.typeOrder} onValueChange={(v) => handleOrderChange('typeOrder', v)}>
                   <SelectTrigger className={selectTriggerClass}>
                     <SelectValue />
@@ -136,7 +118,7 @@ export const OrderEditModal = ({
                 </Select>
               </Row>
 
-              <Row label="Тип техники" isV2={isV2}>
+              <Row label="Тип техники">
                 <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
                   <SelectTrigger className={`${selectTriggerClass} w-full`}>
                     <span className="truncate">{EQUIPMENT_TYPES.find(t => t.value === order.typeEquipment)?.label || order.typeEquipment}</span>
@@ -151,7 +133,7 @@ export const OrderEditModal = ({
                 </Select>
               </Row>
 
-              <Row label="РК" isV2={isV2}>
+              <Row label="РК">
                 <Input 
                   value={order.rk} 
                   onChange={(e) => handleOrderChange('rk', e.target.value)}
@@ -159,7 +141,7 @@ export const OrderEditModal = ({
                 />
               </Row>
 
-              <Row label="Источник" isV2={isV2}>
+              <Row label="Источник">
                 <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
                   <SelectTrigger className={`${selectTriggerClass} w-full`}>
                     <span className="truncate">{order.avitoName || 'Выберите'}</span>
@@ -174,7 +156,7 @@ export const OrderEditModal = ({
                 </Select>
               </Row>
 
-              <Row label="Город" isV2={isV2}>
+              <Row label="Город">
                 <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
                   <SelectTrigger className={selectTriggerClass}>
                     <SelectValue />
@@ -192,9 +174,9 @@ export const OrderEditModal = ({
 
             {/* Правая колонка — Контакты и время */}
             <div className="space-y-3">
-              <h3 className={`text-sm font-medium pb-2 border-b ${isV2 ? 'text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700' : 'text-[#FFD700] border-[#FFD700]/20'}`}>Контакты и время</h3>
+              <h3 className="text-sm font-medium pb-2 border-b text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700">Контакты и время</h3>
               
-              <Row label="Клиент" isV2={isV2}>
+              <Row label="Клиент">
                 <Input 
                   value={order.clientName} 
                   onChange={(e) => handleOrderChange('clientName', e.target.value)}
@@ -202,7 +184,7 @@ export const OrderEditModal = ({
                 />
               </Row>
 
-              <Row label="Телефон" isV2={isV2}>
+              <Row label="Телефон">
                 <Input 
                   value={order.phone || ''} 
                   onChange={(e) => {
@@ -219,21 +201,21 @@ export const OrderEditModal = ({
                     handleOrderChange('phone', value);
                   }}
                   maxLength={11}
-                  className={`${inputClass} ${isV2 ? 'placeholder:text-gray-400' : 'placeholder:text-gray-500'}`}
+                  className={`${inputClass} placeholder:text-gray-400`}
                   placeholder="79991234567"
                 />
               </Row>
 
-              <Row label="Дата" isV2={isV2}>
+              <Row label="Дата">
                 <Input 
                   type="datetime-local"
                   value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
                   onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
-                  className={`${inputClass} ${isV2 ? 'dark:[color-scheme:dark]' : '[color-scheme:dark]'}`}
+                  className={`${inputClass} dark:[color-scheme:dark]`}
                 />
               </Row>
 
-              <Row label="Статус" isV2={isV2}>
+              <Row label="Статус">
                 <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
                   <SelectTrigger className={selectTriggerClass}>
                     <SelectValue />
@@ -251,8 +233,8 @@ export const OrderEditModal = ({
           </div>
 
           {/* Нижняя часть — на всю ширину */}
-          <div className={`mt-4 sm:mt-5 pt-4 sm:pt-5 border-t space-y-3 ${isV2 ? 'border-gray-200 dark:border-gray-700' : 'border-[#FFD700]/20'}`}>
-            <Row label="Адрес" isV2={isV2}>
+          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t space-y-3 border-gray-200 dark:border-gray-700">
+            <Row label="Адрес">
               <Input 
                 value={order.address} 
                 onChange={(e) => handleOrderChange('address', e.target.value)}
@@ -260,41 +242,29 @@ export const OrderEditModal = ({
               />
             </Row>
 
-            <Row label="Проблема" isV2={isV2}>
+            <Row label="Проблема">
               <Textarea 
                 value={order.problem} 
                 onChange={(e) => handleOrderChange('problem', e.target.value)}
-                className={isV2 
-                  ? "min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
-                  : "min-h-[60px] sm:min-h-[80px] bg-[#17212b] border-[#FFD700]/20 text-white resize-none"
-                }
+                className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
               />
             </Row>
           </div>
         </div>
 
         {/* Footer */}
-        <div className={isV2 
-          ? "flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]"
-          : "flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 border-t border-[#FFD700]/30 bg-[#17212b]"
-        }>
+        <div className="flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
           <Button
             variant="outline"
             onClick={onClose}
-            className={`text-sm ${isV2 
-              ? "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-              : "border-gray-600 text-gray-300 hover:bg-gray-800"
-            }`}
+            className="text-sm border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             Отмена
           </Button>
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className={`text-sm ${isV2 
-              ? "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-medium"
-              : "bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0f0f23] font-medium"
-            }`}
+            className="text-sm bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-medium"
           >
             {isSaving ? (
               <>
@@ -318,9 +288,9 @@ export const OrderEditModal = ({
 
 // === Вспомогательные компоненты ===
 
-const Row = ({ label, children, isV2 = false }: { label: string; children: React.ReactNode; isV2?: boolean }) => (
+const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-    <Label className={`text-xs sm:text-sm shrink-0 sm:w-24 ${isV2 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400'}`}>{label}</Label>
+    <Label className="text-xs sm:text-sm shrink-0 sm:w-24 text-gray-500 dark:text-gray-400">{label}</Label>
     <div className="flex-1 min-w-0">{children}</div>
   </div>
 );

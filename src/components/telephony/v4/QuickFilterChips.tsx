@@ -7,10 +7,7 @@ import {
   Search, 
   X,
   Phone,
-  PhoneMissed,
-  PhoneIncoming,
-  Calendar,
-  Clock
+  PhoneMissed
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +24,6 @@ interface QuickFilterChipsProps {
     answered: number;
     today: number;
   };
-  variant?: 'v1' | 'v2';
 }
 
 export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
@@ -35,85 +31,40 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
   onFilterChange,
   searchTerm,
   onSearchChange,
-  counts,
-  variant = 'v1'
+  counts
 }) => {
-  const isV2 = variant === 'v2';
-  const allFilters = [
+  const filters = [
     { 
       id: 'all' as const, 
       label: 'Все', 
       icon: Phone, 
-      count: counts.all,
-      color: 'text-gray-300',
-      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
-      activeBorder: 'border-[#FFD700]'
+      count: counts.all
     },
     { 
       id: 'missed' as const, 
       label: 'Пропущенные', 
       icon: PhoneMissed, 
       count: counts.missed,
-      color: 'text-red-400',
-      activeColor: 'bg-red-500/90 text-white',
-      activeBorder: 'border-red-500',
       highlight: counts.missed > 0
-    },
-    { 
-      id: 'answered' as const, 
-      label: 'Отвеченные', 
-      icon: PhoneIncoming, 
-      count: counts.answered,
-      color: 'text-gray-300',
-      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
-      activeBorder: 'border-[#FFD700]'
-    },
-    { 
-      id: 'today' as const, 
-      label: 'Сегодня', 
-      icon: Calendar, 
-      count: counts.today,
-      color: 'text-gray-300',
-      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
-      activeBorder: 'border-[#FFD700]'
-    },
-    { 
-      id: 'last_hour' as const, 
-      label: 'Последний час', 
-      icon: Clock, 
-      count: null,
-      color: 'text-gray-300',
-      activeColor: 'bg-[#FFD700] text-[#0f0f23]',
-      activeBorder: 'border-[#FFD700]'
-    },
+    }
   ];
-
-  // Для V2 показываем только "Все" и "Пропущенные"
-  const filters = isV2 
-    ? allFilters.filter(f => f.id === 'all' || f.id === 'missed')
-    : allFilters;
 
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
       {/* Поиск */}
       <div className="relative w-full sm:w-auto">
-        <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4", isV2 ? "text-gray-400" : "text-gray-500")} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <Input
           type="text"
           placeholder="Поиск по номеру..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className={cn(
-            "w-full sm:w-48 pl-9 h-8 sm:h-9 text-sm",
-            isV2 
-              ? "bg-[#F3F3EE] dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:ring-[#FEC004]/30" 
-              : "bg-[#0f0f23] border-[#FFD700]/20 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
-          )}
+          className="w-full sm:w-48 pl-9 h-8 sm:h-9 text-sm bg-[#F3F3EE] dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:ring-[#FEC004]/30"
         />
         {searchTerm && (
           <button
             onClick={() => onSearchChange('')}
-            className={cn("absolute right-3 top-1/2 -translate-y-1/2", isV2 ? "text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" : "text-gray-500 hover:text-white")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           >
             <X className="w-4 h-4" />
           </button>
@@ -121,7 +72,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       </div>
 
       {/* Разделитель - скрыт на мобильных */}
-      <div className={cn("w-px h-6 hidden sm:block", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
+      <div className="w-px h-6 hidden sm:block bg-gray-200 dark:bg-gray-600" />
 
       {/* Фильтры-чипы */}
       <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -136,26 +87,15 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
               className={cn(
                 "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
                 "border",
-                isV2 ? (
-                  isActive
-                    ? filter.id === 'missed'
-                      ? "bg-red-500 text-white border-red-500"
-                      : "bg-[#FEC004] text-gray-900 border-[#FEC004]"
-                    : cn(
-                        "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300",
-                        "hover:border-[#FEC004] hover:text-[#FEC004]",
-                        filter.highlight && "border-red-300 dark:border-red-500/50 text-red-500"
-                      )
-                ) : (
-                  isActive
-                    ? cn(filter.activeColor, filter.activeBorder, "shadow-lg shadow-[#FFD700]/20")
-                    : cn(
-                        "bg-[#17212b] border-[#FFD700]/20",
-                        filter.color,
-                        "hover:border-[#FFD700]/50 hover:bg-[#1a1a2e]",
-                        filter.highlight && "border-red-500/50 animate-pulse"
-                      )
-                )
+                isActive
+                  ? filter.id === 'missed'
+                    ? "bg-red-500 text-white border-red-500"
+                    : "bg-[#FEC004] text-gray-900 border-[#FEC004]"
+                  : cn(
+                      "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300",
+                      "hover:border-[#FEC004] hover:text-[#FEC004]",
+                      filter.highlight && "border-red-300 dark:border-red-500/50 text-red-500"
+                    )
               )}
             >
               <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -165,23 +105,13 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
                   variant="secondary" 
                   className={cn(
                     "ml-0.5 h-4 sm:h-5 min-w-[16px] sm:min-w-[20px] text-[10px] sm:text-xs font-bold",
-                    isV2 ? (
-                      isActive 
-                        ? filter.id === 'missed'
-                          ? "bg-white/30 text-white"
-                          : "bg-gray-900/20 text-gray-900"
-                        : filter.id === 'missed' && filter.count > 0
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-500"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                    ) : (
-                      isActive 
-                        ? filter.id === 'missed' 
-                          ? "bg-white/30 text-white" 
-                          : "bg-[#0f0f23]/30 text-[#0f0f23]"
-                        : filter.id === 'missed' && filter.count > 0
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-[#FFD700]/10 text-[#FFD700]/70"
-                    )
+                    isActive 
+                      ? filter.id === 'missed'
+                        ? "bg-white/30 text-white"
+                        : "bg-gray-900/20 text-gray-900"
+                      : filter.id === 'missed' && filter.count > 0
+                        ? "bg-red-100 dark:bg-red-900/30 text-red-500"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                   )}
                 >
                   {filter.count}
@@ -195,21 +125,17 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
       {/* Активный фильтр поиска */}
       {searchTerm && (
         <>
-          <div className={cn("w-px h-6", isV2 ? "bg-gray-200 dark:bg-gray-600" : "bg-[#FFD700]/20")} />
+          <div className="w-px h-6 bg-gray-200 dark:bg-gray-600" />
           <div className="flex items-center gap-2">
-            <span className={cn("text-sm", isV2 ? "text-gray-500 dark:text-gray-400" : "text-gray-400")}>Поиск:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Поиск:</span>
             <Badge 
               variant="outline" 
-              className={cn(
-                isV2 
-                  ? "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10" 
-                  : "border-[#FFD700]/30 text-[#FFD700] bg-[#FFD700]/10"
-              )}
+              className="border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10"
             >
               {searchTerm}
               <button
                 onClick={() => onSearchChange('')}
-                className={cn("ml-1", isV2 ? "hover:text-gray-800 dark:hover:text-gray-200" : "hover:text-white")}
+                className="ml-1 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 <X className="w-3 h-3" />
               </button>

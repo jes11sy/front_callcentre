@@ -12,7 +12,6 @@ interface PaginationProps {
   maxVisiblePages?: number;
   className?: string;
   disabled?: boolean;
-  variant?: 'v1' | 'v2';
 }
 
 export function OptimizedPagination({
@@ -23,10 +22,8 @@ export function OptimizedPagination({
   showPrevNext = true,
   maxVisiblePages = 5,
   className,
-  disabled = false,
-  variant = 'v1'
+  disabled = false
 }: PaginationProps) {
-  const isV2 = variant === 'v2';
   const visiblePages = useMemo(() => {
     if (totalPages <= maxVisiblePages) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -77,12 +74,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(1)}
           disabled={disabled}
-          className={cn(
-            "h-8 w-8 p-0",
-            isV2 
-              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
-              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-          )}
+          className="h-8 w-8 p-0 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
         >
           1
         </Button>
@@ -91,7 +83,7 @@ export function OptimizedPagination({
       {/* Start ellipsis */}
       {showStartEllipsis && (
         <div className="flex items-center justify-center h-8 w-8">
-          <MoreHorizontal className={cn("h-4 w-4", isV2 ? "text-gray-400" : "text-gray-400")} />
+          <MoreHorizontal className="h-4 w-4 text-gray-400" />
         </div>
       )}
 
@@ -102,12 +94,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={handlePrevClick}
           disabled={disabled || currentPage === 1}
-          className={cn(
-            "h-8 w-8 p-0 disabled:opacity-50",
-            isV2 
-              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
-              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-          )}
+          className="h-8 w-8 p-0 disabled:opacity-50 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -123,15 +110,9 @@ export function OptimizedPagination({
           disabled={disabled}
           className={cn(
             "h-8 w-8 p-0",
-            isV2 ? (
-              page === currentPage 
-                ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] border-[#FEC004]" 
-                : "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
-            ) : (
-              page === currentPage 
-                ? "bg-[#FFD700] text-[#0f0f23] hover:bg-[#FFC700] border-[#FFD700]" 
-                : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-            )
+            page === currentPage 
+              ? "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00] border-[#FEC004]" 
+              : "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
           )}
         >
           {page}
@@ -145,12 +126,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={handleNextClick}
           disabled={disabled || currentPage === totalPages}
-          className={cn(
-            "h-8 w-8 p-0 disabled:opacity-50",
-            isV2 
-              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
-              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-          )}
+          className="h-8 w-8 p-0 disabled:opacity-50 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -159,7 +135,7 @@ export function OptimizedPagination({
       {/* End ellipsis */}
       {showEndEllipsis && (
         <div className="flex items-center justify-center h-8 w-8">
-          <MoreHorizontal className={cn("h-4 w-4", isV2 ? "text-gray-400" : "text-gray-400")} />
+          <MoreHorizontal className="h-4 w-4 text-gray-400" />
         </div>
       )}
 
@@ -170,12 +146,7 @@ export function OptimizedPagination({
           size="sm"
           onClick={() => handlePageClick(totalPages)}
           disabled={disabled}
-          className={cn(
-            "h-8 w-8 p-0",
-            isV2 
-              ? "border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
-              : "border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 hover:border-[#FFD700]"
-          )}
+          className="h-8 w-8 p-0 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:border-[#FEC004] hover:text-[#FEC004]"
         >
           {totalPages}
         </Button>
@@ -211,7 +182,7 @@ export function PaginationInfo({
   );
 
   return (
-    <div className={cn('text-sm text-gray-600', className)}>
+    <div className={cn('text-sm text-gray-600 dark:text-gray-400', className)}>
       Показано {startItem}-{endItem} из {totalItems} записей
     </div>
   );
@@ -240,12 +211,12 @@ export function PageSizeSelector({
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      <span className="text-sm text-gray-600">Показать:</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">Показать:</span>
       <select
         value={currentSize}
         onChange={handleSizeChange}
         disabled={disabled}
-        className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-[#252d3a] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#FEC004] disabled:opacity-50"
       >
         {options.map((size) => (
           <option key={size} value={size}>
@@ -253,7 +224,7 @@ export function PageSizeSelector({
           </option>
         ))}
       </select>
-      <span className="text-sm text-gray-600">на странице</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">на странице</span>
     </div>
   );
 }

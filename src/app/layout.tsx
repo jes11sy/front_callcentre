@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
 import { PushPermissionBanner } from "@/components/push/PushNotificationManager";
+import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -101,6 +102,7 @@ export default function RootLayout({
           </ThemeProvider>
         </QueryProvider>
         <WebVitalsScript />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

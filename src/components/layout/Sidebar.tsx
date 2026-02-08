@@ -92,20 +92,20 @@ export function Sidebar() {
     return `${diffDays} дн назад`;
   };
 
-  // Иконка и цвет для типа уведомления
+  // Иконка для типа уведомления
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'call_incoming':
-        return { icon: PhoneIncoming, color: 'text-green-500' };
+        return PhoneIncoming;
       case 'call_missed':
-        return { icon: PhoneMissed, color: 'text-red-500' };
+        return PhoneMissed;
       case 'call_outgoing':
-        return { icon: PhoneOutgoing, color: 'text-blue-500' };
+        return PhoneOutgoing;
       case 'order_created':
       case 'order_edited':
-        return { icon: FileText, color: 'text-[#FEC004]' };
+        return FileText;
       default:
-        return { icon: Info, color: 'text-gray-500' };
+        return Info;
     }
   };
 
@@ -258,7 +258,7 @@ export function Sidebar() {
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => {
-                      const { icon: Icon, color } = getNotificationIcon(notification.type);
+                      const Icon = getNotificationIcon(notification.type);
                       return (
                         <div
                           key={notification.id}
@@ -268,7 +268,7 @@ export function Sidebar() {
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`flex-shrink-0 mt-0.5 ${color}`}>
+                            <div className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500">
                               <Icon className="h-5 w-5" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -382,7 +382,7 @@ export function Sidebar() {
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => {
-                      const { icon: Icon, color } = getNotificationIcon(notification.type);
+                      const Icon = getNotificationIcon(notification.type);
                       return (
                         <div
                           key={notification.id}
@@ -392,7 +392,7 @@ export function Sidebar() {
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`flex-shrink-0 mt-0.5 ${color}`}>
+                            <div className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500">
                               <Icon className="h-5 w-5" />
                             </div>
                             <div className="flex-1 min-w-0">

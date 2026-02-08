@@ -72,8 +72,6 @@ interface UnreadCountResponse {
   };
 }
 
-const REALTIME_API_URL = process.env.NEXT_PUBLIC_REALTIME_URL || 'https://realtime.lead-schem.ru';
-
 export const useNotifications = () => {
   const queryClient = useQueryClient();
   const { on, isConnected } = useGlobalSocket();
@@ -87,7 +85,7 @@ export const useNotifications = () => {
   } = useQuery<NotificationsResponse>({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const response = await api.get(`${REALTIME_API_URL}/api/v1/notifications`);
+      const response = await api.get('/notifications');
       return response.data;
     },
     staleTime: 30000, // 30 секунд
@@ -98,7 +96,7 @@ export const useNotifications = () => {
   const { data: unreadData } = useQuery<UnreadCountResponse>({
     queryKey: ['notifications-unread'],
     queryFn: async () => {
-      const response = await api.get(`${REALTIME_API_URL}/api/v1/notifications/unread-count`);
+      const response = await api.get('/notifications/unread-count');
       return response.data;
     },
     staleTime: 10000, // 10 секунд
@@ -108,7 +106,7 @@ export const useNotifications = () => {
   // Отметить как прочитанное
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const response = await api.post(`${REALTIME_API_URL}/api/v1/notifications/read`, {
+      const response = await api.post('/notifications/read', {
         notificationId,
       });
       return response.data;
@@ -122,7 +120,7 @@ export const useNotifications = () => {
   // Отметить все как прочитанные
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post(`${REALTIME_API_URL}/api/v1/notifications/read-all`);
+      const response = await api.post('/notifications/read-all');
       return response.data;
     },
     onSuccess: () => {
@@ -134,7 +132,7 @@ export const useNotifications = () => {
   // Удалить уведомление
   const deleteNotificationMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const response = await api.delete(`${REALTIME_API_URL}/api/v1/notifications/${notificationId}`);
+      const response = await api.delete(`/notifications/${notificationId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -146,7 +144,7 @@ export const useNotifications = () => {
   // Очистить все уведомления
   const clearAllMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.delete(`${REALTIME_API_URL}/api/v1/notifications`);
+      const response = await api.delete('/notifications');
       return response.data;
     },
     onSuccess: () => {

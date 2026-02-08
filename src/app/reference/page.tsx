@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function ReferencePage() {
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';

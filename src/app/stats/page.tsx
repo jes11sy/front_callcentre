@@ -22,6 +22,9 @@ import {
 import React from 'react';
 import { ErrorMessage, LoadingState } from '@/components/ui/error-boundary';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 interface _OperatorStats {
   operator: {
     id: number;

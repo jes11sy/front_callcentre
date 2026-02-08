@@ -6,6 +6,9 @@ import { UserCheck, Clock, AlertCircle, CheckCircle, MessageSquare, Phone, Users
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function EmployeeRulesPage() {
   const router = useRouter();
 

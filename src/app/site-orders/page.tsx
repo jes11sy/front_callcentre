@@ -22,6 +22,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 interface SiteOrder {
   id: number;
   city: string;

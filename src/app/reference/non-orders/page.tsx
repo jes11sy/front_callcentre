@@ -6,6 +6,9 @@ import { XCircle, AlertTriangle, Phone, MessageSquare, Clock, Wrench, ChevronLef
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function NonOrdersPage() {
   const router = useRouter();
   const nonOrderReasons = [

@@ -19,6 +19,9 @@ import { Call } from '@/types/orders';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 function OrdersContent() {
   const searchParams = useSearchParams();
   const orderIdFromUrl = searchParams.get('orderId');

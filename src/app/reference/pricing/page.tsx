@@ -8,6 +8,9 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function PricingPage() {
   const router = useRouter();
   const { theme } = useDesignStore();

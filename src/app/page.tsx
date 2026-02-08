@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const router = useRouter();
   const hasRedirected = useRef(false);

@@ -36,6 +36,9 @@ import {
 
 // Form schemas removed - not used
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function MessagesPage() {
   const router = useRouter();
   const { socket, isConnected } = useGlobalSocket();

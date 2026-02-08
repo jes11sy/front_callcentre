@@ -12,6 +12,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function SalaryPage() {
   return (
     <DashboardLayout variant="operator" requiredRole="operator">

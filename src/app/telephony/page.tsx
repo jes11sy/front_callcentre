@@ -6,15 +6,18 @@ import { useAuthStore } from '@/store/authStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTelephony } from '@/hooks/useTelephony';
 import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
+
+// Force dynamic rendering to avoid SSG issues with React Query
+export const dynamic = 'force-dynamic';
 
 // Динамические импорты для тяжелых компонентов (без fallback'ов)
-const CreateOrderModal = dynamic(() => import('@/components/telephony/CreateOrderModal').then(mod => ({ default: mod.CreateOrderModal })), {
+const CreateOrderModal = nextDynamic(() => import('@/components/telephony/CreateOrderModal').then(mod => ({ default: mod.CreateOrderModal })), {
   ssr: false
 });
 
 // Новый интерфейс v4 - улучшенная таблица
-const CallTableV4 = dynamic(() => import('@/components/telephony/v4/CallTableV4').then(mod => ({ default: mod.CallTableV4 })), {
+const CallTableV4 = nextDynamic(() => import('@/components/telephony/v4/CallTableV4').then(mod => ({ default: mod.CallTableV4 })), {
   ssr: false
 });
 

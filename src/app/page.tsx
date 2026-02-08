@@ -1,26 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const router = useRouter();
-  const { user, isLoading } = useAuthStore();
-  
-  // Флаг для предотвращения ошибки гидратации - ждём монтирования на клиенте
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const { user, isLoading, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    // Не делаем редирект до монтирования компонента
-    if (!isMounted) return;
+    // Ждём гидратации store
+    if (!_hasHydrated) return;
     
-    // ✅ PWA FIX: Если есть user - сразу редиректим, не ждём isLoading
-    // Store инициализируется с user из localStorage синхронно
+    // Если есть user - на телефонию
     if (user) {
       router.replace('/telephony');
       return;
@@ -30,15 +22,15 @@ export default function Home() {
     if (!isLoading && !user) {
       router.replace('/login');
     }
-  }, [user, isLoading, router, isMounted]);
+  }, [user, isLoading, router, _hasHydrated]);
 
   // Всегда показываем одинаковый UI при первом рендере (для гидратации)
-  // Это предотвращает ошибку React #418
+  // Используем только статичные классы без dark: модификаторов
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-[#02111B]">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Перенаправление...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
+        <p className="text-gray-400">Перенаправление...</p>
       </div>
     </div>
   );

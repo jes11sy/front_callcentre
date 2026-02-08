@@ -12,44 +12,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const withPWA = withPWAInit({
   dest: 'public',
-  register: false, // Отключаем авторегистрацию - регистрируем вручную в ServiceWorkerRegister
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-  // Кастомный service worker для push-уведомлений
-  // Файл worker/index.ts будет скомпилирован и объединён с автогенерируемым SW
-  customWorkerSrc: 'worker',
-  // Кеширование
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  // Workbox конфигурация
-  workboxOptions: {
-    disableDevLogs: true,
-    runtimeCaching: [
-      {
-        urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'google-fonts',
-          expiration: {
-            maxEntries: 10,
-            maxAgeSeconds: 365 * 24 * 60 * 60, // 1 год
-          },
-        },
-      },
-      {
-        urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
-        handler: 'StaleWhileRevalidate',
-        options: {
-          cacheName: 'static-images',
-          expiration: {
-            maxEntries: 64,
-            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 дней
-          },
-        },
-      },
-    ],
-  },
+  // ВАЖНО: Отключаем генерацию SW плагином - используем свой статичный public/sw.js
+  disable: true,
 });
 
 const nextConfig: NextConfig = {

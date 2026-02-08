@@ -136,9 +136,18 @@ export const usePushNotifications = () => {
       // Проверяем разрешение
       const permission = Notification.permission;
 
-      // Проверяем текущую подписку
+      // Проверяем текущую подписку с таймаутом
+      // navigator.serviceWorker.ready может зависнуть если SW не зарегистрирован
       try {
-        const registration = await navigator.serviceWorker.ready;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('SW ready timeout')), 5000);
+        });
+        
+        const registration = await Promise.race([
+          navigator.serviceWorker.ready,
+          timeoutPromise
+        ]);
+        
         const subscription = await registration.pushManager.getSubscription();
         
         setState({
@@ -151,16 +160,18 @@ export const usePushNotifications = () => {
           isStandalone: standalone,
         });
       } catch (error) {
+        console.error('[Push] Ошибка проверки:', error);
+        // Даже если SW не готов, показываем кнопку - пользователь сможет подписаться
         setState(prev => ({
           ...prev,
           isSupported: true,
+          isSubscribed: false,
           permission,
           isLoading: false,
           isStandalone: standalone,
           isIOSPWARequired: false,
-          error: 'Ошибка проверки подписки',
+          error: null, // Не показываем ошибку - просто SW ещё не готов
         }));
-        console.error('[Push] Ошибка проверки:', error);
       }
     };
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useDesignStore } from '@/store/designStore';
+import { useDesignStoreHydrated } from '@/store/designStore';
 
 interface LoadingScreenProps {
   /** Текст под спиннером */
@@ -11,6 +11,8 @@ interface LoadingScreenProps {
   fullScreen?: boolean;
   /** Дополнительные классы */
   className?: string;
+  /** Принудительно показать V1 дизайн (для SSR) */
+  forceV1?: boolean;
 }
 
 /**
@@ -20,17 +22,25 @@ interface LoadingScreenProps {
  * - Suspense fallback
  * - Любые полноэкранные загрузки
  * Поддерживает V1 и V2 дизайн
+ * 
+ * ВАЖНО: До гидратации всегда показывает V1 дизайн для предотвращения ошибки React #418
  */
 export function LoadingScreen({ 
   message, 
   fullScreen = true,
-  className
+  className,
+  forceV1 = false
 }: LoadingScreenProps) {
-  const { version, theme } = useDesignStore();
+  const { version, theme, isHydrated } = useDesignStoreHydrated();
+  
+  // До гидратации или если forceV1 - всегда показываем V1 дизайн
+  // Это предотвращает ошибку гидратации React #418
+  const effectiveVersion = (!isHydrated || forceV1) ? 'v1' : version;
+  const effectiveTheme = (!isHydrated || forceV1) ? 'light' : theme;
 
   // ============ V2 DESIGN ============
-  if (version === 'v2') {
-    const isDark = theme === 'dark';
+  if (effectiveVersion === 'v2') {
+    const isDark = effectiveTheme === 'dark';
     const bgColor = isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]';
     
     const contentV2 = (
@@ -132,7 +142,8 @@ export function LoadingSpinner({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { version } = useDesignStore();
+  const { version, isHydrated } = useDesignStoreHydrated();
+  const effectiveVersion = isHydrated ? version : 'v1';
   
   const sizeClasses = {
     sm: 'w-5 h-5',
@@ -140,15 +151,14 @@ export function LoadingSpinner({
     lg: 'w-12 h-12'
   };
 
-  const borderColor = version === 'v2' ? 'border-[#FEC004]' : 'border-[#FFD700]';
-  const borderBgColor = version === 'v2' ? 'border-[#FEC004]/20' : 'border-[#FFD700]/20';
+  const borderBgColor = effectiveVersion === 'v2' ? 'border-[#FEC004]/20' : 'border-[#FFD700]/20';
 
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
       <div className={cn(sizeClasses[size], "rounded-full border-2", borderBgColor)} />
       <div className={cn(
         "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin",
-        version === 'v2' ? 'border-t-[#FEC004]' : 'border-t-[#FFD700] border-r-[#FFA500]/50',
+        effectiveVersion === 'v2' ? 'border-t-[#FEC004]' : 'border-t-[#FFD700] border-r-[#FFA500]/50',
         sizeClasses[size]
       )} />
     </div>
@@ -168,8 +178,9 @@ export function LoadingState({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { version, theme } = useDesignStore();
-  const isDark = theme === 'dark';
+  const { version, theme, isHydrated } = useDesignStoreHydrated();
+  const effectiveVersion = isHydrated ? version : 'v1';
+  const isDark = isHydrated ? theme === 'dark' : false;
   
   return (
     <div className={cn(
@@ -179,7 +190,7 @@ export function LoadingState({
       <LoadingSpinner size={size} />
       <p className={cn(
         "text-sm", 
-        version === 'v2' 
+        effectiveVersion === 'v2' 
           ? isDark ? 'text-gray-400' : 'text-gray-600'
           : 'text-[#9CA3AF]'
       )}>{message}</p>
@@ -200,8 +211,9 @@ export function LoadingOverlay({
   message?: string;
   children: React.ReactNode;
 }) {
-  const { version, theme } = useDesignStore();
-  const isDark = theme === 'dark';
+  const { version, theme, isHydrated } = useDesignStoreHydrated();
+  const effectiveVersion = isHydrated ? version : 'v1';
+  const isDark = isHydrated ? theme === 'dark' : false;
   
   return (
     <div className="relative">
@@ -209,7 +221,7 @@ export function LoadingOverlay({
       {isLoading && (
         <div className={cn(
           "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50",
-          version === 'v2' 
+          effectiveVersion === 'v2' 
             ? isDark ? 'bg-[#111827]/80' : 'bg-[#F3F3EE]/80'
             : 'bg-[#02111B]/80'
         )}>

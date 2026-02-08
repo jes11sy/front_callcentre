@@ -32,43 +32,11 @@ function sanitizeUserForStorage(user: User | null): SafeUserData | null {
   };
 }
 
-/**
- * Синхронно читаем пользователя из storage при инициализации
- * Это предотвращает мерцание в PWA
- */
-function getInitialUser(): User | null {
-  if (typeof window === 'undefined') return null;
-  
-  try {
-    // Сначала проверяем localStorage (rememberMe)
-    const localUser = localStorage.getItem('user');
-    if (localUser) {
-      return JSON.parse(localUser);
-    }
-    
-    // Потом sessionStorage
-    const sessionUser = sessionStorage.getItem('user');
-    if (sessionUser) {
-      return JSON.parse(sessionUser);
-    }
-    
-    // Проверяем zustand persist storage
-    const authStorage = localStorage.getItem('auth-storage');
-    if (authStorage) {
-      const parsed = JSON.parse(authStorage);
-      if (parsed?.state?.user) {
-        return parsed.state.user;
-      }
-    }
-  } catch {
-    // Игнорируем ошибки парсинга
-  }
-  
-  return null;
-}
-
-// ✅ Инициализируем с данными из storage сразу
-const initialUser = typeof window !== 'undefined' ? getInitialUser() : null;
+// ВАЖНО: НЕ читаем из localStorage при инициализации store!
+// Это вызывает ошибку гидратации React #418, т.к. на сервере user=null,
+// а на клиенте user может быть из localStorage.
+// Zustand persist сам восстановит данные после гидратации через onRehydrateStorage.
+const initialUser: User | null = null;
 
 interface AuthState {
   user: User | null;
@@ -86,11 +54,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // ✅ Начинаем с кэшированного пользователя если есть
+      // Начинаем с null - данные восстановятся из localStorage после гидратации
       user: initialUser,
-      isAuthenticated: !!initialUser,
-      // ✅ Если есть кэшированный пользователь - не показываем loading
-      isLoading: !initialUser,
+      isAuthenticated: false,
+      // Показываем loading пока не произойдёт гидратация
+      isLoading: true,
       _hasHydrated: false,
 
       setUser: (user) =>
@@ -130,21 +98,18 @@ export const useAuthStore = create<AuthState>()(
         user: sanitizeUserForStorage(state.user),
         isAuthenticated: state.isAuthenticated,
       }),
-      // ✅ FIX: Custom merge — если getInitialUser() нашёл user в localStorage,
-      // а в auth-storage лежат протухшие данные (user: null), оставляем актуального user
+      // Merge persisted state with current state after hydration
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<AuthState> | undefined;
-        const merged = { ...currentState, ...(persisted || {}) };
         
-        // Если текущее состояние (из getInitialUser) имеет user,
-        // а persist его не имеет — оставляем актуального
-        if (currentState.user && !persisted?.user) {
-          merged.user = currentState.user;
-          merged.isAuthenticated = true;
-          merged.isLoading = false;
-        }
-        
-        return merged;
+        return {
+          ...currentState,
+          ...(persisted || {}),
+          // После гидратации выключаем loading
+          isLoading: false,
+          // isAuthenticated зависит от наличия user
+          isAuthenticated: !!(persisted?.user),
+        };
       },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

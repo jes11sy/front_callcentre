@@ -14,7 +14,8 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   // ✅ user уже инициализирован из localStorage в store
-  const { user, setUser, setLoading, isLoading } = useAuthStore();
+  // ✅ FIX: Добавляем _hasHydrated для ожидания гидратации Zustand
+  const { user, setUser, setLoading, isLoading, _hasHydrated } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
   const initRef = useRef(false);
@@ -30,6 +31,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [isPublicPage, setLoading]);
 
   useEffect(() => {
+    // ✅ FIX: Ждём гидратации Zustand store перед любыми действиями
+    // Это предотвращает бесконечный цикл редиректов
+    if (!_hasHydrated) {
+      authLogger.log('Waiting for Zustand hydration...');
+      return;
+    }
+
     // Предотвращаем повторную инициализацию
     if (initRef.current) {
       return;
@@ -136,11 +144,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, [setUser, setLoading, isPublicPage, router, user]);
+  }, [setUser, setLoading, isPublicPage, router, user, _hasHydrated]);
 
-  // ✅ Показываем loading только если нет пользователя и не публичная страница
+  // ✅ Показываем loading пока ждём гидратации или если нет пользователя
   // Store инициализируется с user из localStorage, поэтому мерцания не будет
-  if (isLoading && !isPublicPage && !user) {
+  if (!_hasHydrated || (isLoading && !isPublicPage && !user)) {
     return <LoadingScreen message="Загрузка..." />;
   }
 

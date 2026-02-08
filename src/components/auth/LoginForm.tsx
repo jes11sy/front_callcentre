@@ -44,6 +44,8 @@ export function LoginForm() {
         if (response?.success && response.data) {
           // ВАЖНО: Обновляем authStore перед редиректом!
           authLogin(response.data);
+          // ✅ FIX: Используем router.replace вместо window.location.href
+          // Это предотвращает полную перезагрузку страницы и бесконечный цикл редиректов
           router.replace('/telephony');
           return;
         }
@@ -55,6 +57,7 @@ export function LoginForm() {
           const restoredResponse = await authApi.getProfile().catch(() => null);
           if (restoredResponse?.success && restoredResponse.data) {
             authLogin(restoredResponse.data);
+            // ✅ FIX: Используем router.replace вместо window.location.href
             router.replace('/telephony');
             return;
           }
@@ -118,8 +121,9 @@ export function LoginForm() {
         }));
       } catch {}
       
-      // Use window.location for hard redirect to ensure cookies are sent
-      window.location.href = '/telephony';
+      // ✅ FIX: Используем router.replace вместо window.location.href
+      // Это предотвращает полную перезагрузку и бесконечный цикл редиректов
+      router.replace('/telephony');
       
     } catch (error: unknown) {
       // Don't show error if session expired (already redirecting to login)

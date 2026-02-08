@@ -23,13 +23,9 @@ export function TokenRefresher() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isLoginPage = pathname === '/login';
 
-  // 🔧 FIX: Сбрасываем состояние аутентификации при переходе на страницу логина
-  useEffect(() => {
-    if (isLoginPage && isAuthenticated) {
-      authLogger.log('On login page with stale auth state - clearing');
-      logout();
-    }
-  }, [isLoginPage, isAuthenticated, logout]);
+  // ✅ FIX: Убран автоматический logout на странице логина
+  // Это вызывало race condition с гидратацией Zustand и бесконечные редиректы
+  // Теперь AuthProvider и ProtectedRoute ждут гидратации перед принятием решений
 
   // 🔄 Функция обновления токена через /auth/refresh
   const refreshToken = useCallback(async (): Promise<boolean> => {

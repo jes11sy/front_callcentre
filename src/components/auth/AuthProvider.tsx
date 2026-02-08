@@ -17,6 +17,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const initRef = useRef(false);
+  const isRestoringRef = useRef(false);
 
   const isPublicPage = pathname === '/login';
 
@@ -34,7 +35,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return;
     }
 
+    // Debounce для iOS PWA - предотвращаем race conditions
+    let cancelled = false;
+    
     const initAuth = async () => {
+      // Небольшая задержка для стабилизации в PWA режиме
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if (cancelled) return;
       try {
         // 🍪 Пропускаем проверку аутентификации на страницах логина
         if (isPublicPage) {
@@ -70,16 +77,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           
           // Сессия невалидна - пробуем восстановить через IndexedDB
-          authLogger.log('Session invalid, trying IndexedDB restore');
-          const restored = await authApi.restoreSessionFromIndexedDB();
+          // Защита от повторных попыток восстановления
+          if (isRestoringRef.current) {
+            authLogger.log('Already restoring session, skipping');
+            return;
+          }
           
-          if (restored) {
-            authLogger.log('Session restored from IndexedDB');
-            const profile = await authApi.getProfile();
-            if (profile.data) {
-              setUser(profile.data);
-              return;
+          isRestoringRef.current = true;
+          authLogger.log('Session invalid, trying IndexedDB restore');
+          
+          try {
+            const restored = await authApi.restoreSessionFromIndexedDB();
+            
+            if (restored) {
+              authLogger.log('Session restored from IndexedDB');
+              const profile = await authApi.getProfile();
+              if (profile.data) {
+                setUser(profile.data);
+                isRestoringRef.current = false;
+                return;
+              }
             }
+          } finally {
+            isRestoringRef.current = false;
           }
           
           // Не удалось восстановить - редирект на логин
@@ -134,6 +154,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     initAuth();
+    
+    return () => {
+      cancelled = true;
+    };
   }, [setUser, setLoading, isPublicPage, router, isAuthenticated, logout]);
 
   // Показываем loading для защищенных страниц до завершения проверки

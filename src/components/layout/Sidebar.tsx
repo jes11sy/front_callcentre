@@ -242,8 +242,8 @@ export function Sidebar() {
 
             {/* Notifications Dropdown */}
             {isDropdownOpen && (
-              <div className="fixed left-60 bottom-24 w-96 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div className="fixed left-60 bottom-24 w-96 max-h-[70vh] bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[100] flex flex-col">
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   {unreadCount > 0 && (
                     <button
@@ -255,7 +255,7 @@ export function Sidebar() {
                     </button>
                   )}
                 </div>
-                <div className="max-h-96 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => {
                       const Icon = getNotificationIcon(notification.type);

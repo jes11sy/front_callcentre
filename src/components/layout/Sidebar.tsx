@@ -47,7 +47,8 @@ export function Sidebar() {
     isSubscribed: isPushSubscribed, 
     permission: pushPermission,
     subscribe: subscribePush,
-    isSubscribing: isPushSubscribing 
+    isSubscribing: isPushSubscribing,
+    isLoading: isPushLoading,
   } = usePushNotifications();
   
   // Позиция окна уведомлений
@@ -324,11 +325,16 @@ export function Sidebar() {
                   </div>
                   <div className="flex items-center gap-3">
                     {/* Push notifications button */}
-                    {isPushSupported && pushPermission !== 'denied' && (
+                    {!isPushLoading && isPushSupported && pushPermission !== 'denied' && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => { e.stopPropagation(); subscribePush(); }}
-                        disabled={isPushSubscribing || isPushSubscribed}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          console.log('[Sidebar] Push кнопка нажата', { isPushSubscribed, isPushSubscribing });
+                          // Вызываем subscribe даже если уже подписан - хук сам разберётся
+                          subscribePush(); 
+                        }}
+                        disabled={isPushSubscribing}
                         className={`text-xs hover:underline ${
                           isPushSubscribed 
                             ? 'text-green-500' 
@@ -477,10 +483,14 @@ export function Sidebar() {
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">
                     {/* Push notifications button - mobile */}
-                    {isPushSupported && pushPermission !== 'denied' && (
+                    {!isPushLoading && isPushSupported && pushPermission !== 'denied' && (
                       <button
-                        onClick={subscribePush}
-                        disabled={isPushSubscribing || isPushSubscribed}
+                        onClick={() => {
+                          console.log('[Sidebar Mobile] Push кнопка нажата', { isPushSubscribed, isPushSubscribing });
+                          // Вызываем subscribe - хук сам разберётся с состоянием
+                          subscribePush();
+                        }}
+                        disabled={isPushSubscribing}
                         className={`text-xs hover:underline ${
                           isPushSubscribed 
                             ? 'text-green-500' 

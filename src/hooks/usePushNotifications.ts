@@ -375,7 +375,9 @@ export const usePushNotifications = () => {
     const iosDevice = isIOS();
     const standalone = isStandalone();
     
-    console.log('[Push] Начинаем подписку...', { isIOS: iosDevice, isStandalone: standalone });
+    console.log('[Push] ====== SUBSCRIBE ВЫЗВАН ======');
+    console.log('[Push] Платформа:', { isIOS: iosDevice, isStandalone: standalone });
+    console.log('[Push] VAPID_PUBLIC_KEY:', VAPID_PUBLIC_KEY ? 'установлен' : 'НЕ УСТАНОВЛЕН');
     
     // Быстрые синхронные проверки (не сбивают user gesture)
     if (!VAPID_PUBLIC_KEY) {
@@ -390,6 +392,7 @@ export const usePushNotifications = () => {
       const errorMsg = 'Уведомления не поддерживаются в этом браузере';
       setState(prev => ({ ...prev, error: errorMsg }));
       toast.error(errorMsg);
+      console.error('[Push] Notification API не найден');
       return;
     }
     
@@ -397,22 +400,24 @@ export const usePushNotifications = () => {
       const errorMsg = 'Service Worker не поддерживается';
       setState(prev => ({ ...prev, error: errorMsg }));
       toast.error(errorMsg);
+      console.error('[Push] ServiceWorker не поддерживается');
       return;
     }
     
     const currentPermission = Notification.permission;
-    console.log('[Push] Текущее разрешение:', currentPermission);
+    console.log('[Push] Текущее разрешение браузера:', currentPermission);
     
     if (currentPermission === 'denied') {
       const errorMsg = 'Уведомления заблокированы. Разрешите их в настройках браузера';
       setState(prev => ({ ...prev, permission: 'denied', error: errorMsg }));
       toast.error(errorMsg);
+      console.error('[Push] Уведомления заблокированы пользователем');
       return;
     }
 
     // Если разрешение уже есть - сразу подписываемся
     if (currentPermission === 'granted') {
-      console.log('[Push] Разрешение уже есть, подписываемся...');
+      console.log('[Push] Разрешение уже granted, пропускаем диалог, подписываемся...');
       toast.loading('Подключение к серверу...', { id: 'push-subscribe' });
       subscribeMutation.mutate(undefined, {
         onSettled: () => {
@@ -421,10 +426,13 @@ export const usePushNotifications = () => {
       });
       return;
     }
+    
+    console.log('[Push] Разрешение:', currentPermission, '- будем запрашивать диалог');
 
     // КРИТИЧНО: На iOS PWA вызываем requestPermission СРАЗУ, без каких-либо промежуточных вызовов
     // toast.loading() или любой другой вызов "сбивает" user gesture context
-    console.log('[Push] Запрашиваем разрешение (iOS PWA: без toast перед вызовом)...');
+    // НЕ делаем НИКАКИХ async операций до requestPermission!
+    console.log('[Push] Запрашиваем разрешение у браузера (iOS: первый async вызов после клика!)...');
     
     let permission: NotificationPermission;
     

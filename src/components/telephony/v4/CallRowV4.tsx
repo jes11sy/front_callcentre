@@ -263,7 +263,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                       Исходящий звонок
                     </span>
                   </div>
-                )
+                ) : (
                   // Входящий звонок - показываем номер телефона клиента
                   <div className={cn(
                     "font-semibold font-mono text-xs sm:text-sm",
@@ -286,14 +286,14 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     <span>+{groupCalls.length - 1} {pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span>
                     {isExpanded ? (
                       <ChevronUp className="w-3 h-3" />
-                    )
+                    ) : (
                       <ChevronDown className="w-3 h-3" />
                     )}
                   </button>
                 )}
               </div>
             </>
-          )
+          ) : (
             <div className={cn("flex items-center gap-2", "pl-2 sm:pl-4")}>
               <div className={cn(
                 "w-0.5 h-5 rounded",
@@ -303,7 +303,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               {false && (
                 isCallback || isOutgoing ? (
                   <DirectionIcon className={cn("w-3.5 h-3.5", directionConfig.color)} />
-                )
+                ) : (
                   <StatusIcon className={cn("w-3.5 h-3.5", statusConfig.color)} />
                 )
               )}

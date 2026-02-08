@@ -210,9 +210,11 @@ export function PushPermissionBanner() {
     isIOSPWARequired,
     error,
     isLoading,
+    isIOS,
+    isStandalone,
+    iosVersion,
   } = usePushNotifications();
   const [dismissed, setDismissed] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   // Проверяем localStorage при монтировании
   useEffect(() => {
@@ -227,15 +229,10 @@ export function PushPermissionBanner() {
     localStorage.setItem('push-banner-dismissed', 'true');
   };
 
-  // Обёртка для subscribe с отслеживанием состояния
-  const handleSubscribe = async () => {
-    setIsProcessing(true);
-    try {
-      await subscribe();
-    } finally {
-      // Даём время на обработку
-      setTimeout(() => setIsProcessing(false), 1000);
-    }
+  // ВАЖНО: На iOS PWA нельзя оборачивать subscribe() в дополнительную логику,
+  // это может сбить user gesture context. Вызываем напрямую.
+  const handleSubscribe = () => {
+    subscribe();
   };
 
   // Показываем инструкцию для iOS если нужно установить PWA
@@ -297,12 +294,8 @@ export function PushPermissionBanner() {
     return null;
   }
 
-  const buttonDisabled = isSubscribing || isProcessing;
-  const buttonText = isSubscribing 
-    ? 'Подключение...' 
-    : isProcessing 
-      ? 'Обработка...' 
-      : 'Включить';
+  const buttonDisabled = isSubscribing;
+  const buttonText = isSubscribing ? 'Подключение...' : 'Включить';
 
   return (
     <div className="fixed bottom-4 right-4 max-w-sm bg-white dark:bg-[#1e2530] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50 animate-in slide-in-from-bottom-4 font-myriad">
@@ -330,6 +323,11 @@ export function PushPermissionBanner() {
           {error && (
             <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+              {isIOS && isStandalone && (
+                <p className="text-xs text-red-500 dark:text-red-500 mt-1 opacity-70">
+                  iOS {iosVersion || '?'} PWA
+                </p>
+              )}
             </div>
           )}
           

@@ -1,33 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const router = useRouter();
-  const { user, _hasHydrated } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
-
-  // Ждём монтирования на клиенте
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
-    // Ждём монтирования и гидратации store
-    if (!mounted || !_hasHydrated) return;
+    // Редирект только один раз
+    if (hasRedirected.current) return;
+    hasRedirected.current = true;
     
-    // Если есть user - на телефонию
-    if (user) {
-      router.replace('/telephony');
-    } else {
-      // Нет user - на логин
-      router.replace('/login');
-    }
-  }, [user, router, _hasHydrated, mounted]);
+    // Просто редиректим на логин - там проверка авторизации
+    router.replace('/login');
+  }, [router]);
 
-  // Статичный UI для SSR - без условий
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#02111B]">
       <div className="text-center">

@@ -25,12 +25,12 @@ export function LoginForm() {
   // Ref для предотвращения повторной проверки авторизации
   const hasCheckedAuth = useRef(false);
   
-  const _router = useRouter(); // Оставляем для возможного использования
-  const _authStore = useAuthStore(); // Сохраняем для возможного использования
+  const router = useRouter();
+  const { login: authLogin } = useAuthStore();
   
   // Используем хук с поддержкой гидратации для предотвращения ошибки React #418
   const { version, toggleVersion, theme, toggleTheme, isHydrated } = useDesignStoreHydrated();
-
+  
   // Проверяем авторизацию при загрузке (ОДИН РАЗ)
   useEffect(() => {
     // Предотвращаем повторную проверку
@@ -39,27 +39,35 @@ export function LoginForm() {
     
     const checkAuth = async () => {
       try {
-        // 1. Проверяем активную сессию через cookies
-        const isAuthenticated = await authApi.isAuthenticated();
-        if (isAuthenticated) {
-          window.location.href = '/telephony';
+        // 1. Проверяем активную сессию через cookies и получаем профиль
+        const response = await authApi.getProfile().catch(() => null);
+        if (response?.success && response.data) {
+          // ВАЖНО: Обновляем authStore перед редиректом!
+          authLogin(response.data);
+          router.replace('/telephony');
           return;
         }
         
         // 2. Cookies не работают — пробуем восстановить через IndexedDB
         const restored = await authApi.restoreSessionFromIndexedDB();
         if (restored) {
-          window.location.href = '/telephony';
-          return;
+          // Получаем профиль после восстановления сессии
+          const restoredResponse = await authApi.getProfile().catch(() => null);
+          if (restoredResponse?.success && restoredResponse.data) {
+            authLogin(restoredResponse.data);
+            router.replace('/telephony');
+            return;
+          }
         }
       } catch {
-        // Показываем форму логина
+        // Ошибка - показываем форму логина
       }
       
       setIsCheckingAuth(false);
     };
     
     checkAuth();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = async () => {

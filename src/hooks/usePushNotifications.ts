@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '@/lib/api';
 
 // VAPID публичный ключ - должен совпадать с бэкендом
@@ -135,9 +136,13 @@ export const usePushNotifications = () => {
         subscription: subscription.toJSON(),
       });
 
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || 'Сервер не сохранил подписку');
+      }
+
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setState(prev => ({
         ...prev,
         isSubscribed: true,
@@ -145,9 +150,24 @@ export const usePushNotifications = () => {
         error: null,
       }));
       queryClient.invalidateQueries({ queryKey: ['push-settings'] });
+
+      // Автоматически отправляем тестовый push для проверки
+      try {
+        const testResponse = await api.post('/push/test');
+        if (testResponse.data?.success) {
+          toast.success('Push-уведомления включены! Тестовое уведомление отправлено');
+        } else {
+          toast.warning('Подписка сохранена, но тестовый push не отправлен. Проверьте настройки VAPID на сервере');
+          console.error('[Push] Тест не прошёл:', testResponse.data?.message);
+        }
+      } catch (err) {
+        toast.warning('Подписка сохранена, но не удалось отправить тестовый push');
+        console.error('[Push] Ошибка тестового push:', err);
+      }
     },
     onError: (error: Error) => {
       console.error('[Push] Ошибка подписки:', error);
+      toast.error(`Ошибка подписки: ${error.message}`);
       setState(prev => ({
         ...prev,
         error: error.message,
@@ -241,8 +261,15 @@ export const usePushNotifications = () => {
   // Тестовое уведомление
   const sendTestNotification = useCallback(async () => {
     try {
-      await api.post('/push/test');
+      const response = await api.post('/push/test');
+      if (response.data?.success) {
+        toast.success('Тестовое уведомление отправлено');
+      } else {
+        toast.error(response.data?.message || 'Не удалось отправить тестовое уведомление');
+        console.error('[Push] Тест не прошёл:', response.data);
+      }
     } catch (error) {
+      toast.error('Ошибка отправки тестового уведомления');
       console.error('[Push] Ошибка отправки тестового уведомления:', error);
     }
   }, []);

@@ -111,7 +111,7 @@ async function showLocalNotification(options: {
     
     await registration.showNotification(options.title, {
       body: options.body,
-      icon: '/img/logo/logo_v2.png',
+      icon: '/img/logo/pwa_logo.png',
       badge: '/img/logo/favicon.png',
       tag: options.tag,
       renotify: true,
@@ -129,7 +129,7 @@ async function showLocalNotification(options: {
     try {
       new Notification(options.title, {
         body: options.body,
-        icon: '/img/logo/logo_v2.png',
+        icon: '/img/logo/pwa_logo.png',
         tag: options.tag,
       });
     } catch (fallbackError) {

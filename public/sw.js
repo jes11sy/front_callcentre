@@ -32,7 +32,7 @@ self.addEventListener('push', (event) => {
   // Минимальные опции - работают везде, включая iOS Safari
   const options = {
     body: data.body || data.message || '',
-    icon: data.icon || '/img/logo/logo_v2.png',
+    icon: data.icon || '/img/logo/pwa_logo.png',
     badge: data.badge || '/img/logo/favicon.png',
     tag: data.tag || data.type || 'default',
     data: {

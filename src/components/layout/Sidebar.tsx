@@ -157,7 +157,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className={`px-5 pb-6 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
+      <div className={`px-5 ${isMobile ? 'space-y-4 pb-16' : 'space-y-3 pb-6'}`}>
         {/* Version Toggle - только для V1 */}
         {version === 'v1' && (
           <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>

@@ -332,7 +332,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         {isOutgoing ? (
           // Для исходящих звонков показываем "Не указано"
           <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Не указано</span>
-        )
+        ) : (
           // Для входящих звонков показываем город, РК и источник
           <div className="space-y-1">
             <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm">
@@ -456,7 +456,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 <span className="hidden sm:inline">Новый заказ</span>
               </Button>
             </>
-          )
+          ) : (
             call.recordingPath && (
               <Button
                 variant="ghost"

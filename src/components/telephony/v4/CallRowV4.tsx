@@ -227,7 +227,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
                   ) : isOutgoing ? (
                     <DirectionIcon className={cn("w-4 h-4", directionConfig.color)} />
-                  )
+                  ) : (
                     <StatusIcon className={cn("w-4 h-4", statusConfig.color)} />
                   )}
                 </div>

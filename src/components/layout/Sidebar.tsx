@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import { useNotifications } from '@/hooks/useNotifications';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { 
   User, 
   Sun,
@@ -14,6 +15,7 @@ import {
   Menu,
   X,
   Bell,
+  BellRing,
   Check,
   Trash2,
   PhoneIncoming,
@@ -38,6 +40,15 @@ export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const notificationsPanelRef = useRef<HTMLDivElement>(null);
+  
+  // Push notifications
+  const { 
+    isSupported: isPushSupported, 
+    isSubscribed: isPushSubscribed, 
+    permission: pushPermission,
+    subscribe: subscribePush,
+    isSubscribing: isPushSubscribing 
+  } = usePushNotifications();
   
   // Позиция окна уведомлений
   const [panelPosition, setPanelPosition] = useState(DEFAULT_POSITION);
@@ -333,16 +344,38 @@ export function Sidebar() {
                     <GripHorizontal className="h-4 w-4 text-gray-400" />
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   </div>
-                  {unreadCount > 0 && (
-                    <button
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
-                      className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
-                    >
-                      <Check className="h-3 w-3" />
-                      Прочитать все
-                    </button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {/* Push notifications button */}
+                    {isPushSupported && pushPermission !== 'denied' && (
+                      <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); subscribePush(); }}
+                        disabled={isPushSubscribing || isPushSubscribed}
+                        className={`text-xs hover:underline ${
+                          isPushSubscribed 
+                            ? 'text-green-500' 
+                            : 'text-[#FEC004]'
+                        } disabled:opacity-50`}
+                      >
+                        {isPushSubscribing 
+                          ? 'Подключение...' 
+                          : isPushSubscribed 
+                            ? 'Push включен' 
+                            : 'Включить push'
+                        }
+                      </button>
+                    )}
+                    {unreadCount > 0 && (
+                      <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
+                        className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Прочитать все
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex-1 overflow-y-auto bg-white dark:bg-[#1a1f2e]">
                   {notifications.length > 0 ? (
@@ -464,15 +497,36 @@ export function Sidebar() {
               <div className="fixed left-4 right-4 top-20 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[10000]">
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
-                    >
-                      <Check className="h-3 w-3" />
-                      Прочитать все
-                    </button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {/* Push notifications button - mobile */}
+                    {isPushSupported && pushPermission !== 'denied' && (
+                      <button
+                        onClick={subscribePush}
+                        disabled={isPushSubscribing || isPushSubscribed}
+                        className={`text-xs hover:underline ${
+                          isPushSubscribed 
+                            ? 'text-green-500' 
+                            : 'text-[#FEC004]'
+                        } disabled:opacity-50`}
+                      >
+                        {isPushSubscribing 
+                          ? 'Подключение...' 
+                          : isPushSubscribed 
+                            ? 'Push включен' 
+                            : 'Включить push'
+                        }
+                      </button>
+                    )}
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllAsRead}
+                        className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Прочитать все
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length > 0 ? (

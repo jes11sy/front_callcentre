@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
-import { PushPermissionBanner } from "@/components/push/PushNotificationManager";
 import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
 
 const geistSans = Geist({
@@ -82,7 +81,6 @@ export default function RootLayout({
             <AuthProvider>
               <SocketProviders />
               {children}
-              <PushPermissionBanner />
             </AuthProvider>
             <Toaster 
               position="top-right" 

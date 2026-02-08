@@ -1,7 +1,7 @@
 // Service Worker для Push-уведомлений
 // Этот файл статичный и копируется в public при билде
 
-const CACHE_NAME = 'leads-cache-v1';
+const CACHE_NAME = 'leads-cache-v2';
 
 // Обработка push-уведомлений
 self.addEventListener('push', (event) => {

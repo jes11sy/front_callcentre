@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   description: "Система управления лидами",
   icons: {
     icon: '/img/logo/favicon.png',
-    apple: '/img/logo/logo_v2.png',
+    apple: '/img/logo/pwa_logo.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {

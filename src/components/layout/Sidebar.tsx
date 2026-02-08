@@ -314,7 +314,7 @@ export function Sidebar() {
             {isDropdownOpen && (
               <div 
                 ref={notificationsPanelRef}
-                className="fixed w-96 max-h-96 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 flex flex-col bg-white dark:bg-[#1e2736]"
+                className="fixed w-96 max-h-96 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[9999] flex flex-col bg-white dark:bg-[#1e2736]"
                 style={{ left: panelPosition.x, top: panelPosition.y }}
               >
                 <div 

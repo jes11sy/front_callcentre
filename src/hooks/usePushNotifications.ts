@@ -114,17 +114,11 @@ export const usePushNotifications = () => {
     checkSupport();
   }, []);
 
-  // Мутация для подписки
+  // Мутация для подписки (вызывается ПОСЛЕ получения разрешения)
   const subscribeMutation = useMutation({
     mutationFn: async () => {
       if (!VAPID_PUBLIC_KEY) {
-        throw new Error('VAPID ключ не настроен');
-      }
-
-      // Запрашиваем разрешение
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        throw new Error('Разрешение на уведомления не получено');
+        throw new Error('VAPID ключ не настроен. Проверьте NEXT_PUBLIC_VAPID_PUBLIC_KEY');
       }
 
       // Получаем service worker
@@ -153,6 +147,7 @@ export const usePushNotifications = () => {
       queryClient.invalidateQueries({ queryKey: ['push-settings'] });
     },
     onError: (error: Error) => {
+      console.error('[Push] Ошибка подписки:', error);
       setState(prev => ({
         ...prev,
         error: error.message,
@@ -204,8 +199,33 @@ export const usePushNotifications = () => {
   });
 
   // Подписка на push
-  const subscribe = useCallback(() => {
-    subscribeMutation.mutate();
+  // ВАЖНО: requestPermission() вызывается НАПРЯМУЮ в обработчике клика,
+  // ДО мутации React Query. На мобильных браузерах запрос разрешения
+  // блокируется если вызван не из прямого user gesture.
+  const subscribe = useCallback(async () => {
+    try {
+      if (!VAPID_PUBLIC_KEY) {
+        setState(prev => ({ ...prev, error: 'VAPID ключ не настроен' }));
+        console.error('[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY не задан');
+        return;
+      }
+
+      // Запрашиваем разрешение СРАЗУ в контексте клика (user gesture)
+      const permission = await Notification.requestPermission();
+      
+      if (permission !== 'granted') {
+        setState(prev => ({ ...prev, permission, error: 'Разрешение на уведомления не получено' }));
+        return;
+      }
+
+      setState(prev => ({ ...prev, permission: 'granted' }));
+
+      // Теперь запускаем мутацию для подписки на push и отправки на сервер
+      subscribeMutation.mutate();
+    } catch (error) {
+      console.error('[Push] Ошибка при запросе разрешения:', error);
+      setState(prev => ({ ...prev, error: 'Не удалось запросить разрешение' }));
+    }
   }, [subscribeMutation]);
 
   // Отписка от push

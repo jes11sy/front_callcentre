@@ -133,7 +133,14 @@ export function Sidebar() {
   // Закрываем dropdown при клике вне его
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+      // Не закрываем если drag или если клик внутри panel
+      if (isDragging) return;
+      
+      const target = event.target as Node;
+      const isInsideButton = notificationsRef.current?.contains(target);
+      const isInsidePanel = notificationsPanelRef.current?.contains(target);
+      
+      if (!isInsideButton && !isInsidePanel) {
         closeDropdown();
       }
     };
@@ -145,7 +152,7 @@ export function Sidebar() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isDropdownOpen, closeDropdown]);
+  }, [isDropdownOpen, closeDropdown, isDragging]);
 
   // Форматирование времени уведомления
   const formatTime = (dateString: string) => {

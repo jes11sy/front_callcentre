@@ -3,6 +3,13 @@
 
 const CACHE_NAME = 'leads-cache-v1';
 
+// Определяем iOS (Safari на iOS не поддерживает actions и некоторые другие опции)
+const isIOS = () => {
+  const ua = self.navigator?.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || 
+    (ua.includes('Mac') && 'ontouchend' in self);
+};
+
 // Обработка push-уведомлений
 self.addEventListener('push', (event) => {
   console.log('[SW] Push event received');
@@ -30,32 +37,39 @@ self.addEventListener('push', (event) => {
   }
 
   try {
+    const iOS = isIOS();
+    console.log('[SW] Platform iOS:', iOS);
+    
+    // Базовые опции, совместимые с iOS
     const options = {
       body: data.body || data.message || '',
       icon: data.icon || '/img/logo/logo_v2.png',
       badge: data.badge || '/img/logo/favicon.png',
-      vibrate: [200, 100, 200],
       tag: data.tag || data.type || 'default',
-      renotify: true,
-      requireInteraction: data.requireInteraction !== false,
       data: {
         url: data.url || '/',
         type: data.type,
         orderId: data.orderId,
         ...(data.data || {}),
       },
-      actions: data.actions || [],
     };
 
-    // Добавляем действия для звонков
-    if (data.type === 'call_incoming' || data.type === 'call_missed') {
-      options.actions = [
-        { action: 'open', title: 'Открыть' },
-        { action: 'dismiss', title: 'Закрыть' },
-      ];
+    // iOS не поддерживает эти опции - они могут вызвать silent fail
+    if (!iOS) {
+      options.vibrate = [200, 100, 200];
+      options.renotify = true;
+      options.requireInteraction = data.requireInteraction !== false;
+      
+      // actions тоже не поддерживаются на iOS
+      if (data.type === 'call_incoming' || data.type === 'call_missed') {
+        options.actions = [
+          { action: 'open', title: 'Открыть' },
+          { action: 'dismiss', title: 'Закрыть' },
+        ];
+      }
     }
 
-    console.log('[SW] Showing notification:', data.title || 'LEADS CREATE');
+    console.log('[SW] Showing notification:', data.title || 'LEADS CREATE', options);
     event.waitUntil(
       self.registration.showNotification(data.title || 'LEADS CREATE', options)
     );

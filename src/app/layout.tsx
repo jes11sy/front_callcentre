@@ -8,7 +8,6 @@ import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
 import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
-import { PushDebugPanel } from "@/components/push/PushNotificationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,8 +101,6 @@ export default function RootLayout({
               }}
             />
           </ThemeProvider>
-          {/* ВРЕМЕННО: Debug панель для диагностики push на iOS - УДАЛИТЬ ПОСЛЕ ОТЛАДКИ */}
-          <PushDebugPanel />
         </QueryProvider>
         <WebVitalsScript />
         <ServiceWorkerRegister />

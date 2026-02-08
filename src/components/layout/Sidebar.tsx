@@ -113,7 +113,7 @@ export function Sidebar() {
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       {/* Navigation */}
-      <nav className={`flex-1 px-5 ${isMobile ? 'space-y-2' : 'space-y-3'}`}>
+      <nav className={`flex-1 px-5 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
@@ -121,7 +121,7 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
-                isMobile ? 'py-2.5 text-base' : 'py-2.5 text-sm'
+                isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -129,7 +129,7 @@ export function Sidebar() {
               <span 
                 className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
                   active ? 'opacity-100' : 'opacity-0'
-                } ${isMobile ? 'h-10' : 'h-10'}`}
+                } ${isMobile ? 'h-12' : 'h-10'}`}
               >
                 <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
                   <path 
@@ -157,10 +157,10 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className={`px-5 ${isMobile ? 'space-y-2 pb-4 mt-2' : 'space-y-3 pb-6'}`}>
+      <div className={`px-5 pb-6 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
         {/* Version Toggle - только для V1 */}
         {version === 'v1' && (
-          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-2' : 'py-2'}`}>
+          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
             <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
             <button
               onClick={toggleVersion}
@@ -180,7 +180,7 @@ export function Sidebar() {
 
         {/* Theme Toggle - только для V2 */}
         {version === 'v2' && (
-          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-2' : 'py-2'}`}>
+          <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
             <Sun className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
             <button
               onClick={toggleTheme}
@@ -277,14 +277,14 @@ export function Sidebar() {
         <Link
           href="/profile"
           className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
-            isMobile ? 'py-2.5 text-base' : 'py-2.5 text-sm'
+            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <span 
             className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
               isActive('/profile') ? 'opacity-100' : 'opacity-0'
-            } ${isMobile ? 'h-10' : 'h-10'}`}
+            } ${isMobile ? 'h-12' : 'h-10'}`}
           >
             <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
               <path 
@@ -411,7 +411,7 @@ export function Sidebar() {
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="pt-4 flex flex-col h-full overflow-y-auto pb-safe">
+        <div className="pt-6 flex flex-col h-full overflow-y-auto">
           <MenuContent isMobile={true} />
         </div>
       </aside>

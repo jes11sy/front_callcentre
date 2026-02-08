@@ -218,6 +218,13 @@ export const usePushNotifications = () => {
         const subscription = await registration.pushManager.getSubscription();
         console.log('[Push] Текущая подписка:', subscription ? 'есть' : 'нет');
         
+        // Синхронизируем localStorage с реальным состоянием подписки
+        if (subscription) {
+          localStorage.setItem('push-subscribed', 'true');
+        } else {
+          localStorage.removeItem('push-subscribed');
+        }
+        
         setState({
           isSupported: true,
           isSubscribed: !!subscription,
@@ -290,6 +297,8 @@ export const usePushNotifications = () => {
         permission: 'granted',
         error: null,
       }));
+      // Сохраняем флаг для проверки в других местах (toast и т.д.)
+      localStorage.setItem('push-subscribed', 'true');
       queryClient.invalidateQueries({ queryKey: ['push-settings'] });
 
       // Автоматически отправляем тестовый push для проверки
@@ -343,6 +352,8 @@ export const usePushNotifications = () => {
         isSubscribed: false,
         error: null,
       }));
+      // Убираем флаг
+      localStorage.removeItem('push-subscribed');
       queryClient.invalidateQueries({ queryKey: ['push-settings'] });
     },
     onError: (error: Error) => {

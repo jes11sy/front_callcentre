@@ -29,7 +29,12 @@ export function useSocketCalls({
     const call = args[0] as Call;
     socketLogger.log('Parsed call:', call);
     onNewCall(call);
-    notifications.info('Новый звонок получен');
+    
+    // Показываем toast только если push не включен (чтобы не дублировать)
+    const isPushEnabled = localStorage.getItem('push-subscribed') === 'true';
+    if (!isPushEnabled) {
+      notifications.info('Новый звонок получен');
+    }
   }, [onNewCall]);
 
   const handleUpdatedCall = useCallback((...args: unknown[]) => {

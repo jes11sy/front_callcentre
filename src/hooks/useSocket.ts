@@ -97,7 +97,12 @@ export const useSocket = () => {
     // РЕГИСТРИРУЕМ LISTENERS ТУТ ЖЕ
     newSocket.on('call:new', (call: unknown) => {
       socketLogger.log('NEW CALL EVENT RECEIVED:', call);
-      notifications.info('Новый звонок получен');
+      
+      // Показываем toast только если push не включен (чтобы не дублировать)
+      const isPushEnabled = localStorage.getItem('push-subscribed') === 'true';
+      if (!isPushEnabled) {
+        notifications.info('Новый звонок получен');
+      }
       
       // Dispatch custom event для useCallsData
       window.dispatchEvent(new CustomEvent('socket:call:new', { detail: call }));

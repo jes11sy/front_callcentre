@@ -40,6 +40,7 @@ export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const notificationsPanelRef = useRef<HTMLDivElement>(null);
+  const mobileNotificationsPanelRef = useRef<HTMLDivElement>(null);
   
   // Push notifications
   const { 
@@ -146,14 +147,16 @@ export function Sidebar() {
   // Закрываем dropdown при клике вне его
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Не закрываем если drag или если клик внутри panel
+      // Не закрываем если drag
       if (isDragging) return;
       
       const target = event.target as Node;
       const isInsideButton = notificationsRef.current?.contains(target);
-      const isInsidePanel = notificationsPanelRef.current?.contains(target);
+      const isInsideDesktopPanel = notificationsPanelRef.current?.contains(target);
+      const isInsideMobilePanel = mobileNotificationsPanelRef.current?.contains(target);
       
-      if (!isInsideButton && !isInsidePanel) {
+      // Не закрываем если клик внутри любой из панелей
+      if (!isInsideButton && !isInsideDesktopPanel && !isInsideMobilePanel) {
         closeDropdown();
       }
     };
@@ -478,7 +481,10 @@ export function Sidebar() {
 
             {/* Mobile Notifications Dropdown */}
             {isDropdownOpen && (
-              <div className="fixed left-4 right-4 top-20 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[10000]">
+              <div 
+                ref={mobileNotificationsPanelRef}
+                className="fixed left-4 right-4 top-20 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[10000]"
+              >
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">

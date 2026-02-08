@@ -2,10 +2,13 @@
   "name": "LEADS CREATE",
   "short_name": "LEADS",
   "description": "Система управления звонками",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0f172a",
-  "theme_color": "#3b82f6",
+  "theme_color": "#FEC004",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -28,5 +31,7 @@
   ],
   "categories": ["business", "productivity"],
   "lang": "ru",
-  "dir": "ltr"
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "handle_links": "preferred"
 }

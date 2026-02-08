@@ -201,7 +201,7 @@ export function PushNotificationManager({ compact = false }: PushNotificationMan
  * Баннер для первого запроса разрешения
  */
 export function PushPermissionBanner() {
-  const { isSupported, isSubscribed, permission, subscribe, isSubscribing } = usePushNotifications();
+  const { isSupported, isSubscribed, permission, subscribe, isSubscribing, isIOSPWARequired, isIOS } = usePushNotifications();
   const [dismissed, setDismissed] = useState(false);
 
   // Проверяем localStorage при монтировании
@@ -212,6 +212,50 @@ export function PushPermissionBanner() {
     }
   }, []);
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    localStorage.setItem('push-banner-dismissed', 'true');
+  };
+
+  // Показываем инструкцию для iOS если нужно установить PWA
+  if (isIOSPWARequired && !dismissed) {
+    return (
+      <div className="fixed bottom-4 right-4 max-w-sm bg-white dark:bg-[#1e2530] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50 animate-in slide-in-from-bottom-4 font-myriad">
+        <button
+          onClick={handleDismiss}
+          className="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="flex items-start gap-4">
+          <div className="p-2.5 bg-[#FEC004]/10 rounded-xl">
+            <Bell size={26} className="text-[#FEC004]" />
+          </div>
+          <div className="flex-1 pr-4">
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1.5 text-base">
+              Установите приложение
+            </h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
+              Для получения уведомлений на iPhone/iPad:
+            </p>
+            <ol className="text-sm text-gray-500 dark:text-gray-400 mb-4 space-y-1 list-decimal list-inside">
+              <li>Нажмите кнопку «Поделиться» <span className="inline-block w-4 h-4 align-middle">⎙</span></li>
+              <li>Выберите «На экран Домой»</li>
+              <li>Нажмите «Добавить»</li>
+            </ol>
+            <button
+              onClick={handleDismiss}
+              className="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#252d3a] rounded-lg transition-colors"
+            >
+              Понятно
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Не показываем если:
   // - Не поддерживается
   // - Уже подписан
@@ -221,11 +265,6 @@ export function PushPermissionBanner() {
   if (!isSupported || isSubscribed || dismissed || permission !== 'default') {
     return null;
   }
-
-  const handleDismiss = () => {
-    setDismissed(true);
-    localStorage.setItem('push-banner-dismissed', 'true');
-  };
 
   return (
     <div className="fixed bottom-4 right-4 max-w-sm bg-white dark:bg-[#1e2530] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50 animate-in slide-in-from-bottom-4 font-myriad">

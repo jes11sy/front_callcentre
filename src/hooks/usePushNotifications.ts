@@ -13,6 +13,29 @@ interface PushSubscriptionState {
   permission: NotificationPermission | 'default';
   isLoading: boolean;
   error: string | null;
+  /** iOS требует установки PWA на домашний экран для push */
+  isIOSPWARequired: boolean;
+  /** Приложение запущено как PWA (standalone) */
+  isStandalone: boolean;
+}
+
+/**
+ * Определяет, является ли устройство iOS
+ */
+function isIOS(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+/**
+ * Определяет, запущено ли приложение как PWA (standalone)
+ */
+function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true ||
+    document.referrer.includes('android-app://');
 }
 
 interface PushSettingsResponse {
@@ -53,6 +76,8 @@ export const usePushNotifications = () => {
     permission: 'default',
     isLoading: true,
     error: null,
+    isIOSPWARequired: false,
+    isStandalone: false,
   });
 
   // Получение настроек push с сервера
@@ -69,18 +94,41 @@ export const usePushNotifications = () => {
   // Проверка поддержки и текущего состояния
   useEffect(() => {
     const checkSupport = async () => {
-      // Проверяем поддержку
-      const isSupported = 
-        'serviceWorker' in navigator && 
-        'PushManager' in window && 
-        'Notification' in window;
+      const standalone = isStandalone();
+      const iosDevice = isIOS();
+      
+      // Базовая проверка поддержки API
+      const hasServiceWorker = 'serviceWorker' in navigator;
+      const hasPushManager = 'PushManager' in window;
+      const hasNotification = 'Notification' in window;
+      
+      // iOS Safari поддерживает Push только в PWA режиме (iOS 16.4+)
+      // В обычном Safari push не работает
+      const isIOSBrowser = iosDevice && !standalone;
+      
+      const isSupported = hasServiceWorker && hasPushManager && hasNotification && !isIOSBrowser;
 
-      if (!isSupported) {
+      if (!hasServiceWorker || !hasPushManager || !hasNotification) {
         setState(prev => ({
           ...prev,
           isSupported: false,
           isLoading: false,
+          isStandalone: standalone,
+          isIOSPWARequired: false,
           error: 'Push-уведомления не поддерживаются в этом браузере',
+        }));
+        return;
+      }
+      
+      // iOS в браузере - нужно установить PWA
+      if (isIOSBrowser) {
+        setState(prev => ({
+          ...prev,
+          isSupported: false,
+          isLoading: false,
+          isStandalone: standalone,
+          isIOSPWARequired: true,
+          error: 'На iOS добавьте приложение на домашний экран для получения уведомлений',
         }));
         return;
       }
@@ -99,6 +147,8 @@ export const usePushNotifications = () => {
           permission,
           isLoading: false,
           error: null,
+          isIOSPWARequired: false,
+          isStandalone: standalone,
         });
       } catch (error) {
         setState(prev => ({
@@ -106,6 +156,8 @@ export const usePushNotifications = () => {
           isSupported: true,
           permission,
           isLoading: false,
+          isStandalone: standalone,
+          isIOSPWARequired: false,
           error: 'Ошибка проверки подписки',
         }));
         console.error('[Push] Ошибка проверки:', error);
@@ -283,5 +335,7 @@ export const usePushNotifications = () => {
     sendTestNotification,
     isSubscribing: subscribeMutation.isPending,
     isUnsubscribing: unsubscribeMutation.isPending,
+    /** Утилиты для проверки платформы */
+    isIOS: isIOS(),
   };
 };

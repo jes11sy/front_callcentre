@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
@@ -12,24 +12,13 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-/**
- * Проверяет, запущено ли приложение в PWA режиме
- */
-function isPWAMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
+  // ✅ user уже инициализирован из localStorage в store
   const { user, setUser, setLoading, isLoading } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
   const initRef = useRef(false);
   const isRestoringRef = useRef(false);
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   const isPublicPage = pathname === '/login';
 
@@ -37,79 +26,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (isPublicPage) {
       setLoading(false);
-      setInitialCheckDone(true);
     }
   }, [isPublicPage, setLoading]);
 
   useEffect(() => {
     // Предотвращаем повторную инициализацию
-    if (initRef.current && !isPublicPage) {
+    if (initRef.current) {
       return;
     }
 
+    if (isPublicPage) {
+      setLoading(false);
+      return;
+    }
+
+    initRef.current = true;
     let cancelled = false;
-    
-    const initAuth = async () => {
-      try {
-        if (isPublicPage) {
-          setLoading(false);
-          setInitialCheckDone(true);
-          return;
-        }
 
-        initRef.current = true;
+    // ✅ Если есть пользователь в store - сразу убираем loading
+    // Store уже инициализирован с данными из localStorage
+    if (user) {
+      authLogger.log('User already in store, showing content');
+      setLoading(false);
+      
+      // Фоновая проверка сессии
+      setTimeout(() => {
+        if (!cancelled) {
+          validateSessionInBackground();
+        }
+      }, 500);
+      return;
+    }
 
-        // ✅ Синхронное чтение из localStorage (мгновенно)
-        let storedUser = null;
-        if (typeof window !== 'undefined') {
-          const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-          if (userStr) {
-            try {
-              storedUser = JSON.parse(userStr);
-            } catch {
-              storedUser = null;
-            }
-          }
-        }
-        
-        // Нет сохранённого пользователя - редирект на логин
-        if (!storedUser) {
-          authLogger.log('No stored user found');
-          setUser(null);
-          setLoading(false);
-          setInitialCheckDone(true);
-          router.replace('/login');
-          return;
-        }
-
-        // ✅ ВСЕГДА сразу показываем контент с кэшированным пользователем
-        // Независимо от PWA режима — это убирает мерцание
-        authLogger.log('Showing cached user immediately');
-        setUser(storedUser);
-        setLoading(false);
-        setInitialCheckDone(true);
-        
-        // Проверяем сессию в фоне (без блокировки UI)
-        setTimeout(() => {
-          if (cancelled) return;
-          validateSessionInBackground(storedUser);
-        }, 300);
-        
-      } catch (error) {
-        authLogger.error('Auth initialization error:', error);
-        setUser(null);
-        setLoading(false);
-        setInitialCheckDone(true);
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-          router.replace('/login');
-        }
-      }
-    };
+    // Нет пользователя - редирект на логин
+    authLogger.log('No user in store, redirecting to login');
+    setLoading(false);
+    router.replace('/login');
 
     /**
      * Фоновая валидация сессии (без блокировки UI)
      */
-    const validateSessionInBackground = async (storedUser: typeof user) => {
+    async function validateSessionInBackground() {
       try {
         const isAuth = await authApi.isAuthenticated();
         
@@ -119,9 +76,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const profile = await authApi.getProfile();
             if (profile.data && !cancelled) {
               setUser(profile.data);
+              // Сохраняем в localStorage для следующего запуска
+              localStorage.setItem('user', JSON.stringify(profile.data));
             }
           } catch {
-            // Ошибка получения профиля - оставляем кэшированного
             authLogger.warn('Could not fetch profile, keeping cached user');
           }
           return;
@@ -142,6 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               const profile = await authApi.getProfile();
               if (profile.data) {
                 setUser(profile.data);
+                localStorage.setItem('user', JSON.stringify(profile.data));
               }
             } catch {
               // Оставляем кэшированного
@@ -149,7 +108,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } else if (!cancelled) {
             // Не удалось восстановить - редирект
             authLogger.log('Could not restore session');
-            clearUserData();
+            localStorage.removeItem('user');
+            localStorage.removeItem('auth-storage');
             setUser(null);
             router.replace('/login');
           }
@@ -171,27 +131,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         authLogger.error('Background auth check failed:', errorMessage);
       }
-    };
-
-    /**
-     * Очистка данных пользователя
-     */
-    const clearUserData = () => {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('user');
-        sessionStorage.removeItem('user');
-      }
-    };
-
-    initAuth();
+    }
     
     return () => {
       cancelled = true;
     };
   }, [setUser, setLoading, isPublicPage, router, user]);
 
-  // Показываем loading только при первой загрузке и если нет пользователя
-  if (!initialCheckDone && !isPublicPage && !user) {
+  // ✅ Показываем loading только если нет пользователя и не публичная страница
+  // Store инициализируется с user из localStorage, поэтому мерцания не будет
+  if (isLoading && !isPublicPage && !user) {
     return <LoadingScreen message="Загрузка..." />;
   }
 

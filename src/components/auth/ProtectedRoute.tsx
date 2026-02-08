@@ -14,21 +14,23 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated || !user) {
-        router.push('/login');
-        return;
-      }
+    // Редирект только если loading закончился и нет пользователя
+    if (!isLoading && !user) {
+      router.replace('/login');
     }
-  }, [isAuthenticated, user, isLoading, router]);
+  }, [user, isLoading, router]);
 
+  // ✅ PWA FIX: Если есть user - сразу показываем контент
+  // Не ждём isLoading - store инициализируется с user из localStorage
+  if (user) {
+    return <>{children}</>;
+  }
+
+  // Нет user и ещё loading - показываем загрузку
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect to login
-  }
-
-  return <>{children}</>;
+  // Нет user и loading закончился - редирект (ничего не показываем)
+  return null;
 }

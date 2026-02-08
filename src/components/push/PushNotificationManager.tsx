@@ -201,8 +201,18 @@ export function PushNotificationManager({ compact = false }: PushNotificationMan
  * Баннер для первого запроса разрешения
  */
 export function PushPermissionBanner() {
-  const { isSupported, isSubscribed, permission, subscribe, isSubscribing, isIOSPWARequired, isIOS } = usePushNotifications();
+  const { 
+    isSupported, 
+    isSubscribed, 
+    permission, 
+    subscribe, 
+    isSubscribing, 
+    isIOSPWARequired,
+    error,
+    isLoading,
+  } = usePushNotifications();
   const [dismissed, setDismissed] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Проверяем localStorage при монтировании
   useEffect(() => {
@@ -215,6 +225,17 @@ export function PushPermissionBanner() {
   const handleDismiss = () => {
     setDismissed(true);
     localStorage.setItem('push-banner-dismissed', 'true');
+  };
+
+  // Обёртка для subscribe с отслеживанием состояния
+  const handleSubscribe = async () => {
+    setIsProcessing(true);
+    try {
+      await subscribe();
+    } finally {
+      // Даём время на обработку
+      setTimeout(() => setIsProcessing(false), 1000);
+    }
   };
 
   // Показываем инструкцию для iOS если нужно установить PWA
@@ -256,21 +277,39 @@ export function PushPermissionBanner() {
     );
   }
 
+  // Ждём загрузки
+  if (isLoading) {
+    return null;
+  }
+
   // Не показываем если:
   // - Не поддерживается
   // - Уже подписан
-  // - Уже отклонил
-  // - Разрешение уже запрошено (granted или denied)
+  // - Разрешение denied (уже отклонено в браузере)
   // - Баннер был закрыт
-  if (!isSupported || isSubscribed || dismissed || permission !== 'default') {
+  if (!isSupported || isSubscribed || dismissed || permission === 'denied') {
     return null;
   }
+
+  // Показываем баннер только если permission === 'default' или 'granted' но не подписан
+  const showBanner = permission === 'default' || (permission === 'granted' && !isSubscribed);
+  if (!showBanner) {
+    return null;
+  }
+
+  const buttonDisabled = isSubscribing || isProcessing;
+  const buttonText = isSubscribing 
+    ? 'Подключение...' 
+    : isProcessing 
+      ? 'Обработка...' 
+      : 'Включить';
 
   return (
     <div className="fixed bottom-4 right-4 max-w-sm bg-white dark:bg-[#1e2530] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50 animate-in slide-in-from-bottom-4 font-myriad">
       <button
         onClick={handleDismiss}
         className="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        disabled={buttonDisabled}
       >
         <X size={18} />
       </button>
@@ -286,17 +325,32 @@ export function PushPermissionBanner() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
             Получайте уведомления о входящих и пропущенных звонках, даже когда вкладка закрыта
           </p>
+          
+          {/* Показываем ошибку если есть */}
+          {error && (
+            <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
+          
           <div className="flex gap-3">
             <button
-              onClick={subscribe}
-              disabled={isSubscribing}
-              className="px-4 py-2 bg-[#FEC004] text-gray-900 text-sm font-medium rounded-lg hover:bg-[#e6ac00] disabled:opacity-50 transition-colors"
+              onClick={handleSubscribe}
+              disabled={buttonDisabled}
+              className="px-4 py-2 bg-[#FEC004] text-gray-900 text-sm font-medium rounded-lg hover:bg-[#e6ac00] disabled:opacity-50 disabled:cursor-wait transition-colors flex items-center gap-2"
             >
-              {isSubscribing ? 'Подключение...' : 'Включить'}
+              {buttonDisabled && (
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              )}
+              {buttonText}
             </button>
             <button
               onClick={handleDismiss}
-              className="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#252d3a] rounded-lg transition-colors"
+              disabled={buttonDisabled}
+              className="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#252d3a] rounded-lg transition-colors disabled:opacity-50"
             >
               Позже
             </button>

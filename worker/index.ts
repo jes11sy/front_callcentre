@@ -20,6 +20,8 @@ interface PushNotificationData {
 
 // Обработка push-уведомлений
 self.addEventListener('push', (event: PushEvent) => {
+  console.log('[SW] Push event received');
+  
   if (!event.data) {
     console.log('[SW] Push получен, но без данных');
     return;
@@ -30,6 +32,7 @@ self.addEventListener('push', (event: PushEvent) => {
   // Пробуем распарсить как JSON, если не получается - используем как текст
   try {
     data = event.data.json() as PushNotificationData;
+    console.log('[SW] Push data (JSON):', data);
   } catch {
     // Если данные не JSON (например, тестовое сообщение), создаём объект из текста
     const textData = event.data.text();
@@ -67,6 +70,7 @@ self.addEventListener('push', (event: PushEvent) => {
       ];
     }
 
+    console.log('[SW] Showing notification:', data.title || 'LEADS CREATE');
     event.waitUntil(
       self.registration.showNotification(data.title || 'LEADS CREATE', options)
     );
@@ -77,6 +81,7 @@ self.addEventListener('push', (event: PushEvent) => {
 
 // Клик по уведомлению
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  console.log('[SW] Notification clicked');
   event.notification.close();
 
   const data = (event.notification.data as Record<string, unknown>) || {};
@@ -121,25 +126,18 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
 // Закрытие уведомления
 self.addEventListener('notificationclose', (event: NotificationEvent) => {
   const data = (event.notification.data as Record<string, unknown>) || {};
-
-  // Можно отправить на сервер информацию о закрытии
   console.log('[SW] Уведомление закрыто:', data.type);
 });
 
-// Обработка подписки на push
+// Обработка изменения подписки на push
 self.addEventListener('pushsubscriptionchange', ((event: Event) => {
-  const pushEvent = event as ExtendableEvent & {
-    oldSubscription?: PushSubscription;
-    newSubscription?: PushSubscription;
-  };
-
   console.log('[SW] Push подписка изменилась');
 
+  const pushEvent = event as ExtendableEvent;
   pushEvent.waitUntil(
     self.registration.pushManager
       .subscribe({
         userVisibleOnly: true,
-        // applicationServerKey будет использован из существующей подписки
       })
       .then((subscription) => {
         // Отправляем новую подписку на сервер
@@ -155,4 +153,4 @@ self.addEventListener('pushsubscriptionchange', ((event: Event) => {
   );
 }) as EventListener);
 
-export {};
+console.log('[SW] Custom push handlers loaded');

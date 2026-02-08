@@ -12,14 +12,12 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const withPWA = withPWAInit({
   dest: 'public',
-  register: true,
+  register: false, // Отключаем авторегистрацию - регистрируем вручную в ServiceWorkerRegister
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   // Кастомный service worker для push-уведомлений
-  // Файл worker/index.ts будет объединён с автогенерируемым SW
+  // Файл worker/index.ts будет скомпилирован и объединён с автогенерируемым SW
   customWorkerSrc: 'worker',
-  customWorkerDest: 'public',
-  customWorkerPrefix: 'sw',
   // Кеширование
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,

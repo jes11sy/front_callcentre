@@ -170,23 +170,31 @@ export const usePushNotifications = () => {
   // Мутация для подписки (вызывается ПОСЛЕ получения разрешения)
   const subscribeMutation = useMutation({
     mutationFn: async () => {
+      console.log('[Push] subscribeMutation: начало');
+      
       if (!VAPID_PUBLIC_KEY) {
         throw new Error('VAPID ключ не настроен. Проверьте NEXT_PUBLIC_VAPID_PUBLIC_KEY');
       }
 
       // Получаем service worker
+      console.log('[Push] Ожидаем готовности Service Worker...');
       const registration = await navigator.serviceWorker.ready;
+      console.log('[Push] Service Worker готов:', registration.scope);
 
       // Подписываемся на push
+      console.log('[Push] Подписываемся на PushManager...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
+      console.log('[Push] Подписка получена:', subscription.endpoint);
 
       // Отправляем подписку на сервер
+      console.log('[Push] Отправляем подписку на сервер...');
       const response = await api.post('/push/subscribe', {
         subscription: subscription.toJSON(),
       });
+      console.log('[Push] Ответ сервера:', response.data);
 
       if (!response.data?.success) {
         throw new Error(response.data?.message || 'Сервер не сохранил подписку');
@@ -275,28 +283,111 @@ export const usePushNotifications = () => {
   // ДО мутации React Query. На мобильных браузерах запрос разрешения
   // блокируется если вызван не из прямого user gesture.
   const subscribe = useCallback(async () => {
+    console.log('[Push] Начинаем подписку...');
+    
     try {
+      // Проверка VAPID ключа
       if (!VAPID_PUBLIC_KEY) {
-        setState(prev => ({ ...prev, error: 'VAPID ключ не настроен' }));
+        const errorMsg = 'VAPID ключ не настроен';
+        setState(prev => ({ ...prev, error: errorMsg }));
+        toast.error(errorMsg);
         console.error('[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY не задан');
+        return;
+      }
+      console.log('[Push] VAPID ключ есть');
+
+      // Проверяем поддержку
+      if (!('Notification' in window)) {
+        const errorMsg = 'Уведомления не поддерживаются в этом браузере';
+        setState(prev => ({ ...prev, error: errorMsg }));
+        toast.error(errorMsg);
+        console.error('[Push] Notification API не поддерживается');
+        return;
+      }
+      
+      // Проверяем Service Worker
+      if (!('serviceWorker' in navigator)) {
+        const errorMsg = 'Service Worker не поддерживается';
+        setState(prev => ({ ...prev, error: errorMsg }));
+        toast.error(errorMsg);
+        return;
+      }
+      
+      // Проверяем текущее разрешение
+      const currentPermission = Notification.permission;
+      console.log('[Push] Текущее разрешение:', currentPermission);
+      
+      // Если уже denied - показываем инструкцию
+      if (currentPermission === 'denied') {
+        const errorMsg = 'Уведомления заблокированы. Разрешите их в настройках браузера';
+        setState(prev => ({ ...prev, permission: 'denied', error: errorMsg }));
+        toast.error(errorMsg);
+        return;
+      }
+
+      // Если разрешение уже есть - сразу подписываемся
+      if (currentPermission === 'granted') {
+        console.log('[Push] Разрешение уже есть, подписываемся...');
+        toast.loading('Подключение к серверу...', { id: 'push-subscribe' });
+        subscribeMutation.mutate(undefined, {
+          onSettled: () => {
+            toast.dismiss('push-subscribe');
+          }
+        });
         return;
       }
 
       // Запрашиваем разрешение СРАЗУ в контексте клика (user gesture)
-      const permission = await Notification.requestPermission();
+      console.log('[Push] Запрашиваем разрешение...');
+      toast.loading('Запрос разрешения...', { id: 'push-permission' });
+      
+      let permission: NotificationPermission;
+      
+      try {
+        permission = await Notification.requestPermission();
+        toast.dismiss('push-permission');
+        console.log('[Push] Получено разрешение:', permission);
+      } catch (permError) {
+        toast.dismiss('push-permission');
+        // Некоторые браузеры используют callback вместо Promise
+        console.error('[Push] Ошибка requestPermission:', permError);
+        const errorMsg = 'Не удалось запросить разрешение на уведомления';
+        setState(prev => ({ ...prev, error: errorMsg }));
+        toast.error(errorMsg);
+        return;
+      }
+      
+      if (permission === 'denied') {
+        const errorMsg = 'Вы отклонили разрешение на уведомления';
+        setState(prev => ({ ...prev, permission: 'denied', error: errorMsg }));
+        toast.error(errorMsg);
+        return;
+      }
       
       if (permission !== 'granted') {
-        setState(prev => ({ ...prev, permission, error: 'Разрешение на уведомления не получено' }));
+        const errorMsg = 'Разрешение на уведомления не получено';
+        setState(prev => ({ ...prev, permission, error: errorMsg }));
+        toast.warning(errorMsg);
         return;
       }
 
-      setState(prev => ({ ...prev, permission: 'granted' }));
+      setState(prev => ({ ...prev, permission: 'granted', error: null }));
+      console.log('[Push] Разрешение получено, запускаем подписку на сервер...');
+      toast.loading('Подключение к серверу...', { id: 'push-subscribe' });
 
       // Теперь запускаем мутацию для подписки на push и отправки на сервер
-      subscribeMutation.mutate();
+      subscribeMutation.mutate(undefined, {
+        onSettled: () => {
+          toast.dismiss('push-subscribe');
+        }
+      });
     } catch (error) {
+      toast.dismiss('push-permission');
+      toast.dismiss('push-subscribe');
+      const errorMsg = error instanceof Error ? error.message : 'Не удалось запросить разрешение';
       console.error('[Push] Ошибка при запросе разрешения:', error);
-      setState(prev => ({ ...prev, error: 'Не удалось запросить разрешение' }));
+      setState(prev => ({ ...prev, error: errorMsg }));
+      toast.error(errorMsg);
     }
   }, [subscribeMutation]);
 

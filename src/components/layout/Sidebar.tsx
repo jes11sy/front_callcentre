@@ -15,7 +15,12 @@ import {
   X,
   Bell,
   Check,
-  Trash2
+  Trash2,
+  PhoneIncoming,
+  PhoneMissed,
+  PhoneOutgoing,
+  FileText,
+  Info
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -85,6 +90,23 @@ export function Sidebar() {
     if (diffMins < 60) return `${diffMins} мин назад`;
     if (diffHours < 24) return `${diffHours} ч назад`;
     return `${diffDays} дн назад`;
+  };
+
+  // Иконка и цвет для типа уведомления
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'call_incoming':
+        return { icon: PhoneIncoming, color: 'text-green-500' };
+      case 'call_missed':
+        return { icon: PhoneMissed, color: 'text-red-500' };
+      case 'call_outgoing':
+        return { icon: PhoneOutgoing, color: 'text-blue-500' };
+      case 'order_created':
+      case 'order_edited':
+        return { icon: FileText, color: 'text-[#FEC004]' };
+      default:
+        return { icon: Info, color: 'text-gray-500' };
+    }
   };
 
   // Обработка клика на уведомление
@@ -235,32 +257,38 @@ export function Sidebar() {
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length > 0 ? (
-                    notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
-                        className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
-                          !notification.read ? 'bg-[#FEC004]/5' : ''
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                              {formatTime(notification.createdAt)}
-                            </p>
+                    notifications.map((notification) => {
+                      const { icon: Icon, color } = getNotificationIcon(notification.type);
+                      return (
+                        <div
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
+                            !notification.read ? 'bg-[#FEC004]/5' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`flex-shrink-0 mt-0.5 ${color}`}>
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                                {notification.title}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                {formatTime(notification.createdAt)}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                            )}
                           </div>
-                          {!notification.read && (
-                            <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
-                          )}
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
                       <Bell className="h-10 w-10 mx-auto mb-3 opacity-50" />
@@ -353,32 +381,38 @@ export function Sidebar() {
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length > 0 ? (
-                    notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
-                        className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
-                          !notification.read ? 'bg-[#FEC004]/5' : ''
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                              {formatTime(notification.createdAt)}
-                            </p>
+                    notifications.map((notification) => {
+                      const { icon: Icon, color } = getNotificationIcon(notification.type);
+                      return (
+                        <div
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
+                            !notification.read ? 'bg-[#FEC004]/5' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`flex-shrink-0 mt-0.5 ${color}`}>
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                                {notification.title}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                {formatTime(notification.createdAt)}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                            )}
                           </div>
-                          {!notification.read && (
-                            <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
-                          )}
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                       <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />

@@ -533,7 +533,7 @@ export function Sidebar() {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-56 bg-white dark:bg-[#1e2530] h-screen flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad">
+      <aside className="hidden lg:flex w-56 bg-white dark:bg-[#1e2530] h-screen flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad z-[100]">
         {/* Logo */}
         <div className="p-6 pb-16">
           <Link href="/telephony">

@@ -21,7 +21,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <Sidebar />
           {/* pt-16 на мобильных для header, lg:pt-0 на десктопе */}
           {/* ml-0 на мобильных, lg:ml-56 на десктопе для sidebar */}
-          <main className="pt-16 lg:pt-0 lg:ml-56 min-h-screen isolate">
+          <main className="pt-16 lg:pt-0 lg:ml-56 min-h-screen">
             {children}
           </main>
         </div>

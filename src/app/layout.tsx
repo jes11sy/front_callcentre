@@ -102,11 +102,11 @@ export default function RootLayout({
               }}
             />
           </ThemeProvider>
+          {/* ВРЕМЕННО: Debug панель для диагностики push на iOS - УДАЛИТЬ ПОСЛЕ ОТЛАДКИ */}
+          <PushDebugPanel />
         </QueryProvider>
         <WebVitalsScript />
         <ServiceWorkerRegister />
-        {/* ВРЕМЕННО: Debug панель для диагностики push на iOS - УДАЛИТЬ ПОСЛЕ ОТЛАДКИ */}
-        <PushDebugPanel />
       </body>
     </html>
   );

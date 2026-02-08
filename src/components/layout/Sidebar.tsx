@@ -82,8 +82,9 @@ export function Sidebar() {
     let lastPos = panelPosition;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newX = Math.max(0, Math.min(window.innerWidth - 384, e.clientX - dragOffset.current.x));
-      const newY = Math.max(0, Math.min(window.innerHeight - 200, e.clientY - dragOffset.current.y));
+      // Ограничиваем только чтобы хотя бы 100px окна было видно на экране
+      const newX = Math.max(-300, Math.min(window.innerWidth - 100, e.clientX - dragOffset.current.x));
+      const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragOffset.current.y));
       lastPos = { x: newX, y: newY };
       setPanelPosition(lastPos);
     };
@@ -442,7 +443,11 @@ export function Sidebar() {
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={toggleDropdown}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors relative"
+              className={`p-2 transition-colors relative ${
+                isDropdownOpen 
+                  ? 'text-[#FEC004]' 
+                  : 'text-gray-600 dark:text-gray-300 hover:text-[#FEC004]'
+              }`}
               aria-label="Уведомления"
             >
               <Bell className="h-6 w-6" />

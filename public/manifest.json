@@ -3,13 +3,18 @@
   "short_name": "LEADS",
   "description": "Система управления звонками",
   "id": "/",
-  "start_url": "/",
+  "start_url": "/telephony",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0f172a",
   "theme_color": "#FEC004",
   "orientation": "portrait-primary",
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/",
+    "type": "module"
+  },
   "icons": [
     {
       "src": "/img/logo/favicon.png",

@@ -2,18 +2,29 @@
 
 import { useEffect } from 'react';
 import { useGlobalSocket } from '@/hooks/useGlobalSocket';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 /**
  * Слушатель WebSocket событий для отправки push-уведомлений о звонках
  * 
  * Этот компонент слушает события call_incoming и call_missed
  * и показывает браузерные уведомления когда вкладка не активна
+ * 
+ * ВАЖНО: Если push уведомления включены на сервере, локальные уведомления
+ * не показываются, чтобы избежать дублирования
  */
 export function CallPushListener() {
   const { on, isConnected } = useGlobalSocket();
+  const { isPushSubscribed } = usePushNotifications();
 
   useEffect(() => {
     if (!isConnected) return;
+
+    // Если push включен - сервер сам пришлёт уведомление, не дублируем
+    if (isPushSubscribed) {
+      console.log('[CallPushListener] Push включен, локальные уведомления отключены');
+      return;
+    }
 
     // Проверяем поддержку и разрешение
     const canNotify = 
@@ -81,7 +92,7 @@ export function CallPushListener() {
       unsubMissed();
       unsubNotification();
     };
-  }, [isConnected, on]);
+  }, [isConnected, on, isPushSubscribed]);
 
   return null;
 }

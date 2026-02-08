@@ -3,13 +3,6 @@
 
 const CACHE_NAME = 'leads-cache-v1';
 
-// Определяем iOS (Safari на iOS не поддерживает actions и некоторые другие опции)
-const isIOS = () => {
-  const ua = self.navigator?.userAgent || '';
-  return /iPad|iPhone|iPod/.test(ua) || 
-    (ua.includes('Mac') && 'ontouchend' in self);
-};
-
 // Обработка push-уведомлений
 self.addEventListener('push', (event) => {
   console.log('[SW] Push event received');
@@ -26,7 +19,7 @@ self.addEventListener('push', (event) => {
     data = event.data.json();
     console.log('[SW] Push data (JSON):', data);
   } catch (e) {
-    // Если данные не JSON (например, тестовое сообщение), создаём объект из текста
+    // Если данные не JSON, создаём объект из текста
     const textData = event.data.text();
     console.log('[SW] Push получен как текст:', textData);
     data = {
@@ -36,46 +29,28 @@ self.addEventListener('push', (event) => {
     };
   }
 
-  try {
-    const iOS = isIOS();
-    console.log('[SW] Platform iOS:', iOS);
-    
-    // Базовые опции, совместимые с iOS
-    const options = {
-      body: data.body || data.message || '',
-      icon: data.icon || '/img/logo/logo_v2.png',
-      badge: data.badge || '/img/logo/favicon.png',
-      tag: data.tag || data.type || 'default',
-      data: {
-        url: data.url || '/',
-        type: data.type,
-        orderId: data.orderId,
-        ...(data.data || {}),
-      },
-    };
+  // Минимальные опции - работают везде, включая iOS Safari
+  const options = {
+    body: data.body || data.message || '',
+    icon: data.icon || '/img/logo/logo_v2.png',
+    badge: data.badge || '/img/logo/favicon.png',
+    tag: data.tag || data.type || 'default',
+    data: {
+      url: data.url || '/',
+      type: data.type,
+      orderId: data.orderId,
+      ...(data.data || {}),
+    },
+  };
 
-    // iOS не поддерживает эти опции - они могут вызвать silent fail
-    if (!iOS) {
-      options.vibrate = [200, 100, 200];
-      options.renotify = true;
-      options.requireInteraction = data.requireInteraction !== false;
-      
-      // actions тоже не поддерживаются на iOS
-      if (data.type === 'call_incoming' || data.type === 'call_missed') {
-        options.actions = [
-          { action: 'open', title: 'Открыть' },
-          { action: 'dismiss', title: 'Закрыть' },
-        ];
-      }
-    }
-
-    console.log('[SW] Showing notification:', data.title || 'LEADS CREATE', options);
-    event.waitUntil(
-      self.registration.showNotification(data.title || 'LEADS CREATE', options)
-    );
-  } catch (error) {
-    console.error('[SW] Ошибка обработки push:', error);
-  }
+  const title = data.title || 'LEADS CREATE';
+  console.log('[SW] Showing notification:', title);
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+      .then(() => console.log('[SW] Notification shown successfully'))
+      .catch(err => console.error('[SW] Failed to show notification:', err))
+  );
 });
 
 // Клик по уведомлению

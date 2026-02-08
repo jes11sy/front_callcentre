@@ -12,7 +12,7 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 
 import { authApi } from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
-import { useDesignStore } from '@/store/designStore';
+import { useDesignStoreHydrated } from '@/store/designStore';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +27,9 @@ export function LoginForm() {
   
   const _router = useRouter(); // Оставляем для возможного использования
   const _authStore = useAuthStore(); // Сохраняем для возможного использования
-  const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
+  
+  // Используем хук с поддержкой гидратации для предотвращения ошибки React #418
+  const { version, toggleVersion, theme, toggleTheme, isHydrated } = useDesignStoreHydrated();
 
   // Проверяем авторизацию при загрузке (ОДИН РАЗ)
   useEffect(() => {
@@ -180,11 +182,11 @@ export function LoginForm() {
     ) : null
   );
 
-  // Показываем загрузку пока проверяем авторизацию
-  if (isCheckingAuth) {
+  // Показываем загрузку пока проверяем авторизацию или ждём гидратации store
+  // Это предотвращает ошибку гидратации React #418
+  if (isCheckingAuth || !isHydrated) {
     return (
       <div className="relative">
-        <VersionToggle />
         <LoadingScreen />
       </div>
     );

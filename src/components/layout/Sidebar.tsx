@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useDesignStore } from '@/store/designStore';
+import { useDesignStoreHydrated } from '@/store/designStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { 
@@ -34,7 +34,7 @@ const DEFAULT_POSITION = { x: 240, y: 100 }; // left-60 = 240px
 
 export function Sidebar() {
   const { user } = useAuthStore();
-  const { version, toggleVersion, theme, toggleTheme } = useDesignStore();
+  const { version, toggleVersion, theme, toggleTheme } = useDesignStoreHydrated();
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -272,20 +272,16 @@ export function Sidebar() {
         {/* Version Toggle - только для V1 */}
         {version === 'v1' && (
           <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
-            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v1' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V1</span>
+            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} text-[#FEC004]`}>V1</span>
             <button
               onClick={toggleVersion}
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                version === 'v2' ? 'bg-[#FEC004]' : 'bg-gray-300 dark:bg-gray-600'
-              }`}
+              className="relative w-12 h-6 rounded-full transition-colors duration-300 bg-gray-300 dark:bg-gray-600"
             >
               <span
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
-                  version === 'v2' ? 'translate-x-6' : 'translate-x-0'
-                }`}
+                className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 translate-x-0"
               />
             </button>
-            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} ${version === 'v2' ? 'text-[#FEC004]' : 'text-gray-400'}`}>V2</span>
+            <span className={`transition-colors ${isMobile ? 'text-base' : 'text-sm'} text-gray-400`}>V2</span>
           </div>
         )}
 

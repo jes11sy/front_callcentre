@@ -1,14 +1,24 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
+  
+  // Флаг для предотвращения ошибки гидратации - ждём монтирования на клиенте
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
+    // Не делаем редирект до монтирования компонента
+    if (!isMounted) return;
+    
     // ✅ PWA FIX: Если есть user - сразу редиректим, не ждём isLoading
     // Store инициализируется с user из localStorage синхронно
     if (user) {
@@ -20,14 +30,10 @@ export default function Home() {
     if (!isLoading && !user) {
       router.replace('/login');
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, isMounted]);
 
-  // ✅ Если user есть - ничего не показываем (мгновенный редирект)
-  if (user) {
-    return null;
-  }
-
-  // Показываем спиннер только если нет user и ещё loading
+  // Всегда показываем одинаковый UI при первом рендере (для гидратации)
+  // Это предотвращает ошибку React #418
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
       <div className="text-center">

@@ -8,9 +8,23 @@ self.addEventListener('push', (event) => {
     return;
   }
 
+  let data;
+  
+  // Пробуем распарсить как JSON, если не получается - используем как текст
   try {
-    const data = event.data.json();
-    
+    data = event.data.json();
+  } catch (jsonError) {
+    // Если данные не JSON (например, тестовое сообщение), создаём объект из текста
+    const textData = event.data.text();
+    console.log('[SW] Push получен как текст:', textData);
+    data = {
+      title: 'LEADS CREATE',
+      body: textData,
+      type: 'text_message'
+    };
+  }
+
+  try {
     const options = {
       body: data.body || data.message || '',
       icon: data.icon || '/img/logo/logo_v2.png',
@@ -23,7 +37,7 @@ self.addEventListener('push', (event) => {
         url: data.url || '/',
         type: data.type,
         orderId: data.orderId,
-        ...data.data
+        ...(data.data || {})
       },
       actions: data.actions || []
     };

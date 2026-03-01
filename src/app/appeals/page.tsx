@@ -76,7 +76,7 @@ export const CATEGORY_LABELS: Record<AppealCategory, string> = {
   callback: 'Перезвон',
 };
 
-const STATUS_FLOW: AppealStatus[] = [
+export const STATUS_FLOW: AppealStatus[] = [
   'new',
   'in_progress',
   'waiting_client',

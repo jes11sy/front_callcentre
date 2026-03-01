@@ -46,8 +46,7 @@ export function useOrderForm({ type, defaultValues, onSubmit }: UseOrderFormOpti
       phone: '',
       address: '',
       dateMeeting: '',
-      typeEquipment: 'КП',
-      problem: '',
+      equipmentTypeId: 0,
       ...defaultValues
     }
   });

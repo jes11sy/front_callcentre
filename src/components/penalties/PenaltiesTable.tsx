@@ -13,7 +13,7 @@ export interface Penalty {
   city: string;
   note: string; // Причина
   amount: number;
-  dateCreate: string;
+  createdAt: string;
   nameCreate?: string; // Имя создателя
 }
 
@@ -127,7 +127,7 @@ export const PenaltiesTable = ({
                     {penalty.city}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDate(penalty.dateCreate)}
+                    {formatDate(penalty.createdAt)}
                   </div>
                 </div>
                 <div className="text-base font-bold text-red-600 dark:text-red-400">
@@ -195,7 +195,7 @@ export const PenaltiesTable = ({
                     {formatCurrency(penalty.amount)}
                   </TableCell>
                   <TableCell className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(penalty.dateCreate)}
+                    {formatDate(penalty.createdAt)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">

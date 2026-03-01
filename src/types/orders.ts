@@ -1,27 +1,28 @@
 export interface Order {
   id: number;
-  rk: string;
-  city: string;
-  avitoName?: string;
-  avitoChatId?: string;
+  rkId: number;
+  rk?: { id: number; name: string };
+  cityId: number;
+  city?: { id: number; name: string };
   phone: string;
   typeOrder: string;
   clientName: string;
   address: string;
   dateMeeting: string;
-  typeEquipment: string;
-  problem: string;
+  equipmentTypeId: number;
+  equipmentType?: { id: number; name: string };
   callRecord?: string;
-  statusOrder: string;
+  statusId: number;
+  status?: { id: number; name: string; code: string };
   result?: number;
   expenditure?: number;
   clean?: number;
   bsoDoc?: string[];
   expenditureDoc?: string[];
   masterId?: number;
-  operatorNameId: number;
-  createDate: string;
-  closingData?: string;
+  operatorId: number;
+  createdAt: string;
+  closingAt?: string;
   updatedAt?: string;
   operator: {
     id: number;
@@ -66,7 +67,7 @@ export interface OrderFilters {
   searchPhone: string;
   searchAddress: string;
   status: string;
-  city: string;
+  cityId: string;
   master: string;
   closingDate: string;
 }
@@ -75,7 +76,7 @@ export type OrderTab = 'description' | 'master' | 'documents';
 
 export interface Call {
   id: number;
-  dateCreate: string;
+  createdAt: string;
   recordingPath?: string;
 }
 
@@ -83,7 +84,7 @@ export interface Employee {
   id: number;
   name: string;
   login: string;
-  statusWork: 'active' | 'inactive' | 'on_call' | 'break';
+  status: 'active' | 'inactive';
   role: string;
   createdAt: string;
   updatedAt: string;
@@ -93,7 +94,7 @@ export interface EmployeeFormData {
   name: string;
   login: string;
   password?: string;
-  statusWork: 'active' | 'inactive' | 'on_call' | 'break';
+  status: 'active' | 'inactive';
   role: string;
 }
 

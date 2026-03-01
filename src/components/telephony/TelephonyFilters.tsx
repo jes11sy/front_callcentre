@@ -128,29 +128,20 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                 </Select>
               </div>
               <div>
-                <Label htmlFor="city" className="text-gray-300">Город</Label>
+                <Label htmlFor="cityId" className="text-gray-300">ID Города</Label>
                 <Input
-                  id="city"
-                  placeholder="Название города"
-                  {...register('city')}
+                  id="cityId"
+                  placeholder="ID города"
+                  {...register('cityId')}
                   className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
                 />
               </div>
               <div>
-                <Label htmlFor="rk" className="text-gray-300">РК</Label>
+                <Label htmlFor="rkId" className="text-gray-300">ID РК</Label>
                 <Input
-                  id="rk"
-                  placeholder="РК"
-                  {...register('rk')}
-                  className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
-                />
-              </div>
-              <div>
-                <Label htmlFor="avitoName" className="text-gray-300">Источник</Label>
-                <Input
-                  id="avitoName"
-                  placeholder="Имя аккаунта"
-                  {...register('avitoName')}
+                  id="rkId"
+                  placeholder="ID рекламной кампании"
+                  {...register('rkId')}
                   className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
                 />
               </div>

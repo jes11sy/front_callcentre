@@ -173,18 +173,18 @@ export const CallDetailPanel: React.FC<CallDetailPanelProps> = ({
             <DetailRow 
               icon={MapPin} 
               label="Город" 
-              value={call.city} 
+              value={call.city?.name || '—'} 
             />
             <DetailRow 
               icon={Building2} 
               label="РК" 
-              value={call.rk} 
+              value={call.rk?.name || '—'} 
             />
-            {call.avitoName && (
+            {call.avito?.name && (
               <DetailRow 
                 icon={Tag} 
-                label="Источник" 
-                value={call.avitoName}
+                label="Авито" 
+                value={call.avito.name}
                 highlight 
               />
             )}

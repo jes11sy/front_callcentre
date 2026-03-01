@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LoadingSpinner } from '@/components/ui/loading';
 import { X, Save } from 'lucide-react';
 import { Order } from '@/types/orders';
-import { ORDER_TYPES, EQUIPMENT_TYPES, STATUS_OPTIONS, STATUS_COLORS, STATUS_LABELS, CITIES } from '@/constants/orders';
+import { ORDER_TYPES, STATUS_OPTIONS } from '@/constants/orders';
+import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 
@@ -33,18 +34,10 @@ export const OrderEditModal = ({
   isSaving, 
   onOrderChange 
 }: OrderEditModalProps) => {
-  const [sources, setSources] = useState<string[]>([]);
   const { theme } = useDesignStore();
-
-  useEffect(() => {
-    if (isOpen) {
-      api.get('/phones/sources').then(res => {
-        if (res.data.success && res.data.data) {
-          setSources(res.data.data);
-        }
-      }).catch(() => {});
-    }
-  }, [isOpen]);
+  const { data: cities = [] } = useCities();
+  const { data: rks = [] } = useRKs();
+  const { data: equipmentTypes = [] } = useEquipmentTypes();
 
   if (!isOpen || !order) return null;
 
@@ -119,14 +112,14 @@ export const OrderEditModal = ({
               </Row>
 
               <Row label="Тип техники">
-                <Select value={order.typeEquipment} onValueChange={(v) => handleOrderChange('typeEquipment', v)}>
+                <Select value={order.equipmentTypeId?.toString() || ''} onValueChange={(v) => handleOrderChange('equipmentTypeId', Number(v))}>
                   <SelectTrigger className={`${selectTriggerClass} w-full`}>
-                    <span className="truncate">{EQUIPMENT_TYPES.find(t => t.value === order.typeEquipment)?.label || order.typeEquipment}</span>
+                    <span className="truncate">{order.equipmentType?.name || 'Выберите'}</span>
                   </SelectTrigger>
                   <SelectContent className={selectContentClass}>
-                    {EQUIPMENT_TYPES.map((t) => (
-                      <SelectItem key={t.value} value={t.value} className={selectItemClass}>
-                        {t.label}
+                    {equipmentTypes.map((t) => (
+                      <SelectItem key={t.id} value={t.id.toString()} className={selectItemClass}>
+                        {t.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -134,37 +127,33 @@ export const OrderEditModal = ({
               </Row>
 
               <Row label="РК">
-                <Input 
-                  value={order.rk} 
-                  onChange={(e) => handleOrderChange('rk', e.target.value)}
-                  className={inputClass}
-                />
-              </Row>
-
-              <Row label="Источник">
-                <Select value={order.avitoName || ''} onValueChange={(v) => handleOrderChange('avitoName', v)}>
+                <Select value={order.rkId?.toString() || ''} onValueChange={(v) => handleOrderChange('rkId', Number(v))}>
                   <SelectTrigger className={`${selectTriggerClass} w-full`}>
-                    <span className="truncate">{order.avitoName || 'Выберите'}</span>
+                    <span className="truncate">{order.rk?.name || 'Выберите'}</span>
                   </SelectTrigger>
                   <SelectContent className={selectContentClass}>
-                    {sources.map((s) => (
-                      <SelectItem key={s} value={s} className={selectItemClass}>
-                        {s}
+                    {rks.map((r) => (
+                      <SelectItem key={r.id} value={r.id.toString()} className={selectItemClass}>
+                        {r.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Row>
 
+              <Row label="Авито">
+                <span className="text-sm text-gray-500 dark:text-gray-400">{order.avito?.name || '—'}</span>
+              </Row>
+
               <Row label="Город">
-                <Select value={order.city} onValueChange={(v) => handleOrderChange('city', v)}>
+                <Select value={order.cityId?.toString() || ''} onValueChange={(v) => handleOrderChange('cityId', Number(v))}>
                   <SelectTrigger className={selectTriggerClass}>
-                    <SelectValue />
+                    <span className="truncate">{order.city?.name || 'Выберите'}</span>
                   </SelectTrigger>
                   <SelectContent className={selectContentClass}>
-                    {CITIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value} className={selectItemClass}>
-                        {c.label}
+                    {cities.map((c) => (
+                      <SelectItem key={c.id} value={c.id.toString()} className={selectItemClass}>
+                        {c.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -216,9 +205,9 @@ export const OrderEditModal = ({
               </Row>
 
               <Row label="Статус">
-                <Select value={order.statusOrder} onValueChange={(v) => handleOrderChange('statusOrder', v)}>
+                <Select value={order.status?.name || ''} onValueChange={(v) => handleOrderChange('status', { ...order.status, name: v })}>
                   <SelectTrigger className={selectTriggerClass}>
-                    <SelectValue />
+                    <span className="truncate">{order.status?.name || 'Выберите'}</span>
                   </SelectTrigger>
                   <SelectContent className={selectContentClass}>
                     {STATUS_OPTIONS.filter(o => o.value !== 'all').map((o) => (
@@ -242,10 +231,10 @@ export const OrderEditModal = ({
               />
             </Row>
 
-            <Row label="Проблема">
+            <Row label="Комментарий">
               <Textarea 
-                value={order.problem} 
-                onChange={(e) => handleOrderChange('problem', e.target.value)}
+                value={(order as any).comment || ''} 
+                onChange={(e) => handleOrderChange('comment' as keyof Order, e.target.value)}
                 className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
               />
             </Row>

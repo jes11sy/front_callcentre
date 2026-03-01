@@ -35,30 +35,26 @@ import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
-
-// Статические опции
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
-const DIRECTION_OPTIONS = ['Не указано', 'КП', 'БТ', 'МНЧ'] as const;
+import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
 
 const orderSchema = z.object({
-  rk: z.string().optional(),
-  avitoName: z.string().optional(),
-  city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
+  rkId: z.number().optional(),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']),
   clientName: z.string().min(1, 'Введите имя клиента'),
   address: z.string().min(1, 'Введите адрес'),
   dateMeeting: z.string().min(1, 'Выберите дату встречи'),
-  typeEquipment: z.string().optional(),
-  problem: z.string().min(1, 'Опишите проблему'),
+  equipmentTypeId: z.number().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
 interface Call {
   id: number;
-  rk: string;
-  city: string;
-  avitoName?: string;
+  rkId?: number;
+  rk?: { id: number; name: string };
+  cityId?: number;
+  city?: { id: number; name: string };
   phoneClient: string;
   phoneAts: string;
   createdAt: string;
@@ -81,15 +77,17 @@ interface Call {
 interface Order {
   id: number;
   clientName: string;
-  city: string;
-  statusOrder: string;
+  cityId?: number;
+  city?: { id: number; name: string };
+  statusId?: number;
+  status?: { id: number; name: string; code: string };
   dateMeeting: string;
-  typeEquipment: string;
+  equipmentTypeId?: number;
+  equipmentType?: { id: number; name: string };
   typeOrder?: string;
-  problem?: string;
   createdAt: string;
-  rk?: string;
-  avitoName?: string;
+  rkId?: number;
+  rk?: { id: number; name: string };
   address?: string;
   result?: number;
   master?: {
@@ -122,6 +120,9 @@ export function CreateOrderModal({
   const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [sources, setSources] = useState<string[]>([]);
   const [campaigns, setCampaigns] = useState<string[]>([]);
+  const { data: availableCities = [] } = useCities();
+  const { data: availableEquipmentTypes = [] } = useEquipmentTypes();
+  const { data: availableRKs = [] } = useRKs();
   const [playingCallId, setPlayingCallId] = useState<number | null>(null);
   const [playingCall, setPlayingCall] = useState<Call | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -177,17 +178,13 @@ export function CreateOrderModal({
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: getDefaultRk(call?.rk),
-      city: call?.city && CITY_OPTIONS.includes(call.city as typeof CITY_OPTIONS[number]) 
-        ? call.city as typeof CITY_OPTIONS[number] 
-        : undefined,
-      avitoName: getDefaultSource(call?.avitoName),
+      rkId: call?.rkId,
+      cityId: call?.cityId,
       typeOrder: 'Впервые',
-      typeEquipment: 'Не указано',
+      equipmentTypeId: undefined,
       clientName: '',
       address: '',
       dateMeeting: '',
-      problem: ''
     }
   });
 
@@ -345,16 +342,14 @@ export function CreateOrderModal({
 
       const orderData = {
         callIds: callGroup.length > 0 ? callGroup.map(c => c.id) : [call.id],
-        rk: data.rk === 'Не указано' ? '' : data.rk,
-        avitoName: data.avitoName === 'Не указано' ? '' : data.avitoName,
-        city: data.city,
+        rkId: data.rkId,
+        cityId: data.cityId,
         typeOrder: data.typeOrder,
         clientName: data.clientName,
         address: data.address,
         dateMeeting: data.dateMeeting,
-        typeEquipment: data.typeEquipment === 'Не указано' ? '' : data.typeEquipment,
-        problem: data.problem,
-        operatorNameId: user?.id || 0
+        equipmentTypeId: data.equipmentTypeId,
+        operatorId: user?.id || 0
       };
 
       const response = await authApi.post('/orders/from-call', orderData);
@@ -384,25 +379,13 @@ export function CreateOrderModal({
   useEffect(() => {
     if (call && open) {
       setTimeout(() => {
-        // РК: если есть в списке campaigns - берём, иначе "Не указано"
-        const rkValue = call.rk && campaigns.includes(call.rk) ? call.rk : 'Не указано';
-        setValue('rk', rkValue);
-        
-        // Город
-        setValue('city', call.city && CITY_OPTIONS.includes(call.city as typeof CITY_OPTIONS[number]) 
-          ? call.city as typeof CITY_OPTIONS[number] 
-          : '' as any);
-        
-        // Источник: если есть в списке sources - берём, иначе "Не указано"
-        const sourceValue = call.avitoName && sources.includes(call.avitoName) ? call.avitoName : 'Не указано';
-        setValue('avitoName', sourceValue);
-        
+        setValue('rkId', call.rkId);
+        setValue('cityId', call.cityId);
         setValue('typeOrder', 'Впервые');
-        setValue('typeEquipment', 'Не указано');
+        setValue('equipmentTypeId', undefined);
         setValue('clientName', '');
         setValue('address', '');
         setValue('dateMeeting', '');
-        setValue('problem', '');
       }, 0);
     }
   }, [call?.id, open, setValue, campaigns, sources]);
@@ -455,10 +438,10 @@ export function CreateOrderModal({
             <div className={`hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400`}>
               <span className="text-gray-300 dark:text-gray-600">|</span>
               <span className={`font-medium text-gray-700 dark:text-gray-200`}>{call.phoneClient}</span>
-              {call.city && (
+              {call.city?.name && (
                 <>
                   <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <span>{call.city}</span>
+                  <span>{call.city.name}</span>
                 </>
               )}
             </div>
@@ -547,15 +530,15 @@ export function CreateOrderModal({
                                 <span className="truncate">{c.operator?.name || 'Без оператора'}</span>
                               </div>
                               <span className="text-gray-300 dark:text-gray-600">•</span>
-                              <span className={`shrink-0 text-gray-700 dark:text-gray-300 font-medium`}>{c.rk || '—'}</span>
-                              {c.avitoName && (
+                              <span className={`shrink-0 text-gray-700 dark:text-gray-300 font-medium`}>{c.rk?.name || '—'}</span>
+                              {c.avito?.name && (
                                 <>
                                   <span className="text-gray-300 dark:text-gray-600">•</span>
-                                  <span className={`shrink-0 text-gray-600 dark:text-gray-400`}>{c.avitoName}</span>
+                                  <span className={`shrink-0 text-gray-600 dark:text-gray-400`}>{c.avito.name}</span>
                                 </>
                               )}
                               <span className="text-gray-300 dark:text-gray-600">•</span>
-                              <span className="shrink-0">{c.city || '—'}</span>
+                              <span className="shrink-0">{c.city?.name || '—'}</span>
                             </div>
                             
                             {/* Строка 3: Номер клиента + Запись */}
@@ -625,18 +608,14 @@ export function CreateOrderModal({
                               )}
                             </div>
                             <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600`}>
-                              {(order as any).status || order.statusOrder || 'Нет статуса'}
+                              {order.status?.name || 'Нет статуса'}
                             </Badge>
                           </div>
                           
-                          {/* Строка 2: РК + Источник */}
+                          {/* Строка 2: РК */}
                           <div className={`flex items-center gap-2 text-gray-500 dark:text-gray-400`}>
-                            {order.rk && (
-                              <span className="text-gray-700 dark:text-gray-300 font-medium">{order.rk}</span>
-                            )}
-                            {order.rk && order.avitoName && <span className="text-gray-300 dark:text-gray-600">•</span>}
-                            {order.avitoName && (
-                              <span className="text-gray-600 dark:text-gray-400">{order.avitoName}</span>
+                            {order.rk?.name && (
+                              <span className="text-gray-700 dark:text-gray-300 font-medium">{order.rk.name}</span>
                             )}
                           </div>
                           
@@ -713,41 +692,40 @@ export function CreateOrderModal({
                   <div>
                     <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Город *</Label>
                     <Controller
-                      name="city"
+                      name="cityId"
                       control={control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите город</span>} />
                           </SelectTrigger>
                           <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
-                            {CITY_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
+                            {availableCities.map((city: { id: number; name: string }) => (
+                              <SelectItem key={city.id} value={city.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{city.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city.message}</p>}
+                    {errors.cityId && <p className="text-xs text-red-400 mt-1">{errors.cityId.message}</p>}
                   </div>
                 </div>
 
-                {/* Row 2: Источник + Направление */}
+                {/* Row 2: РК + Направление */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Источник</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>РК</Label>
                     <Controller
-                      name="avitoName"
+                      name="rkId"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
-                            <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
+                            <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите РК</span>} />
                           </SelectTrigger>
                           <SelectContent className={`z-[10000] max-h-60 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
-                            <SelectItem value="Не указано" className="text-gray-500 dark:text-gray-400 data-[highlighted]:bg-[#FEC004]/10">Не указано</SelectItem>
-                            {sources.map((option) => (
-                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
+                            {availableRKs.map((rk: { id: number; name: string }) => (
+                              <SelectItem key={rk.id} value={rk.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{rk.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -755,18 +733,18 @@ export function CreateOrderModal({
                     />
                   </div>
                   <div>
-                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Направление</Label>
+                    <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Тип техники</Label>
                     <Controller
-                      name="typeEquipment"
+                      name="equipmentTypeId"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={`h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
                           <SelectContent className={`z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600`}>
-                            {DIRECTION_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{option}</SelectItem>
+                            {availableEquipmentTypes.map((et: { id: number; name: string }) => (
+                              <SelectItem key={et.id} value={et.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">{et.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -833,16 +811,15 @@ export function CreateOrderModal({
                   </div>
                 </div>
 
-                {/* Row 5: Проблема */}
+                {/* Row 5: Комментарий */}
                 <div>
-                  <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Проблема *</Label>
+                  <Label className={`text-xs mb-1 block text-gray-600 dark:text-gray-400`}>Комментарий</Label>
                   <Textarea
-                    {...register('problem')}
-                    placeholder="Опишите проблему клиента..."
+                    {...register('comment')}
+                    placeholder="Комментарий к заказу..."
                     rows={3}
                     className={`text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30`}
                   />
-                  {errors.problem && <p className="text-xs text-red-400 mt-1">{errors.problem.message}</p>}
                 </div>
               </form>
             </ScrollArea>

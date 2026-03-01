@@ -131,9 +131,11 @@ export interface AvitoChat {
   isStarred?: boolean;
   isPinned?: boolean;
   priority?: 'low' | 'normal' | 'high' | 'urgent';
-  avitoAccountName: string; // Убираем ? - это обязательное поле
-  city: string; // Убираем ? - это обязательное поле
-  rk: string; // Добавляем обязательное поле rk
+  avitoAccountName: string;
+  cityId?: number;
+  city?: { id: number; name: string };
+  rkId?: number;
+  rk?: { id: number; name: string };
   context?: {
     type: string;
     value: {
@@ -264,25 +266,27 @@ export interface MessageStats {
 
 export interface LinkedOrder {
   id: number;
-  rk: string;
-  city: string;
+  rkId: number;
+  rk?: { id: number; name: string };
+  cityId: number;
+  city?: { id: number; name: string };
   clientName: string;
   phone: string;
-  statusOrder: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+  statusId: number;
+  status?: { id: number; name: string; code: string };
   typeOrder: 'repeat' | 'first_time' | 'warranty';
   address: string;
   dateMeeting: string;
-  typeEquipment: 'bt' | 'kp' | 'mnch';
-  problem: string;
+  equipmentTypeId: number;
+  equipmentType?: { id: number; name: string };
   result?: number;
   expenditure?: number;
   clean?: number;
   bsoDoc?: string[];
   expenditureDoc?: string[];
-  operatorNameId: number; // Добавляем недостающее поле
-  createDate: string; // Добавляем недостающее поле
-  createdAt: string; // Добавляем недостающее поле
-  updatedAt: string; // Добавляем недостающее поле
+  operatorId: number;
+  createdAt: string;
+  updatedAt: string;
   operator: {
     id: number;
     name: string;

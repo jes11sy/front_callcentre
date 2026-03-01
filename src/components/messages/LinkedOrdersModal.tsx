@@ -9,29 +9,30 @@ import { Loader2, FileText, ExternalLink, Phone, MapPin } from 'lucide-react';
 
 interface LinkedOrder {
   id: number;
-  rk: string;
-  city: string;
-  avitoName?: string;
-  avitoChatId?: string;
+  rkId: number;
+  rk?: { id: number; name: string };
+  cityId: number;
+  city?: { id: number; name: string };
   phone: string;
   typeOrder: 'first_time' | 'repeat' | 'warranty';
   clientName: string;
   address: string;
   dateMeeting: string;
-  typeEquipment: 'kp' | 'bt' | 'mnch';
-  problem: string;
+  equipmentTypeId: number;
+  equipmentType?: { id: number; name: string };
+  comment?: string;
   callRecord?: string;
-  statusOrder: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+  statusId: number;
+  status?: { id: number; name: string; code: string };
   result?: number;
   expenditure?: number;
   clean?: number;
   bsoDoc?: string[];
   expenditureDoc?: string[];
   masterId?: number;
-  operatorNameId: number;
-  createDate: string;
-  closingData?: string;
+  operatorId: number;
   createdAt: string;
+  closingAt?: string;
   updatedAt: string;
   operator: {
     id: number;
@@ -160,16 +161,9 @@ export function LinkedOrdersModal({
                             #{order.id}
                           </Badge>
                           <Badge 
-                            className={`text-xs font-medium ${
-                              order.statusOrder === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                              order.statusOrder === 'assigned' ? 'bg-sky-500/20 text-sky-400 border-sky-500/30' :
-                              order.statusOrder === 'in_progress' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                              order.statusOrder === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                              order.statusOrder === 'cancelled' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                              'bg-gray-500/20 text-gray-400 border-gray-500/30'
-                            }`}
+                            className={`text-xs font-medium bg-gray-500/20 text-gray-400 border-gray-500/30`}
                           >
-                            {order.statusOrder}
+                            {order.status?.name || '—'}
                           </Badge>
                         </div>
                         <Button
@@ -196,7 +190,7 @@ export function LinkedOrdersModal({
                           </span>
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            {order.city}
+                            {order.city?.name || '—'}
                           </span>
                         </div>
                       </div>
@@ -206,9 +200,7 @@ export function LinkedOrdersModal({
                         <div className="bg-[#0f0f23] rounded p-2 border border-gray-700">
                           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Тип</p>
                           <p className="font-semibold text-white text-sm">
-                            {order.typeEquipment === 'kp' ? 'КП' :
-                             order.typeEquipment === 'bt' ? 'БТ' :
-                             'МНЧ'}
+                            {order.equipmentType?.name || '—'}
                           </p>
                         </div>
                         <div className="bg-[#0f0f23] rounded p-2 border border-gray-700">
@@ -229,11 +221,12 @@ export function LinkedOrdersModal({
                         </div>
                       </div>
 
-                      {/* Problem Description */}
+                      {order.comment && (
                       <div className="bg-[#FFD700]/10 rounded p-2 border-l-2 border-[#FFD700]">
-                        <p className="text-xs font-medium text-[#FFD700] uppercase tracking-wide mb-1">Проблема</p>
-                        <p className="text-xs text-gray-300">{order.problem}</p>
+                        <p className="text-xs font-medium text-[#FFD700] uppercase tracking-wide mb-1">Комментарий</p>
+                        <p className="text-xs text-gray-300">{order.comment}</p>
                       </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}

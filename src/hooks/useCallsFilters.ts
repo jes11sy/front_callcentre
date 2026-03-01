@@ -10,10 +10,9 @@ import { useOptimizedSearch } from './useOptimizedSearch';
 const filtersSchema = z.object({
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
-  city: z.string().optional(),
-  rk: z.string().optional(),
+  cityId: z.string().optional(),
+  rkId: z.string().optional(),
   status: z.string().optional(),
-  avitoName: z.string().optional(),
 });
 
 export const useCallsFilters = () => {
@@ -38,10 +37,9 @@ export const useCallsFilters = () => {
     defaultValues: {
       dateFrom: '',
       dateTo: '',
-      city: '',
-      rk: '',
+      cityId: '',
+      rkId: '',
       status: '',
-      avitoName: ''
     }
   });
 

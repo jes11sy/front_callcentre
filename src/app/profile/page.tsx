@@ -39,7 +39,7 @@ import { useRouter } from 'next/navigation';
 const profileSchema = z.object({
   name: z.string().min(2, 'Имя должно содержать минимум 2 символа'),
   city: z.string().min(2, 'Город должен содержать минимум 2 символа'),
-  statusWork: z.string().min(1, 'Выберите рабочий статус'),
+  status: z.string().min(1, 'Выберите рабочий статус'),
   note: z.string().optional()
 });
 
@@ -61,13 +61,11 @@ interface Profile {
   login: string;
   city: string;
   status: string;
-  statusWork: string;
   passport?: string;
   contract?: string;
-  dateCreate: string;
+  createdAt: string;
   note?: string;
   role: string;
-  createdAt: string;
   updatedAt: string;
   _count?: {
     calls: number;
@@ -194,7 +192,7 @@ export default function ProfilePage() {
       profileForm.reset({
         name: profile.name,
         city: profile.city,
-        statusWork: profile.statusWork,
+        status: profile.status,
         note: profile.note || ''
       });
     }
@@ -211,7 +209,7 @@ export default function ProfilePage() {
       profileForm.reset({
         name: profile.name,
         city: profile.city,
-        statusWork: profile.statusWork,
+        status: profile.status,
         note: profile.note || ''
       });
     }
@@ -382,8 +380,8 @@ export default function ProfilePage() {
               <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Рабочий статус</span>
               {isEditing ? (
                 <Select 
-                  value={profileForm.watch('statusWork')} 
-                  onValueChange={(value) => profileForm.setValue('statusWork', value)}
+                  value={profileForm.watch('status')} 
+                  onValueChange={(value) => profileForm.setValue('status', value)}
                 >
                   <SelectTrigger className={`w-32 ${
                     isDark 
@@ -399,7 +397,7 @@ export default function ProfilePage() {
                   </SelectContent>
                 </Select>
               ) : (
-                <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.statusWork)}</span>
+                <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.status)}</span>
               )}
             </div>
 
@@ -423,7 +421,7 @@ export default function ProfilePage() {
             {/* Дата начала */}
             <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
               <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
-              <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.dateCreate)}</span>
+              <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.createdAt)}</span>
             </div>
 
             {/* Примечание */}

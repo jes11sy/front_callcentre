@@ -216,24 +216,23 @@ const InfoTab = ({
           {/* Бейджи статуса и типа */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
             <Badge 
-              className={`text-xs px-2.5 py-1 ${statusColors[order.statusOrder as keyof typeof statusColors] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
+              className={`text-xs px-2.5 py-1 ${statusColors[order.status?.name as keyof typeof statusColors] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
             >
-              {STATUS_LABELS[order.statusOrder as keyof typeof STATUS_LABELS] || order.statusOrder}
+              {order.status?.name || '—'}
             </Badge>
             <Badge variant="outline" className="text-xs px-2.5 py-1 border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10 dark:bg-[#FEC004]/5">
-              {order.typeEquipment}
+              {order.equipmentType?.name || '—'}
             </Badge>
           </div>
           
           <DataRow label="Тип заявки" value={order.typeOrder} />
-          <DataRow label="РК" value={order.rk} />
-          <DataRow label="Источник" value={order.avitoName || '—'} muted={!order.avitoName} />
-          <DataRow label="Город" value={order.city} />
+          <DataRow label="РК" value={order.rk?.name || '—'} />
+          <DataRow label="Авито" value={order.avito?.name || '—'} muted={!order.avito?.name} />
+          <DataRow label="Город" value={order.city?.name || '—'} />
           <DataRow label="Клиент" value={order.clientName} />
           <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} />
           <DataRow label="Дата встречи" value={formatDate(order.dateMeeting)} />
           <DataRow label="Адрес" value={order.address} />
-          <DataRow label="Проблема" value={order.problem} />
         </div>
 
         {/* Правая колонка — мастер и финансы */}
@@ -386,13 +385,15 @@ const HistoryTab = ({
     // Другие изменения
     if (metadata.changes) {
       const fieldLabels: Record<string, string> = {
-        statusOrder: 'Статус',
+        statusId: 'Статус',
         masterId: 'Мастер',
         address: 'Адрес',
         phone: 'Телефон',
         clientName: 'Клиент',
         dateMeeting: 'Дата встречи',
-        problem: 'Проблема',
+        equipmentTypeId: 'Тип техники',
+        cityId: 'Город',
+        rkId: 'РК',
       };
 
       Object.entries(metadata.changes).forEach(([field, change]) => {
@@ -553,9 +554,7 @@ const CallPlayer = ({
   stopPlayback: () => void;
   formatTime: (time: number) => string;
 }) => {
-  // Format date - handle both createdAt and dateCreate
-  const callDate = (call as unknown as { createdAt?: string; dateCreate?: string }).createdAt || 
-                   (call as unknown as { dateCreate?: string }).dateCreate;
+  const callDate = (call as unknown as { createdAt?: string }).createdAt;
 
   return (
     <div className="p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">

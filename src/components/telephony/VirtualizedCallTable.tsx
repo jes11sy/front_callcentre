@@ -88,16 +88,16 @@ const GroupHeader = React.memo(({
           <div className="rounded-full w-3 h-3 bg-[#FFD700] flex items-center justify-center">
             <div className="w-1.5 h-1.5 rounded-full bg-[#0f0f23]"></div>
           </div>
-          {latestCall.rk}
+          {latestCall.rk?.name || '—'}
         </div>
       </TableCell>
       
-      <TableCell className="text-white">{latestCall.city}</TableCell>
+      <TableCell className="text-white">{latestCall.city?.name || '—'}</TableCell>
       
       <TableCell>
-        {latestCall.avitoName ? (
+        {latestCall.avito?.name ? (
           <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-            {latestCall.avitoName}
+            {latestCall.avito.name}
           </Badge>
         ) : (
           <span className="text-gray-400">—</span>

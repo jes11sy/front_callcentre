@@ -24,11 +24,10 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import authApi from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
-
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
+import { useCities, useEquipmentTypes } from '@/hooks/useStaticData';
 
 const orderSchema = z.object({
-  city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']).refine((val) => val !== undefined, {
     message: 'Выберите тип заявки'
   }),
@@ -36,10 +35,8 @@ const orderSchema = z.object({
   phone: z.string().min(1, 'Номер телефона обязателен'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ']).refine((val) => val !== undefined, {
-    message: 'Выберите тип техники'
-  }),
-  problem: z.string().min(1, 'Описание проблемы обязательно')
+  equipmentTypeId: z.number({ required_error: 'Тип техники обязателен' }).min(1, 'Тип техники обязателен'),
+  comment: z.string().optional()
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -71,12 +68,16 @@ export function CreateOrderFromChatModal({
 }: CreateOrderFromChatModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuthStore();
+  const { data: availableCities = [] } = useCities();
+  const { data: availableEquipmentTypes = [] } = useEquipmentTypes();
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
+      cityId: 0,
       typeOrder: 'Впервые',
-      typeEquipment: 'КП'
+      equipmentTypeId: 0,
+      comment: ''
     }
   });
 
@@ -96,18 +97,16 @@ export function CreateOrderFromChatModal({
       setIsSubmitting(true);
 
       const orderData = {
-        rk: 'Авито',
-        city: data.city,
-        avitoName: chat.avitoAccountName,
+        cityId: data.cityId,
         avitoChatId: chat.id,
         typeOrder: data.typeOrder,
         clientName: data.clientName,
         phone: data.phone,
         address: data.address,
         dateMeeting: data.dateMeeting,
-        typeEquipment: data.typeEquipment,
-        problem: data.problem,
-        operatorNameId: user?.id || 0
+        equipmentTypeId: data.equipmentTypeId,
+        comment: data.comment,
+        operatorId: user?.id || 0
       };
 
       const response = await authApi.post('/orders/from-chat', orderData);
@@ -135,14 +134,16 @@ export function CreateOrderFromChatModal({
   // Автозаполнение формы при изменении чата
   React.useEffect(() => {
     if (chat && open) {
-      setValue('city', chat.city);
-      // Берем имя клиента из users[0].name (первый пользователь в чате)
-      const clientName = chat.users && chat.users.length > 0 ? chat.users[0].name : '';
+      const cityMatch = availableCities.find((c: { id: number; name: string }) =>
+        c.name.toLowerCase() === (chat.city || '').toLowerCase()
+      );
+      if (cityMatch) setValue('cityId', cityMatch.id);
+      const clientName = (chat as unknown as { users?: { name: string }[] }).users?.[0]?.name || '';
       setValue('clientName', clientName);
       setValue('phone', chat.context?.phone || '');
       setValue('address', chat.context?.address || '');
     }
-  }, [chat, open, setValue]);
+  }, [chat, open, setValue, availableCities]);
 
   if (!chat) return null;
 
@@ -225,27 +226,27 @@ export function CreateOrderFromChatModal({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city" className="text-sm font-medium text-gray-300">Город *</Label>
+                    <Label htmlFor="cityId" className="text-sm font-medium text-gray-300">Город *</Label>
                     <Controller
-                      name="city"
+                      name="cityId"
                       control={control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white focus:border-[#FFD700] focus:ring-[#FFD700]/20 [&>span]:data-[placeholder]:text-gray-400">
                             <SelectValue placeholder="Выберите город" />
                           </SelectTrigger>
                           <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                            {CITY_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className="text-white hover:bg-[#FFD700]/10">
-                                {option}
+                            {availableCities.map((city: { id: number; name: string }) => (
+                              <SelectItem key={city.id} value={city.id.toString()} className="text-white hover:bg-[#FFD700]/10">
+                                {city.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.city && (
-                      <p className="text-sm text-red-400">{errors.city.message}</p>
+                    {errors.cityId && (
+                      <p className="text-sm text-red-400">{errors.cityId.message}</p>
                     )}
                   </div>
                 </div>
@@ -336,25 +337,25 @@ export function CreateOrderFromChatModal({
                 )}
                   </div>
                   <div className="space-y-2">
-                <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-300">Тип техники *</Label>
+                <Label htmlFor="equipmentTypeId" className="text-sm font-medium text-gray-300">Тип техники *</Label>
                 <Controller
-                  name="typeEquipment"
+                  name="equipmentTypeId"
                   control={form.control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                       <SelectTrigger className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20">
                         <SelectValue placeholder="Выберите тип техники" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0f0f23] border-[#FFD700]/30">
-                        <SelectItem value="КП" className="text-white hover:bg-[#FFD700]/10">КП</SelectItem>
-                        <SelectItem value="БТ" className="text-white hover:bg-[#FFD700]/10">БТ</SelectItem>
-                        <SelectItem value="МНЧ" className="text-white hover:bg-[#FFD700]/10">МНЧ</SelectItem>
+                        {availableEquipmentTypes.map((et: { id: number; name: string }) => (
+                          <SelectItem key={et.id} value={et.id.toString()} className="text-white hover:bg-[#FFD700]/10">{et.name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                {errors.typeEquipment && (
-                  <p className="text-sm text-red-400">{errors.typeEquipment.message}</p>
+                {errors.equipmentTypeId && (
+                  <p className="text-sm text-red-400">{errors.equipmentTypeId.message}</p>
                 )}
                       </div>
                     </div>
@@ -371,17 +372,14 @@ export function CreateOrderFromChatModal({
               )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="problem" className="text-sm font-medium text-gray-300">Описание проблемы *</Label>
+                  <Label htmlFor="comment" className="text-sm font-medium text-gray-300">Комментарий</Label>
               <Textarea
-                id="problem"
-                {...register('problem')}
-                placeholder="Опишите проблему"
+                id="comment"
+                {...register('comment')}
+                placeholder="Комментарий к заказу"
                 rows={2}
                 className="bg-[#0f0f23] border-[#FFD700]/30 text-white placeholder:text-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
               />
-              {errors.problem && (
-                <p className="text-sm text-red-400">{errors.problem.message}</p>
-              )}
                     </div>
               </CardContent>
             </Card>

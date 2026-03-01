@@ -6,7 +6,7 @@ import { ordersApi, cashApi } from '@/lib/api-client';
 export const usePenalties = () => {
   const { user } = useAuthStore();
   const [penalties, setPenalties] = useState<Penalty[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const [cities, setCities] = useState<Array<{ id: number; name: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPenalty, setSelectedPenalty] = useState<Penalty | null>(null);
@@ -28,7 +28,9 @@ export const usePenalties = () => {
         
         // Загружаем уникальные города из filterOptions (без загрузки всех заказов)
         const filterOptions = await ordersApi.getFilterOptions();
-        const uniqueCities = (filterOptions.data?.cities || []).sort();
+        const uniqueCities = (filterOptions.data?.cities || []).sort(
+          (a: { id: number; name: string }, b: { id: number; name: string }) => a.name.localeCompare(b.name)
+        );
         
         setCities(uniqueCities);
         
@@ -36,10 +38,11 @@ export const usePenalties = () => {
         const penaltyData = (penaltiesResponse.data || [])
           .map((item: any) => ({
             id: item.id,
-            city: item.city,
+            cityId: item.cityId,
+            cityName: item.city?.name || '',
             note: item.note || '',
             amount: Math.abs(item.amount),
-            dateCreate: item.dateCreate,
+            createdAt: item.createdAt,
             nameCreate: item.nameCreate,
           }));
         
@@ -72,26 +75,24 @@ export const usePenalties = () => {
 
   const handleSavePenalty = async (
     id: number,
-    data: { city: string; reason: string; amount: number; orderNumber?: string }
+    data: { cityId: number; reason: string; amount: number; orderNumber?: string }
   ) => {
     try {
-      // Формируем note из причины и номера заказа
       const note = data.orderNumber 
         ? `${data.reason} заказ ${data.orderNumber}`
         : data.reason;
       
       await cashApi.updateCashTransaction(id.toString(), {
-        city: data.city,
+        cityId: data.cityId,
         note: note,
-        amount: Math.abs(data.amount), // Положительная сумма
+        amount: Math.abs(data.amount),
         paymentPurpose: 'Штраф',
       });
       
-      // Обновляем локальное состояние
       setPenalties(prev =>
         prev.map(p =>
           p.id === id
-            ? { ...p, city: data.city, note: note, amount: data.amount }
+            ? { ...p, cityId: data.cityId, note: note, amount: data.amount }
             : p
         )
       );
@@ -102,33 +103,32 @@ export const usePenalties = () => {
   };
 
   const handleCreatePenalty = async (data: {
-    city: string;
+    cityId: number;
     reason: string;
     amount: number;
     orderNumber?: string;
   }) => {
     try {
-      // Формируем note из причины и номера заказа
       const note = data.orderNumber 
         ? `${data.reason} заказ ${data.orderNumber}`
         : data.reason;
       
       const response = await cashApi.createCashTransaction({
-        city: data.city,
+        cityId: data.cityId,
         note: note,
-        amount: Math.abs(data.amount), // Положительная сумма
+        amount: Math.abs(data.amount),
         name: 'приход',
         paymentPurpose: 'Штраф',
       });
       
-      // Добавляем в локальное состояние
       if (response.data) {
         const newPenalty: Penalty = {
           id: response.data.id,
-          city: data.city,
+          cityId: data.cityId,
+          cityName: cities.find(c => c.id === data.cityId)?.name || '',
           note: note,
           amount: data.amount,
-          dateCreate: response.data.dateCreate || new Date().toISOString(),
+          createdAt: response.data.createdAt || new Date().toISOString(),
           nameCreate: user?.name || user?.login,
         };
         setPenalties(prev => [newPenalty, ...prev]);

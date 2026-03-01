@@ -4,31 +4,46 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api'; // Используем настроенный axios instance
 
-// Хук для получения списка городов
+// Хук для получения списка городов (возвращает { id, name }[])
 export const useCities = () => {
-  return useQuery({
+  return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['cities'],
     queryFn: async () => {
-      const response = await api.get('/phones/cities');
-      return response.data;
+      const response = await api.get('/orders/filter-options');
+      return response.data?.data?.cities || [];
     },
-    staleTime: 30 * 60 * 1000, // 30 минут
-    gcTime: 60 * 60 * 1000, // 1 час
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     retry: 1,
     refetchOnWindowFocus: false,
   });
 };
 
-// Хук для получения списка РК
+// Хук для получения списка РК (возвращает { id, name }[])
 export const useRKs = () => {
-  return useQuery({
+  return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['rks'],
     queryFn: async () => {
-      const response = await api.get('/phones/campaigns');
-      return response.data;
+      const response = await api.get('/orders/filter-options');
+      return response.data?.data?.rks || [];
     },
-    staleTime: 30 * 60 * 1000, // 30 минут
-    gcTime: 60 * 60 * 1000, // 1 час
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// Хук для получения списка типов оборудования (возвращает { id, name }[])
+export const useEquipmentTypes = () => {
+  return useQuery<Array<{ id: number; name: string }>>({
+    queryKey: ['equipmentTypes'],
+    queryFn: async () => {
+      const response = await api.get('/orders/filter-options');
+      return response.data?.data?.equipmentTypes || [];
+    },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     retry: 1,
     refetchOnWindowFocus: false,
   });

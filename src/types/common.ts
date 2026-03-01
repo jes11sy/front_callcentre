@@ -7,8 +7,8 @@ export interface BaseOrderFields {
   phone: string;
   address: string;
   dateMeeting: string;
-  typeEquipment: 'КП' | 'БТ' | 'МНЧ';
-  problem: string;
+  equipmentTypeId: number;
+  equipmentType?: { id: number; name: string };
 }
 
 // Оператор
@@ -27,22 +27,22 @@ export interface AvitoAccount {
 // Базовый заказ
 export interface BaseOrder extends BaseOrderFields {
   id: number;
-  rk: string;
-  city: string;
-  avitoName?: string;
-  avitoChatId?: string;
+  rkId: number;
+  rk?: { id: number; name: string };
+  cityId: number;
+  city?: { id: number; name: string };
   callRecord?: string;
-  statusOrder: string;
+  statusId: number;
+  status?: { id: number; name: string; code: string };
   result?: number;
   expenditure?: number;
   clean?: number;
   bsoDoc?: string[];
   expenditureDoc?: string[];
   masterId?: number;
-  operatorNameId: number;
-  createDate: string;
-  closingData?: string;
+  operatorId: number;
   createdAt: string;
+  closingAt?: string;
   updatedAt: string;
   operator: Operator;
   avito?: AvitoAccount;
@@ -56,26 +56,23 @@ export interface BaseOrder extends BaseOrderFields {
 // Данные для создания заказа из чата
 export interface CreateOrderFromChatData extends BaseOrderFields {
   chatId: string;
-  rk: 'Авито';
-  city: string;
-  avitoName: string;
+  rkId: number;
+  cityId: number;
   avitoChatId: string;
 }
 
 // Данные для создания заказа из звонка
 export interface CreateOrderFromCallData extends BaseOrderFields {
   callId: number;
-  rk: 'Авито' | 'Листовка';
-  avitoName?: string;
-  city: string;
+  rkId: number;
+  cityId: number;
 }
 
 // Данные для создания заказа с нуля
 export interface CreateOrderData extends BaseOrderFields {
-  rk: string;
-  city: string;
-  avitoName?: string;
-  operatorNameId: number;
+  rkId: number;
+  cityId: number;
+  operatorId: number;
 }
 
 // API ответы

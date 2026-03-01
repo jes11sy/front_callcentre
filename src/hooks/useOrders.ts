@@ -27,7 +27,7 @@ export const useOrders = () => {
     searchPhone: '',
     searchAddress: '',
     status: '',
-    city: '',
+    cityId: '',
     master: '',
     closingDate: ''
   });
@@ -57,7 +57,7 @@ export const useOrders = () => {
     searchPhone: filters.searchPhone || undefined,
     searchAddress: filters.searchAddress || undefined,
     status: filters.status !== 'all' ? filters.status : undefined,
-    city: filters.city || undefined,
+    cityId: filters.cityId || undefined,
     master: filters.master || undefined,
     closingDate: filters.closingDate || undefined,
   }), [page, limit, filters]);
@@ -78,7 +78,7 @@ export const useOrders = () => {
         ...(filters.searchPhone && { searchPhone: filters.searchPhone }),
         ...(filters.searchAddress && { searchAddress: filters.searchAddress }),
         ...(filters.status && filters.status !== 'all' && { status: filters.status }),
-        ...(filters.city && { city: filters.city }),
+        ...(filters.cityId && { cityId: filters.cityId }),
         ...(filters.master && { master: filters.master }),
         ...(filters.closingDate && { closingDate: filters.closingDate }),
       });
@@ -163,16 +163,16 @@ export const useOrders = () => {
       // Фильтруем только разрешенные для обновления поля (согласно UpdateOrderDto)
       const allowedFields = [
         // Основные поля
-        'rk', 'city', 'avitoName', 'phone', 'typeOrder', 'clientName', 'address',
-        'dateMeeting', 'typeEquipment', 'problem', 'avitoChatId', 'callId', 'operatorNameId',
+        'rkId', 'cityId', 'phone', 'typeOrder', 'clientName', 'address',
+        'dateMeeting', 'equipmentTypeId', 'callId', 'operatorId',
         // Статус и мастер
-        'statusOrder', 'masterId',
+        'statusId', 'masterId',
         // Финансовые поля
         'result', 'expenditure', 'clean', 'masterChange', 'prepayment',
         // Документы
         'bsoDoc', 'expenditureDoc', 'cashReceiptDoc',
         // Даты
-        'closingData', 'dateClosmod',
+        'closingAt', 'dateClosmod',
         // Дополнительные поля
         'comment', 'cashSubmissionStatus', 'cashSubmissionAmount'
       ];
@@ -268,7 +268,7 @@ export const useOrders = () => {
       searchPhone: '',
       searchAddress: '',
       status: '',
-      city: '',
+      cityId: '',
       master: '',
       closingDate: ''
     });

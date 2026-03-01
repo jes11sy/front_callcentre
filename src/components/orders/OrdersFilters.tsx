@@ -18,11 +18,8 @@ interface OrdersFiltersProps {
 
 export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: citiesData } = useCities();
+  const { data: cities = [] } = useCities();
   const { theme } = useDesignStore();
-  
-  // Получаем список городов из ответа API
-  const cities: string[] = citiesData?.data || citiesData || [];
 
   return (
     <div className="w-full font-myriad">
@@ -94,7 +91,7 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
             
             <div className="space-y-2">
               <Label htmlFor="city" className="text-gray-600 dark:text-gray-400">Город</Label>
-              <Select value={filters.city || 'all'} onValueChange={(value) => onFilterChange('city', value === 'all' ? '' : value)}>
+              <Select value={filters.cityId || 'all'} onValueChange={(value) => onFilterChange('cityId', value === 'all' ? '' : value)}>
                 <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                   <SelectValue placeholder="Все города" />
                 </SelectTrigger>
@@ -105,13 +102,13 @@ export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) =
                   >
                     Все города
                   </SelectItem>
-                  {cities.map((city: string) => (
+                  {cities.map((city) => (
                     <SelectItem 
-                      key={city} 
-                      value={city} 
+                      key={city.id} 
+                      value={city.id.toString()} 
                       className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
                     >
-                      {city}
+                      {city.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

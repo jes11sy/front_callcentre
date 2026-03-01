@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Loader2, 
@@ -23,28 +22,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/store/authStore'; // 🍪 Используем authStore для получения user
-import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
+import { useAuthStore } from '@/store/authStore';
+import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
-
-// Опции для выпадающих списков
-const RK_OPTIONS = ['Авито', 'Листовка'] as const;
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
-const SOURCE_OPTIONS = [
-  'Не указано',
-  'Владимир',
-  'Диспетчер МНЧ Расклейка',
-  'Сайт Водоканал',
-  'Сайт Поверка',
-  'Диспетчер Быт КП МНЧ',
-  'Газета',
-  'Поверка Счетчиков Партнер'
-] as const;
+import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
 
 const orderSchema = z.object({
-  rk: z.enum(RK_OPTIONS, { message: 'Рекламная Компания обязательна' }),
-  city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
-  avitoName: z.enum(SOURCE_OPTIONS).optional(),
+  rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
   phone: z.string()
     .min(11, 'Телефон должен содержать 11 цифр')
     .max(11, 'Телефон должен содержать 11 цифр')
@@ -55,10 +40,7 @@ const orderSchema = z.object({
   clientName: z.string().min(1, 'Имя клиента обязательно'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ'], { 
-    message: 'Тип техники обязателен' 
-  }),
-  problem: z.string().min(1, 'Описание проблемы обязательно'),
+  equipmentTypeId: z.number({ required_error: 'Тип техники обязателен' }).min(1, 'Тип техники обязателен'),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -79,19 +61,21 @@ export default function CreateOrderModal({
   const { user } = useAuthStore(); // 🍪 Получаем user из store
   const { theme } = useDesignStore();
 
+  const { data: cities = [] } = useCities();
+  const { data: rks = [] } = useRKs();
+  const { data: equipmentTypes = [] } = useEquipmentTypes();
+
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: undefined,
-      city: undefined,
-      avitoName: undefined,
+      rkId: 0,
+      cityId: 0,
       phone: '',
       typeOrder: undefined,
       clientName: '',
       address: '',
       dateMeeting: '',
-      typeEquipment: undefined,
-      problem: ''
+      equipmentTypeId: 0,
     }
   });
 
@@ -109,7 +93,7 @@ export default function CreateOrderModal({
 
       const response = await api.post('/orders', {
         ...data,
-        operatorNameId: user?.id || 0
+        operatorId: user?.id || 0
       });
 
       queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -162,73 +146,52 @@ export default function CreateOrderModal({
             <CardContent className="space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="rk" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
+                  <Label htmlFor="rkId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
                   <Controller
-                    name="rk"
+                    name="rkId"
                     control={form.control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                          {RK_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
-                              {option}
+                          {rks.map((rk) => (
+                            <SelectItem key={rk.id} value={rk.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                              {rk.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     )}
                   />
-                  {errors.rk && (
-                    <p className="text-sm text-red-400">{errors.rk.message}</p>
+                  {errors.rkId && (
+                    <p className="text-sm text-red-400">{errors.rkId.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
+                  <Label htmlFor="cityId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
                   <Controller
-                    name="city"
+                    name="cityId"
                     control={form.control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите город" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                          {CITY_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
-                              {option}
+                          {cities.map((city) => (
+                            <SelectItem key={city.id} value={city.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                              {city.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     )}
                   />
-                  {errors.city && (
-                    <p className="text-sm text-red-400">{errors.city.message}</p>
+                  {errors.cityId && (
+                    <p className="text-sm text-red-400">{errors.cityId.message}</p>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="avitoName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Источник</Label>
-                  <Controller
-                    name="avitoName"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
-                          <SelectValue placeholder="Выберите источник" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                          {SOURCE_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
                 </div>
               </div>
             </CardContent>
@@ -343,25 +306,27 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
+                  <Label htmlFor="equipmentTypeId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
                   <Controller
-                    name="typeEquipment"
+                    name="equipmentTypeId"
                     control={form.control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите тип техники" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                          <SelectItem value="КП" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">КП</SelectItem>
-                          <SelectItem value="БТ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">БТ</SelectItem>
-                          <SelectItem value="МНЧ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">МНЧ</SelectItem>
+                          {equipmentTypes.map((et) => (
+                            <SelectItem key={et.id} value={et.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                              {et.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     )}
                   />
-                  {errors.typeEquipment && (
-                    <p className="text-sm text-red-400">{errors.typeEquipment.message}</p>
+                  {errors.equipmentTypeId && (
+                    <p className="text-sm text-red-400">{errors.equipmentTypeId.message}</p>
                   )}
                 </div>
               </div>
@@ -375,19 +340,6 @@ export default function CreateOrderModal({
                 />
                 {errors.dateMeeting && (
                   <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="problem" className="text-sm font-medium text-gray-600 dark:text-gray-400">Описание проблемы *</Label>
-                <Textarea
-                  id="problem"
-                  {...register('problem')}
-                  placeholder="Опишите проблему"
-                  rows={2}
-                  className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
-                />
-                {errors.problem && (
-                  <p className="text-sm text-red-400">{errors.problem.message}</p>
                 )}
               </div>
             </CardContent>

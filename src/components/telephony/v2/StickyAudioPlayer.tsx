@@ -185,7 +185,7 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                 "text-[10px] truncate",
                 isDark ? "text-gray-400" : "text-gray-500"
               )}>
-                {call.city}
+                {call.city?.name || '—'}
               </div>
             </div>
           </div>
@@ -320,7 +320,7 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                 "text-xs truncate",
                 isDark ? "text-gray-400" : "text-gray-500"
               )}>
-                {call.city} • {call.operator.name}
+                {call.city?.name || '—'} • {call.operator.name}
               </div>
             </div>
           </div>

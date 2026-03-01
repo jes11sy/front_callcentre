@@ -51,15 +51,6 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
     return statusConfig[status as keyof typeof statusConfig] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
-  const getEquipmentType = (type: string) => {
-    const typeConfig = {
-      'kp': 'КП',
-      'bt': 'БТ',
-      'mnch': 'МНЧ'
-    };
-    return typeConfig[type as keyof typeof typeConfig] || type;
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden bg-[#0f0f23] border-2 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)]">
@@ -94,8 +85,23 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
                 {orderHistory.map((order: unknown, _index: number) => {
-                  const orderData = order as { id: string; status?: string; statusOrder?: string; clientName: string; phone: string; city: string; typeEquipment: string; dateMeeting: string; operator?: { name?: string }; problem: string; address?: string; rk?: string };
-                  const orderStatus = orderData.status || orderData.statusOrder || '';
+                  const orderData = order as {
+                    id: string;
+                    status?: { id: number; name: string; code: string };
+                    clientName: string;
+                    phone: string;
+                    cityId?: number;
+                    city?: { id: number; name: string };
+                    equipmentTypeId?: number;
+                    equipmentType?: { id: number; name: string };
+                    dateMeeting: string;
+                    operator?: { name?: string };
+                    comment?: string;
+                    address?: string;
+                    rkId?: number;
+                    rk?: { id: number; name: string };
+                  };
+                  const orderStatusName = orderData.status?.name || '';
                   return (
                   <Card key={orderData.id} className="border-2 border-[#FFD700]/30 hover:border-[#FFD700]/50 transition-colors bg-[#17212b]">
                     <CardContent className="p-4">
@@ -106,9 +112,9 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                             #{orderData.id}
                           </Badge>
                           <Badge 
-                            className={`text-xs font-medium ${getStatusBadge(orderStatus)}`}
+                            className={`text-xs font-medium ${getStatusBadge(orderStatusName)}`}
                           >
-                            {orderStatus || 'Нет статуса'}
+                            {orderStatusName || 'Нет статуса'}
                           </Badge>
                         </div>
                         <Button
@@ -135,7 +141,7 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                           </span>
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            {orderData.city}
+                            {orderData.city?.name || '—'}
                           </span>
                         </div>
                       </div>
@@ -145,7 +151,7 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                         <div className="bg-[#0f0f23] rounded p-2 border border-gray-700">
                           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Тип</p>
                           <p className="font-semibold text-white text-sm">
-                            {getEquipmentType(orderData.typeEquipment)}
+                            {orderData.equipmentType?.name || '—'}
                           </p>
                         </div>
                         <div className="bg-[#0f0f23] rounded p-2 border border-gray-700">
@@ -166,11 +172,12 @@ export const OrderHistoryModal: React.FC<OrderHistoryModalProps> = ({
                         </div>
                       </div>
 
-                      {/* Problem Description */}
+                      {orderData.comment && (
                       <div className="bg-[#FFD700]/10 rounded p-2 border-l-2 border-[#FFD700]">
-                        <p className="text-xs font-medium text-[#FFD700] uppercase tracking-wide mb-1">Проблема</p>
-                        <p className="text-xs text-gray-300">{orderData.problem}</p>
+                        <p className="text-xs font-medium text-[#FFD700] uppercase tracking-wide mb-1">Комментарий</p>
+                        <p className="text-xs text-gray-300">{orderData.comment}</p>
                       </div>
+                      )}
                     </CardContent>
                   </Card>
                   );

@@ -234,9 +234,9 @@ function OrdersContent() {
           call={{
             id: playingCall.id,
             phoneClient: selectedOrder?.phone || 'Неизвестный номер',
-            city: selectedOrder?.city || '',
+            city: selectedOrder?.city || {},
             operator: { 
-              id: selectedOrder?.operatorNameId || 0, 
+              id: selectedOrder?.operatorId || 0, 
               name: selectedOrder?.operator?.name || 'Оператор' 
             },
             recordingPath: playingCall.recordingPath || ''

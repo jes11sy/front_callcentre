@@ -67,16 +67,16 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
               <div className="w-1.5 h-1.5 rounded-full bg-[#0f0f23]"></div>
             )}
           </div>
-          {call.rk}
+          {call.rk?.name || '—'}
         </div>
       </TableCell>
       
-      <TableCell className="text-white">{call.city}</TableCell>
+      <TableCell className="text-white">{call.city?.name || '—'}</TableCell>
       
       <TableCell>
-        {call.avitoName ? (
+        {call.avito?.name ? (
           <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-            {call.avitoName}
+            {call.avito.name}
           </Badge>
         ) : (
           <span className="text-gray-400">—</span>

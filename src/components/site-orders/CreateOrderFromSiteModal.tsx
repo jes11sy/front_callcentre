@@ -23,25 +23,11 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
-
-// Опции для выпадающих списков
-const RK_OPTIONS = ['Авито', 'Листовка'] as const;
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
-const SOURCE_OPTIONS = [
-  'Не указано',
-  'Владимир',
-  'Диспетчер МНЧ Расклейка',
-  'Сайт Водоканал',
-  'Сайт Поверка',
-  'Диспетчер Быт КП МНЧ',
-  'Газета',
-  'Поверка Счетчиков Партнер'
-] as const;
+import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
 
 const orderSchema = z.object({
-  rk: z.enum(RK_OPTIONS, { message: 'Рекламная Компания обязательна' }),
-  city: z.enum(CITY_OPTIONS, { message: 'Город обязателен' }),
-  avitoName: z.enum(SOURCE_OPTIONS).optional(),
+  rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
   phone: z.string()
     .min(11, 'Телефон должен содержать 11 цифр')
     .max(11, 'Телефон должен содержать 11 цифр')
@@ -52,10 +38,8 @@ const orderSchema = z.object({
   clientName: z.string().min(1, 'Имя клиента обязательно'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ'], { 
-    message: 'Тип техники обязателен' 
-  }),
-  problem: z.string().min(1, 'Описание проблемы обязательно'),
+  equipmentTypeId: z.number({ required_error: 'Тип техники обязателен' }).min(1, 'Тип техники обязателен'),
+  comment: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -89,19 +73,22 @@ export default function CreateOrderFromSiteModal({
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
 
+  const { data: availableCities = [] } = useCities();
+  const { data: availableEquipmentTypes = [] } = useEquipmentTypes();
+  const { data: availableRKs = [] } = useRKs();
+
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      rk: undefined,
-      city: undefined,
-      avitoName: undefined,
+      rkId: 0,
+      cityId: 0,
       phone: '',
       typeOrder: 'Впервые',
       clientName: '',
       address: '',
       dateMeeting: '',
-      typeEquipment: undefined,
-      problem: ''
+      equipmentTypeId: 0,
+      comment: ''
     }
   });
 
@@ -113,10 +100,8 @@ export default function CreateOrderFromSiteModal({
     setValue
   } = form;
 
-  // Заполняем форму данными из заявки сайта
   useEffect(() => {
     if (siteOrder && open) {
-      // Форматируем телефон
       let phone = siteOrder.phone.replace(/\D/g, '');
       if (phone.startsWith('8')) {
         phone = '7' + phone.slice(1);
@@ -132,20 +117,18 @@ export default function CreateOrderFromSiteModal({
       setValue('clientName', siteOrder.clientName);
       setValue('phone', phone);
       
-      // Пробуем установить город если он совпадает
-      const cityMatch = CITY_OPTIONS.find(c => 
-        c.toLowerCase() === siteOrder.city.toLowerCase()
+      const cityMatch = availableCities.find((c: { id: number; name: string }) => 
+        c.name.toLowerCase() === siteOrder.city.toLowerCase()
       );
       if (cityMatch) {
-        setValue('city', cityMatch);
+        setValue('cityId', cityMatch.id);
       }
 
-      // Используем комментарий как начальное описание проблемы
       if (siteOrder.comment) {
-        setValue('problem', siteOrder.comment);
+        setValue('comment', siteOrder.comment);
       }
     }
-  }, [siteOrder, open, setValue]);
+  }, [siteOrder, open, setValue, availableCities]);
 
   const onSubmit = async (data: OrderFormData) => {
     if (!siteOrder) return;
@@ -153,15 +136,13 @@ export default function CreateOrderFromSiteModal({
     try {
       setIsSubmitting(true);
 
-      // Создаем заказ
       const response = await api.post('/orders', {
         ...data,
-        operatorNameId: user?.id || 0
+        operatorId: user?.id || 0
       });
 
       const orderId = response.data.order?.id || response.data.id;
 
-      // Связываем заявку сайта с заказом
       if (orderId) {
         await api.patch(`/site-orders/${siteOrder.id}/link-order`, { orderId });
       }
@@ -186,13 +167,9 @@ export default function CreateOrderFromSiteModal({
 
   if (!open) return null;
 
-  // Стили
   const selectTriggerClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
-  
   const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
-  
   const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
-  
   const inputClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20";
 
   return (
@@ -228,73 +205,52 @@ export default function CreateOrderFromSiteModal({
               <CardContent className="space-y-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="rk" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
+                    <Label htmlFor="rkId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
                     <Controller
-                      name="rk"
+                      name="rkId"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder="Выберите РК" />
                           </SelectTrigger>
                           <SelectContent className={selectContentClass}>
-                            {RK_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={selectItemClass}>
-                                {option}
+                            {availableRKs.map((rk: { id: number; name: string }) => (
+                              <SelectItem key={rk.id} value={rk.id.toString()} className={selectItemClass}>
+                                {rk.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.rk && (
-                      <p className="text-sm text-red-400">{errors.rk.message}</p>
+                    {errors.rkId && (
+                      <p className="text-sm text-red-400">{errors.rkId.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
+                    <Label htmlFor="cityId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
                     <Controller
-                      name="city"
+                      name="cityId"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder="Выберите город" />
                           </SelectTrigger>
                           <SelectContent className={selectContentClass}>
-                            {CITY_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={selectItemClass}>
-                                {option}
+                            {availableCities.map((city: { id: number; name: string }) => (
+                              <SelectItem key={city.id} value={city.id.toString()} className={selectItemClass}>
+                                {city.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.city && (
-                      <p className="text-sm text-red-400">{errors.city.message}</p>
+                    {errors.cityId && (
+                      <p className="text-sm text-red-400">{errors.cityId.message}</p>
                     )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="avitoName" className="text-sm font-medium text-gray-600 dark:text-gray-400">Источник</Label>
-                    <Controller
-                      name="avitoName"
-                      control={form.control}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={selectTriggerClass}>
-                            <SelectValue placeholder="Выберите источник" />
-                          </SelectTrigger>
-                          <SelectContent className={selectContentClass}>
-                            {SOURCE_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option} className={selectItemClass}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
                   </div>
                 </div>
               </CardContent>
@@ -334,7 +290,6 @@ export default function CreateOrderFromSiteModal({
                           value={field.value.startsWith('7') && field.value.length > 1 ? '+7' + field.value.slice(1) : ''}
                           onChange={(e) => {
                             let input = e.target.value.replace(/\D/g, '');
-                            
                             if (input.startsWith('8')) {
                               input = '7' + input.slice(1);
                             } else if (input.startsWith('9')) {
@@ -342,11 +297,9 @@ export default function CreateOrderFromSiteModal({
                             } else if (input.length > 0 && !input.startsWith('7')) {
                               input = '7' + input;
                             }
-                            
                             if (input.length > 11) {
                               input = input.slice(0, 11);
                             }
-                            
                             field.onChange(input);
                           }}
                           placeholder="Введите номер телефона"
@@ -407,25 +360,25 @@ export default function CreateOrderFromSiteModal({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="typeEquipment" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
+                    <Label htmlFor="equipmentTypeId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
                     <Controller
-                      name="typeEquipment"
+                      name="equipmentTypeId"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                           <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder="Выберите тип техники" />
                           </SelectTrigger>
                           <SelectContent className={selectContentClass}>
-                            <SelectItem value="КП" className={selectItemClass}>КП</SelectItem>
-                            <SelectItem value="БТ" className={selectItemClass}>БТ</SelectItem>
-                            <SelectItem value="МНЧ" className={selectItemClass}>МНЧ</SelectItem>
+                            {availableEquipmentTypes.map((et: { id: number; name: string }) => (
+                              <SelectItem key={et.id} value={et.id.toString()} className={selectItemClass}>{et.name}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.typeEquipment && (
-                      <p className="text-sm text-red-400">{errors.typeEquipment.message}</p>
+                    {errors.equipmentTypeId && (
+                      <p className="text-sm text-red-400">{errors.equipmentTypeId.message}</p>
                     )}
                   </div>
                 </div>
@@ -442,17 +395,14 @@ export default function CreateOrderFromSiteModal({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="problem" className="text-sm font-medium text-gray-600 dark:text-gray-400">Описание проблемы *</Label>
+                  <Label htmlFor="comment" className="text-sm font-medium text-gray-600 dark:text-gray-400">Комментарий</Label>
                   <Textarea
-                    id="problem"
-                    {...register('problem')}
-                    placeholder="Опишите проблему"
+                    id="comment"
+                    {...register('comment')}
+                    placeholder="Комментарий к заказу"
                     rows={2}
                     className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
                   />
-                  {errors.problem && (
-                    <p className="text-sm text-red-400">{errors.problem.message}</p>
-                  )}
                 </div>
               </CardContent>
             </Card>

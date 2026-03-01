@@ -8,7 +8,8 @@ interface OperatorStats {
   operator: {
     id: number;
     name: string;
-    city: string;
+    cityId?: number;
+    city?: { id: number; name: string };
   };
   period: {
     startDate: string;
@@ -29,11 +30,13 @@ interface OperatorStats {
     calls: number;
   }>;
   cityStats: Array<{
-    city: string;
+    cityId: number;
+    cityName: string;
     calls: number;
   }>;
   rkStats: Array<{
-    rk: string;
+    rkId: number;
+    rkName: string;
     calls: number;
   }>;
 }

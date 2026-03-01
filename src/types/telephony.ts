@@ -1,8 +1,9 @@
 export interface Call {
   id: number;
-  rk: string;
-  city: string;
-  avitoName?: string;
+  rkId?: number;
+  rk?: { id: number; name: string };
+  cityId?: number;
+  city?: { id: number; name: string };
   phoneClient: string;
   phoneAts: string;
   createdAt: string;
@@ -31,8 +32,8 @@ export interface Call {
   phone?: {
     id: number;
     number: string;
-    rk: string;
-    city: string;
+    rkId?: number;
+    cityId?: number;
   };
 }
 
@@ -54,18 +55,18 @@ export interface CallsResponse {
 export interface CallFilters {
   dateFrom?: string;
   dateTo?: string;
-  city?: string;
-  rk?: string;
+  cityId?: number;
+  rkId?: number;
   status?: string;
-  avitoName?: string;
 }
 
 export interface Phone {
   id: number;
   number: string;
-  rk: string;
-  city: string;
-  avitoName?: string;
+  rkId: number;
+  rk?: { id: number; name: string };
+  cityId: number;
+  city?: { id: number; name: string };
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -73,9 +74,8 @@ export interface Phone {
 
 export interface PhoneFormData {
   number: string;
-  rk: string;
-  city: string;
-  avitoName?: string;
+  rkId: number;
+  cityId: number;
 }
 
 

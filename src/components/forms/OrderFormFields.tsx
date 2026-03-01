@@ -1,4 +1,3 @@
-// Переиспользуемые поля формы для заказов - устраняет дублирование кода
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { FormFieldProps } from '@/types/common';
-import { ORDER_TYPE_OPTIONS, EQUIPMENT_TYPE_OPTIONS, RK_OPTIONS } from '@/lib/validation-schemas';
+import { ORDER_TYPE_OPTIONS } from '@/lib/validation-schemas';
+import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
 
-// Поле выбора типа заказа
 export function OrderTypeSelect({ control, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
@@ -38,67 +37,66 @@ export function OrderTypeSelect({ control, errors, className }: FormFieldProps) 
   );
 }
 
-// Поле выбора типа техники
 export function EquipmentTypeSelect({ control, errors, className }: FormFieldProps) {
+  const { data: equipmentTypes = [] } = useEquipmentTypes();
   return (
     <div className={className}>
-      <Label htmlFor="typeEquipment">Тип техники *</Label>
+      <Label htmlFor="equipmentTypeId">Тип техники *</Label>
       <Controller
-        name="typeEquipment"
+        name="equipmentTypeId"
         control={control}
         render={({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value}>
+          <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
             <SelectTrigger>
               <SelectValue placeholder="Выберите тип техники" />
             </SelectTrigger>
             <SelectContent>
-              {EQUIPMENT_TYPE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+              {equipmentTypes.map((et: { id: number; name: string }) => (
+                <SelectItem key={et.id} value={et.id.toString()}>
+                  {et.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         )}
       />
-      {errors.typeEquipment && (
-        <p className="text-sm text-destructive mt-1">{errors.typeEquipment.message}</p>
+      {errors.equipmentTypeId && (
+        <p className="text-sm text-destructive mt-1">{errors.equipmentTypeId.message}</p>
       )}
     </div>
   );
 }
 
-// Поле выбора РК
 export function RkSelect({ control, errors, className }: FormFieldProps) {
+  const { data: availableRKs = [] } = useRKs();
   return (
     <div className={className}>
-      <Label htmlFor="rk">РК *</Label>
+      <Label htmlFor="rkId">РК *</Label>
       <Controller
-        name="rk"
+        name="rkId"
         control={control}
         render={({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value}>
+          <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
             <SelectTrigger>
               <SelectValue placeholder="Выберите РК" />
             </SelectTrigger>
             <SelectContent>
-              {RK_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+              {availableRKs.map((rk: { id: number; name: string }) => (
+                <SelectItem key={rk.id} value={rk.id.toString()}>
+                  {rk.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         )}
       />
-      {errors.rk && (
-        <p className="text-sm text-destructive mt-1">{errors.rk.message}</p>
+      {errors.rkId && (
+        <p className="text-sm text-destructive mt-1">{errors.rkId.message}</p>
       )}
     </div>
   );
 }
 
-// Поле имени клиента
 export function ClientNameInput({ register, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
@@ -115,7 +113,6 @@ export function ClientNameInput({ register, errors, className }: FormFieldProps)
   );
 }
 
-// Поле телефона
 export function PhoneInput({ register, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
@@ -133,7 +130,6 @@ export function PhoneInput({ register, errors, className }: FormFieldProps) {
   );
 }
 
-// Поле адреса
 export function AddressInput({ register, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
@@ -150,7 +146,6 @@ export function AddressInput({ register, errors, className }: FormFieldProps) {
   );
 }
 
-// Поле даты встречи
 export function DateMeetingInput({ register, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
@@ -167,70 +162,45 @@ export function DateMeetingInput({ register, errors, className }: FormFieldProps
   );
 }
 
-// Поле описания проблемы
-export function ProblemTextarea({ register, errors, className }: FormFieldProps) {
+export function CommentTextarea({ register, errors, className }: FormFieldProps) {
   return (
     <div className={className}>
-      <Label htmlFor="problem">Описание проблемы *</Label>
+      <Label htmlFor="comment">Комментарий</Label>
       <Textarea
-        id="problem"
-        {...register('problem')}
-        placeholder="Опишите проблему"
+        id="comment"
+        {...register('comment')}
+        placeholder="Комментарий к заказу"
         rows={4}
       />
-      {errors.problem && (
-        <p className="text-sm text-destructive mt-1">{errors.problem.message}</p>
-      )}
     </div>
   );
 }
 
-// Поле города
-export function CityInput({ register, errors, className }: FormFieldProps) {
+export function CitySelect({ control, errors, className }: FormFieldProps) {
+  const { data: availableCities = [] } = useCities();
   return (
     <div className={className}>
-      <Label htmlFor="city">Город *</Label>
-      <Input
-        id="city"
-        {...register('city')}
-        placeholder="Введите город"
+      <Label htmlFor="cityId">Город *</Label>
+      <Controller
+        name="cityId"
+        control={control}
+        render={({ field }) => (
+          <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите город" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableCities.map((city: { id: number; name: string }) => (
+                <SelectItem key={city.id} value={city.id.toString()}>
+                  {city.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       />
-      {errors.city && (
-        <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
-      )}
-    </div>
-  );
-}
-
-// Поле имени Авито аккаунта
-export function AvitoNameInput({ register, errors, className }: FormFieldProps) {
-  return (
-    <div className={className}>
-      <Label htmlFor="avitoName">Имя Авито аккаунта</Label>
-      <Input
-        id="avitoName"
-        {...register('avitoName')}
-        placeholder="Введите имя Авито аккаунта"
-      />
-      {errors.avitoName && (
-        <p className="text-sm text-destructive mt-1">{errors.avitoName.message}</p>
-      )}
-    </div>
-  );
-}
-
-// Поле РК (текстовое)
-export function RkInput({ register, errors, className }: FormFieldProps) {
-  return (
-    <div className={className}>
-      <Label htmlFor="rk">РК *</Label>
-      <Input
-        id="rk"
-        {...register('rk')}
-        placeholder="Введите РК"
-      />
-      {errors.rk && (
-        <p className="text-sm text-destructive mt-1">{errors.rk.message}</p>
+      {errors.cityId && (
+        <p className="text-sm text-destructive mt-1">{errors.cityId.message}</p>
       )}
     </div>
   );

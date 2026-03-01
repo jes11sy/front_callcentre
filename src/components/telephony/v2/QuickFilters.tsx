@@ -244,14 +244,6 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                   className="bg-[#0f0f23] border-[#FFD700]/20 text-white placeholder:text-gray-500"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm text-gray-400">Источник</Label>
-                <Input
-                  placeholder="Имя аккаунта"
-                  {...register('avitoName')}
-                  className="bg-[#0f0f23] border-[#FFD700]/20 text-white placeholder:text-gray-500"
-                />
-              </div>
             </div>
 
             <div className="flex items-center gap-2 pt-2">

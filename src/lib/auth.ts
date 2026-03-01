@@ -34,10 +34,8 @@ export interface ProfileResponse {
   data: User & {
     city?: string;
     status?: string;
-    statusWork?: string;
-    dateCreate?: string;
-    note?: string;
     createdAt?: string;
+    note?: string;
   };
 }
 

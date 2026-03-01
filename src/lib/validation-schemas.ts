@@ -10,27 +10,26 @@ export const orderBaseSchema = z.object({
   phone: z.string().min(1, 'Номер телефона обязателен'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  typeEquipment: z.enum(['КП', 'БТ', 'МНЧ']).refine((val) => val !== undefined, {
-    message: 'Выберите тип техники'
-  }),
-  problem: z.string().min(1, 'Описание проблемы обязательно')
+  equipmentTypeId: z.number({ required_error: 'Выберите тип техники' }).min(1, 'Выберите тип техники'),
 });
 
 // Схема для создания заказа из чата (минимальные поля)
-export const chatOrderSchema = orderBaseSchema;
+export const chatOrderSchema = orderBaseSchema.extend({
+  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
+  avitoChatId: z.string().optional(),
+});
 
 // Схема для создания заказа из звонка (дополнительные поля)
 export const callOrderSchema = orderBaseSchema.extend({
-  rk: z.enum(['Авито', 'Листовка']),
-  avitoName: z.string().optional(),
-  city: z.string().min(1, 'Введите город')
+  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
 });
 
 // Схема для создания заказа с нуля (все поля)
 export const fullOrderSchema = orderBaseSchema.extend({
-  rk: z.string().min(1, 'РК обязателен'),
-  city: z.string().min(1, 'Город обязателен'),
-  avitoName: z.string().optional()
+  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
+  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
 });
 
 // Типы для форм
@@ -46,13 +45,10 @@ export const ORDER_TYPE_OPTIONS = [
   { value: 'Гарантия', label: 'Гарантия' }
 ] as const;
 
-export const EQUIPMENT_TYPE_OPTIONS = [
+// Equipment types and RK options are now fetched dynamically from /orders/filter-options
+// These constants are kept for reference only
+export const EQUIPMENT_TYPE_OPTIONS_LEGACY = [
   { value: 'КП', label: 'КП' },
   { value: 'БТ', label: 'БТ' },
   { value: 'МНЧ', label: 'МНЧ' }
-] as const;
-
-export const RK_OPTIONS = [
-  { value: 'Авито', label: 'Авито' },
-  { value: 'Листовка', label: 'Листовка' }
 ] as const;

@@ -120,7 +120,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
 
   // Фильтруем заказы только с активными статусами
   const activeOrders = useMemo(() => {
-    return orders.filter(order => ACTIVE_STATUSES.includes(order.statusOrder));
+    return orders.filter(order => ACTIVE_STATUSES.includes(order.status?.name || ''));
   }, [orders]);
 
   // Получаем уникальные города из заказов на выбранную дату
@@ -128,11 +128,11 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
     const citySet = new Set<string>();
     
     activeOrders.forEach(order => {
-      if (!order.dateMeeting || !order.city) return;
+      if (!order.dateMeeting || !order.city?.name) return;
       const orderTime = new Date(order.dateMeeting);
       
       if (isSameDate(orderTime, selectedDate)) {
-        citySet.add(order.city);
+        citySet.add(order.city.name);
       }
     });
     
@@ -149,8 +149,9 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
       
       if (isSameDate(orderTime, selectedDate)) {
         counts.all = (counts.all || 0) + 1;
-        if (order.city) {
-          counts[order.city] = (counts[order.city] || 0) + 1;
+        const cityName = order.city?.name;
+        if (cityName) {
+          counts[cityName] = (counts[cityName] || 0) + 1;
         }
       }
     });
@@ -187,16 +188,15 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   // Фильтрованные заказы по выбранному городу
   const filteredOrders = useMemo(() => {
     if (activeCity === 'all') return activeOrders;
-    return activeOrders.filter(order => order.city === activeCity);
+    return activeOrders.filter(order => order.city?.name === activeCity);
   }, [activeOrders, activeCity]);
 
   // Мемоизированная функция для подсчета заказов в временном слоте
-  const getOrdersForTimeSlot = useCallback((hour: number, minute: number, typeEquipment: string) => {
+  const getOrdersForTimeSlot = useCallback((hour: number, minute: number, equipmentTypeName: string) => {
     return filteredOrders.filter(order => {
-      if (!order.dateMeeting || order.typeEquipment !== typeEquipment) return false;
+      if (!order.dateMeeting || order.equipmentType?.name !== equipmentTypeName) return false;
       const orderTime = new Date(order.dateMeeting);
       
-      // Проверяем, что заявка на выбранную дату
       if (!isSameDate(orderTime, selectedDate)) return false;
       
       const orderHour = orderTime.getHours();
@@ -206,9 +206,9 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   }, [filteredOrders, selectedDate, isSameDate]);
 
   // Подсчёт итогов по типу техники
-  const getEquipmentTotal = useCallback((typeEquipment: string) => {
+  const getEquipmentTotal = useCallback((equipmentTypeName: string) => {
     return filteredOrders.filter(order => {
-      if (!order.dateMeeting || order.typeEquipment !== typeEquipment) return false;
+      if (!order.dateMeeting || order.equipmentType?.name !== equipmentTypeName) return false;
       const orderTime = new Date(order.dateMeeting);
       
       return isSameDate(orderTime, selectedDate);

@@ -168,14 +168,13 @@ const OrdersTableComponent = ({
                     <TableHead className="w-14 sm:w-16 text-xs sm:text-sm text-gray-600 dark:text-gray-400">ID</TableHead>
                     <TableHead className="w-14 sm:w-20 text-xs sm:text-sm text-gray-600 dark:text-gray-400">РК</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Город</TableHead>
-                    <TableHead className="w-24 sm:w-28 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Источник</TableHead>
+                    <TableHead className="w-24 sm:w-28 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Авито</TableHead>
                     <TableHead className="w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Телефон</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Тип</TableHead>
                     <TableHead className="w-28 sm:w-32 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Клиент</TableHead>
                     <TableHead className="w-32 sm:w-40 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Адрес</TableHead>
                     <TableHead className="w-24 sm:w-28 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Дата</TableHead>
                     <TableHead className="w-20 sm:w-28 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Техника</TableHead>
-                    <TableHead className="w-32 sm:w-40 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Проблема</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Статус</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Мастер</TableHead>
                   </TableRow>
@@ -188,11 +187,11 @@ const OrdersTableComponent = ({
                       onClick={() => onViewOrder(order)}
                     >
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">{order.id}</TableCell>
-                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.rk}</TableCell>
-                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.city}</TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.rk?.name || '—'}</TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.city?.name || '—'}</TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
-                        <div className="max-w-20 sm:max-w-28 truncate text-xs sm:text-sm text-gray-700 dark:text-gray-300" title={order.avitoName || 'Не указан'}>
-                          {order.avitoName || <span className="text-gray-400">—</span>}
+                        <div className="max-w-20 sm:max-w-28 truncate text-xs sm:text-sm text-gray-700 dark:text-gray-300" title={order.avito?.name || 'Не указан'}>
+                          {order.avito?.name || <span className="text-gray-400">—</span>}
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
@@ -221,22 +220,17 @@ const OrdersTableComponent = ({
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
-                        <div className="max-w-20 sm:max-w-28 truncate" title={order.typeEquipment}>
+                        <div className="max-w-20 sm:max-w-28 truncate" title={order.equipmentType?.name || '—'}>
                           <Badge variant="outline" className="text-[10px] sm:text-xs border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10">
-                            {order.typeEquipment}
+                            {order.equipmentType?.name || '—'}
                           </Badge>
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
-                        <div className="max-w-28 sm:max-w-40 truncate text-xs sm:text-sm text-gray-700 dark:text-gray-300" title={order.problem}>
-                          {order.problem}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
                         <Badge 
-                          className={`text-[10px] sm:text-xs whitespace-nowrap ${statusColors[order.statusOrder as keyof typeof statusColors] || 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'}`}
+                          className={`text-[10px] sm:text-xs whitespace-nowrap ${statusColors[order.status?.name as keyof typeof statusColors] || 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'}`}
                         >
-                          {order.statusOrder}
+                          {order.status?.name || '—'}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">

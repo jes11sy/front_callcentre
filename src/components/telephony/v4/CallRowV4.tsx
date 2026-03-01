@@ -332,20 +332,20 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         ) : (
           <div className="space-y-1">
             <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm">
-              <span className="text-gray-900 dark:text-gray-100">{call.city}</span>
+              <span className="text-gray-900 dark:text-gray-100">{call.city?.name || '—'}</span>
               <span className="text-gray-400">•</span>
-              <span className="text-gray-600 dark:text-gray-400">{call.rk}</span>
+              <span className="text-gray-600 dark:text-gray-400">{call.rk?.name || '—'}</span>
             </div>
-            {call.avitoName && (
+            {call.avito?.name && (
               <Badge 
                 variant="outline" 
                 className={cn(
                   "text-[10px] sm:text-xs max-w-[100px] sm:max-w-[150px] truncate",
                   "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/5 dark:bg-[#FEC004]/10"
                 )}
-                title={call.avitoName}
+                title={call.avito.name}
               >
-                {call.avitoName}
+                {call.avito.name}
               </Badge>
             )}
           </div>

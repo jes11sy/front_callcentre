@@ -129,11 +129,11 @@ export const CallCard: React.FC<CallCardProps> = ({
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <MapPin className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{call.city}</span>
-              {call.avitoName && (
+              <span className="truncate">{call.city?.name || '—'}</span>
+              {call.avito?.name && (
                 <>
                   <span className="text-gray-600">•</span>
-                  <span className="truncate text-[#FFD700]/70">{call.avitoName}</span>
+                  <span className="truncate text-[#FFD700]/70">{call.avito?.name}</span>
                 </>
               )}
             </div>

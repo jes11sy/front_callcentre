@@ -232,16 +232,18 @@ export function Sidebar() {
   // Контент меню (переиспользуется для десктопа и мобильной версии)
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
-      {/* Search button */}
-      <div className={`px-5 ${isMobile ? 'mb-4' : 'mb-2'}`}>
+      {/* Search — styled like nav items */}
+      <div className={`px-5 ${isMobile ? 'mb-1' : 'mb-1'}`}>
         <button
           onClick={() => { setSearchOpen(true); if (isMobile) setIsMobileMenuOpen(false); }}
-          className={`flex items-center gap-3 px-3 w-full font-normal transition-colors group rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#FEC004]/50 hover:bg-[#FEC004]/5 ${
-            isMobile ? 'py-3 text-base' : 'py-2 text-sm'
+          className={`nav-icon-hover relative flex items-center gap-3 px-3 w-full font-normal transition-colors group ${
+            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
           }`}
         >
-          <Search className={`text-gray-400 group-hover:text-[#FEC004] transition-colors ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
-          <span className="text-gray-400 group-hover:text-[#FEC004] transition-colors">Поиск клиента...</span>
+          <Search className={`nav-icon transition-all shrink-0 text-gray-500 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
+          <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
+            Поиск
+          </span>
         </button>
       </div>
 

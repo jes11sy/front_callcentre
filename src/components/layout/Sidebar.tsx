@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { GlobalSearch } from './GlobalSearch';
+import { GlobalSearchOverlay } from './GlobalSearch';
 import { 
   User, 
   Sun,
@@ -16,9 +16,7 @@ import {
   Menu,
   X,
   Bell,
-  BellRing,
   Check,
-  Trash2,
   PhoneIncoming,
   PhoneMissed,
   PhoneOutgoing,
@@ -26,6 +24,7 @@ import {
   Info,
   GripHorizontal,
   MessageSquare,
+  Search,
   type LucideIcon
 } from 'lucide-react';
 
@@ -216,18 +215,7 @@ export function Sidebar() {
     }
   };
 
-  // Ctrl+K для глобального поиска
   const [searchOpen, setSearchOpen] = useState(false);
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const navItems: Array<{ name: string; href: string; icon?: string; lucideIcon?: LucideIcon }> = [
     { name: 'Телефония', href: '/telephony', icon: '/img/navigate/telephony.svg' },
@@ -244,12 +232,18 @@ export function Sidebar() {
   // Контент меню (переиспользуется для десктопа и мобильной версии)
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
-      {/* Global Search */}
-      {!isMobile && (
-        <div className="px-5 mb-2">
-          <GlobalSearch />
-        </div>
-      )}
+      {/* Search button */}
+      <div className={`px-5 ${isMobile ? 'mb-4' : 'mb-2'}`}>
+        <button
+          onClick={() => { setSearchOpen(true); if (isMobile) setIsMobileMenuOpen(false); }}
+          className={`flex items-center gap-3 px-3 w-full font-normal transition-colors group rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#FEC004]/50 hover:bg-[#FEC004]/5 ${
+            isMobile ? 'py-3 text-base' : 'py-2 text-sm'
+          }`}
+        >
+          <Search className={`text-gray-400 group-hover:text-[#FEC004] transition-colors ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
+          <span className="text-gray-400 group-hover:text-[#FEC004] transition-colors">Поиск клиента...</span>
+        </button>
+      </div>
 
       {/* Navigation */}
       <nav className={`flex-1 px-5 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
@@ -464,7 +458,16 @@ export function Sidebar() {
             className="h-9 w-auto" 
           />
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Mobile Search */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#FEC004] transition-colors"
+            aria-label="Поиск"
+          >
+            <Search className="h-6 w-6" />
+          </button>
+
           {/* Mobile Notifications Bell */}
           <div className="relative" ref={notificationsRef}>
             <button
@@ -592,6 +595,9 @@ export function Sidebar() {
 
         <MenuContent isMobile={false} />
       </aside>
+
+      {/* Global Search Overlay */}
+      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

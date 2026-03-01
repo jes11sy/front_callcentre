@@ -100,7 +100,7 @@ export const chatsApi = {
 // API для cash (касса/штрафы)
 export const cashApi = {
   // Получение транзакций
-  async getCashTransactions(params?: { name?: string; city?: string; paymentPurpose?: string; limit?: number }): Promise<ApiResponse> {
+  async getCashTransactions(params?: { type?: 'income' | 'expense'; cityId?: number; paymentPurpose?: string; startDate?: string; endDate?: string; page?: number; limit?: number }): Promise<ApiResponse> {
     const searchParams = params ? apiUtils.createSearchParams(params) : new URLSearchParams();
     const queryString = searchParams.toString();
     const response = await api.get(`/cash${queryString ? `?${queryString}` : ''}`);

@@ -21,9 +21,8 @@ export const usePenalties = () => {
         
         // Загружаем штрафы напрямую с фильтром paymentPurpose на бэкенде
         const penaltiesResponse = await cashApi.getCashTransactions({
-          name: 'приход',
           paymentPurpose: 'Штраф',
-          limit: 500, // Достаточно для всех штрафов
+          limit: 500,
         });
         
         // Загружаем уникальные города из filterOptions (без загрузки всех заказов)

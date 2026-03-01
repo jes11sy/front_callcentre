@@ -1,100 +1,284 @@
 'use client';
 
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// Badge removed - not used
+import { useDesignStore } from '@/store/designStore';
+import { useAuthStore } from '@/store/authStore';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { 
-  DollarSign, 
-  Calendar,
   TrendingUp,
-  Clock,
-  FileText,
+  Phone,
+  ShoppingCart,
+  Calendar,
+  RefreshCw,
+  Loader2,
   AlertCircle
 } from 'lucide-react';
+import api from '@/lib/api';
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
 
+interface ProfileStats {
+  operator: {
+    id: number;
+    name: string;
+    city: string;
+    startDate: string;
+  };
+  total: {
+    calls: number;
+    orders: number;
+  };
+  monthly: {
+    calls: number;
+    orders: number;
+  };
+  today: {
+    calls: number;
+    orders: number;
+  };
+}
+
+interface PeriodStats {
+  calls: {
+    total: number;
+    accepted: number;
+    missed: number;
+    acceptanceRate: number;
+  };
+  orders: {
+    total: number;
+    byStatus: Record<string, number>;
+  };
+  dailyStats: Array<{ date: string; calls: number }>;
+}
+
+function getMonthRange() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const fmt = (d: Date) => d.toISOString().split('T')[0];
+  return { start: fmt(start), end: fmt(end) };
+}
+
 export default function SalaryPage() {
+  const { theme } = useDesignStore();
+  const { user } = useAuthStore();
+  const isDark = theme === 'dark';
+
+  const defaultRange = getMonthRange();
+  const [startDate, setStartDate] = useState(defaultRange.start);
+  const [endDate, setEndDate] = useState(defaultRange.end);
+
+  const { data: profileStats, isLoading: profileLoading } = useQuery<ProfileStats>({
+    queryKey: ['profileStats'],
+    queryFn: async () => {
+      const response = await api.get('/auth/profile/stats');
+      return response.data.data || response.data;
+    },
+  });
+
+  const { data: periodStats, isLoading: periodLoading, refetch } = useQuery<PeriodStats>({
+    queryKey: ['salaryPeriodStats', startDate, endDate],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('startDate', startDate);
+      params.append('endDate', endDate);
+      const response = await api.get(`/stats/my?${params}`);
+      return response.data;
+    },
+    enabled: !!startDate && !!endDate,
+  });
+
+  const isLoading = profileLoading || periodLoading;
+
+  const conversionRate = periodStats?.calls.accepted
+    ? Math.round((periodStats.orders.total / periodStats.calls.accepted) * 100)
+    : 0;
+
+  const daysInPeriod = startDate && endDate
+    ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000) + 1)
+    : 1;
+
+  const resetToCurrentMonth = () => {
+    const range = getMonthRange();
+    setStartDate(range.start);
+    setEndDate(range.end);
+  };
+
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#0f0f23] min-h-screen">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-[#FFD700] flex items-center">
-                  <DollarSign className="h-8 w-8 mr-3 text-[#FFD700]" />
-                  Зарплата
-                </h1>
-                <p className="text-gray-400 mt-2">
-                  Информация о заработной плате и выплатах
-                </p>
-              </div>
+      <div className={`w-full min-h-screen font-myriad transition-colors duration-300 ${
+        isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
+      }`}>
+        <div className="max-w-3xl mx-auto py-4 sm:py-8 px-3 sm:px-6">
+
+          {/* Date Filter */}
+          <div className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6 sm:mb-8 pb-4 border-b ${
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${
+                  isDark
+                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}
+              />
+              <span className="text-gray-400">—</span>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${
+                  isDark
+                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}
+              />
             </div>
+            <Button
+              onClick={resetToCurrentMonth}
+              variant="ghost"
+              size="sm"
+              className={`h-10 sm:h-9 hover:text-[#FEC004] font-light ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Текущий месяц
+            </Button>
           </div>
 
-          {/* Coming Soon Card */}
-          <Card className="max-w-2xl mx-auto border-2 border-[#FFD700]/30 bg-[#17212b]">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-[#FFD700]/20 rounded-full flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-[#FFD700]" />
-              </div>
-              <CardTitle className="text-2xl text-white">Скоро будет доступно</CardTitle>
-              <CardDescription className="text-lg text-gray-400">
-                Раздел &quot;Зарплата&quot; находится в разработке
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <p className="text-gray-400">
-                В этом разделе вы сможете просматривать:
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div className="flex items-center space-x-3 p-4 bg-[#0f0f23] rounded-lg border border-[#FFD700]/30">
-                  <Calendar className="h-5 w-5 text-[#FFD700]" />
-                  <div className="text-left">
-                    <p className="font-medium text-white">История выплат</p>
-                    <p className="text-sm text-gray-400">Все предыдущие зарплаты</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-4 bg-[#0f0f23] rounded-lg border border-[#FFD700]/30">
-                  <TrendingUp className="h-5 w-5 text-green-400" />
-                  <div className="text-left">
-                    <p className="font-medium text-white">Статистика доходов</p>
-                    <p className="text-sm text-gray-400">Графики и аналитика</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-4 bg-[#0f0f23] rounded-lg border border-[#FFD700]/30">
-                  <Clock className="h-5 w-5 text-purple-400" />
-                  <div className="text-left">
-                    <p className="font-medium text-white">Отработанные часы</p>
-                    <p className="text-sm text-gray-400">Учет рабочего времени</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-4 bg-[#0f0f23] rounded-lg border border-[#FFD700]/30">
-                  <FileText className="h-5 w-5 text-orange-400" />
-                  <div className="text-left">
-                    <p className="font-medium text-white">Справки и документы</p>
-                    <p className="text-sm text-gray-400">Скачивание документов</p>
-                  </div>
-                </div>
-              </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-[#FEC004]" />
+            </div>
+          ) : (
+            <div className="space-y-4 sm:space-y-6">
 
-              <div className="mt-6 p-4 bg-[#FFD700]/10 rounded-lg border border-[#FFD700]/30">
-                <p className="text-[#FFD700] font-medium">
-                  Ожидаемая дата запуска: Q1 2025
-                </p>
-                <p className="text-gray-400 text-sm mt-1">
-                  Следите за обновлениями в системе
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              {/* Заголовок с именем */}
+              {profileStats && (
+                <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Оператор</p>
+                      <p className={`text-lg font-medium mt-0.5 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.operator.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Город</p>
+                      <p className={`text-base mt-0.5 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.operator.city}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Звонки за период */}
+              {periodStats && (
+                <>
+                  <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                    <div className="flex items-baseline justify-between mb-3">
+                      <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Звонки за период</span>
+                      <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{periodStats.calls.total}</span>
+                    </div>
+                    <div className={`h-2 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                      <div
+                        className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
+                        style={{ width: `${periodStats.calls.total ? Math.round((periodStats.calls.accepted / periodStats.calls.total) * 100) : 0}%` }}
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between gap-1 text-sm">
+                      <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Принятые: <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{periodStats.calls.accepted}</span>
+                      </span>
+                      <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Пропущенные: <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{periodStats.calls.missed}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Заказы за период */}
+                  <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                    <div className="flex items-baseline justify-between">
+                      <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Заказы за период</span>
+                      <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{periodStats.orders.total}</span>
+                    </div>
+                    <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                      {daysInPeriod > 1 ? `в среднем ${(periodStats.orders.total / daysInPeriod).toFixed(1)} заказа/день` : 'за выбранный день'}
+                    </p>
+                    {periodStats.orders.byStatus && Object.keys(periodStats.orders.byStatus).length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        {Object.entries(periodStats.orders.byStatus).map(([status, count]) => (
+                          <div key={status} className="flex items-center justify-between text-sm">
+                            <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{status}</span>
+                            <span className={`font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Конверсия */}
+                  <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                    <div className="flex items-baseline justify-between mb-3">
+                      <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Конверсия</span>
+                      <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{conversionRate}%</span>
+                    </div>
+                    <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                      <div
+                        className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(conversionRate, 100)}%` }}
+                      />
+                    </div>
+                    <p className={`text-xs sm:text-sm font-light mt-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                      заказов на принятый звонок
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Итого за всё время */}
+              {profileStats && (
+                <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                  <p className={`text-sm font-light mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Всё время</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.calls}</p>
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>звонков</p>
+                    </div>
+                    <div>
+                      <p className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.orders}</p>
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>заказов</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Сегодня */}
+              {profileStats && (
+                <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                  <p className={`text-sm font-light mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Сегодня</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.today.calls}</p>
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>звонков</p>
+                    </div>
+                    <div>
+                      <p className={`text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.today.orders}</p>
+                      <p className={`text-sm font-light ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>заказов</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

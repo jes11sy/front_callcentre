@@ -17,7 +17,9 @@ import {
   PhoneOff, 
   ShoppingCart, 
   Calendar,
-  RefreshCw
+  RefreshCw,
+  TrendingUp,
+  Target
 } from 'lucide-react';
 import React from 'react';
 import { ErrorMessage, LoadingState } from '@/components/ui/error-boundary';
@@ -138,6 +140,12 @@ export default function StatsPage() {
   // Минималистичный дизайн с горизонтальными прогресс-барами
   const acceptanceRate = stats?.calls.total ? Math.round((stats.calls.accepted / stats.calls.total) * 100) : 0;
   const missedRate = stats?.calls.total ? Math.round((stats.calls.missed / stats.calls.total) * 100) : 0;
+  const conversionRate = stats?.calls.accepted ? Math.round((stats.orders.total / stats.calls.accepted) * 100) : 0;
+  const daysInPeriod = startDate && endDate
+    ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000) + 1)
+    : 1;
+  const avgCallsPerDay = stats?.calls.total ? Math.round(stats.calls.total / daysInPeriod) : 0;
+  const avgOrdersPerDay = stats?.orders.total ? (stats.orders.total / daysInPeriod).toFixed(1) : '0';
 
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
@@ -223,8 +231,51 @@ export default function StatsPage() {
                   <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Заказы</span>
                   <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{stats.orders.total}</span>
                 </div>
-                <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>за период</p>
+                <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  в среднем {avgOrdersPerDay} заказа/день
+                </p>
               </div>
+
+              {/* Конверсия */}
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                <div className="flex items-baseline justify-between mb-3">
+                  <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Конверсия</span>
+                  <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{conversionRate}%</span>
+                </div>
+                <div className={`h-2 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                  <div
+                    className="h-full bg-[#FEC004] rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(conversionRate, 100)}%` }}
+                  />
+                </div>
+                <p className={`text-xs sm:text-sm font-light ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  заказов на принятый звонок: <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{stats.calls.accepted > 0 ? `${stats.orders.total}/${stats.calls.accepted}` : '—'}</span>
+                </p>
+              </div>
+
+              {/* Нагрузка */}
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                <div className="flex items-baseline justify-between">
+                  <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Средняя нагрузка</span>
+                  <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{avgCallsPerDay}</span>
+                </div>
+                <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>звонков в день</p>
+              </div>
+
+              {/* Разбивка по статусам заказов */}
+              {stats.orders.byStatus && Object.keys(stats.orders.byStatus).length > 0 && (
+                <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
+                  <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Заказы по статусам</span>
+                  <div className="mt-3 space-y-2">
+                    {Object.entries(stats.orders.byStatus).map(([status, count]) => (
+                      <div key={status} className="flex items-center justify-between text-sm">
+                        <span className={`font-light ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{status}</span>
+                        <span className={`font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : null}
         </div>

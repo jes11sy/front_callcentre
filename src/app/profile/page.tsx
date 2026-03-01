@@ -23,7 +23,9 @@ import {
   XCircle,
   Eye,
   EyeOff,
-  LogOut
+  LogOut,
+  Bell,
+  BellOff
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +36,7 @@ import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -106,6 +109,15 @@ export default function ProfilePage() {
   
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+
+  const {
+    isSupported: isPushSupported,
+    isSubscribed: isPushSubscribed,
+    permission: pushPermission,
+    subscribe: subscribePush,
+    isSubscribing: isPushSubscribing,
+    isLoading: isPushLoading,
+  } = usePushNotifications();
 
   const handleLogout = async () => {
     try {
@@ -533,6 +545,44 @@ export default function ProfilePage() {
               </form>
             )}
           </div>
+
+          {/* Push-уведомления */}
+          {isPushSupported && (
+            <>
+              <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
+              <div className={`flex justify-between items-center py-2`}>
+                <div className="flex items-center gap-2">
+                  {isPushSubscribed ? (
+                    <Bell className={`h-4 w-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
+                  ) : (
+                    <BellOff className={`h-4 w-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
+                  )}
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Push-уведомления</span>
+                </div>
+                <button
+                  onClick={() => subscribePush()}
+                  disabled={isPushSubscribing || pushPermission === 'denied'}
+                  className={`text-sm transition-colors disabled:opacity-50 ${
+                    isPushSubscribed
+                      ? 'text-green-500 hover:text-green-600'
+                      : pushPermission === 'denied'
+                      ? 'text-red-400 cursor-not-allowed'
+                      : `hover:text-[#FEC004] ${isDark ? 'text-gray-400' : 'text-gray-500'}`
+                  }`}
+                >
+                  {isPushLoading
+                    ? 'Загрузка...'
+                    : isPushSubscribing
+                    ? 'Подключение...'
+                    : isPushSubscribed
+                    ? 'Включены'
+                    : pushPermission === 'denied'
+                    ? 'Заблокированы'
+                    : 'Включить'}
+                </button>
+              </div>
+            </>
+          )}
 
           {/* Выход */}
           <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />

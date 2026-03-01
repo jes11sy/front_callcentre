@@ -23,7 +23,9 @@ import {
   PhoneOutgoing,
   FileText,
   Info,
-  GripHorizontal
+  GripHorizontal,
+  MessageSquare,
+  type LucideIcon
 } from 'lucide-react';
 
 // Ключ для localStorage
@@ -213,9 +215,10 @@ export function Sidebar() {
     }
   };
 
-  const navItems = [
+  const navItems: Array<{ name: string; href: string; icon?: string; lucideIcon?: LucideIcon }> = [
     { name: 'Телефония', href: '/telephony', icon: '/img/navigate/telephony.svg' },
     { name: 'Заказы', href: '/orders', icon: '/img/navigate/orders.svg' },
+    { name: 'Обращения', href: '/appeals', lucideIcon: MessageSquare },
     { name: 'Заявки Сайт', href: '/site-orders', icon: '/img/navigate/site-orders.svg' },
     { name: 'Штрафы', href: '/penalties', icon: '/img/navigate/penalties.svg' },
     { name: 'Статистика', href: '/stats', icon: '/img/navigate/stats.svg' },
@@ -256,13 +259,19 @@ export function Sidebar() {
                   />
                 </svg>
               </span>
-              <Image 
-                src={item.icon} 
-                alt={item.name} 
-                width={isMobile ? 24 : 20} 
-                height={isMobile ? 24 : 20} 
-                className={`nav-icon transition-all ${active ? 'nav-icon-active' : ''} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
-              />
+              {item.lucideIcon ? (
+                <item.lucideIcon
+                  className={`nav-icon transition-all shrink-0 ${active ? 'text-[#FEC004]' : 'text-gray-500 dark:text-gray-400'} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
+                />
+              ) : (
+                <Image
+                  src={item.icon!}
+                  alt={item.name}
+                  width={isMobile ? 24 : 20}
+                  height={isMobile ? 24 : 20}
+                  className={`nav-icon transition-all ${active ? 'nav-icon-active' : ''} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
+                />
+              )}
               <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
                 {item.name}
               </span>
@@ -327,31 +336,6 @@ export function Sidebar() {
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    {/* Push notifications button - всегда показываем, как debug кнопка */}
-                    <button
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        subscribePush(); 
-                      }}
-                      disabled={isPushSubscribing}
-                      className={`text-xs hover:underline ${
-                        isPushSubscribed 
-                          ? 'text-green-500' 
-                          : 'text-[#FEC004]'
-                      } disabled:opacity-50`}
-                    >
-                      {isPushLoading 
-                        ? 'Загрузка...'
-                        : isPushSubscribing 
-                          ? 'Подключение...' 
-                          : isPushSubscribed 
-                            ? 'Push включен' 
-                            : pushPermission === 'denied'
-                              ? 'Push заблокирован'
-                              : 'Включить push'
-                      }
-                    </button>
                     {unreadCount > 0 && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
@@ -488,27 +472,6 @@ export function Sidebar() {
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">
-                    {/* Push notifications button - mobile, всегда показываем */}
-                    <button
-                      onClick={() => subscribePush()}
-                      disabled={isPushSubscribing}
-                      className={`text-xs hover:underline ${
-                        isPushSubscribed 
-                          ? 'text-green-500' 
-                          : 'text-[#FEC004]'
-                      } disabled:opacity-50`}
-                    >
-                      {isPushLoading 
-                        ? 'Загрузка...'
-                        : isPushSubscribing 
-                          ? 'Подключение...' 
-                          : isPushSubscribed 
-                            ? 'Push включен' 
-                            : pushPermission === 'denied'
-                              ? 'Push заблокирован'
-                              : 'Включить push'
-                      }
-                    </button>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}

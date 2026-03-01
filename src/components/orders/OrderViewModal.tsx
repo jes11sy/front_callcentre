@@ -19,7 +19,7 @@ import { STATUS_LABELS, STATUS_COLORS, STATUS_COLORS_V2 } from '@/constants/orde
 import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 
-type ViewTab = 'info' | 'documents' | 'history';
+type ViewTab = 'info' | 'documents' | 'history' | 'calls';
 
 interface OrderViewModalProps {
   isOpen: boolean;
@@ -156,6 +156,16 @@ const OrderViewModalComponent = ({
           >
             История
           </button>
+          <button
+            onClick={() => setActiveTab('calls')}
+            className={`flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'calls'
+                ? 'text-[#FEC004] border-b-2 border-[#FEC004] -mb-px'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            Звонки{orderCalls.length > 0 && <span className="ml-1 text-xs opacity-60">({orderCalls.length})</span>}
+          </button>
         </div>
       
         {/* Content */}
@@ -179,6 +189,15 @@ const OrderViewModalComponent = ({
               history={history} 
               loading={loadingHistory} 
               onRefresh={loadHistory}
+            />
+          )}
+
+          {activeTab === 'calls' && (
+            <CallsTab
+              orderCalls={orderCalls}
+              loadingCalls={loadingCalls}
+              loadRecording={loadRecording}
+              formatDate={formatDate}
             />
           )}
         </div>
@@ -501,6 +520,93 @@ const HistoryTab = ({
           })}
         </div>
       )}
+    </div>
+  );
+};
+
+// Вкладка "Звонки"
+const CallsTab = ({
+  orderCalls,
+  loadingCalls,
+  loadRecording,
+  formatDate,
+}: {
+  orderCalls: Call[];
+  loadingCalls: boolean;
+  loadRecording: (call: Call) => void;
+  formatDate: (date: string | number) => string;
+}) => {
+  if (loadingCalls) {
+    return (
+      <div className="p-4 flex items-center justify-center py-8">
+        <LoadingSpinner size="md" />
+      </div>
+    );
+  }
+
+  if (orderCalls.length === 0) {
+    return (
+      <div className="p-4">
+        <div className="flex flex-col items-center justify-center py-8 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700">
+          <Play className="w-8 h-8 mb-2 text-gray-300 dark:text-gray-600" />
+          <span className="text-sm text-gray-400 dark:text-gray-500">Звонков по номеру клиента не найдено</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 space-y-3">
+      <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">
+        Звонки с этим клиентом ({orderCalls.length})
+      </h3>
+      {orderCalls.map((call) => {
+        const callDate = (call as unknown as { createdAt?: string }).createdAt;
+        const isIncoming = !call.phoneClient?.toLowerCase().includes('sip:');
+        return (
+          <div
+            key={call.id}
+            className="p-3 bg-white dark:bg-[#252d3a] rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-xs px-2 py-0.5 rounded-full border ${
+                    call.status === 'answered'
+                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30'
+                      : call.status === 'missed'
+                      ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30'
+                      : 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-500/30'
+                  }`}>
+                    {call.status === 'answered' ? 'Отвечен' : call.status === 'missed' ? 'Пропущен' : call.status === 'busy' ? 'Занято' : 'Нет ответа'}
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {isIncoming ? 'Входящий' : 'Исходящий'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  {callDate && <span>{new Date(callDate).toLocaleString('ru-RU')}</span>}
+                  {call.duration && (
+                    <span>• {Math.floor(call.duration / 60)}:{String(call.duration % 60).padStart(2, '0')}</span>
+                  )}
+                  {call.operator?.name && <span>• {call.operator.name}</span>}
+                </div>
+              </div>
+              {call.recordingPath && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => loadRecording(call)}
+                  className="shrink-0 h-9 w-9 p-0 text-[#FEC004] hover:bg-[#FEC004]/10 border border-[#FEC004]/30 rounded-full"
+                  title="Прослушать"
+                >
+                  <Play className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

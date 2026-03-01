@@ -307,7 +307,7 @@ export default function MessagesPage() {
   // Убираем полный скелетон страницы - показываем только кастомный скелетон списка чатов
 
   // Временная заглушка - тех обслуживание
-  const showMaintenance = true;
+  const showMaintenance = false;
 
   return (
     <DashboardLayout>

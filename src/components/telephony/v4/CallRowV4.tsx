@@ -16,11 +16,15 @@ import {
   PhoneMissed,
   MapPin,
   User,
-  Clock
+  Clock,
+  MessageSquare
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
 import { useDesignStore } from '@/store/designStore';
+import { useState } from 'react';
+import { CreateAppealModal } from '@/components/appeals/CreateAppealModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Склонение слов
 function pluralize(count: number, one: string, few: string, many: string): string {
@@ -90,6 +94,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
   orderHistoryLoading: _orderHistoryLoading
 }) => {
   const { theme } = useDesignStore();
+  const queryClient = useQueryClient();
+  const [appealModalOpen, setAppealModalOpen] = useState(false);
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU', {
       hour: '2-digit',
@@ -451,6 +457,19 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1" />
                 <span className="hidden sm:inline">Новый заказ</span>
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAppealModalOpen(true)}
+                className={cn(
+                  "h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm",
+                  "text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                )}
+                title="Создать обращение"
+              >
+                <MessageSquare className="w-3.5 h-3.5 sm:mr-1" />
+                <span className="hidden sm:inline">Обращение</span>
+              </Button>
             </>
           ) : (
             call.recordingPath && (
@@ -469,6 +488,18 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
           )}
         </div>
       </TableCell>
+      {appealModalOpen && (
+        <CreateAppealModal
+          open={appealModalOpen}
+          onOpenChange={setAppealModalOpen}
+          initialPhone={displayPhone}
+          initialCallId={call.id}
+          onSaved={() => {
+            setAppealModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['appeals'] });
+          }}
+        />
+      )}
     </TableRow>
   );
 }, (prevProps, nextProps) => {

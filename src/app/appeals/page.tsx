@@ -97,6 +97,7 @@ export default function AppealsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppeal, setEditingAppeal] = useState<Appeal | null>(null);
   const [detailAppeal, setDetailAppeal] = useState<Appeal | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const { data, isLoading, error } = useQuery<AppealsResponse>({
     queryKey: ['appeals', page, search, statusFilter, categoryFilter],
@@ -112,6 +113,15 @@ export default function AppealsPage() {
     },
   });
 
+  const { data: statsData } = useQuery<{ success: boolean; data: { total: number; byStatus: Record<string, number>; byCategory: Record<string, number> } }>({
+    queryKey: ['appeals-stats'],
+    queryFn: async () => {
+      const response = await api.get('/appeals/stats');
+      return response.data;
+    },
+    staleTime: 30000,
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: AppealStatus }) => {
       const response = await api.patch(`/appeals/${id}`, { status });
@@ -119,6 +129,7 @@ export default function AppealsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appeals'] });
+      queryClient.invalidateQueries({ queryKey: ['appeals-stats'] });
       toast.success('Статус обновлён');
     },
     onError: () => toast.error('Ошибка при обновлении статуса'),
@@ -130,7 +141,9 @@ export default function AppealsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appeals'] });
+      queryClient.invalidateQueries({ queryKey: ['appeals-stats'] });
       setDetailAppeal(null);
+      setConfirmDeleteId(null);
       toast.success('Обращение удалено');
     },
     onError: () => toast.error('Ошибка при удалении'),
@@ -148,9 +161,7 @@ export default function AppealsPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Удалить обращение?')) {
-      deleteMutation.mutate(id);
-    }
+    setConfirmDeleteId(id);
   };
 
   if (isLoading && !data) {
@@ -169,7 +180,7 @@ export default function AppealsPage() {
         <div className="flex items-center justify-center min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <p className="text-red-400 dark:text-red-400 text-gray-700">Ошибка загрузки обращений</p>
+            <p className="text-red-500 dark:text-red-400">Ошибка загрузки обращений</p>
             <p className="text-sm text-gray-500 mt-1">API /appeals не подключён к бэкенду</p>
           </div>
         </div>
@@ -235,14 +246,13 @@ export default function AppealsPage() {
             </div>
 
             {/* Статистика */}
-            {data?.data && (
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4">
-                {STATUS_FLOW.map((s) => {
-                  const count = data.data.filter((a) => a.status === s).length;
-                  return (
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4">
+              {STATUS_FLOW.map((s) => {
+                const count = statsData?.data?.byStatus?.[s] ?? 0;
+                return (
                     <button
                       key={s}
-                      onClick={() => setStatusFilter(statusFilter === s ? '' : s)}
+                      onClick={() => { setStatusFilter(statusFilter === s ? '' : s); setPage(1); }}
                       className={`p-2.5 rounded-lg border text-left transition-all ${
                         statusFilter === s
                           ? isDark ? 'bg-[#FEC004]/20 border-[#FEC004]/50' : 'bg-[#FEC004]/10 border-[#FEC004]/40'
@@ -254,8 +264,7 @@ export default function AppealsPage() {
                     </button>
                   );
                 })}
-              </div>
-            )}
+            </div>
 
             {/* Таблица */}
             <div className={`rounded-lg border overflow-hidden ${isDark ? 'bg-[#1e2530] border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -535,10 +544,45 @@ export default function AppealsPage() {
         appeal={editingAppeal}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ['appeals'] });
+          queryClient.invalidateQueries({ queryKey: ['appeals-stats'] });
           setIsModalOpen(false);
           setEditingAppeal(null);
         }}
       />
+
+      {/* Confirm Delete Dialog */}
+      {confirmDeleteId !== null && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4">
+          <div className={`w-full max-w-sm rounded-xl p-6 shadow-2xl ${isDark ? 'bg-[#1e2530] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Удалить обращение?</h3>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Это действие необратимо.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => setConfirmDeleteId(null)}
+                className={isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              >
+                Отмена
+              </Button>
+              <Button
+                onClick={() => deleteMutation.mutate(confirmDeleteId)}
+                disabled={deleteMutation.isPending}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Удалить
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

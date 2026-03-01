@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { Order, Call, OrderHistoryItem } from '@/types/orders';
 import { STATUS_LABELS, STATUS_COLORS, STATUS_COLORS_V2 } from '@/constants/orders';
-import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 
 type ViewTab = 'info' | 'documents' | 'history' | 'calls';
@@ -28,10 +27,6 @@ interface OrderViewModalProps {
   orderCalls: Call[];
   loadingCalls: boolean;
   loadRecording: (call: Call) => void;
-  skipBackward?: () => void;
-  skipForward?: () => void;
-  seekTo?: (time: number) => void;
-  setVolume?: (volume: number) => void;
   formatDate: (date: string | number) => string;
   onEdit?: () => void;
 }
@@ -49,7 +44,6 @@ const OrderViewModalComponent = ({
   const [activeTab, setActiveTab] = useState<ViewTab>('info');
   const [history, setHistory] = useState<OrderHistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const { theme } = useDesignStore();
 
   // Сброс состояния при смене заказа
   useEffect(() => {
@@ -57,13 +51,18 @@ const OrderViewModalComponent = ({
     setActiveTab('info');
   }, [order?.id]);
 
+  // Сброс истории при обновлении заказа (чтобы подгрузить свежие данные)
+  useEffect(() => {
+    setHistory([]);
+  }, [order?.updatedAt]);
+
   // Загрузка истории при переключении на вкладку
   useEffect(() => {
     if (activeTab === 'history' && order && history.length === 0) {
       loadHistory();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, order?.id]);
+  }, [activeTab, order?.id, order?.updatedAt, history.length]);
 
   const loadHistory = async () => {
     if (!order) return;

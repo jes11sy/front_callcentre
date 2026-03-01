@@ -5,37 +5,59 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
 import { OrderFilters } from '@/types/orders';
 import { STATUS_OPTIONS } from '@/constants/orders';
 import { useCities } from '@/hooks/useStaticData';
-import { useDesignStore } from '@/store/designStore';
-
 interface OrdersFiltersProps {
   filters: OrderFilters;
   onFilterChange: (key: keyof OrderFilters, value: string) => void;
+  onReset?: () => void;
 }
 
-export const OrdersFilters = ({ filters, onFilterChange }: OrdersFiltersProps) => {
+export const OrdersFilters = ({ filters, onFilterChange, onReset }: OrdersFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: cities = [] } = useCities();
-  const { theme } = useDesignStore();
+
+  const hasActiveFilters = !!(
+    filters.searchId || filters.searchPhone || filters.searchAddress ||
+    (filters.status && filters.status !== 'all') || filters.cityId ||
+    filters.master || filters.closingDate
+  );
 
   return (
     <div className="w-full font-myriad">
-      {/* Кнопка фильтров */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full sm:w-auto justify-center bg-white dark:bg-[#252d3a] border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004] min-w-[120px] sm:min-w-[140px]"
-      >
-        <Filter className="mr-2 h-4 w-4" />
-        Фильтры
-        {isOpen ? (
-          <ChevronUp className="ml-2 h-4 w-4" />
-        ) : (
-          <ChevronDown className="ml-2 h-4 w-4" />
+      {/* Кнопки управления фильтрами */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-full sm:w-auto justify-center bg-white dark:bg-[#252d3a] border text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004] min-w-[120px] sm:min-w-[140px] ${
+            hasActiveFilters
+              ? 'border-[#FEC004] text-[#FEC004]'
+              : 'border-gray-200 dark:border-gray-600'
+          }`}
+        >
+          <Filter className="mr-2 h-4 w-4" />
+          Фильтры
+          {hasActiveFilters && <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-[#FEC004]" />}
+          {isOpen ? (
+            <ChevronUp className="ml-2 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-2 h-4 w-4" />
+          )}
+        </Button>
+        {hasActiveFilters && onReset && (
+          <Button
+            onClick={onReset}
+            variant="ghost"
+            size="sm"
+            className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 gap-1.5"
+          >
+            <X className="h-3.5 w-3.5" />
+            Сбросить
+          </Button>
         )}
-      </Button>
+      </div>
 
       {/* Раскрывающиеся фильтры */}
       {isOpen && (

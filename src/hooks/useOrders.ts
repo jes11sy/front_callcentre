@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Order, OrdersResponse, OrderFilters, Call } from '@/types/orders';
 import { notifications } from '@/components/ui/notifications';
@@ -15,9 +14,7 @@ const formatDateForApi = (date: Date): string => {
 };
 
 export const useOrders = () => {
-  const router = useRouter();
   const { user } = useAuthStore();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   // Состояние фильтров
@@ -126,22 +123,6 @@ export const useOrders = () => {
     staleTime: 30000, // Кэшируем на 30 секунд
   });
 
-  // Обработка параметра orderId из URL
-  useEffect(() => {
-    const orderId = searchParams.get('orderId');
-    if (orderId && ordersData?.orders) {
-      const order = ordersData.orders.find(o => o.id === parseInt(orderId));
-      if (order) {
-        setSelectedOrder(order);
-        setIsViewModalOpen(true);
-        // Очищаем URL параметр
-        const url = new URL(window.location.href);
-        url.searchParams.delete('orderId');
-        window.history.replaceState({}, '', url.toString());
-      }
-    }
-  }, [searchParams, ordersData?.orders]);
-
   // 🍪 Обновление статуса заказа через axios
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
@@ -214,7 +195,7 @@ export const useOrders = () => {
           }
         })
       );
-      setOrderCalls(calls.filter(call => call !== null && call.recordingPath));
+      setOrderCalls(calls.filter(call => call !== null));
     } catch (error) {
       console.error('Error loading calls:', error);
       setOrderCalls([]);

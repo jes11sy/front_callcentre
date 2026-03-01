@@ -102,6 +102,7 @@ function OrdersContent() {
     handleCloseViewModal,
     handleEditOrder,
     updateFilter,
+    resetFilters,
     loadOrderCalls: _loadOrderCalls,
     setPage,
     setLimit,
@@ -180,6 +181,7 @@ function OrdersContent() {
                 <OrdersFilters 
                   filters={filters}
                   onFilterChange={updateFilter}
+                  onReset={resetFilters}
                 />
               }
             />
@@ -195,10 +197,6 @@ function OrdersContent() {
               orderCalls={orderCalls}
               loadingCalls={loadingCalls}
               loadRecording={loadRecording}
-              skipBackward={() => {}}
-              skipForward={() => {}}
-              seekTo={() => {}}
-              setVolume={() => {}}
               formatDate={(date) => new Date(date).toLocaleString('ru-RU')}
               onEdit={() => {
                 setIsEditModalOpen(true);

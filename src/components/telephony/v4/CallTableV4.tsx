@@ -16,7 +16,6 @@ import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { Call } from '@/types/telephony';
-import { useDesignStore } from '@/store/designStore';
 
 // Размеры для пагинации по группам
 const GROUP_SIZES = [
@@ -92,8 +91,6 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLimitChange,
   stats
 }) => {
-  const { theme } = useDesignStore();
-  
   // Local state
   const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');

@@ -17,7 +17,6 @@ export const orderBaseSchema = z.object({
 export const chatOrderSchema = orderBaseSchema.extend({
   rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
   cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
-  avitoChatId: z.string().optional(),
 });
 
 // Схема для создания заказа из звонка (дополнительные поля)

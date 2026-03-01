@@ -25,6 +25,8 @@ export interface Call {
     name: string;
     login: string;
   };
+  orderId?: number | null;
+  appealId?: number | null;
   avito?: {
     id: number;
     name: string;

@@ -1,5 +1,5 @@
 // 🍪 API клиент с httpOnly cookies поддержкой
-import { CreateOrderFromChatData, CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
+import { CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
 import api from '@/lib/api'; // Используем настроенный axios instance
 
 // API для заказов
@@ -7,12 +7,6 @@ export const ordersApi = {
   // Создание заказа с нуля
   async create(data: CreateOrderData): Promise<ApiResponse> {
     const response = await api.post('/orders', data);
-    return response.data;
-  },
-
-  // Создание заказа из чата
-  async createFromChat(data: CreateOrderFromChatData): Promise<ApiResponse> {
-    const response = await api.post('/orders/from-chat', data);
     return response.data;
   },
 
@@ -72,27 +66,6 @@ export const callsApi = {
   // Получение истории заказов по телефону
   async getOrderHistory(phone: string): Promise<ApiResponse> {
     const response = await api.get(`/orders?search=${encodeURIComponent(phone)}`);
-    return response.data;
-  }
-};
-
-// API для чатов
-export const chatsApi = {
-  // Получение чатов
-  async getChats(): Promise<ApiResponse> {
-    const response = await api.get('/chats');
-    return response.data;
-  },
-
-  // Получение сообщений чата
-  async getChatMessages(chatId: string): Promise<ApiResponse> {
-    const response = await api.get(`/chats/${chatId}/messages`);
-    return response.data;
-  },
-
-  // Отправка сообщения
-  async sendMessage(chatId: string, message: string): Promise<ApiResponse> {
-    const response = await api.post(`/chats/${chatId}/messages`, { message });
     return response.data;
   }
 };

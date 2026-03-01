@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
+import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
@@ -398,29 +399,11 @@ export default function SiteOrdersPage() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Показано {data.data.length} из {data.pagination.total} заявок
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004]"
-                  >
-                    Назад
-                  </Button>
-                  <span className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
-                    {page} / {data.pagination.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
-                    disabled={page === data.pagination.totalPages}
-                    className="border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004]"
-                  >
-                    Далее
-                  </Button>
-                </div>
+                <OptimizedPagination
+                  currentPage={page}
+                  totalPages={data.pagination.totalPages}
+                  onPageChange={setPage}
+                />
               </div>
             )}
           </div>

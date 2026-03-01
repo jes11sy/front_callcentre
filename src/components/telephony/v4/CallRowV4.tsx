@@ -406,6 +406,23 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             >
               {statusConfig.label}
             </Badge>
+            {/* Итог звонка */}
+            {call.orderId && (
+              <Badge
+                variant="outline"
+                className="text-[10px] sm:text-xs border-green-400/50 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10"
+              >
+                Заказ #{call.orderId}
+              </Badge>
+            )}
+            {call.appealId && !call.orderId && (
+              <Badge
+                variant="outline"
+                className="text-[10px] sm:text-xs border-purple-400/50 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10"
+              >
+                Обращение
+              </Badge>
+            )}
           </div>
         </div>
       </TableCell>

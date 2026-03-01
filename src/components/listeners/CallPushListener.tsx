@@ -15,7 +15,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
  */
 export function CallPushListener() {
   const { on, isConnected } = useGlobalSocket();
-  const { isPushSubscribed } = usePushNotifications();
+  const { isSubscribed: isPushSubscribed } = usePushNotifications();
 
   useEffect(() => {
     if (!isConnected) return;

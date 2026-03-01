@@ -52,21 +52,6 @@ export const useEquipmentTypes = () => {
   });
 };
 
-// Хук для получения списка Авито аккаунтов
-export const useAvitoAccounts = () => {
-  return useQuery({
-    queryKey: ['avito-accounts'],
-    queryFn: async () => {
-      const response = await api.get('/avito-accounts');
-      return response.data;
-    },
-    staleTime: 30 * 60 * 1000, // 30 минут
-    gcTime: 60 * 60 * 1000, // 1 час
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-};
-
 // Хук для получения операторов
 export const useOperators = () => {
   return useQuery({

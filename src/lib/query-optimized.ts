@@ -66,7 +66,6 @@ export const queryKeys = {
   calls: ['calls'] as const,
   messages: ['messages'] as const,
   stats: ['stats'] as const,
-  avito: ['avito'] as const,
   employees: ['employees'] as const,
 } as const;
 

@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { GlobalSearch } from './GlobalSearch';
 import { 
   User, 
   Sun,
@@ -215,6 +216,19 @@ export function Sidebar() {
     }
   };
 
+  // Ctrl+K для глобального поиска
+  const [searchOpen, setSearchOpen] = useState(false);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const navItems: Array<{ name: string; href: string; icon?: string; lucideIcon?: LucideIcon }> = [
     { name: 'Телефония', href: '/telephony', icon: '/img/navigate/telephony.svg' },
     { name: 'Заказы', href: '/orders', icon: '/img/navigate/orders.svg' },
@@ -230,6 +244,13 @@ export function Sidebar() {
   // Контент меню (переиспользуется для десктопа и мобильной версии)
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
+      {/* Global Search */}
+      {!isMobile && (
+        <div className="px-5 mb-2">
+          <GlobalSearch />
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className={`flex-1 px-5 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
         {navItems.map((item) => {

@@ -123,23 +123,25 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
     return orders.filter(order => ACTIVE_STATUSES.includes(order.status?.name || ''));
   }, [orders]);
 
-  // Получаем уникальные города из заказов на выбранную дату
+  // Получаем уникальные города (name + id) из заказов на выбранную дату
   const cities = useMemo(() => {
-    const citySet = new Set<string>();
+    const cityMap = new Map<string, number>(); // name → id
     
     activeOrders.forEach(order => {
-      if (!order.dateMeeting || !order.city?.name) return;
+      if (!order.dateMeeting || !order.city?.name || !order.city?.id) return;
       const orderTime = new Date(order.dateMeeting);
       
       if (isSameDate(orderTime, selectedDate)) {
-        citySet.add(order.city.name);
+        cityMap.set(order.city.name, order.city.id);
       }
     });
     
-    return Array.from(citySet).sort();
+    return Array.from(cityMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b, 'ru'))
+      .map(([name, id]) => ({ name, id }));
   }, [activeOrders, selectedDate, isSameDate]);
 
-  // Подсчёт заказов на выбранную дату по городам
+  // Подсчёт заказов на выбранную дату по городам (ключ — city.name)
   const cityCounts = useMemo(() => {
     const counts: Record<string, number> = { all: 0 };
     
@@ -159,14 +161,23 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
     return counts;
   }, [activeOrders, selectedDate, isSameDate]);
 
-  // Обработчик клика на город
-  const handleCityClick = useCallback((city: string) => {
-    setActiveCity(city);
+  // Маппинг city.name → city.id для передачи ID во внешний onCityClick
+  const cityNameToId = useMemo(() => {
+    return Object.fromEntries(cities.map(c => [c.name, c.id]));
+  }, [cities]);
+
+  // Обработчик клика на город — внутри храним name, наружу отдаём cityId
+  const handleCityClick = useCallback((cityName: string) => {
+    setActiveCity(cityName);
     if (onCityClick) {
-      // Передаем пустую строку для "Все города" чтобы сбросить фильтр
-      onCityClick(city === 'all' ? '' : city);
+      if (cityName === 'all') {
+        onCityClick('');
+      } else {
+        const cityId = cityNameToId[cityName];
+        onCityClick(cityId ? String(cityId) : '');
+      }
     }
-  }, [onCityClick]);
+  }, [onCityClick, cityNameToId]);
 
   // Переключение даты
   const goToPrevDay = useCallback(() => {
@@ -314,21 +325,21 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   <span>Все города</span>
                   <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts.all || 0}</span>
                 </button>
-                {cities.map(city => (
+                {cities.map(c => (
                   <button
-                    key={city}
+                    key={c.id}
                     onClick={() => {
-                      handleCityClick(city);
+                      handleCityClick(c.name);
                       setIsCityDropdownOpen(false);
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
-                      activeCity === city
+                      activeCity === c.name
                         ? 'bg-[#FEC004]/20 text-[#FEC004]'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]'
                     }`}
                   >
-                    <span>{city}</span>
-                    <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts[city] || 0}</span>
+                    <span>{c.name}</span>
+                    <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts[c.name] || 0}</span>
                   </button>
                 ))}
               </div>
@@ -401,23 +412,23 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               </span>
             </button>
             
-            {cities.map(city => (
+            {cities.map(c => (
               <button
-                key={city}
-                onClick={() => handleCityClick(city)}
+                key={c.id}
+                onClick={() => handleCityClick(c.name)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  activeCity === city
+                  activeCity === c.name
                     ? 'bg-[#FEC004] text-gray-900'
                     : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
                 }`}
               >
-                {city}
+                {c.name}
                 <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
-                  activeCity === city 
+                  activeCity === c.name 
                     ? 'bg-gray-900/10'
                     : 'bg-[#FEC004]/20 text-[#FEC004]'
                 }`}>
-                  {cityCounts[city] || 0}
+                  {cityCounts[c.name] || 0}
                 </span>
               </button>
             ))}

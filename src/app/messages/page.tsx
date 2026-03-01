@@ -30,7 +30,6 @@ import { MessageInputWrapper } from '@/components/messages/MessageInputWrapper';
 // Types
 import { 
   AvitoChat, 
-  QuickReply, 
   LinkedOrder 
 } from '@/types/avito';
 
@@ -99,10 +98,6 @@ export default function MessagesPage() {
     cleanup
   } = useAutoRefresh();
   
-  // UI state
-  const [quickReplies] = useState<QuickReply[]>([]);
-  const [showQuickReplies, setShowQuickReplies] = useState(false);
-  
   // Dialog states
   const [showCreateOrderModal, setShowCreateOrderModal] = useState(false);
   const [showLinkedOrdersModal, setShowLinkedOrdersModal] = useState(false);
@@ -137,13 +132,6 @@ export default function MessagesPage() {
   // scrollToMessage removed - not used
 
 
-
-  const handleQuickReply = useCallback((_reply: QuickReply) => {
-    if (selectedChat) {
-      // TODO: Implement quick reply functionality
-      setShowQuickReplies(false);
-    }
-  }, [selectedChat]);
 
   const handleSendMessage = useCallback(async (messageText: string) => {
     if (selectedChat) {
@@ -460,10 +448,6 @@ export default function MessagesPage() {
                 <MessageInputWrapper
                   onSend={handleSendMessage}
                   sending={sendingMessage}
-                  quickReplies={quickReplies}
-                  showQuickReplies={showQuickReplies}
-                  onToggleQuickReplies={() => setShowQuickReplies(!showQuickReplies)}
-                  onQuickReply={handleQuickReply}
                 />
               </>
             )}

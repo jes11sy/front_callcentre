@@ -14,7 +14,9 @@ import {
   Phone,
   User,
   MapPin,
-  MessageSquare
+  MessageSquare,
+  Clock,
+  AlarmClock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,13 +29,14 @@ export const dynamic = 'force-dynamic';
 
 interface SiteOrder {
   id: number;
-  city: string;
+  city: { id: number; name: string } | null;
   site: string;
   clientName: string;
   phone: string;
   status: string;
   comment: string | null;
   commentOperator: string | null;
+  callbackAt: string | null;
   createdAt: string;
   orderId: number | null;
 }
@@ -49,6 +52,25 @@ interface SiteOrdersResponse {
 }
 
 const STATUS_OPTIONS = ['Создан', 'В обработке', 'Перезвонить', 'Не отвечает', 'Отказ'] as const;
+
+const isCallbackOverdue = (callbackAt: string | null): boolean => {
+  if (!callbackAt) return false;
+  return new Date(callbackAt) < new Date();
+};
+
+const formatCallbackTime = (callbackAt: string): string => {
+  const date = new Date(callbackAt);
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  
+  if (diffMin < -60 * 24) {
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+  if (diffMin < 0) return `просрочено на ${Math.abs(diffMin)} мин`;
+  if (diffMin < 60) return `через ${diffMin} мин`;
+  return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+};
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -78,6 +100,7 @@ export default function SiteOrdersPage() {
   const [selectedSiteOrder, setSelectedSiteOrder] = useState<SiteOrder | null>(null);
   const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
   const [editingComment, setEditingComment] = useState<{ id: number; value: string } | null>(null);
+  const [callbackModal, setCallbackModal] = useState<{ id: number; value: string } | null>(null);
 
   // Fetch site orders
   const { data, isLoading, error } = useQuery<SiteOrdersResponse>({
@@ -96,8 +119,8 @@ export default function SiteOrdersPage() {
 
   // Update status mutation
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await api.patch(`/site-orders/${id}/status`, { status });
+    mutationFn: async ({ id, status, callbackAt }: { id: number; status: string; callbackAt?: string }) => {
+      const response = await api.patch(`/site-orders/${id}/status`, { status, callbackAt });
       return response.data;
     },
     onSuccess: () => {
@@ -126,7 +149,22 @@ export default function SiteOrdersPage() {
   });
 
   const handleStatusChange = (id: number, status: string) => {
-    updateStatusMutation.mutate({ id, status });
+    if (status === 'Перезвонить') {
+      // Предлагаем выбрать время перезвона (по умолчанию через 30 минут)
+      const defaultTime = new Date(Date.now() + 30 * 60000);
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const localIso = `${defaultTime.getFullYear()}-${pad(defaultTime.getMonth() + 1)}-${pad(defaultTime.getDate())}T${pad(defaultTime.getHours())}:${pad(defaultTime.getMinutes())}`;
+      setCallbackModal({ id, value: localIso });
+    } else {
+      updateStatusMutation.mutate({ id, status });
+    }
+  };
+
+  const handleConfirmCallback = () => {
+    if (!callbackModal) return;
+    const callbackAt = new Date(callbackModal.value).toISOString();
+    updateStatusMutation.mutate({ id: callbackModal.id, status: 'Перезвонить', callbackAt });
+    setCallbackModal(null);
   };
 
   const handleCreateOrder = (siteOrder: SiteOrder) => {
@@ -248,11 +286,25 @@ export default function SiteOrdersPage() {
                         className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a] transition-colors"
                       >
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{order.id}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{order.city}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{order.city?.name || '—'}</td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{order.site}</td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{order.clientName}</td>
                         <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">{order.phone}</td>
                         <td className="px-4 py-3">
+                          {/* Индикатор дедлайна перезвона */}
+                          {order.status === 'Перезвонить' && order.callbackAt && (
+                            <div className={`flex items-center gap-1 mb-1.5 text-xs font-medium ${
+                              isCallbackOverdue(order.callbackAt)
+                                ? 'text-red-500 dark:text-red-400'
+                                : 'text-purple-600 dark:text-purple-400'
+                            }`}>
+                              {isCallbackOverdue(order.callbackAt)
+                                ? <AlarmClock className="h-3.5 w-3.5 flex-shrink-0" />
+                                : <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                              }
+                              <span>{formatCallbackTime(order.callbackAt)}</span>
+                            </div>
+                          )}
                           <Select 
                             value={order.status} 
                             onValueChange={(value) => handleStatusChange(order.id, value)}
@@ -374,6 +426,50 @@ export default function SiteOrdersPage() {
           </div>
         </div>
       </div>
+
+      {/* Callback Time Picker Modal */}
+      {callbackModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4">
+          <div className={`w-full max-w-sm rounded-xl p-6 shadow-2xl ${isDark ? 'bg-[#1e2530] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Время перезвона</h3>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Когда перезвонить клиенту?</p>
+              </div>
+            </div>
+            <input
+              type="datetime-local"
+              value={callbackModal.value}
+              onChange={(e) => setCallbackModal({ ...callbackModal, value: e.target.value })}
+              className={`w-full h-10 px-3 rounded-lg border text-sm mb-4 focus:outline-none focus:border-purple-400 ${
+                isDark
+                  ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
+                  : 'bg-white border-gray-200 text-gray-900'
+              }`}
+            />
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => setCallbackModal(null)}
+                className={isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              >
+                Отмена
+              </Button>
+              <Button
+                onClick={handleConfirmCallback}
+                disabled={updateStatusMutation.isPending || !callbackModal.value}
+                className="bg-purple-500 hover:bg-purple-600 text-white"
+              >
+                {updateStatusMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Поставить
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Order Modal */}
       <CreateOrderFromSiteModal

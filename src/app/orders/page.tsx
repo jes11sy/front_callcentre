@@ -115,9 +115,9 @@ function OrdersContent() {
     setTimelineDate
   } = useOrders();
 
-  // Обработчик клика на город во временной шкале
-  const handleCityClick = React.useCallback((city: string) => {
-    updateFilter('city', city);
+  // Обработчик клика на город во временной шкале — передаёт cityId
+  const handleCityClick = React.useCallback((cityId: string) => {
+    updateFilter('cityId', cityId);
   }, [updateFilter]);
 
   // Открываем заказ по ID из URL (только один раз)

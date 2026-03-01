@@ -1,49 +1,52 @@
 'use client';
 
-// 🍪 Хуки для получения статических данных с httpOnly cookies
+// 🍪 Хуки для получения справочных данных с /references/*
 import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api'; // Используем настроенный axios instance
+import api from '@/lib/api';
 
-// Хук для получения списка городов (возвращает { id, name }[])
+const STALE_TIME = 30 * 60 * 1000; // 30 минут
+const GC_TIME = 60 * 60 * 1000;    // 1 час
+
+// Хук для получения списка городов из справочника
 export const useCities = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['cities'],
     queryFn: async () => {
-      const response = await api.get('/orders/filter-options');
-      return response.data?.data?.cities || [];
+      const response = await api.get('/references/cities', { params: { isActive: true } });
+      return (response.data?.data || []).map((c: { id: number; name: string }) => ({ id: c.id, name: c.name }));
     },
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     retry: 1,
     refetchOnWindowFocus: false,
   });
 };
 
-// Хук для получения списка РК (возвращает { id, name }[])
+// Хук для получения списка РК из справочника
 export const useRKs = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['rks'],
     queryFn: async () => {
-      const response = await api.get('/orders/filter-options');
-      return response.data?.data?.rks || [];
+      const response = await api.get('/references/rks', { params: { isActive: true } });
+      return (response.data?.data || []).map((r: { id: number; name: string }) => ({ id: r.id, name: r.name }));
     },
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     retry: 1,
     refetchOnWindowFocus: false,
   });
 };
 
-// Хук для получения списка типов оборудования (возвращает { id, name }[])
+// Хук для получения списка типов оборудования из справочника
 export const useEquipmentTypes = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['equipmentTypes'],
     queryFn: async () => {
-      const response = await api.get('/orders/filter-options');
-      return response.data?.data?.equipmentTypes || [];
+      const response = await api.get('/references/equipment-types', { params: { isActive: true } });
+      return (response.data?.data || []).map((e: { id: number; name: string }) => ({ id: e.id, name: e.name }));
     },
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     retry: 1,
     refetchOnWindowFocus: false,
   });

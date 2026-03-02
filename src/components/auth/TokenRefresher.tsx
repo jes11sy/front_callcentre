@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { authLogger } from '@/lib/logger';
@@ -9,26 +9,30 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
-// 🔄 Silent Refresh - обновляем токен каждые 4 минуты (токен живёт 15 минут)
-const REFRESH_INTERVAL = 4 * 60 * 1000; // 4 минуты
+const REFRESH_INTERVAL = 4 * 60 * 1000; // 4 минуты (токен живёт 15 минут)
+const INITIAL_REFRESH_DELAY = 30 * 1000; // 30 секунд после монтирования
+const MAX_CONSECUTIVE_FAILURES = 3;
 
 /**
- * 🍪 TokenRefresher - проактивно обновляет httpOnly cookies сессию
- * ✅ FIX: Добавлен Silent Refresh аналогично frontend dir
- * Обновляет токены каждые 4 минуты пока страница открыта
+ * TokenRefresher — проактивно обновляет httpOnly cookies сессию.
+ *
+ * Защита от выкидывания через 15 минут:
+ * 1. Silent refresh каждые 4 минуты (интервал)
+ * 2. Refresh при возврате в вкладку (visibilitychange)
+ * 3. Refresh при восстановлении сети (online event)
+ * 4. Fallback через IndexedDB при провале cookie-refresh
+ * 5. Logout только после MAX_CONSECUTIVE_FAILURES подряд неудач
  */
 export function TokenRefresher() {
-  const { isAuthenticated, setUser, logout } = useAuthStore();
+  const { isAuthenticated, setUser, logout: storeLogout } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const failureCountRef = useRef(0);
+  const isRefreshingRef = useRef(false);
   const isLoginPage = pathname === '/login';
 
-  // ✅ FIX: Убран автоматический logout на странице логина
-  // Это вызывало race condition с гидратацией Zustand и бесконечные редиректы
-  // Теперь AuthProvider и ProtectedRoute ждут гидратации перед принятием решений
-
-  // 🔄 Функция обновления токена через /auth/refresh
-  const refreshToken = useCallback(async (): Promise<boolean> => {
+  const doRefresh = useCallback(async (): Promise<boolean> => {
     try {
       const response = await axios.post(
         `${API_BASE_URL}/auth/refresh`,
@@ -44,15 +48,14 @@ export function TokenRefresher() {
       );
 
       if (response.data?.success) {
-        authLogger.log('🔄 Silent refresh successful');
+        authLogger.log('Silent refresh successful');
         
-        // Обновляем refresh token в IndexedDB если пришёл новый
         if (response.data?.data?.refreshToken) {
           try {
             const { saveRefreshToken } = await import('@/lib/remember-me');
             await saveRefreshToken(response.data.data.refreshToken);
-          } catch (e) {
-            // Ignore IndexedDB errors
+          } catch {
+            // IndexedDB errors are non-critical
           }
         }
         
@@ -62,75 +65,122 @@ export function TokenRefresher() {
     } catch (error: unknown) {
       const status = (error as { response?: { status?: number } })?.response?.status;
       
-      // 401/403 - токен невалиден, не логируем как ошибку
       if (status === 401 || status === 403) {
         authLogger.log('Silent refresh failed - token expired or invalid');
         return false;
       }
       
-      // Сетевые ошибки - просто пропускаем, попробуем позже
       authLogger.warn('Silent refresh network error, will retry');
       return false;
     }
   }, []);
 
-  useEffect(() => {
-    // 🍪 Пропускаем на страницах логина
-    if (isLoginPage) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+  const tryRestoreFromIndexedDB = useCallback(async (): Promise<boolean> => {
+    try {
+      const restored = await authApi.restoreSessionFromIndexedDB();
+      if (restored) {
+        authLogger.log('Session restored from IndexedDB after refresh failure');
+        return true;
       }
-      return;
+    } catch {
+      authLogger.warn('IndexedDB restore failed');
     }
+    return false;
+  }, []);
 
-    if (!isAuthenticated) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
+  const handleForceLogout = useCallback(() => {
+    authLogger.log('Force logout after max consecutive failures');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth-storage');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('auth-storage');
     }
+    storeLogout();
+    router.replace('/login');
+  }, [storeLogout, router]);
 
-    // 🔄 Silent Refresh - обновляем токен каждые 4 минуты пока страница открыта
-    const silentRefresh = async () => {
-      // Проверяем что не на странице логина
-      if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) {
-        authLogger.log('Skipping silent refresh - on login page');
-        return;
+  const silentRefresh = useCallback(async () => {
+    if (isRefreshingRef.current) return;
+    if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) return;
+
+    isRefreshingRef.current = true;
+
+    try {
+      authLogger.log('Running silent refresh...');
+      
+      let success = await doRefresh();
+      
+      if (!success) {
+        authLogger.log('Cookie refresh failed, trying IndexedDB fallback...');
+        success = await tryRestoreFromIndexedDB();
       }
 
-      authLogger.log('🔄 Running silent refresh...');
-      
-      const success = await refreshToken();
-      
       if (success) {
-        // Опционально: обновляем профиль после refresh
+        failureCountRef.current = 0;
+        
         try {
           const profile = await authApi.getProfile();
           if (profile.data) {
             setUser(profile.data);
           }
         } catch {
-          // Игнорируем ошибки получения профиля
+          // Profile fetch failure is non-critical
         }
+      } else {
+        failureCountRef.current += 1;
+        authLogger.warn(`Silent refresh failed (${failureCountRef.current}/${MAX_CONSECUTIVE_FAILURES})`);
+        
+        if (failureCountRef.current >= MAX_CONSECUTIVE_FAILURES) {
+          handleForceLogout();
+        }
+      }
+    } finally {
+      isRefreshingRef.current = false;
+    }
+  }, [doRefresh, tryRestoreFromIndexedDB, setUser, handleForceLogout]);
+
+  useEffect(() => {
+    if (isLoginPage || !isAuthenticated) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      failureCountRef.current = 0;
+      return;
+    }
+
+    const initialTimeout = setTimeout(silentRefresh, INITIAL_REFRESH_DELAY);
+    intervalRef.current = setInterval(silentRefresh, REFRESH_INTERVAL);
+
+    // Refresh при возврате в вкладку (браузер замораживает таймеры в фоне)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        authLogger.log('Tab became visible, triggering refresh');
+        silentRefresh();
       }
     };
 
-    // Запускаем первый refresh через 1 минуту (даём время на инициализацию)
-    const initialTimeout = setTimeout(silentRefresh, 60 * 1000);
+    // Refresh при восстановлении сети
+    const handleOnline = () => {
+      authLogger.log('Network restored, triggering refresh');
+      silentRefresh();
+    };
 
-    // Запускаем периодический refresh каждые 4 минуты
-    intervalRef.current = setInterval(silentRefresh, REFRESH_INTERVAL);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('online', handleOnline);
 
     return () => {
       clearTimeout(initialTimeout);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
     };
-  }, [isAuthenticated, setUser, isLoginPage, refreshToken]);
+  }, [isAuthenticated, isLoginPage, silentRefresh]);
 
-  return null; // Компонент не рендерит ничего
+  return null;
 }
 

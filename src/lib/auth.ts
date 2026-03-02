@@ -172,14 +172,33 @@ api.interceptors.response.use(
       }
       
       // Выполняем refresh с mutex защитой
-      const refreshSuccess = await doRefreshWithMutex();
+      let refreshSuccess = await doRefreshWithMutex();
+      
+      // Fallback: пробуем восстановить через IndexedDB
+      if (!refreshSuccess) {
+        try {
+          const { getRefreshToken } = await import('./remember-me');
+          const storedToken = await getRefreshToken();
+          if (storedToken) {
+            authLogger.log('[Auth] Trying IndexedDB fallback for refresh');
+            const fallbackResponse = await refreshApi.post('/auth/refresh', { refreshToken: storedToken });
+            if (fallbackResponse.data?.success) {
+              refreshSuccess = true;
+              if (fallbackResponse.data?.data?.refreshToken) {
+                const { saveRefreshToken } = await import('./remember-me');
+                await saveRefreshToken(fallbackResponse.data.data.refreshToken);
+              }
+            }
+          }
+        } catch {
+          authLogger.log('[Auth] IndexedDB fallback also failed');
+        }
+      }
       
       if (refreshSuccess) {
-        // Повторяем исходный запрос с обновленными cookies
         originalRequest._retry = true;
         return api.request(originalRequest);
       } else {
-        // НЕ делаем редирект здесь - пусть AuthProvider решает
         const sessionError = new Error('SESSION_EXPIRED');
         (sessionError as any).isSessionExpired = true;
         return Promise.reject(sessionError);

@@ -236,11 +236,11 @@ export function Sidebar() {
       <div className={`px-5 ${isMobile ? 'mb-1' : 'mb-1'}`}>
         <button
           onClick={() => { setSearchOpen(true); if (isMobile) setIsMobileMenuOpen(false); }}
-          className={`nav-icon-hover relative flex items-center gap-3 px-3 w-full font-normal transition-colors group ${
+          className={`relative flex items-center gap-3 px-3 w-full font-normal transition-colors group ${
             isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
           }`}
         >
-          <Search className={`nav-icon transition-all shrink-0 text-gray-500 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
+          <Search className={`transition-all shrink-0 text-gray-500 dark:text-gray-400 group-hover:text-[#FEC004] ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
           <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
             Поиск
           </span>
@@ -278,7 +278,7 @@ export function Sidebar() {
               </span>
               {item.lucideIcon ? (
                 <item.lucideIcon
-                  className={`nav-icon transition-all shrink-0 ${active ? 'text-[#FEC004]' : 'text-gray-500 dark:text-gray-400'} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
+                  className={`transition-all shrink-0 ${active ? 'text-[#FEC004]' : 'text-gray-500 dark:text-gray-400 group-hover:text-[#FEC004]'} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
                 />
               ) : (
                 <Image

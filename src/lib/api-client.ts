@@ -2,6 +2,15 @@
 import { CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/common';
 import api from '@/lib/api'; // Используем настроенный axios instance
 
+export interface CashTransactionData {
+  type: 'income' | 'expense';
+  amount: number;
+  cityId?: number;
+  paymentPurpose?: string;
+  description?: string;
+  date?: string;
+}
+
 // API для заказов
 export const ordersApi = {
   // Создание заказа с нуля
@@ -81,13 +90,13 @@ export const cashApi = {
   },
 
   // Создание транзакции
-  async createCashTransaction(data: any): Promise<ApiResponse> {
+  async createCashTransaction(data: CashTransactionData): Promise<ApiResponse> {
     const response = await api.post('/cash', data);
     return response.data;
   },
 
   // Обновление транзакции
-  async updateCashTransaction(id: string, data: any): Promise<ApiResponse> {
+  async updateCashTransaction(id: string, data: Partial<CashTransactionData>): Promise<ApiResponse> {
     const response = await api.put(`/cash/${id}`, data);
     return response.data;
   },
@@ -102,7 +111,7 @@ export const cashApi = {
 // Утилиты для работы с API
 export const apiUtils = {
   // Создание URLSearchParams из объекта
-  createSearchParams(params: Record<string, any>): URLSearchParams {
+  createSearchParams(params: Record<string, string | number | boolean | undefined | null>): URLSearchParams {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {

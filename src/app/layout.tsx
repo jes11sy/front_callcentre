@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
 import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,7 +56,16 @@ export default function RootLayout({
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
           rel="stylesheet"
+          media="print"
+          // @ts-expect-error onLoad sets media to all for async CSS loading
+          onLoad="this.media='all'"
         />
+        <noscript>
+          <link
+            href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
+            rel="stylesheet"
+          />
+        </noscript>
         {/* Inline script to prevent flash of wrong theme */}
         <script
           dangerouslySetInnerHTML={{
@@ -79,6 +89,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ErrorBoundary>
         <QueryProvider>
           <ThemeProvider>
             <AuthProvider>
@@ -102,6 +113,7 @@ export default function RootLayout({
             />
           </ThemeProvider>
         </QueryProvider>
+        </ErrorBoundary>
         <WebVitalsScript />
         <ServiceWorkerRegister />
       </body>

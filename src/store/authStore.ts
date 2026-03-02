@@ -26,7 +26,7 @@ function sanitizeUserForStorage(user: User | null): SafeUserData | null {
   return {
     id: user.id,
     login: user.login,
-    name: user.name,
+    name: user.name || '',
     role: user.role,
     cities: user.cities,
   };

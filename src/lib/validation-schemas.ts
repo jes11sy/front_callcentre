@@ -13,29 +13,23 @@ export const orderBaseSchema = z.object({
   equipmentTypeId: z.number({ required_error: 'Выберите тип техники' }).min(1, 'Выберите тип техники'),
 });
 
-// Схема для создания заказа из чата (минимальные поля)
-export const chatOrderSchema = orderBaseSchema.extend({
+// Единая схема заказа с rkId и cityId (используется для создания из чата, звонка и с нуля)
+export const orderWithLocationSchema = orderBaseSchema.extend({
   rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
   cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
 });
 
-// Схема для создания заказа из звонка (дополнительные поля)
-export const callOrderSchema = orderBaseSchema.extend({
-  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
-});
-
-// Схема для создания заказа с нуля (все поля)
-export const fullOrderSchema = orderBaseSchema.extend({
-  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
-});
+// Алиасы для обратной совместимости
+export const chatOrderSchema = orderWithLocationSchema;
+export const callOrderSchema = orderWithLocationSchema;
+export const fullOrderSchema = orderWithLocationSchema;
 
 // Типы для форм
 export type OrderBaseFormData = z.infer<typeof orderBaseSchema>;
-export type ChatOrderFormData = z.infer<typeof chatOrderSchema>;
-export type CallOrderFormData = z.infer<typeof callOrderSchema>;
-export type FullOrderFormData = z.infer<typeof fullOrderSchema>;
+export type OrderWithLocationFormData = z.infer<typeof orderWithLocationSchema>;
+export type ChatOrderFormData = OrderWithLocationFormData;
+export type CallOrderFormData = OrderWithLocationFormData;
+export type FullOrderFormData = OrderWithLocationFormData;
 
 // Константы для селектов
 export const ORDER_TYPE_OPTIONS = [

@@ -51,40 +51,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initRef.current = true;
     let cancelled = false;
 
-    // ✅ Если есть пользователь в store - сразу убираем loading
-    // Store уже инициализирован с данными из localStorage
     if (user) {
       authLogger.log('User already in store, showing content');
       setLoading(false);
       
-      // Фоновая проверка сессии
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         if (!cancelled) {
           validateSessionInBackground();
         }
       }, 500);
-      return;
+      
+      return () => {
+        cancelled = true;
+        clearTimeout(timeoutId);
+      };
     }
 
-    // Нет пользователя - редирект на логин
     authLogger.log('No user in store, redirecting to login');
     setLoading(false);
     router.replace('/login');
 
-    /**
-     * Фоновая валидация сессии (без блокировки UI)
-     */
     async function validateSessionInBackground() {
       try {
         const isAuth = await authApi.isAuthenticated();
         
         if (isAuth) {
-          // Сессия валидна - обновляем профиль в фоне
           try {
             const profile = await authApi.getProfile();
             if (profile.data && !cancelled) {
               setUser(profile.data);
-              // Сохраняем в localStorage для следующего запуска
               localStorage.setItem('user', JSON.stringify(profile.data));
             }
           } catch {
@@ -93,7 +88,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return;
         }
         
-        // Сессия невалидна - пробуем восстановить
         authLogger.log('Session invalid, trying to restore');
         
         if (isRestoringRef.current) return;
@@ -111,10 +105,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 localStorage.setItem('user', JSON.stringify(profile.data));
               }
             } catch {
-              // Оставляем кэшированного
+              // Keep cached user
             }
           } else if (!cancelled) {
-            // Не удалось восстановить - редирект
             authLogger.log('Could not restore session');
             localStorage.removeItem('user');
             localStorage.removeItem('auth-storage');
@@ -128,7 +121,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         
-        // Сетевые ошибки игнорируем - пользователь уже видит контент
         if (errorMessage.includes('network') || 
             errorMessage.includes('timeout') ||
             errorMessage.includes('aborted') ||

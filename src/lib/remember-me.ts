@@ -79,20 +79,63 @@ async function openDB(): Promise<IDBDatabase> {
   })
 }
 
+const DEVICE_SECRET_KEY = 'callcentre_device_secret'
+
 /**
- * Генерирует ключ шифрования
+ * Генерирует или извлекает уникальный секрет устройства из IndexedDB.
+ * Этот секрет создаётся один раз и не может быть воспроизведён злоумышленником
+ * без физического доступа к IndexedDB.
+ */
+async function getOrCreateDeviceSecret(): Promise<Uint8Array> {
+  const db = await openDB()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite')
+    const store = transaction.objectStore(STORE_NAME)
+    const request = store.get(DEVICE_SECRET_KEY)
+
+    request.onsuccess = async () => {
+      if (request.result) {
+        resolve(Uint8Array.from(atob(request.result as string), c => c.charCodeAt(0)))
+        db.close()
+        return
+      }
+
+      const secret = crypto.getRandomValues(new Uint8Array(32))
+      const encoded = btoa(String.fromCharCode(...secret))
+      const putRequest = store.put(encoded, DEVICE_SECRET_KEY)
+      putRequest.onsuccess = () => {
+        resolve(secret)
+        db.close()
+      }
+      putRequest.onerror = () => {
+        reject(putRequest.error)
+        db.close()
+      }
+    }
+    request.onerror = () => {
+      reject(request.error)
+      db.close()
+    }
+  })
+}
+
+/**
+ * Генерирует ключ шифрования.
+ * Использует уникальный per-device секрет (хранится в IndexedDB) + origin + salt.
+ * Злоумышленник не может воспроизвести ключ без доступа к IndexedDB.
  */
 async function generateEncryptionKey(salt: Uint8Array): Promise<CryptoKey> {
-  const fingerprint = [
-    'callcentre_token_v1',
-    window.location.origin,
-    navigator.language || 'ru',
-    Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  ].join('|')
+  const deviceSecret = await getOrCreateDeviceSecret()
+
+  const fingerprint = new Uint8Array([
+    ...deviceSecret,
+    ...new TextEncoder().encode(window.location.origin),
+  ])
 
   const baseKey = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(fingerprint),
+    fingerprint,
     'PBKDF2',
     false,
     ['deriveKey']

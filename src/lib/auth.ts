@@ -17,6 +17,7 @@ export interface User {
   login: string;
   role: 'admin' | 'operator';
   name?: string;
+  cities?: string[];
 }
 
 export interface AuthResponse {
@@ -280,8 +281,26 @@ export const authApi = {
   getUser: async (): Promise<User | null> => {
     if (typeof window === 'undefined') return null;
     
-    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    const raw = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!raw) return null;
+    
+    try {
+      const parsed = JSON.parse(raw);
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        typeof parsed.id === 'number' &&
+        typeof parsed.login === 'string' &&
+        typeof parsed.role === 'string'
+      ) {
+        return parsed as User;
+      }
+      return null;
+    } catch {
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+      return null;
+    }
   },
 
   /**

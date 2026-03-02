@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 
 interface OptimizedQueryOptions {
   staleTime?: number;
@@ -9,7 +9,6 @@ interface OptimizedQueryOptions {
   retry?: number;
 }
 
-// Оптимизированный хук для запросов с умным кэшированием
 export const useOptimizedQuery = <T>(
   queryKey: (string | number)[],
   queryFn: () => Promise<T>,
@@ -17,34 +16,46 @@ export const useOptimizedQuery = <T>(
 ) => {
   const queryClient = useQueryClient();
 
-  const defaultOptions = useMemo(() => ({
-    staleTime: 2 * 60 * 1000, // 2 минуты
-    cacheTime: 5 * 60 * 1000, // 5 минут
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: 2,
-    ...options
-  }), [options]);
+  const {
+    staleTime = 2 * 60 * 1000,
+    cacheTime = 5 * 60 * 1000,
+    refetchOnWindowFocus = false,
+    refetchOnMount = false,
+    retry = 2,
+  } = options;
+
+  const mergedOptions = useMemo(() => ({
+    staleTime,
+    cacheTime,
+    refetchOnWindowFocus,
+    refetchOnMount,
+    retry,
+  }), [staleTime, cacheTime, refetchOnWindowFocus, refetchOnMount, retry]);
+
+  // Стабилизируем queryKey через ref + сравнение по значению
+  const queryKeyRef = useRef(queryKey);
+  if (JSON.stringify(queryKeyRef.current) !== JSON.stringify(queryKey)) {
+    queryKeyRef.current = queryKey;
+  }
+  const stableQueryKey = queryKeyRef.current;
 
   const query = useQuery({
-    queryKey,
+    queryKey: stableQueryKey,
     queryFn,
-    ...defaultOptions
+    ...mergedOptions
   });
 
-  // Функция для принудительного обновления
   const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey });
-  }, [queryClient, queryKey]);
+    queryClient.invalidateQueries({ queryKey: stableQueryKey });
+  }, [queryClient, stableQueryKey]);
 
-  // Функция для предварительной загрузки данных
   const prefetch = useCallback(() => {
     queryClient.prefetchQuery({
-      queryKey,
+      queryKey: stableQueryKey,
       queryFn,
-      ...defaultOptions
+      ...mergedOptions
     });
-  }, [queryClient, queryKey, queryFn, defaultOptions]);
+  }, [queryClient, stableQueryKey, queryFn, mergedOptions]);
 
   return {
     ...query,

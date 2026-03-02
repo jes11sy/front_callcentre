@@ -104,9 +104,9 @@ export interface OrderModalProps extends ModalProps {
 
 // Формы
 export interface FormFieldProps {
-  register?: any;
-  control?: any;
-  errors: any;
+  register?: unknown;
+  control?: unknown;
+  errors: Record<string, { message?: string }>;
   className?: string;
 }
 

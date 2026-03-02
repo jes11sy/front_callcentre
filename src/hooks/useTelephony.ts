@@ -48,11 +48,13 @@ export const useTelephony = () => {
   const handleManualRefresh = useCallback(() => {
     filters.setCurrentPage(1);
     callsData.fetchCalls(filters.apiParams);
-  }, [filters]);
+  }, [filters.setCurrentPage, filters.apiParams, callsData.fetchCalls]);
+
+  // Флаг для предотвращения повторных запросов
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Начальная загрузка данных
   useEffect(() => {
-    // Принудительно загружаем данные с базовыми параметрами
     const basicParams = new URLSearchParams({
       page: '1',
       limit: '10',
@@ -61,10 +63,8 @@ export const useTelephony = () => {
     });
     
     callsData.fetchCalls(basicParams);
-  }, []); // Загружаем только при монтировании
-
-  // Флаг для предотвращения повторных запросов
-  const [isInitialized, setIsInitialized] = useState(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Обновление данных при изменении фильтров
   useEffect(() => {
@@ -72,7 +72,8 @@ export const useTelephony = () => {
       const params = new URLSearchParams(filters.stableApiParams);
       callsData.fetchCalls(params);
     }
-  }, [filters.stableApiParams, isInitialized]); // Используем стабилизированные параметры
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.stableApiParams, isInitialized]);
 
   // Устанавливаем флаг инициализации после первой загрузки
   useEffect(() => {
@@ -85,7 +86,8 @@ export const useTelephony = () => {
   useEffect(() => {
     filters.setTotalCalls(callsData.totalCalls);
     filters.setTotalPages(callsData.totalPages);
-  }, [callsData.totalCalls, callsData.totalPages, filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callsData.totalCalls, callsData.totalPages]);
 
 
   return {

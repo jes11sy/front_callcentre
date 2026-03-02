@@ -45,26 +45,24 @@ export const useCallsData = () => {
   });
   const [newCallsCount, setNewCallsCount] = useState(0);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [lastParams, setLastParams] = useState<string>('');
   
+  const lastParamsRef = useRef<string>('');
+  const hasDataRef = useRef<boolean>(false);
   const previousTotalRef = useRef<number>(0);
   const isFirstLoadRef = useRef<boolean>(true);
 
-  // Загрузка сгруппированных звонков
   const fetchCalls = useCallback(async (params: URLSearchParams) => {
     const paramsString = params.toString();
     
-    // Предотвращаем повторные запросы с одинаковыми параметрами
-    if (lastParams === paramsString && Object.keys(groupedCalls).length > 0) {
+    if (lastParamsRef.current === paramsString && hasDataRef.current) {
       return;
     }
     
     try {
       setLoading(true);
       setError(null);
-      setLastParams(paramsString);
+      lastParamsRef.current = paramsString;
 
-      // Используем новый endpoint /calls/grouped
       const response = await authApi.get(`/calls/grouped?${paramsString}`);
       const data: GroupedCallsResponse = response.data;
 
@@ -73,7 +71,6 @@ export const useCallsData = () => {
         const newStats = data.data.stats;
         const pagination = data.data.pagination;
         
-        // Подсчёт новых звонков
         if (!isFirstLoadRef.current && newStats.totalCalls > previousTotalRef.current) {
           const newCallsDiff = newStats.totalCalls - previousTotalRef.current;
           setNewCallsCount(prev => prev + newCallsDiff);
@@ -81,22 +78,21 @@ export const useCallsData = () => {
         
         previousTotalRef.current = newStats.totalCalls;
         isFirstLoadRef.current = false;
+        hasDataRef.current = Object.keys(newGroupedCalls).length > 0;
         
-        // Обновляем состояния
         setGroupedCalls(newGroupedCalls);
         setStats(newStats);
         setTotalCalls(newStats.totalCalls);
         setTotalGroups(newStats.totalGroups);
         setTotalPages(pagination.totalPages);
         
-        // Плоский список для совместимости
         const flatCalls = Object.values(newGroupedCalls).flat();
         setCalls(flatCalls);
       } else {
         throw new Error('Ошибка при получении данных');
       }
     } catch (err: unknown) {
-      if ((err as Error)?.message === 'SESSION_EXPIRED' || (err as any)?.isSessionExpired) {
+      if (err instanceof Error && (err.message === 'SESSION_EXPIRED' || (err as Error & { isSessionExpired?: boolean }).isSessionExpired)) {
         return;
       }
       
@@ -106,7 +102,7 @@ export const useCallsData = () => {
     } finally {
       setLoading(false);
     }
-  }, [lastParams, groupedCalls]);
+  }, []);
 
   const resetNewCallsCount = useCallback(() => {
     setNewCallsCount(0);

@@ -114,7 +114,7 @@ export function LoginForm() {
       try {
         localStorage.setItem('auth-storage', JSON.stringify({
           state: {
-            user: { id: u.id, login: u.login, name: u.name || '', role: u.role, cities: (u as any).cities },
+            user: { id: u.id, login: u.login, name: u.name || '', role: u.role, cities: u.cities },
             isAuthenticated: true,
           },
           version: 0,
@@ -214,7 +214,7 @@ export function LoginForm() {
           Авторизация
         </h1>
 
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-5">
           <div>
             <Label className={`text-sm font-medium mb-2 block transition-colors ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
@@ -275,8 +275,7 @@ export function LoginForm() {
           )}
 
           <Button
-            type="button"
-            onClick={handleLogin}
+            type="submit"
             className="w-full h-12 bg-[#FEC004] hover:bg-[#e5ad04] text-gray-900 font-semibold rounded-lg transition-colors"
             disabled={isLoading}
           >
@@ -296,7 +295,7 @@ export function LoginForm() {
       <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center text-sm transition-colors ${
         theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
       }`}>
-        © 2025 Новые схемы
+        © {new Date().getFullYear()} Новые схемы
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { notifications } from '@/components/ui/notifications';
 import { socketLogger } from '@/lib/logger';
@@ -36,35 +36,35 @@ async function getSocketToken(): Promise<string | null> {
   }
 }
 
+/**
+ * @deprecated Используйте useGlobalSocket вместо useSocket.
+ * Этот хук оставлен для обратной совместимости и делегирует в useGlobalSocket.
+ */
 export const useSocket = () => {
-  socketLogger.log('useSocket called');
+  socketLogger.log('useSocket called (deprecated — use useGlobalSocket)');
   const socketRef = useRef<Socket | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const isConnectingRef = useRef(false);
 
   useEffect(() => {
-    socketLogger.log('useSocket useEffect running');
     if (globalSocket) {
       socketRef.current = globalSocket;
       return;
     }
 
-    // Предотвращаем множественные запросы токена
-    if (isConnecting) return;
-    setIsConnecting(true);
+    if (isConnectingRef.current) return;
+    isConnectingRef.current = true;
 
-    // ✅ FIX #40: Получаем токен через API вместо localStorage
     const initSocket = async () => {
-      // Используем кешированный промис для предотвращения дублирования запросов
       if (!socketTokenPromise) {
         socketTokenPromise = getSocketToken();
       }
       
       const token = await socketTokenPromise;
-      socketTokenPromise = null; // Сбрасываем после получения
+      socketTokenPromise = null;
       
       if (!token) {
         socketLogger.warn('No auth token available for socket');
-        setIsConnecting(false);
+        isConnectingRef.current = false;
         return;
       }
 
@@ -82,52 +82,46 @@ export const useSocket = () => {
         path: '/socket.io/'
       });
 
-    newSocket.on('connect', () => {
-      socketLogger.log('WebSocket connected');
-    });
+      newSocket.on('connect', () => {
+        socketLogger.log('WebSocket connected');
+      });
 
-    newSocket.on('disconnect', (reason) => {
-      socketLogger.log('WebSocket disconnected:', reason);
-    });
+      newSocket.on('disconnect', (reason) => {
+        socketLogger.log('WebSocket disconnected:', reason);
+      });
 
-    newSocket.on('error', (error) => {
-      socketLogger.error('WebSocket error:', error);
-    });
+      newSocket.on('error', (error) => {
+        socketLogger.error('WebSocket error:', error);
+      });
 
-    // РЕГИСТРИРУЕМ LISTENERS ТУТ ЖЕ
-    newSocket.on('call:new', (call: unknown) => {
-      socketLogger.log('NEW CALL EVENT RECEIVED:', call);
-      
-      // Показываем toast только если push не включен (чтобы не дублировать)
-      const isPushEnabled = localStorage.getItem('push-subscribed') === 'true';
-      if (!isPushEnabled) {
-        notifications.info('Новый звонок получен');
-      }
-      
-      // Dispatch custom event для useCallsData
-      window.dispatchEvent(new CustomEvent('socket:call:new', { detail: call }));
-    });
+      newSocket.on('call:new', (call: unknown) => {
+        socketLogger.log('NEW CALL EVENT RECEIVED:', call);
+        const isPushEnabled = localStorage.getItem('push-subscribed') === 'true';
+        if (!isPushEnabled) {
+          notifications.info('Новый звонок получен');
+        }
+        window.dispatchEvent(new CustomEvent('socket:call:new', { detail: call }));
+      });
 
-    newSocket.on('call:updated', (call: unknown) => {
-      socketLogger.log('CALL UPDATED EVENT RECEIVED:', call);
-      window.dispatchEvent(new CustomEvent('socket:call:updated', { detail: call }));
-    });
+      newSocket.on('call:updated', (call: unknown) => {
+        socketLogger.log('CALL UPDATED EVENT RECEIVED:', call);
+        window.dispatchEvent(new CustomEvent('socket:call:updated', { detail: call }));
+      });
 
-    newSocket.on('call:ended', (call: unknown) => {
-      socketLogger.log('CALL ENDED EVENT RECEIVED:', call);
-      window.dispatchEvent(new CustomEvent('socket:call:ended', { detail: call }));
-    });
+      newSocket.on('call:ended', (call: unknown) => {
+        socketLogger.log('CALL ENDED EVENT RECEIVED:', call);
+        window.dispatchEvent(new CustomEvent('socket:call:ended', { detail: call }));
+      });
 
       globalSocket = newSocket;
       socketRef.current = newSocket;
-      setIsConnecting(false);
+      isConnectingRef.current = false;
     };
 
     initSocket();
 
     return () => {
       if (globalSocket) {
-        // ✅ FIX: Очищаем ВСЕ слушатели, включая connect/disconnect/error
         globalSocket.off('connect');
         globalSocket.off('disconnect');
         globalSocket.off('error');
@@ -137,8 +131,9 @@ export const useSocket = () => {
         globalSocket.disconnect();
         globalSocket = null;
       }
+      isConnectingRef.current = false;
     };
-  }, [isConnecting]);
+  }, []);
 
   return socketRef.current || globalSocket;
 };

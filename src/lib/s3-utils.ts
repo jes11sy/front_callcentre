@@ -2,7 +2,7 @@
  * 🍪 Утилиты для работы с приватными файлами в S3 с httpOnly cookies
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
 
 const _API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
@@ -120,8 +120,13 @@ export function useFileUrls(fileKeys: string[], expiresIn: number = 3600) {
   const [url, setUrl] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const prevKeysRef = useRef<string>('');
 
   useEffect(() => {
+    const keysStr = fileKeys.join(',');
+    if (keysStr === prevKeysRef.current) return;
+    prevKeysRef.current = keysStr;
+
     if (!fileKeys || fileKeys.length === 0) {
       setUrl({});
       return;
@@ -148,7 +153,8 @@ export function useFileUrls(fileKeys: string[], expiresIn: number = 3600) {
     return () => {
       mounted = false;
     };
-  }, [JSON.stringify(fileKeys), expiresIn]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fileKeys, expiresIn]);
 
   return { url, loading, error };
 }

@@ -1,6 +1,15 @@
 /**
- * ✅ FIX: Объединенный API модуль - переиспользует axios instance из auth.ts
- * Это устраняет дублирование axios instances и обеспечивает единую конфигурацию
+ * Единая точка входа для HTTP-клиента.
+ * 
+ * АРХИТЕКТУРА:
+ * - auth.ts    — создаёт axios instance + authApi (login, logout, refresh, getProfile)
+ * - api.ts     — реэкспортирует axios instance + authUtils (обратная совместимость)
+ * - api-client.ts — типизированные API-методы (ordersApi, callsApi, cashApi)
+ * 
+ * Для HTTP-запросов используйте:
+ *   import api from '@/lib/api'        — axios instance
+ *   import { authApi } from '@/lib/auth' — методы авторизации
+ *   import { ordersApi } from '@/lib/api-client' — бизнес-методы
  */
 import api, { authApi } from '@/lib/auth';
 import { authLogger, apiLogger } from '@/lib/logger';

@@ -38,6 +38,11 @@ export interface Appeal {
   siteOrderId?: number;
   orderId?: number;
   operator?: { id: number; name: string };
+  cityId?: number;
+  rkId?: number;
+  source?: string;
+  cityName?: string;
+  rkName?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -273,12 +278,13 @@ export default function AppealsPage() {
                   <thead>
                     <tr className={`border-b ${isDark ? 'bg-[#252d3a] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                       <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>ID</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Клиент</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Категория</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Описание</th>
                       <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Статус</th>
                       <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Дата</th>
-                      <th className={`px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Действия</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Источник</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Телефон</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Имя</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Примечание</th>
+                      <th className={`px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -294,30 +300,6 @@ export default function AppealsPage() {
                           }`}
                         >
                           <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{appeal.id}</td>
-                          <td className="px-4 py-3">
-                            <div className={`text-sm font-mono font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-                              {appeal.clientPhone}
-                            </div>
-                            {appeal.clientName && (
-                              <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{appeal.clientName}</div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`text-xs px-2 py-1 rounded-full border ${
-                              appeal.category === 'complaint'
-                                ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30'
-                                : appeal.category === 'callback'
-                                ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'
-                            }`}>
-                              {CATEGORY_LABELS[appeal.category]}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <p className={`text-sm max-w-[250px] truncate ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                              {appeal.description}
-                            </p>
-                          </td>
                           <td className="px-4 py-3">
                             <Select
                               value={appeal.status}
@@ -340,8 +322,31 @@ export default function AppealsPage() {
                               </SelectContent>
                             </Select>
                           </td>
-                          <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <td className={`px-4 py-3 text-sm whitespace-nowrap ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             {new Date(appeal.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1 text-xs sm:text-sm">
+                              {appeal.cityName && <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{appeal.cityName}</span>}
+                              {appeal.cityName && appeal.rkName && <span className="text-gray-400">•</span>}
+                              {appeal.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>{appeal.rkName}</span>}
+                              {(appeal.cityName || appeal.rkName) && appeal.source && <span className="text-gray-400">•</span>}
+                              {appeal.source && <span className="text-[#FEC004]">{appeal.source}</span>}
+                              {!appeal.cityName && !appeal.rkName && !appeal.source && <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>—</span>}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`text-sm font-mono ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                              {appeal.clientPhone}
+                            </span>
+                          </td>
+                          <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {appeal.clientName || '—'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className={`text-sm max-w-[200px] truncate ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                              {appeal.description || '—'}
+                            </p>
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
@@ -369,7 +374,7 @@ export default function AppealsPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="py-16 text-center">
+                        <td colSpan={8} className="py-16 text-center">
                           <MessageSquare className={`h-10 w-10 mx-auto mb-3 ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
                           <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Обращений не найдено</p>
                         </td>
@@ -468,11 +473,27 @@ export default function AppealsPage() {
                   </span>
                 </div>
 
-                {/* Описание */}
-                <div>
-                  <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Что хотел клиент</p>
-                  <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{detailAppeal.description}</p>
-                </div>
+                {/* Источник */}
+                {(detailAppeal.cityName || detailAppeal.rkName || detailAppeal.source) && (
+                  <div>
+                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Источник</p>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      {detailAppeal.cityName && <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{detailAppeal.cityName}</span>}
+                      {detailAppeal.cityName && detailAppeal.rkName && <span className="text-gray-400">•</span>}
+                      {detailAppeal.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>{detailAppeal.rkName}</span>}
+                      {(detailAppeal.cityName || detailAppeal.rkName) && detailAppeal.source && <span className="text-gray-400">•</span>}
+                      {detailAppeal.source && <span className="text-[#FEC004]">{detailAppeal.source}</span>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Примечание */}
+                {detailAppeal.description && (
+                  <div>
+                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Примечание</p>
+                    <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{detailAppeal.description}</p>
+                  </div>
+                )}
 
                 {/* Итог */}
                 {detailAppeal.result && (

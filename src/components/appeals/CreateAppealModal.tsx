@@ -20,7 +20,7 @@ const schema = z.object({
   clientPhone: z.string().min(1, 'Укажите телефон клиента'),
   clientName: z.string().optional(),
   category: z.enum(['question', 'complaint', 'order', 'consultation', 'callback']),
-  description: z.string().min(1, 'Опишите суть обращения'),
+  description: z.string().optional(),
   result: z.string().optional(),
   status: z.enum(['new', 'in_progress', 'waiting_client', 'closed_resolved', 'closed_refused']),
   callId: z.string().optional(),
@@ -214,16 +214,15 @@ export function CreateAppealModal({
               </div>
             </div>
 
-            {/* Описание */}
+            {/* Примечание */}
             <div>
-              <Label className={labelCls}>Что хотел клиент *</Label>
+              <Label className={labelCls}>Примечание</Label>
               <textarea
                 {...register('description')}
                 rows={3}
-                placeholder="Опишите суть обращения..."
+                placeholder="Примечание к обращению..."
                 className={`mt-1 w-full rounded-md border px-3 py-2 text-sm resize-none ${inputCls}`}
               />
-              {errors.description && <p className={errorCls}>{errors.description.message}</p>}
             </div>
 
             {/* Итог */}

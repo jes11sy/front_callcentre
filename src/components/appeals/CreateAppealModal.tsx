@@ -9,12 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, PhoneCall } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 import type { Appeal, AppealStatus } from '@/app/appeals/page';
-import { STATUS_LABELS, STATUS_FLOW } from '@/app/appeals/page';
+import { STATUS_LABELS, STATUS_COLORS, STATUS_FLOW } from '@/app/appeals/page';
 
 const schema = z.object({
   clientPhone: z.string().min(1, 'Укажите телефон клиента'),
@@ -61,6 +61,7 @@ export function CreateAppealModal({
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
   const isEdit = !!appeal;
+  const isFromCall = !!callContext;
 
   const {
     register,
@@ -118,7 +119,11 @@ export function CreateAppealModal({
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const payload: Record<string, unknown> = {
-        ...data,
+        clientPhone: data.clientPhone,
+        clientName: data.clientName || undefined,
+        description: data.description || undefined,
+        result: data.result || undefined,
+        status: data.status,
         callId: data.callId ? Number(data.callId) : undefined,
         siteOrderId: data.siteOrderId ? Number(data.siteOrderId) : undefined,
         orderId: data.orderId ? Number(data.orderId) : undefined,
@@ -151,6 +156,11 @@ export function CreateAppealModal({
   const labelCls = `text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`;
   const errorCls = 'text-xs text-red-400 mt-1';
 
+  const sourceParts: string[] = [];
+  if (callContext?.cityName) sourceParts.push(callContext.cityName);
+  if (callContext?.rkName) sourceParts.push(callContext.rkName);
+  if (callContext?.source) sourceParts.push(callContext.source);
+
   return (
     <div
       className="fixed inset-0 z-[9998] flex items-end sm:items-center sm:justify-center bg-black/50"
@@ -165,9 +175,12 @@ export function CreateAppealModal({
         {/* Шапка */}
         <div className={`px-5 py-4 border-b ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
           <div className="flex items-center justify-between">
-            <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-              {isEdit ? `Редактировать обращение #${appeal.id}` : 'Новое обращение'}
-            </h2>
+            <div className="flex items-center gap-2.5">
+              {isFromCall && <PhoneCall className="h-4 w-4 text-[#FEC004]" />}
+              <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                {isEdit ? `Обращение #${appeal.id}` : isFromCall ? 'Обращение по звонку' : 'Новое обращение'}
+              </h2>
+            </div>
             <Button
               variant="ghost"
               size="sm"
@@ -177,13 +190,11 @@ export function CreateAppealModal({
               <X className="h-4 w-4" />
             </Button>
           </div>
-          {callContext && (callContext.cityName || callContext.rkName || callContext.source) && (
-            <div className="flex items-center gap-1.5 mt-2 text-sm">
-              {callContext.cityName && <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{callContext.cityName}</span>}
-              {callContext.cityName && callContext.rkName && <span className="text-gray-400">•</span>}
-              {callContext.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>{callContext.rkName}</span>}
-              {(callContext.cityName || callContext.rkName) && callContext.source && <span className="text-gray-400">•</span>}
-              {callContext.source && <span className="text-[#FEC004]">{callContext.source}</span>}
+
+          {/* Источник из звонка */}
+          {isFromCall && sourceParts.length > 0 && (
+            <div className={`mt-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              Источник: <span className={isDark ? 'text-gray-200' : 'text-gray-800'}>{sourceParts.join(' • ')}</span>
             </div>
           )}
         </div>
@@ -195,40 +206,45 @@ export function CreateAppealModal({
             {/* Телефон + Имя */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className={labelCls}>Телефон *</Label>
+                <Label className={labelCls}>Телефон</Label>
                 <Input
                   {...register('clientPhone')}
                   placeholder="+7 999 000-00-00"
-                  className={`mt-1 ${inputCls}`}
+                  readOnly={isFromCall}
+                  className={`mt-1 ${inputCls} ${isFromCall ? 'opacity-70' : ''}`}
                 />
                 {errors.clientPhone && <p className={errorCls}>{errors.clientPhone.message}</p>}
               </div>
               <div>
-                <Label className={labelCls}>Имя клиента</Label>
+                <Label className={labelCls}>Имя</Label>
                 <Input
                   {...register('clientName')}
-                  placeholder="Иван"
+                  placeholder="Имя клиента"
                   className={`mt-1 ${inputCls}`}
+                  autoFocus={isFromCall}
                 />
               </div>
             </div>
 
-            {/* Статус */}
+            {/* Статус — кнопками для быстрого выбора */}
             <div>
               <Label className={labelCls}>Статус</Label>
-              <Select
-                value={watch('status')}
-                onValueChange={(v) => setValue('status', v as AppealStatus)}
-              >
-                <SelectTrigger className={`mt-1 ${inputCls}`}>
-                  <SelectValue placeholder="Выберите" />
-                </SelectTrigger>
-                <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
-                  {STATUS_FLOW.map((s) => (
-                    <SelectItem key={s} value={s} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{STATUS_LABELS[s]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {STATUS_FLOW.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setValue('status', s)}
+                    className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${
+                      watch('status') === s
+                        ? `${STATUS_COLORS[s]} ring-1 ring-offset-1 ${isDark ? 'ring-offset-[#1e2530]' : 'ring-offset-white'} ring-[#FEC004]`
+                        : `${STATUS_COLORS[s]} opacity-50 hover:opacity-80`
+                    }`}
+                  >
+                    {STATUS_LABELS[s]}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Примечание */}
@@ -236,56 +252,44 @@ export function CreateAppealModal({
               <Label className={labelCls}>Примечание</Label>
               <textarea
                 {...register('description')}
-                rows={3}
-                placeholder="Примечание к обращению..."
-                className={`mt-1 w-full rounded-md border px-3 py-2 text-sm resize-none ${inputCls}`}
-              />
-            </div>
-
-            {/* Итог */}
-            <div>
-              <Label className={labelCls}>Итог разговора</Label>
-              <textarea
-                {...register('result')}
                 rows={2}
-                placeholder="Чем завершился разговор..."
+                placeholder="Примечание..."
                 className={`mt-1 w-full rounded-md border px-3 py-2 text-sm resize-none ${inputCls}`}
               />
             </div>
 
-            {/* Привязки */}
-            <div>
-              <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Привязки (необязательно)</p>
-              <div className="grid grid-cols-3 gap-2">
+            {/* Расширенные поля — только в режиме редактирования или создания вручную */}
+            {!isFromCall && (
+              <>
                 <div>
-                  <Label className={labelCls}>ID звонка</Label>
-                  <Input
-                    {...register('callId')}
-                    placeholder="123"
-                    type="number"
-                    className={`mt-1 ${inputCls}`}
+                  <Label className={labelCls}>Итог разговора</Label>
+                  <textarea
+                    {...register('result')}
+                    rows={2}
+                    placeholder="Чем завершился разговор..."
+                    className={`mt-1 w-full rounded-md border px-3 py-2 text-sm resize-none ${inputCls}`}
                   />
                 </div>
+
                 <div>
-                  <Label className={labelCls}>ID заявки</Label>
-                  <Input
-                    {...register('siteOrderId')}
-                    placeholder="456"
-                    type="number"
-                    className={`mt-1 ${inputCls}`}
-                  />
+                  <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Привязки</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className={labelCls}>ID звонка</Label>
+                      <Input {...register('callId')} placeholder="123" type="number" className={`mt-1 ${inputCls}`} />
+                    </div>
+                    <div>
+                      <Label className={labelCls}>ID заявки</Label>
+                      <Input {...register('siteOrderId')} placeholder="456" type="number" className={`mt-1 ${inputCls}`} />
+                    </div>
+                    <div>
+                      <Label className={labelCls}>ID заказа</Label>
+                      <Input {...register('orderId')} placeholder="789" type="number" className={`mt-1 ${inputCls}`} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label className={labelCls}>ID заказа</Label>
-                  <Input
-                    {...register('orderId')}
-                    placeholder="789"
-                    type="number"
-                    className={`mt-1 ${inputCls}`}
-                  />
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
           {/* Футер */}
@@ -303,10 +307,8 @@ export function CreateAppealModal({
               disabled={saveMutation.isPending}
               className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
             >
-              {saveMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : null}
-              {isEdit ? 'Сохранить' : 'Создать обращение'}
+              {saveMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              {isEdit ? 'Сохранить' : 'Создать'}
             </Button>
           </div>
         </form>

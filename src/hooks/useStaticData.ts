@@ -52,6 +52,32 @@ export const useEquipmentTypes = () => {
   });
 };
 
+interface OrderStatus {
+  id: number;
+  name: string;
+  code: string;
+  color: string;
+  group: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export const useOrderStatuses = (group?: 'appeal' | 'order') => {
+  return useQuery<OrderStatus[]>({
+    queryKey: ['orderStatuses', group],
+    queryFn: async () => {
+      const response = await api.get('/references/order-statuses');
+      const all: OrderStatus[] = response.data?.data || [];
+      if (group) return all.filter(s => s.group === group && s.isActive);
+      return all.filter(s => s.isActive);
+    },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+};
+
 // Хук для получения операторов
 export const useOperators = () => {
   return useQuery({

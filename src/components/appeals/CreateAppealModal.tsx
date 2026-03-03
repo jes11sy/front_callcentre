@@ -30,12 +30,23 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+interface CallContext {
+  phone: string;
+  callId: number;
+  cityId?: number;
+  rkId?: number;
+  source?: string | null;
+  cityName?: string;
+  rkName?: string;
+}
+
 interface CreateAppealModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   appeal?: Appeal | null;
   initialPhone?: string;
   initialCallId?: number;
+  callContext?: CallContext | null;
   onSaved: () => void;
 }
 
@@ -45,6 +56,7 @@ export function CreateAppealModal({
   appeal,
   initialPhone,
   initialCallId,
+  callContext,
   onSaved,
 }: CreateAppealModalProps) {
   const { theme } = useDesignStore();
@@ -80,6 +92,18 @@ export function CreateAppealModal({
           siteOrderId: appeal.siteOrderId ? String(appeal.siteOrderId) : '',
           orderId: appeal.orderId ? String(appeal.orderId) : '',
         });
+      } else if (callContext) {
+        reset({
+          clientPhone: callContext.phone,
+          clientName: '',
+          category: 'question',
+          description: '',
+          result: '',
+          status: 'new',
+          callId: String(callContext.callId),
+          siteOrderId: '',
+          orderId: '',
+        });
       } else {
         reset({
           clientPhone: initialPhone || '',
@@ -94,16 +118,21 @@ export function CreateAppealModal({
         });
       }
     }
-  }, [open, appeal, initialPhone, initialCallId, reset]);
+  }, [open, appeal, initialPhone, initialCallId, callContext, reset]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const payload = {
+      const payload: Record<string, unknown> = {
         ...data,
         callId: data.callId ? Number(data.callId) : undefined,
         siteOrderId: data.siteOrderId ? Number(data.siteOrderId) : undefined,
         orderId: data.orderId ? Number(data.orderId) : undefined,
       };
+      if (!isEdit && callContext) {
+        payload.cityId = callContext.cityId;
+        payload.rkId = callContext.rkId;
+        payload.source = callContext.source ?? undefined;
+      }
       if (isEdit && appeal) {
         const response = await api.patch(`/appeals/${appeal.id}`, payload);
         return response.data;
@@ -139,18 +168,29 @@ export function CreateAppealModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Шапка */}
-        <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
-          <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-            {isEdit ? `Редактировать обращение #${appeal.id}` : 'Новое обращение'}
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-            className={`h-8 w-8 p-0 ${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-500 hover:text-gray-900'}`}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        <div className={`px-5 py-4 border-b ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
+          <div className="flex items-center justify-between">
+            <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+              {isEdit ? `Редактировать обращение #${appeal.id}` : 'Новое обращение'}
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              className={`h-8 w-8 p-0 ${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          {callContext && (callContext.cityName || callContext.rkName || callContext.source) && (
+            <div className="flex items-center gap-1.5 mt-2 text-sm">
+              {callContext.cityName && <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{callContext.cityName}</span>}
+              {callContext.cityName && callContext.rkName && <span className="text-gray-400">•</span>}
+              {callContext.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>{callContext.rkName}</span>}
+              {(callContext.cityName || callContext.rkName) && callContext.source && <span className="text-gray-400">•</span>}
+              {callContext.source && <span className="text-[#FEC004]">{callContext.source}</span>}
+            </div>
+          )}
         </div>
 
         {/* Форма */}

@@ -45,6 +45,7 @@ export const useCallsData = () => {
   });
   const [newCallsCount, setNewCallsCount] = useState(0);
   const [socketConnected, setSocketConnected] = useState(false);
+  const [answeredCallForAppeal, setAnsweredCallForAppeal] = useState<Call | null>(null);
   
   const lastParamsRef = useRef<string>('');
   const hasDataRef = useRef<boolean>(false);
@@ -147,11 +148,19 @@ export const useCallsData = () => {
         c.id === call.id ? { ...c, ...call } : c
       )
     );
+
+    if (call.status === 'answered' && call.callDirection === 'inbound' && !call.appealId) {
+      setAnsweredCallForAppeal(call);
+    }
   }, []);
 
   const handleEndedCall = useCallback((call: Call) => {
     handleUpdatedCall(call);
   }, [handleUpdatedCall]);
+
+  const clearAnsweredCallForAppeal = useCallback(() => {
+    setAnsweredCallForAppeal(null);
+  }, []);
 
   return {
     calls,
@@ -164,8 +173,10 @@ export const useCallsData = () => {
     stats,
     newCallsCount,
     socketConnected,
+    answeredCallForAppeal,
     fetchCalls,
     resetNewCallsCount,
+    clearAnsweredCallForAppeal,
     handleNewCall,
     handleUpdatedCall,
     handleEndedCall

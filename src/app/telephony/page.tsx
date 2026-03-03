@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -13,6 +13,10 @@ export const dynamic = 'force-dynamic';
 
 // Динамические импорты для тяжелых компонентов (без fallback'ов)
 const CreateOrderModal = nextDynamic(() => import('@/components/telephony/CreateOrderModal').then(mod => ({ default: mod.CreateOrderModal })), {
+  ssr: false
+});
+
+const CreateAppealModal = nextDynamic(() => import('@/components/appeals/CreateAppealModal').then(mod => ({ default: mod.CreateAppealModal })), {
   ssr: false
 });
 
@@ -57,8 +61,23 @@ export default function TelephonyPage() {
     closePlayer,
     downloadRecording,
     createOrderFromCall,
-    handleOrderCreated
+    handleOrderCreated,
+    answeredCallForAppeal,
+    clearAnsweredCallForAppeal
   } = useTelephony();
+
+  const appealCallContext = useMemo(() => {
+    if (!answeredCallForAppeal) return null;
+    return {
+      phone: answeredCallForAppeal.phoneClient,
+      callId: answeredCallForAppeal.id,
+      cityId: answeredCallForAppeal.cityId,
+      rkId: answeredCallForAppeal.rkId,
+      source: answeredCallForAppeal.source ?? answeredCallForAppeal.phone?.source,
+      cityName: answeredCallForAppeal.city?.name,
+      rkName: answeredCallForAppeal.rk?.name,
+    };
+  }, [answeredCallForAppeal]);
 
   // Показываем скелетон при загрузке (только для первой загрузки)
   if (loading && calls.length === 0) {
@@ -107,6 +126,14 @@ export default function TelephonyPage() {
         open={showCreateOrderModal}
         onOpenChange={setShowCreateOrderModal}
         onOrderCreated={handleOrderCreated}
+      />
+
+      {/* Auto Appeal Modal — opens when operator answers an inbound call */}
+      <CreateAppealModal
+        open={!!answeredCallForAppeal}
+        onOpenChange={(open) => { if (!open) clearAnsweredCallForAppeal(); }}
+        callContext={appealCallContext}
+        onSaved={() => clearAnsweredCallForAppeal()}
       />
     </DashboardLayout>
   );

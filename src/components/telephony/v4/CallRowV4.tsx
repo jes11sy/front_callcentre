@@ -17,7 +17,6 @@ import {
   MapPin,
   User,
   Clock,
-  History
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
@@ -456,19 +455,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               >
                 <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1" />
                 <span className="hidden sm:inline">Создать</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onCreateOrder(call, groupCalls)}
-                className={cn(
-                  "h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm",
-                  "text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
-                )}
-                title="История заказов"
-              >
-                <History className="w-3.5 h-3.5 sm:mr-1" />
-                <span className="hidden sm:inline">История</span>
               </Button>
             </>
           ) : (

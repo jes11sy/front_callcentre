@@ -78,6 +78,20 @@ export const useOrderStatuses = (group?: 'appeal' | 'order') => {
   });
 };
 
+export const useSources = () => {
+  return useQuery<string[]>({
+    queryKey: ['sources'],
+    queryFn: async () => {
+      const response = await api.get('/phones/sources');
+      return response.data?.data || [];
+    },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+};
+
 // Хук для получения операторов
 export const useOperators = () => {
   return useQuery({

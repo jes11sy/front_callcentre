@@ -250,6 +250,11 @@ export function CreateAppealModal({
 
   const isOrder = mode === 'order';
 
+  const sourceOptions = [...sources];
+  if (watchSource && !sourceOptions.includes(watchSource)) {
+    sourceOptions.unshift(watchSource);
+  }
+
   const formatHistoryDate = (d: string) => new Date(d).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   return (
@@ -337,6 +342,9 @@ export function CreateAppealModal({
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="Город" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>
+                        {watchCityId && watchCityId !== 'none' && !cities.find(c => String(c.id) === watchCityId) && (
+                          <SelectItem value={watchCityId} className={selectItemCls}>{callContext?.cityName || `ID ${watchCityId}`}</SelectItem>
+                        )}
                         {cities.map((c) => <SelectItem key={c.id} value={String(c.id)} className={selectItemCls}>{c.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -347,6 +355,9 @@ export function CreateAppealModal({
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="РК" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>
+                        {watchRkId && watchRkId !== 'none' && !rks.find(r => String(r.id) === watchRkId) && (
+                          <SelectItem value={watchRkId} className={selectItemCls}>{callContext?.rkName || `ID ${watchRkId}`}</SelectItem>
+                        )}
                         {rks.map((r) => <SelectItem key={r.id} value={String(r.id)} className={selectItemCls}>{r.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -357,7 +368,7 @@ export function CreateAppealModal({
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="Источник" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>
-                        {sources.map((s) => <SelectItem key={s} value={s} className={selectItemCls}>{s}</SelectItem>)}
+                        {sourceOptions.map((s) => <SelectItem key={s} value={s} className={selectItemCls}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>

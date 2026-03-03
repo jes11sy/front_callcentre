@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -126,6 +126,42 @@ export function CreateAppealModal({
     staleTime: 30_000,
   });
 
+  const initialValues = useMemo<FormData>(() => {
+    if (appeal) {
+      return {
+        phone: appeal.phone,
+        clientName: appeal.clientName || '',
+        description: appeal.description || '',
+        status: appeal.status,
+        cityId: appeal.cityId ? String(appeal.cityId) : '',
+        rkId: appeal.rkId ? String(appeal.rkId) : '',
+        source: appeal.source || '',
+        callId: appeal.callId ? String(appeal.callId) : '',
+        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+      };
+    }
+    if (callContext) {
+      return {
+        phone: callContext.phone || '',
+        clientName: '',
+        description: '',
+        status: 'new',
+        cityId: callContext.cityId ? String(callContext.cityId) : '',
+        rkId: callContext.rkId ? String(callContext.rkId) : '',
+        source: callContext.source || '',
+        callId: String(callContext.callId || ''),
+        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+      };
+    }
+    return {
+      phone: initialPhone || '',
+      clientName: '', description: '', status: 'new',
+      cityId: '', rkId: '', source: '',
+      callId: initialCallId ? String(initialCallId) : '',
+      address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+    };
+  }, [appeal, callContext, initialPhone, initialCallId]);
+
   const {
     register,
     handleSubmit,
@@ -134,54 +170,9 @@ export function CreateAppealModal({
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: { status: 'new' },
+    defaultValues: initialValues,
+    values: initialValues,
   });
-
-  useEffect(() => {
-    if (!open) return;
-    setMode('appeal');
-
-    const setAll = (vals: Partial<FormData>) => {
-      (Object.keys(vals) as (keyof FormData)[]).forEach((key) => {
-        setValue(key, vals[key] ?? '', { shouldValidate: false, shouldDirty: false, shouldTouch: false });
-      });
-    };
-
-    if (appeal) {
-      setAll({
-        phone: appeal.phone,
-        clientName: appeal.clientName || '',
-        description: appeal.description,
-        status: appeal.status,
-        cityId: appeal.cityId ? String(appeal.cityId) : '',
-        rkId: appeal.rkId ? String(appeal.rkId) : '',
-        source: appeal.source || '',
-        callId: appeal.callId ? String(appeal.callId) : '',
-        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-      });
-    } else if (callContext) {
-      setAll({
-        phone: callContext.phone,
-        clientName: '',
-        description: '',
-        status: 'new',
-        cityId: callContext.cityId ? String(callContext.cityId) : '',
-        rkId: callContext.rkId ? String(callContext.rkId) : '',
-        source: callContext.source || '',
-        callId: String(callContext.callId),
-        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-      });
-    } else {
-      setAll({
-        phone: initialPhone || '',
-        clientName: '', description: '', status: 'new',
-        cityId: '', rkId: '', source: '',
-        callId: initialCallId ? String(initialCallId) : '',
-        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -260,6 +251,10 @@ export function CreateAppealModal({
   if (watchSource && !sourceOptions.includes(watchSource)) {
     sourceOptions.unshift(watchSource);
   }
+
+  const citySelectValue = watchCityId || 'none';
+  const rkSelectValue = watchRkId || 'none';
+  const sourceSelectValue = watchSource || 'none';
 
   const formatHistoryDate = (d: string) => new Date(d).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
@@ -344,7 +339,7 @@ export function CreateAppealModal({
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <Label className={labelCls}>Город{isOrder ? ' *' : ''}</Label>
-                    <Select value={watchCityId || 'none'} onValueChange={(v) => setValue('cityId', v === 'none' ? '' : v)}>
+                    <Select value={citySelectValue} onValueChange={(v) => setValue('cityId', v === 'none' ? '' : v)}>
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="Город" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>
@@ -357,7 +352,7 @@ export function CreateAppealModal({
                   </div>
                   <div>
                     <Label className={labelCls}>РК</Label>
-                    <Select value={watchRkId || 'none'} onValueChange={(v) => setValue('rkId', v === 'none' ? '' : v)}>
+                    <Select value={rkSelectValue} onValueChange={(v) => setValue('rkId', v === 'none' ? '' : v)}>
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="РК" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>
@@ -370,7 +365,7 @@ export function CreateAppealModal({
                   </div>
                   <div>
                     <Label className={labelCls}>Источник</Label>
-                    <Select value={watchSource || 'none'} onValueChange={(v) => setValue('source', v === 'none' ? '' : v)}>
+                    <Select value={sourceSelectValue} onValueChange={(v) => setValue('source', v === 'none' ? '' : v)}>
                       <SelectTrigger className={selectTriggerCls}><SelectValue placeholder="Источник" /></SelectTrigger>
                       <SelectContent className={selectContentCls}>
                         <SelectItem value="none" className={selectItemCls}>—</SelectItem>

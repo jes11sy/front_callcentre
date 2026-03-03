@@ -27,7 +27,7 @@ export const useRKs = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['rks'],
     queryFn: async () => {
-      const response = await api.get('/references/rks', { params: { isActive: true } });
+      const response = await api.get('/references/rk', { params: { isActive: true } });
       return (response.data?.data || []).map((r: { id: number; name: string }) => ({ id: r.id, name: r.name }));
     },
     staleTime: STALE_TIME,

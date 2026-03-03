@@ -27,14 +27,16 @@ export type AppealStatus = 'new' | 'accepted' | 'refused' | 'spam' | 'non_order'
 
 export interface Appeal {
   id: number;
-  clientPhone: string;
+  phone: string;
   clientName?: string;
   description: string;
   result?: string;
   status: AppealStatus;
-  callId?: number;
+  statusId?: number;
+  statusName?: string;
+  statusColor?: string;
+  callId?: string | number;
   siteOrderId?: number;
-  orderId?: number;
   operator?: { id: number; name: string };
   cityId?: number;
   rkId?: number;
@@ -324,7 +326,7 @@ export default function AppealsPage() {
                           </td>
                           <td className="px-4 py-3">
                             <span className={`text-sm font-mono ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-                              {appeal.clientPhone}
+                              {appeal.phone}
                             </span>
                           </td>
                           <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -441,7 +443,7 @@ export default function AppealsPage() {
                   <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Клиент</p>
                   <div className="flex items-center gap-2">
                     <Phone className={`h-4 w-4 shrink-0 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
-                    <span className={`font-mono text-sm ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{detailAppeal.clientPhone}</span>
+                    <span className={`font-mono text-sm ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{detailAppeal.phone}</span>
                   </div>
                   {detailAppeal.clientName && (
                     <p className={`text-sm mt-1 ml-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{detailAppeal.clientName}</p>
@@ -489,9 +491,6 @@ export default function AppealsPage() {
                 <div className="space-y-1.5">
                   {detailAppeal.callId && (
                     <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Звонок: <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>#{detailAppeal.callId}</span></p>
-                  )}
-                  {detailAppeal.orderId && (
-                    <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Заказ: <span className="text-[#FEC004]">#{detailAppeal.orderId}</span></p>
                   )}
                   {detailAppeal.siteOrderId && (
                     <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Заявка с сайта: <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>#{detailAppeal.siteOrderId}</span></p>

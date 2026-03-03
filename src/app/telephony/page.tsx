@@ -62,22 +62,22 @@ export default function TelephonyPage() {
     downloadRecording,
     createOrderFromCall,
     handleOrderCreated,
-    answeredCallForAppeal,
-    clearAnsweredCallForAppeal
+    answeredCallForOrder,
+    clearAnsweredCallForOrder
   } = useTelephony();
 
   const appealCallContext = useMemo(() => {
-    if (!answeredCallForAppeal) return null;
+    if (!answeredCallForOrder) return null;
     return {
-      phone: answeredCallForAppeal.phoneClient,
-      callId: answeredCallForAppeal.id,
-      cityId: answeredCallForAppeal.cityId,
-      rkId: answeredCallForAppeal.rkId,
-      source: answeredCallForAppeal.source ?? answeredCallForAppeal.phone?.source,
-      cityName: answeredCallForAppeal.city?.name,
-      rkName: answeredCallForAppeal.rk?.name,
+      phone: answeredCallForOrder.phoneClient,
+      callId: answeredCallForOrder.id,
+      cityId: answeredCallForOrder.cityId,
+      rkId: answeredCallForOrder.rkId,
+      source: answeredCallForOrder.source ?? answeredCallForOrder.phone?.source,
+      cityName: answeredCallForOrder.cityName ?? answeredCallForOrder.city?.name,
+      rkName: answeredCallForOrder.rkName ?? answeredCallForOrder.rk?.name,
     };
-  }, [answeredCallForAppeal]);
+  }, [answeredCallForOrder]);
 
   // Показываем скелетон при загрузке (только для первой загрузки)
   if (loading && calls.length === 0) {
@@ -130,10 +130,10 @@ export default function TelephonyPage() {
 
       {/* Auto Appeal Modal — opens when operator answers an inbound call */}
       <CreateAppealModal
-        open={!!answeredCallForAppeal}
-        onOpenChange={(open) => { if (!open) clearAnsweredCallForAppeal(); }}
+        open={!!answeredCallForOrder}
+        onOpenChange={(open) => { if (!open) clearAnsweredCallForOrder(); }}
         callContext={appealCallContext}
-        onSaved={() => clearAnsweredCallForAppeal()}
+        onSaved={() => clearAnsweredCallForOrder()}
       />
     </DashboardLayout>
   );

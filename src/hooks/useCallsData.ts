@@ -45,7 +45,7 @@ export const useCallsData = () => {
   });
   const [newCallsCount, setNewCallsCount] = useState(0);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [answeredCallForAppeal, setAnsweredCallForAppeal] = useState<Call | null>(null);
+  const [answeredCallForOrder, setAnsweredCallForOrder] = useState<Call | null>(null);
   
   const lastParamsRef = useRef<string>('');
   const hasDataRef = useRef<boolean>(false);
@@ -113,10 +113,9 @@ export const useCallsData = () => {
 
   // Callbacks для socket events
   const handleNewCall = useCallback((call: Call) => {
-    // Обновляем groupedCalls
     setGroupedCalls(prev => {
       const phone = call.phoneClient;
-      const newGrouped = { [phone]: [call], ...prev }; // Новая группа в начало
+      const newGrouped = { [phone]: [call], ...prev };
       if (prev[phone]) {
         newGrouped[phone] = [call, ...prev[phone]];
       }
@@ -131,6 +130,10 @@ export const useCallsData = () => {
       answeredCalls: call.status === 'answered' ? prev.answeredCalls + 1 : prev.answeredCalls,
     }));
     setNewCallsCount(prev => prev + 1);
+
+    if (call.status === 'answered' && call.callDirection === 'inbound' && !call.orderId) {
+      setAnsweredCallForOrder(call);
+    }
   }, []);
 
   const handleUpdatedCall = useCallback((call: Call) => {
@@ -149,8 +152,8 @@ export const useCallsData = () => {
       )
     );
 
-    if (call.status === 'answered' && call.callDirection === 'inbound' && !call.appealId) {
-      setAnsweredCallForAppeal(call);
+    if (call.status === 'answered' && call.callDirection === 'inbound' && !call.orderId) {
+      setAnsweredCallForOrder(call);
     }
   }, []);
 
@@ -158,8 +161,8 @@ export const useCallsData = () => {
     handleUpdatedCall(call);
   }, [handleUpdatedCall]);
 
-  const clearAnsweredCallForAppeal = useCallback(() => {
-    setAnsweredCallForAppeal(null);
+  const clearAnsweredCallForOrder = useCallback(() => {
+    setAnsweredCallForOrder(null);
   }, []);
 
   return {
@@ -173,10 +176,10 @@ export const useCallsData = () => {
     stats,
     newCallsCount,
     socketConnected,
-    answeredCallForAppeal,
+    answeredCallForOrder,
     fetchCalls,
     resetNewCallsCount,
-    clearAnsweredCallForAppeal,
+    clearAnsweredCallForOrder,
     handleNewCall,
     handleUpdatedCall,
     handleEndedCall

@@ -26,8 +26,9 @@ export interface Call {
     login: string;
   };
   orderId?: number | null;
-  appealId?: number | null;
   source?: string | null;
+  cityName?: string | null;
+  rkName?: string | null;
   avito?: {
     id: number;
     name: string;

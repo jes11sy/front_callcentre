@@ -150,7 +150,7 @@ export const useTelephony = () => {
     createOrderFromCall: actions.createOrderFromCall,
     handleOrderCreated: actions.handleOrderCreated,
     resetNewCallsCount: callsData.resetNewCallsCount,
-    answeredCallForAppeal: callsData.answeredCallForAppeal,
-    clearAnsweredCallForAppeal: callsData.clearAnsweredCallForAppeal
+    answeredCallForOrder: callsData.answeredCallForOrder,
+    clearAnsweredCallForOrder: callsData.clearAnsweredCallForOrder
   };
 };

@@ -23,14 +23,12 @@ import { CreateAppealModal } from '@/components/appeals/CreateAppealModal';
 
 export const dynamic = 'force-dynamic';
 
-export type AppealStatus = 'new' | 'in_progress' | 'waiting_client' | 'closed_resolved' | 'closed_refused';
-export type AppealCategory = 'question' | 'complaint' | 'order' | 'consultation' | 'callback';
+export type AppealStatus = 'new' | 'accepted' | 'refused' | 'spam' | 'non_order' | 'duplicate' | 'callback' | 'complaint' | 'consultation';
 
 export interface Appeal {
   id: number;
   clientPhone: string;
   clientName?: string;
-  category: AppealCategory;
   description: string;
   result?: string;
   status: AppealStatus;
@@ -59,34 +57,38 @@ interface AppealsResponse {
 
 export const STATUS_LABELS: Record<AppealStatus, string> = {
   new: 'Новое',
-  in_progress: 'В работе',
-  waiting_client: 'Ожидает клиента',
-  closed_resolved: 'Закрыто (решено)',
-  closed_refused: 'Закрыто (отказ)',
+  accepted: 'Принят',
+  refused: 'Отказ',
+  spam: 'Спам',
+  non_order: 'Незаказ',
+  duplicate: 'Дубль',
+  callback: 'Перезвонить',
+  complaint: 'Жалоба',
+  consultation: 'Консультация',
 };
 
 export const STATUS_COLORS: Record<AppealStatus, string> = {
   new: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30',
-  in_progress: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-500/30',
-  waiting_client: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30',
-  closed_resolved: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30',
-  closed_refused: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30',
-};
-
-export const CATEGORY_LABELS: Record<AppealCategory, string> = {
-  question: 'Вопрос',
-  complaint: 'Жалоба',
-  order: 'Заказ',
-  consultation: 'Консультация',
-  callback: 'Перезвон',
+  accepted: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30',
+  refused: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30',
+  spam: 'bg-gray-100 dark:bg-gray-600/20 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-500/30',
+  non_order: 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-500/30',
+  duplicate: 'bg-gray-100 dark:bg-gray-600/20 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-500/30',
+  callback: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30',
+  complaint: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30',
+  consultation: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-500/30',
 };
 
 export const STATUS_FLOW: AppealStatus[] = [
   'new',
-  'in_progress',
-  'waiting_client',
-  'closed_resolved',
-  'closed_refused',
+  'accepted',
+  'refused',
+  'spam',
+  'non_order',
+  'duplicate',
+  'callback',
+  'complaint',
+  'consultation',
 ];
 
 export default function AppealsPage() {
@@ -97,7 +99,6 @@ export default function AppealsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppeal, setEditingAppeal] = useState<Appeal | null>(null);
@@ -105,20 +106,19 @@ export default function AppealsPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const { data, isLoading, error } = useQuery<AppealsResponse>({
-    queryKey: ['appeals', page, search, statusFilter, categoryFilter],
+    queryKey: ['appeals', page, search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', '50');
       if (search) params.append('search', search);
       if (statusFilter) params.append('status', statusFilter);
-      if (categoryFilter) params.append('category', categoryFilter);
       const response = await api.get(`/appeals?${params.toString()}`);
       return response.data;
     },
   });
 
-  const { data: statsData } = useQuery<{ success: boolean; data: { total: number; byStatus: Record<string, number>; byCategory: Record<string, number> } }>({
+  const { data: statsData } = useQuery<{ success: boolean; data: { total: number; byStatus: Record<string, number> } }>({
     queryKey: ['appeals-stats'],
     queryFn: async () => {
       const response = await api.get('/appeals/stats');
@@ -227,19 +227,6 @@ export default function AppealsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="w-[150px]">
-                  <Select value={categoryFilter || 'all'} onValueChange={(v) => { setCategoryFilter(v === 'all' ? '' : v); setPage(1); }}>
-                    <SelectTrigger className={`h-9 ${isDark ? 'bg-[#252d3a] border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`}>
-                      <SelectValue placeholder="Все категории" />
-                    </SelectTrigger>
-                    <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
-                      <SelectItem value="all" className={isDark ? 'text-gray-200' : 'text-gray-700'}>Все категории</SelectItem>
-                      {(Object.entries(CATEGORY_LABELS) as [AppealCategory, string][]).map(([k, v]) => (
-                        <SelectItem key={k} value={k} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{v}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <Button
                   onClick={handleOpenCreate}
                   className="h-9 bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold ml-auto"
@@ -251,7 +238,7 @@ export default function AppealsPage() {
             </div>
 
             {/* Статистика */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4">
+            <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 mb-4">
               {STATUS_FLOW.map((s) => {
                 const count = statsData?.data?.byStatus?.[s] ?? 0;
                 return (
@@ -461,15 +448,10 @@ export default function AppealsPage() {
                   )}
                 </div>
 
-                {/* Статус / Категория */}
-                <div className="flex items-center gap-3">
+                {/* Статус */}
+                <div>
                   <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${STATUS_COLORS[detailAppeal.status]}`}>
                     {STATUS_LABELS[detailAppeal.status]}
-                  </span>
-                  <span className={`text-xs px-2.5 py-1 rounded-full border ${
-                    isDark ? 'bg-gray-700 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-200'
-                  }`}>
-                    {CATEGORY_LABELS[detailAppeal.category]}
                   </span>
                 </div>
 

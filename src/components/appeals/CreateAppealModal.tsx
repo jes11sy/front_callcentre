@@ -13,16 +13,15 @@ import { Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
-import type { Appeal, AppealStatus, AppealCategory } from '@/app/appeals/page';
-import { STATUS_LABELS, STATUS_FLOW, CATEGORY_LABELS } from '@/app/appeals/page';
+import type { Appeal, AppealStatus } from '@/app/appeals/page';
+import { STATUS_LABELS, STATUS_FLOW } from '@/app/appeals/page';
 
 const schema = z.object({
   clientPhone: z.string().min(1, 'Укажите телефон клиента'),
   clientName: z.string().optional(),
-  category: z.enum(['question', 'complaint', 'order', 'consultation', 'callback']),
   description: z.string().optional(),
   result: z.string().optional(),
-  status: z.enum(['new', 'in_progress', 'waiting_client', 'closed_resolved', 'closed_refused']),
+  status: z.enum(['new', 'accepted', 'refused', 'spam', 'non_order', 'duplicate', 'callback', 'complaint', 'consultation']),
   callId: z.string().optional(),
   siteOrderId: z.string().optional(),
   orderId: z.string().optional(),
@@ -74,7 +73,6 @@ export function CreateAppealModal({
     resolver: zodResolver(schema),
     defaultValues: {
       status: 'new',
-      category: 'question',
     },
   });
 
@@ -84,7 +82,6 @@ export function CreateAppealModal({
         reset({
           clientPhone: appeal.clientPhone,
           clientName: appeal.clientName || '',
-          category: appeal.category,
           description: appeal.description,
           result: appeal.result || '',
           status: appeal.status,
@@ -96,7 +93,6 @@ export function CreateAppealModal({
         reset({
           clientPhone: callContext.phone,
           clientName: '',
-          category: 'question',
           description: '',
           result: '',
           status: 'new',
@@ -108,7 +104,6 @@ export function CreateAppealModal({
         reset({
           clientPhone: initialPhone || '',
           clientName: '',
-          category: 'question',
           description: '',
           result: '',
           status: 'new',
@@ -218,40 +213,22 @@ export function CreateAppealModal({
               </div>
             </div>
 
-            {/* Категория + Статус */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className={labelCls}>Категория *</Label>
-                <Select
-                  value={watch('category')}
-                  onValueChange={(v) => setValue('category', v as AppealCategory)}
-                >
-                  <SelectTrigger className={`mt-1 ${inputCls}`}>
-                    <SelectValue placeholder="Выберите" />
-                  </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
-                    {(Object.entries(CATEGORY_LABELS) as [AppealCategory, string][]).map(([k, v]) => (
-                      <SelectItem key={k} value={k} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{v}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className={labelCls}>Статус *</Label>
-                <Select
-                  value={watch('status')}
-                  onValueChange={(v) => setValue('status', v as AppealStatus)}
-                >
-                  <SelectTrigger className={`mt-1 ${inputCls}`}>
-                    <SelectValue placeholder="Выберите" />
-                  </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
-                    {STATUS_FLOW.map((s) => (
-                      <SelectItem key={s} value={s} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{STATUS_LABELS[s]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Статус */}
+            <div>
+              <Label className={labelCls}>Статус</Label>
+              <Select
+                value={watch('status')}
+                onValueChange={(v) => setValue('status', v as AppealStatus)}
+              >
+                <SelectTrigger className={`mt-1 ${inputCls}`}>
+                  <SelectValue placeholder="Выберите" />
+                </SelectTrigger>
+                <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
+                  {STATUS_FLOW.map((s) => (
+                    <SelectItem key={s} value={s} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{STATUS_LABELS[s]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Примечание */}

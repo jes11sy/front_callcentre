@@ -17,7 +17,7 @@ import {
   MapPin,
   User,
   Clock,
-  MessageSquare
+  History
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { cn } from '@/lib/utils';
@@ -406,15 +406,6 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             >
               {statusConfig.label}
             </Badge>
-            {/* Итог звонка */}
-            {call.orderId && (
-              <Badge
-                variant="outline"
-                className="text-[10px] sm:text-xs border-green-400/50 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10"
-              >
-                #{call.orderId}
-              </Badge>
-            )}
           </div>
         </div>
       </TableCell>
@@ -457,27 +448,27 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               
               <Button
                 size="sm"
-                onClick={() => onCreateOrder(call, groupCalls)}
+                onClick={() => setAppealModalOpen(true)}
                 className={cn(
                   "h-7 sm:h-8 font-medium px-2 sm:px-3 text-xs sm:text-sm",
                   "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
                 )}
               >
                 <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1" />
-                <span className="hidden sm:inline">Новый заказ</span>
+                <span className="hidden sm:inline">Создать</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setAppealModalOpen(true)}
+                onClick={() => onCreateOrder(call, groupCalls)}
                 className={cn(
                   "h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm",
                   "text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
                 )}
-                title="Создать обращение"
+                title="История заказов"
               >
-                <MessageSquare className="w-3.5 h-3.5 sm:mr-1" />
-                <span className="hidden sm:inline">Обращение</span>
+                <History className="w-3.5 h-3.5 sm:mr-1" />
+                <span className="hidden sm:inline">История</span>
               </Button>
             </>
           ) : (
@@ -501,11 +492,19 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
         <CreateAppealModal
           open={appealModalOpen}
           onOpenChange={setAppealModalOpen}
-          initialPhone={displayPhone}
-          initialCallId={call.id}
+          callContext={{
+            phone: (isOutgoing || isCallback) ? call.phoneAts : call.phoneClient,
+            callId: call.id,
+            cityId: call.cityId,
+            rkId: call.rkId,
+            source: call.source ?? call.phone?.source ?? undefined,
+            cityName: call.cityName ?? call.city?.name,
+            rkName: call.rkName ?? call.rk?.name,
+          }}
           onSaved={() => {
             setAppealModalOpen(false);
             queryClient.invalidateQueries({ queryKey: ['appeals'] });
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
           }}
         />
       )}

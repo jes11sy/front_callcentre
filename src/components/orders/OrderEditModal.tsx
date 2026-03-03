@@ -225,17 +225,60 @@ export const OrderEditModal = ({
           <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t space-y-3 border-gray-200 dark:border-gray-700">
             <Row label="Адрес">
               <Input 
-                value={order.address} 
+                value={order.address || ''} 
                 onChange={(e) => handleOrderChange('address', e.target.value)}
                 className={inputClass}
               />
             </Row>
 
-            <Row label="Комментарий">
+            <Row label="Примечание">
               <Textarea 
-                value={(order as any).comment || ''} 
-                onChange={(e) => handleOrderChange('comment' as keyof Order, e.target.value)}
+                value={order.description || ''} 
+                onChange={(e) => handleOrderChange('description', e.target.value)}
                 className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                placeholder="Примечание к заказу..."
+              />
+            </Row>
+          </div>
+
+          {/* Контроль качества */}
+          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t space-y-3 border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-medium pb-2 border-b text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700">Контроль качества</h3>
+            
+            <Row label="Статус КК">
+              <Select value={order.qaStatus || 'none'} onValueChange={(v) => handleOrderChange('qaStatus', v === 'none' ? null : v)}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Не проверено" />
+                </SelectTrigger>
+                <SelectContent className={selectContentClass}>
+                  <SelectItem value="none" className={selectItemClass}>—</SelectItem>
+                  <SelectItem value="Проверено" className={selectItemClass}>Проверено</SelectItem>
+                  <SelectItem value="Не проверено" className={selectItemClass}>Не проверено</SelectItem>
+                  <SelectItem value="Не отвечает" className={selectItemClass}>Не отвечает</SelectItem>
+                  <SelectItem value="Расхождение" className={selectItemClass}>Расхождение</SelectItem>
+                </SelectContent>
+              </Select>
+            </Row>
+
+            <Row label="Сумма ОК">
+              <Select value={order.qaAmountConfirmed === true ? 'yes' : order.qaAmountConfirmed === false ? 'no' : 'none'} onValueChange={(v) => handleOrderChange('qaAmountConfirmed', v === 'yes' ? true : v === 'no' ? false : null)}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent className={selectContentClass}>
+                  <SelectItem value="none" className={selectItemClass}>—</SelectItem>
+                  <SelectItem value="yes" className={selectItemClass}>Да</SelectItem>
+                  <SelectItem value="no" className={selectItemClass}>Нет</SelectItem>
+                </SelectContent>
+              </Select>
+            </Row>
+
+            <Row label="Примечание КК">
+              <Textarea 
+                value={order.qaNote || ''} 
+                onChange={(e) => handleOrderChange('qaNote', e.target.value)}
+                className="min-h-[60px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                placeholder="Комментарий по проверке..."
               />
             </Row>
           </div>

@@ -168,7 +168,7 @@ const OrdersTableComponent = ({
                     <TableHead className="w-14 sm:w-16 text-xs sm:text-sm text-gray-600 dark:text-gray-400">ID</TableHead>
                     <TableHead className="w-14 sm:w-20 text-xs sm:text-sm text-gray-600 dark:text-gray-400">РК</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Город</TableHead>
-                    <TableHead className="w-24 sm:w-28 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Авито</TableHead>
+                    <TableHead className="w-28 sm:w-36 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Источник</TableHead>
                     <TableHead className="w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Телефон</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Тип</TableHead>
                     <TableHead className="w-28 sm:w-32 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Клиент</TableHead>
@@ -190,8 +190,11 @@ const OrdersTableComponent = ({
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.rk?.name || '—'}</TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{order.city?.name || '—'}</TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
-                        <div className="max-w-20 sm:max-w-28 truncate text-xs sm:text-sm text-gray-700 dark:text-gray-300" title={order.avito?.name || 'Не указан'}>
-                          {order.avito?.name || <span className="text-gray-400">—</span>}
+                        <div className="max-w-28 sm:max-w-36 truncate text-xs sm:text-sm text-gray-700 dark:text-gray-300" title={[order.cityName ?? order.city?.name, order.rkName ?? order.rk?.name, order.source].filter(Boolean).join(' • ') || '—'}>
+                          {(() => {
+                            const parts = [order.cityName ?? order.city?.name, order.rkName ?? order.rk?.name, order.source].filter(Boolean);
+                            return parts.length > 0 ? parts.join(' • ') : <span className="text-gray-400">—</span>;
+                          })()}
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">

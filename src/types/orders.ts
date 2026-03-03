@@ -2,21 +2,30 @@ export interface Order {
   id: number;
   rkId: number;
   rk?: { id: number; name: string };
+  rkName?: string;
   cityId: number;
   city?: { id: number; name: string };
+  cityName?: string;
   phone: string;
-  typeOrder: string;
+  typeOrder?: string;
+  orderTypeName?: string;
   clientName: string;
-  address: string;
-  dateMeeting: string;
-  equipmentTypeId: number;
+  address?: string;
+  dateMeeting?: string;
+  equipmentTypeId?: number;
   equipmentType?: { id: number; name: string };
+  equipmentTypeName?: string;
   callRecord?: string;
   statusId: number;
   status?: { id: number; name: string; code: string };
+  statusName?: string;
+  statusCode?: string;
+  statusColor?: string;
   result?: number;
   expenditure?: number;
   clean?: number;
+  masterChange?: number;
+  prepayment?: number;
   bsoDoc?: string[];
   expenditureDoc?: string[];
   masterId?: number;
@@ -24,6 +33,13 @@ export interface Order {
   createdAt: string;
   closingAt?: string;
   updatedAt?: string;
+  description?: string;
+  source?: string;
+  siteOrderId?: number;
+  problem?: string;
+  qaStatus?: string;
+  qaAmountConfirmed?: boolean;
+  qaNote?: string;
   operator: {
     id: number;
     name: string;
@@ -38,6 +54,10 @@ export interface Order {
     name: string;
   };
   callId?: string;
+  documents?: Array<{ id: number; type: string; url: string; createdAt: string }>;
+  comments?: Array<{ id: number; role: string; userId: number; text: string; createdAt: string }>;
+  cashSubmission?: { status: string; amount: number; submittedAt: string; approvedAt: string } | null;
+  hasPoverka?: boolean;
 }
 
 export interface OrdersResponse {

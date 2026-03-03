@@ -30,7 +30,6 @@ export interface Appeal {
   phone: string;
   clientName?: string;
   description: string;
-  result?: string;
   status: AppealStatus;
   statusId?: number;
   statusName?: string;
@@ -476,14 +475,6 @@ export default function AppealsPage() {
                   <div>
                     <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Примечание</p>
                     <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{detailAppeal.description}</p>
-                  </div>
-                )}
-
-                {/* Итог */}
-                {detailAppeal.result && (
-                  <div>
-                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Итог разговора</p>
-                    <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{detailAppeal.result}</p>
                   </div>
                 )}
 

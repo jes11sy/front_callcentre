@@ -243,14 +243,15 @@ const InfoTab = ({
             </Badge>
           </div>
           
-          <DataRow label="Тип заявки" value={order.typeOrder} />
-          <DataRow label="РК" value={order.rk?.name || '—'} />
-          <DataRow label="Авито" value={order.avito?.name || '—'} muted={!order.avito?.name} />
-          <DataRow label="Город" value={order.city?.name || '—'} />
+          <DataRow label="Тип заявки" value={order.typeOrder || order.orderTypeName || '—'} muted={!order.typeOrder && !order.orderTypeName} />
+          <DataRow label="Источник" value={[order.cityName ?? order.city?.name, order.rkName ?? order.rk?.name, order.source].filter(Boolean).join(' • ') || '—'} muted={!order.city?.name && !order.cityName && !order.source} />
+          <DataRow label="Город" value={order.cityName ?? order.city?.name ?? '—'} />
+          <DataRow label="РК" value={order.rkName ?? order.rk?.name ?? '—'} />
           <DataRow label="Клиент" value={order.clientName} />
           <DataRow label="Телефон" value={order.phone || '—'} muted={!order.phone} />
-          <DataRow label="Дата встречи" value={formatDate(order.dateMeeting)} />
-          <DataRow label="Адрес" value={order.address} />
+          <DataRow label="Дата встречи" value={order.dateMeeting ? formatDate(order.dateMeeting) : '—'} muted={!order.dateMeeting} />
+          <DataRow label="Адрес" value={order.address || '—'} muted={!order.address} />
+          {order.description && <DataRow label="Примечание" value={order.description} />}
         </div>
 
         {/* Правая колонка — мастер и финансы */}
@@ -267,11 +268,23 @@ const InfoTab = ({
         </div>
       </div>
 
+      {/* Контроль качества */}
+      {(order.qaStatus || order.qaNote || order.qaAmountConfirmed !== undefined) && (
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">Контроль качества</h3>
+          <div className="space-y-1">
+            <DataRow label="Статус проверки" value={order.qaStatus || '—'} muted={!order.qaStatus} />
+            <DataRow label="Сумма подтверждена" value={order.qaAmountConfirmed === true ? 'Да' : order.qaAmountConfirmed === false ? 'Нет' : '—'} muted={order.qaAmountConfirmed == null} />
+            {order.qaNote && <DataRow label="Примечание КК" value={order.qaNote} />}
+          </div>
+        </div>
+      )}
+
       {/* Оператор */}
       <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a] flex items-center">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">Оператор:</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.operator.name}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.operator?.name || '—'}</span>
         </div>
       </div>
 

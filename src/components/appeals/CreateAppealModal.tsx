@@ -131,7 +131,6 @@ export function CreateAppealModal({
     handleSubmit,
     setValue,
     watch,
-    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -139,43 +138,50 @@ export function CreateAppealModal({
   });
 
   useEffect(() => {
-    if (open) {
-      setMode('appeal');
-      if (appeal) {
-        reset({
-          phone: appeal.phone,
-          clientName: appeal.clientName || '',
-          description: appeal.description,
-          status: appeal.status,
-          cityId: appeal.cityId ? String(appeal.cityId) : '',
-          rkId: appeal.rkId ? String(appeal.rkId) : '',
-          source: appeal.source || '',
-          callId: appeal.callId ? String(appeal.callId) : '',
-          address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-        });
-      } else if (callContext) {
-        reset({
-          phone: callContext.phone,
-          clientName: '',
-          description: '',
-          status: 'new',
-          cityId: callContext.cityId ? String(callContext.cityId) : '',
-          rkId: callContext.rkId ? String(callContext.rkId) : '',
-          source: callContext.source || '',
-          callId: String(callContext.callId),
-          address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-        });
-      } else {
-        reset({
-          phone: initialPhone || '',
-          clientName: '', description: '', status: 'new',
-          cityId: '', rkId: '', source: '',
-          callId: initialCallId ? String(initialCallId) : '',
-          address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
-        });
-      }
+    if (!open) return;
+    setMode('appeal');
+
+    const setAll = (vals: Partial<FormData>) => {
+      (Object.keys(vals) as (keyof FormData)[]).forEach((key) => {
+        setValue(key, vals[key] ?? '', { shouldValidate: false, shouldDirty: false, shouldTouch: false });
+      });
+    };
+
+    if (appeal) {
+      setAll({
+        phone: appeal.phone,
+        clientName: appeal.clientName || '',
+        description: appeal.description,
+        status: appeal.status,
+        cityId: appeal.cityId ? String(appeal.cityId) : '',
+        rkId: appeal.rkId ? String(appeal.rkId) : '',
+        source: appeal.source || '',
+        callId: appeal.callId ? String(appeal.callId) : '',
+        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+      });
+    } else if (callContext) {
+      setAll({
+        phone: callContext.phone,
+        clientName: '',
+        description: '',
+        status: 'new',
+        cityId: callContext.cityId ? String(callContext.cityId) : '',
+        rkId: callContext.rkId ? String(callContext.rkId) : '',
+        source: callContext.source || '',
+        callId: String(callContext.callId),
+        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+      });
+    } else {
+      setAll({
+        phone: initialPhone || '',
+        clientName: '', description: '', status: 'new',
+        cityId: '', rkId: '', source: '',
+        callId: initialCallId ? String(initialCallId) : '',
+        address: '', dateMeeting: '', typeOrder: 'Впервые', equipmentTypeId: '',
+      });
     }
-  }, [open, appeal, initialPhone, initialCallId, callContext, reset]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {

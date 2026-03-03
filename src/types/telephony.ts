@@ -27,6 +27,7 @@ export interface Call {
   };
   orderId?: number | null;
   appealId?: number | null;
+  source?: string | null;
   avito?: {
     id: number;
     name: string;
@@ -36,6 +37,7 @@ export interface Call {
     number: string;
     rkId?: number;
     cityId?: number;
+    source?: string | null;
   };
 }
 

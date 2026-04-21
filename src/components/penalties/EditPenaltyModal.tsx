@@ -113,15 +113,15 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
   if (!penalty) return null;
 
   // Стили
-  const dialogClass = "bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 w-[calc(100%-2rem)] sm:max-w-md font-myriad";
+  const dialogClass = "bg-[#f5f5f7] dark:bg-[#111113] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-100 w-[calc(100%-2rem)] sm:max-w-md font-myriad rounded-[20px]";
   
-  const selectTriggerClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
+  const selectTriggerClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:[&_[data-placeholder]]:text-white/45 dark:[&_svg]:text-white/70";
   
-  const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
+  const selectContentClass = "bg-white border-gray-200 dark:bg-[#1e1e20] dark:border-white/10";
   
-  const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
+  const selectItemClass = "text-gray-700 data-[highlighted]:bg-black/5 dark:text-white dark:data-[highlighted]:bg-white/10";
   
-  const inputClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004]";
+  const inputClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45";
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -230,14 +230,14 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
             variant="outline"
             onClick={handleClose}
             disabled={isSaving}
-            className="h-11 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="h-11 border-gray-200 dark:border-white/15 text-gray-500 dark:text-white/80 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
           >
             Отмена
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="h-11 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+            className={isDark ? 'h-11 bg-white text-[#111113] hover:bg-gray-100' : 'h-11 bg-[#FEC004] text-[#111113] hover:bg-[#e3ac00]'}
           >
             {isSaving ? (
               <>

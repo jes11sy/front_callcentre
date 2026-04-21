@@ -3,9 +3,10 @@
 import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { useDesignStore } from '@/store/designStore';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTelephony } from '@/hooks/useTelephony';
-import { TelephonyPageSkeleton } from '@/components/telephony/TelephonyPageSkeleton';
+import { LoadingState } from '@/components/ui/loading-state';
 import nextDynamic from 'next/dynamic';
 
 // Force dynamic rendering to avoid SSG issues with React Query
@@ -28,6 +29,8 @@ const CallTableV4 = nextDynamic(() => import('@/components/telephony/v4/CallTabl
 export default function TelephonyPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
 
   const {
     // States
@@ -66,6 +69,7 @@ export default function TelephonyPage() {
     clearAnsweredCallForOrder
   } = useTelephony();
 
+<<<<<<< Updated upstream
   const appealCallContext = useMemo(() => {
     if (!answeredCallForOrder) return null;
     return {
@@ -80,17 +84,22 @@ export default function TelephonyPage() {
   }, [answeredCallForOrder]);
 
   // Показываем скелетон при загрузке (только для первой загрузки)
+=======
+  // Показываем единый экран загрузки при первой загрузке
+>>>>>>> Stashed changes
   if (loading && calls.length === 0) {
     return (
       <DashboardLayout variant="operator">
-        <TelephonyPageSkeleton />
+        <div className="w-full min-h-screen px-4 py-6 bg-[#f5f5f7] dark:bg-[#111113]">
+          <LoadingState isDark={isDark} message="Загрузка звонков..." fullPage />
+        </div>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout variant="operator">
-      <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
+      <div className="w-full min-h-screen px-4 py-6 bg-[#f5f5f7] dark:bg-[#111113]">
         <CallTableV4
           calls={calls}
           groupedCalls={groupedCalls}

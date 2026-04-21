@@ -8,7 +8,11 @@ import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
 import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
+<<<<<<< Updated upstream
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+=======
+import { cookies } from "next/headers";
+>>>>>>> Stashed changes
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,14 +49,24 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const cookieTheme = cookieStore.get('theme')?.value;
+  const initialDark = cookieTheme === 'dark';
+
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="ru" className={initialDark ? 'dark' : undefined} suppressHydrationWarning>
       <head>
+        <style>{`
+          html, body { background-color: #f5f5f7; }
+          @media (prefers-color-scheme: dark) {
+            html, body { background-color: #111113; }
+          }
+        `}</style>
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
           rel="stylesheet"
@@ -72,13 +86,42 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  var cookieMatch = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+                  var cookieTheme = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
                   var stored = localStorage.getItem('design-storage');
-                  if (stored) {
+                  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var root = document.documentElement;
+                  var setThemePaint = function(isDark) {
+                    root.style.backgroundColor = isDark ? '#111113' : '#f5f5f7';
+                    root.style.colorScheme = isDark ? 'dark' : 'light';
+                    if (document.body) {
+                      document.body.style.backgroundColor = isDark ? '#111113' : '#f5f5f7';
+                    }
+                  };
+                  if (cookieTheme === 'dark') {
+                    root.classList.add('dark');
+                    setThemePaint(true);
+                  } else if (cookieTheme === 'light') {
+                    root.classList.remove('dark');
+                    setThemePaint(false);
+                  } else if (stored) {
                     var parsed = JSON.parse(stored);
                     var state = parsed.state || parsed;
                     if (state.theme === 'dark') {
-                      document.documentElement.classList.add('dark');
+                      root.classList.add('dark');
+                      setThemePaint(true);
+                    } else if (state.theme === 'light') {
+                      root.classList.remove('dark');
+                      setThemePaint(false);
+                    } else if (prefersDark) {
+                      root.classList.add('dark');
+                      setThemePaint(true);
                     }
+                  } else if (prefersDark) {
+                    root.classList.add('dark');
+                    setThemePaint(true);
+                  } else {
+                    setThemePaint(false);
                   }
                 } catch (e) {}
               })();
@@ -99,15 +142,16 @@ export default function RootLayout({
             <Toaster 
               position="top-right" 
               theme="system"
+              richColors={false}
               toastOptions={{
                 classNames: {
-                  toast: 'bg-white dark:bg-[#1e2736] border-gray-200 dark:border-gray-700',
-                  title: 'text-gray-900 dark:text-gray-100',
-                  description: 'text-gray-500 dark:text-gray-400',
-                  success: 'bg-white dark:bg-[#1e2736] text-green-600 dark:text-green-400',
-                  error: 'bg-white dark:bg-[#1e2736] text-red-600 dark:text-red-400',
-                  warning: 'bg-white dark:bg-[#1e2736] text-yellow-600 dark:text-yellow-400',
-                  info: 'bg-white dark:bg-[#1e2736] text-blue-600 dark:text-blue-400',
+                  toast: 'bg-[#15181d] border-[#2a2f36] text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] rounded-2xl',
+                  title: 'text-white font-semibold',
+                  description: 'text-white/75',
+                  success: 'bg-[#15181d] text-white',
+                  error: 'bg-[#15181d] text-white',
+                  warning: 'bg-[#15181d] text-white',
+                  info: 'bg-[#15181d] text-white',
                 },
               }}
             />

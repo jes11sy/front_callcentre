@@ -15,8 +15,8 @@ export default function Home() {
     if (hasRedirected.current) return;
     hasRedirected.current = true;
     
-    // Просто редиректим на логин - там проверка авторизации
-    router.replace('/login');
+    // Редиректим на основную рабочую страницу
+    router.replace('/telephony');
   }, [router]);
 
   return (

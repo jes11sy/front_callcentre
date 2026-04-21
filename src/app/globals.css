@@ -31,6 +31,17 @@
   filter: invert(73%) sepia(89%) saturate(1000%) hue-rotate(2deg) brightness(104%) contrast(101%);
 }
 
+@media (min-width: 1024px) {
+  .cc-main-content {
+    margin-left: 288px;
+    transition: margin-left 300ms ease;
+  }
+
+  .sidebar-collapsed .cc-main-content {
+    margin-left: 136px;
+  }
+}
+
 /* Myriad Pro для V2 дизайна */
 @font-face {
   font-family: 'Myriad Pro';
@@ -159,6 +170,18 @@ th:hover {
   background-color: transparent !important;
 }
 
+/* Сайдбар: выбранный пункт с текстом — заметный серый фон (inline CSS, чтобы фон не терялся из-за Tailwind/merge) */
+.cc-sidebar-item-active-expanded {
+  background-color: #bdbec7 !important;
+  color: #fec004 !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.dark .cc-sidebar-item-active-expanded {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+  color: #fec004 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
 
 @layer utilities {
   /* Объединенные CSS переменные - убираем дублирование */
@@ -300,6 +323,25 @@ th:hover {
   .custom-scrollbar {
     scrollbar-width: thin !important;
     scrollbar-color: #FFD700 #0a0a1a !important;
+  }
+
+  /* Orders timeline scrollbar in dark theme */
+  .orders-dark-scroll::-webkit-scrollbar-track {
+    background: #000000 !important;
+  }
+
+  .orders-dark-scroll::-webkit-scrollbar-thumb {
+    background: #ffffff !important;
+    border-radius: 9999px !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  .orders-dark-scroll::-webkit-scrollbar-thumb:hover {
+    background: #f2f2f2 !important;
+  }
+
+  .orders-dark-scroll {
+    scrollbar-color: #ffffff #000000 !important;
   }
 
   /* Оптимизированные состояния загрузки */

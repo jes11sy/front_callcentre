@@ -3,7 +3,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Call } from '@/types/telephony';
 import authApi from '@/lib/auth';
-import { notifications } from '@/components/ui/notifications';
 
 interface GroupedCallsResponse {
   success: boolean;
@@ -99,7 +98,6 @@ export const useCallsData = () => {
       
       console.error('Error fetching calls:', err);
       setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Ошибка при загрузке звонков');
-      notifications.error('Ошибка при загрузке звонков');
     } finally {
       setLoading(false);
     }

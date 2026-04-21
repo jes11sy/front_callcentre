@@ -6,7 +6,6 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Select, 
@@ -16,11 +15,10 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { 
-  Edit, 
+  Edit2, 
   Save, 
   X, 
   Loader2,
-  XCircle,
   Eye,
   EyeOff,
   LogOut,
@@ -36,7 +34,11 @@ import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+<<<<<<< Updated upstream
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+=======
+import { LoadingState } from '@/components/ui/loading-state';
+>>>>>>> Stashed changes
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -243,26 +245,6 @@ export default function ProfilePage() {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-700 border-green-200';
-      case 'inactive': return 'bg-red-100 text-red-700 border-red-200';
-      case 'on_call': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'break': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active': return 'Активен';
-      case 'inactive': return 'Неактивен';
-      case 'on_call': return 'На звонке';
-      case 'break': return 'Перерыв';
-      default: return status;
-    }
-  };
-
   const getWorkStatusText = (status: string) => {
     switch (status) {
       case 'offline': return 'Оффлайн';
@@ -276,110 +258,168 @@ export default function ProfilePage() {
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
-
-  if (error) {
-    return (
-      <DashboardLayout variant="operator" requiredRole="operator">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
-          <div className="px-4 py-6 sm:px-0">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <p className="text-red-700 dark:text-red-400">Ошибка при загрузке профиля</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const hasNetworkError = Boolean(error);
 
   if (isLoading) {
     return (
       <DashboardLayout variant="operator" requiredRole="operator">
-        <div className={`py-10 px-10 min-h-screen font-myriad transition-colors duration-300 ${
-          isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
-        }`}>
-          <div className="max-w-3xl">
-            <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FEC004]" />
-              <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Загрузка профиля...</p>
+        <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#111113] px-4 py-6 font-myriad">
+          <LoadingState isDark={isDark} message="Загрузка профиля..." fullPage />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <DashboardLayout variant="operator" requiredRole="operator">
+        <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#111113] px-4 py-6 font-myriad">
+          {hasNetworkError && (
+            <div className={`mb-4 rounded-[16px] border px-4 py-3 text-sm ${
+              isDark
+                ? 'border-red-400/40 bg-red-500/10 text-red-100'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }`}>
+              <div className="flex items-center justify-between gap-3">
+                <span>Вы оффлайн или сервер недоступен. Страница открыта, но данные профиля не загружены.</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className={isDark ? 'border-white/20 bg-transparent text-white hover:bg-white/10' : ''}
+                >
+                  Повторить
+                </Button>
+              </div>
             </div>
+          )}
+          <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10 text-gray-300' : 'bg-white border-black/10 text-gray-600'}`}>
+            Данные профиля временно недоступны.
           </div>
         </div>
       </DashboardLayout>
     );
   }
 
-  if (!profile) return null;
-
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className={`py-10 px-10 min-h-screen font-myriad transition-colors duration-300 ${
-        isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
-      }`}>
-        <div className="max-w-3xl space-y-8">
+      <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#111113] px-4 py-6 font-myriad">
+        <div className="mx-auto max-w-5xl space-y-4">
+          {hasNetworkError && (
+            <div className={`rounded-[16px] border px-4 py-3 text-sm ${
+              isDark
+                ? 'border-red-400/40 bg-red-500/10 text-red-100'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }`}>
+              <div className="flex items-center justify-between gap-3">
+                <span>Вы оффлайн или сервер недоступен. Интерфейс открыт, данные могут быть неактуальны.</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className={isDark ? 'border-white/20 bg-transparent text-white hover:bg-white/10' : ''}
+                >
+                  Повторить
+                </Button>
+              </div>
+            </div>
+          )}
+          
           
           {/* Шапка профиля */}
-          <div className="flex items-start justify-between">
+          <div className={`flex items-start justify-between rounded-[20px] border px-5 py-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-[#FEC004] flex items-center justify-center text-gray-900 text-xl font-medium">
+              <div className={`h-14 w-14 rounded-full flex items-center justify-center text-lg font-medium ${isDark ? 'bg-white/[0.12] text-white' : 'bg-[#0a4f42] text-white'}`}>
                 {getInitials(profile.name)}
               </div>
               <div>
-                <h1 className={`text-xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.name}</h1>
+                <h1 className={`text-[20px] font-semibold tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.name}</h1>
                 <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{profile.login} • {profile.city}</p>
-                <Badge className={getStatusColor(profile.status) + ' mt-1'}>
-                  {getStatusText(profile.status)}
-                </Badge>
               </div>
             </div>
             {!isEditing ? (
-              <Button 
-                onClick={handleEdit} 
-                variant="ghost"
-                className={`hover:text-[#FEC004] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
+              <button onClick={handleEdit} className={`transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Edit2 className="h-5 w-5" />
+              </button>
             ) : (
               <div className="flex gap-2">
-                <Button onClick={handleCancel} variant="ghost" className={isDark ? 'text-gray-400' : 'text-gray-500'}>
-                  <X className="h-4 w-4" />
-                </Button>
-                <Button 
-                  onClick={profileForm.handleSubmit(handleSave)}
-                  disabled={updateProfileMutation.isPending}
-                  className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
-                >
-                  {updateProfileMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                </Button>
+                <button onClick={handleCancel} className={`transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}>
+                  <X className="h-5 w-5" />
+                </button>
+                <button onClick={profileForm.handleSubmit(handleSave)} disabled={updateProfileMutation.isPending} className={`transition-colors disabled:opacity-50 ${isDark ? 'text-gray-200 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>
+                  {updateProfileMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                </button>
               </div>
             )}
           </div>
 
-          {/* Статистика (для операторов) */}
-          {profile.role === 'operator' && profileStats && (
-            <>
-              <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
-              <div className="grid grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.calls}</div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Звонков</div>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="space-y-4">
+              {profile.role === 'operator' && profileStats && (
+                <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
+                  <p className={`mb-3 text-sm font-semibold ${isDark ? 'text-white/80' : 'text-[#111113]'}`}>Статистика</p>
+                  <div className="grid grid-cols-4 gap-3 text-center">
+                    <div>
+                      <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.calls}</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Звонков</div>
+                    </div>
+                    <div>
+                      <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.orders}</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Заказов</div>
+                    </div>
+                    <div>
+                      <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.monthly.calls}</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>За месяц</div>
+                    </div>
+                    <div>
+                      <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.today.calls}</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Сегодня</div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.total.orders}</div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Заказов</div>
+              )}
+
+              <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
+                <p className={`mb-3 text-sm font-semibold ${isDark ? 'text-white/80' : 'text-[#111113]'}`}>Контакт и профиль</p>
+                <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Рабочий статус</span>
+                  {isEditing ? (
+                    <Select value={profileForm.watch('statusWork')} onValueChange={(value) => profileForm.setValue('statusWork', value)}>
+                      <SelectTrigger className={`w-32 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                        <SelectItem value="offline">Оффлайн</SelectItem>
+                        <SelectItem value="online">В сети</SelectItem>
+                        <SelectItem value="break">Перерыв</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.statusWork)}</span>
+                  )}
                 </div>
-                <div>
-                  <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.monthly.calls}</div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>За месяц</div>
+                <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Город</span>
+                  {isEditing ? (
+                    <Input {...profileForm.register('city')} className={`w-40 text-right ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
+                  ) : (
+                    <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{profile.city}</span>
+                  )}
                 </div>
-                <div>
-                  <div className={`text-2xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profileStats.today.calls}</div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Сегодня</div>
+                <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
+                  <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.dateCreate)}</span>
+                </div>
+                <div className="flex justify-between items-start py-3">
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Примечание</span>
+                  {isEditing ? (
+                    <Textarea {...profileForm.register('note')} className={`w-64 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} rows={2} />
+                  ) : (
+                    <span className={`text-right max-w-xs ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.note || 'Не указано'}</span>
+                  )}
                 </div>
               </div>
+<<<<<<< Updated upstream
             </>
           )}
 
@@ -411,25 +451,53 @@ export default function ProfilePage() {
               ) : (
                 <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.status)}</span>
               )}
+=======
+>>>>>>> Stashed changes
             </div>
 
-            {/* Город (редактируемый) */}
-            <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Город</span>
-              {isEditing ? (
-                <Input
-                  {...profileForm.register('city')}
-                  className={`w-40 text-right ${
-                    isDark 
-                      ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                      : 'bg-white border-gray-200 text-gray-900'
-                  }`}
-                />
-              ) : (
-                <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{profile.city}</span>
-              )}
-            </div>
+            <div className="space-y-4">
+              <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
+                <button onClick={() => setIsChangingPassword(!isChangingPassword)} className={`w-full rounded-xl px-4 py-2 text-sm text-left transition-colors ${isDark ? 'bg-white/[0.06] text-gray-200 hover:bg-white/[0.1]' : 'bg-black/[0.04] text-gray-700 hover:bg-black/[0.08]'}`}>
+                  {isChangingPassword ? 'Отмена' : 'Сменить пароль'}
+                </button>
+                {isChangingPassword && (
+                  <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="mt-4 space-y-4">
+                    <div className="space-y-1">
+                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Текущий пароль</Label>
+                      <div className="relative">
+                        <Input type={showCurrentPassword ? 'text' : 'password'} {...passwordForm.register('currentPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
+                        <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Новый пароль</Label>
+                      <div className="relative">
+                        <Input type={showNewPassword ? 'text' : 'password'} {...passwordForm.register('newPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
+                        <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Подтвердите пароль</Label>
+                      <div className="relative">
+                        <Input type={showConfirmPassword ? 'text' : 'password'} {...passwordForm.register('confirmPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <Button type="submit" disabled={changePasswordMutation.isPending} className={isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#0a4f42] text-white hover:bg-[#083f35]'}>
+                      {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Сохранить пароль
+                    </Button>
+                  </form>
+                )}
+              </div>
 
+<<<<<<< Updated upstream
             {/* Дата начала */}
             <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
               <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
@@ -541,11 +609,18 @@ export default function ProfilePage() {
                 >
                   {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   Сохранить пароль
+=======
+              <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
+                <Button onClick={handleLogout} variant="ghost" className={`w-full justify-start gap-2 ${isDark ? 'text-red-300 hover:text-red-200 hover:bg-white/10' : 'text-red-600 hover:text-red-700 hover:bg-red-50'}`}>
+                  <LogOut className="h-4 w-4" />
+                  Выйти из аккаунта
+>>>>>>> Stashed changes
                 </Button>
-              </form>
-            )}
+              </div>
+            </div>
           </div>
 
+<<<<<<< Updated upstream
           {/* Push-уведомления */}
           {isPushSupported && (
             <>
@@ -598,6 +673,8 @@ export default function ProfilePage() {
             Выйти из аккаунта
           </Button>
 
+=======
+>>>>>>> Stashed changes
         </div>
       </div>
     </DashboardLayout>

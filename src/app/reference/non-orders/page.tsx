@@ -1,8 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { XCircle, AlertTriangle, Phone, MessageSquare, Clock, Wrench, ChevronLeft } from 'lucide-react';
+import { XCircle, AlertTriangle, MessageSquare, Wrench, ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useRouter } from 'next/navigation';
 
@@ -105,7 +103,7 @@ export default function NonOrdersPage() {
 
   return (
     <DashboardLayout>
-      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#f5f5f7] dark:bg-[#111113] font-myriad">
         <div className="max-w-4xl space-y-8 sm:space-y-10">
           
           {/* Кнопка назад - только мобилка */}
@@ -118,13 +116,13 @@ export default function NonOrdersPage() {
           </button>
 
           {/* Что мы НЕ делаем - в начале */}
-          <section className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-500/30">
-            <h2 className="text-lg text-red-700 dark:text-red-400 mb-4">Что мы НЕ делаем</h2>
+          <section className="bg-white dark:bg-white/[0.03] p-6 rounded-[20px] border border-black/[0.08] dark:border-white/10">
+            <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4">Что мы НЕ делаем</h2>
             <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-              <li><span className="text-red-600 dark:text-red-400 font-medium">Не выкупаем технику</span> — мы не занимаемся выкупом</li>
-              <li><span className="text-red-600 dark:text-red-400 font-medium">Не ездим только ради диагностики</span> — диагностика бесплатна только при ремонте</li>
-              <li><span className="text-red-600 dark:text-red-400 font-medium">Не ремонтируем/меняем матрицы</span> — не работаем с матрицами экранов</li>
-              <li><span className="text-red-600 dark:text-red-400 font-medium">Не ремонтируем мелкую бытовую технику</span> — пылесосы, тостеры и прочую мелочовку</li>
+              <li><span className="text-[#0a4f42] dark:text-white font-medium">Не выкупаем технику</span> — мы не занимаемся выкупом</li>
+              <li><span className="text-[#0a4f42] dark:text-white font-medium">Не ездим только ради диагностики</span> — диагностика бесплатна только при ремонте</li>
+              <li><span className="text-[#0a4f42] dark:text-white font-medium">Не ремонтируем/меняем матрицы</span> — не работаем с матрицами экранов</li>
+              <li><span className="text-[#0a4f42] dark:text-white font-medium">Не ремонтируем мелкую бытовую технику</span> — пылесосы, тостеры и прочую мелочовку</li>
             </ul>
           </section>
 
@@ -137,7 +135,7 @@ export default function NonOrdersPage() {
                   <div key={reasonIndex} className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0">
                     <p className="text-gray-900 dark:text-gray-100 font-medium">{reason.title}</p>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{reason.description}</p>
-                    <p className="text-blue-600 dark:text-blue-400 text-sm mt-2">Действие: {reason.action}</p>
+                    <p className="text-[#0a4f42] dark:text-white text-sm mt-2">Действие: {reason.action}</p>
                   </div>
                 ))}
               </div>
@@ -156,8 +154,8 @@ export default function NonOrdersPage() {
           </section>
 
           {/* Советы */}
-          <section className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-500/30">
-            <h2 className="text-lg text-green-700 dark:text-green-400 mb-4">Как минимизировать незаказы</h2>
+          <section className="bg-white dark:bg-white/[0.03] p-6 rounded-[20px] border border-black/[0.08] dark:border-white/10">
+            <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4">Как минимизировать незаказы</h2>
             <ul className="space-y-2 text-gray-700 dark:text-gray-300">
               <li>Четко объяснять ценовую политику с самого начала</li>
               <li>Уточнять удобное время для клиента</li>

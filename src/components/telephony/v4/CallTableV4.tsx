@@ -12,9 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LoadingState } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Call } from '@/types/telephony';
 
 // Размеры для пагинации по группам
@@ -25,7 +25,7 @@ const GROUP_SIZES = [
   { value: '50', label: '50' },
 ];
 import { CallRowV4 } from './CallRowV4';
-import { QuickFilterChips, QuickFilter } from './QuickFilterChips';
+import { QuickFilterChips } from './QuickFilterChips';
 import { StickyAudioPlayer } from '../v2/StickyAudioPlayer';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -91,45 +91,15 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLimitChange,
   stats
 }) => {
+<<<<<<< Updated upstream
+=======
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
+  
+>>>>>>> Stashed changes
   // Local state
-  const [activeFilter, setActiveFilter] = useState<QuickFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [stickyPlayerCall, setStickyPlayerCall] = useState<Call | null>(null);
-
-  // Подсчёт для фильтров - используем серверную статистику если есть
-  const filterCounts = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const isToday = (dateString: string) => {
-      const callDate = new Date(dateString);
-      callDate.setHours(0, 0, 0, 0);
-      return callDate.getTime() === today.getTime();
-    };
-    
-    // Подсчет пропущенных за сегодня (локально)
-    const missedToday = calls.filter(c => c.status === 'missed' && isToday(c.createdAt)).length;
-    const todayCalls = calls.filter(c => isToday(c.createdAt)).length;
-    
-    if (stats) {
-      // Показываем только за сегодня
-      return {
-        all: stats.todayCalls,
-        missed: missedToday,
-        answered: stats.answeredCalls,
-        today: stats.todayCalls
-      };
-    }
-    
-    // Fallback на локальный подсчёт
-    // Показываем только за сегодня
-    return {
-      all: todayCalls,
-      missed: missedToday,
-      answered: calls.filter(c => c.status === 'answered' && isToday(c.createdAt)).length,
-      today: todayCalls
-    };
-  }, [stats, calls, totalCalls]);
 
   // Локальная фильтрация для поиска и быстрых фильтров
   // Серверная пагинация уже применена, здесь только дополнительная фильтрация на клиенте
@@ -146,39 +116,8 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
       );
     }
     
-    // Быстрые фильтры (локальные, в рамках загруженных данных)
-    // TODO: В будущем можно передавать эти фильтры на сервер
-    if (activeFilter !== 'all') {
-      const now = new Date();
-      const today = new Date(now);
-      today.setHours(0, 0, 0, 0);
-      const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-      
-      filtered = Object.fromEntries(
-        Object.entries(filtered).filter(([_, groupCalls]) => {
-          const latestCall = groupCalls[0];
-          const callDate = new Date(latestCall.createdAt);
-          
-          switch (activeFilter) {
-            case 'missed':
-              return latestCall.status === 'missed';
-            case 'answered':
-              return latestCall.status === 'answered';
-            case 'today':
-              const callDay = new Date(callDate);
-              callDay.setHours(0, 0, 0, 0);
-              return callDay.getTime() === today.getTime();
-            case 'last_hour':
-              return callDate >= hourAgo;
-            default:
-              return true;
-          }
-        })
-      );
-    }
-    
     return filtered;
-  }, [groupedCalls, searchTerm, activeFilter]);
+  }, [groupedCalls, searchTerm]);
 
   const displayedGroupsCount = Object.keys(filteredGroupedCalls).length;
 
@@ -197,56 +136,59 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   const SortIcon = ({ field }: { field: string }) => {
     if (sortBy !== field) return <ArrowUpDown className="w-3.5 h-3.5 ml-1 opacity-50" />;
     return sortOrder === 'asc' 
-      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-[#FFD700]" />
-      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-[#FFD700]" />;
+      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-[#0a4f42] dark:text-white" />
+      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-[#0a4f42] dark:text-white" />;
   };
 
   const isStickyPlayerVisible = stickyPlayerCall !== null && currentAudioUrl !== null;
 
-  if (error) {
-    return (
-      <Card className="bg-[#17212b] border-2 border-[#FFD700]/30">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center p-8 text-red-400">
-            <div className="text-center">
-              <p className="text-lg font-medium">Ошибка загрузки</p>
-              <p className="text-sm text-gray-400">{error}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const hasNetworkError = Boolean(error);
 
   // V2 Design
   return (
       <>
+        {hasNetworkError && (
+          <div className={`mb-4 rounded-[16px] border px-4 py-3 text-sm ${
+            isDark
+              ? 'border-red-400/40 bg-red-500/10 text-red-100'
+              : 'border-red-200 bg-red-50 text-red-700'
+          }`}>
+            <div className="flex items-center justify-between gap-3">
+              <span>Ошибка сети: данные не загрузились. Показываю интерфейс для проверки редизайна.</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.reload()}
+                className={isDark ? 'border-white/20 bg-transparent text-white hover:bg-white/10' : ''}
+              >
+                Повторить
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Фильтры отдельно для V2 */}
-        <div className="mb-4 sm:mb-6 bg-white dark:bg-[#1e2530] rounded-xl p-3 sm:p-4 shadow-sm dark:shadow-none dark:border dark:border-gray-700">
+        <div className={`mb-4 rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
           <QuickFilterChips
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            counts={filterCounts}
-            variant="v2"
           />
         </div>
 
         {/* Таблица V2 */}
-        <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-none font-myriad">
+        <Card className={`rounded-[20px] border font-myriad shadow-none ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
           <CardContent className="p-2 sm:p-4">
             <div className="overflow-x-auto rounded-lg">
               <Table className="min-w-[700px] w-full">
                 <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-[#252d3a] border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]">
+                  <TableRow className={`border-b-2 ${isDark ? 'bg-white/[0.04] border-white/20 hover:bg-white/[0.04]' : 'bg-gray-50 border-gray-200 hover:bg-gray-50'}`}>
                     <TableHead className="w-[18%] py-2 sm:py-3 px-2 sm:px-4">
                       <span className="text-gray-800 dark:text-gray-200 font-medium text-xs sm:text-sm">Клиент</span>
                     </TableHead>
                     <TableHead className="w-[22%] py-2 sm:py-3 px-2 sm:px-4">
                       <button 
                         onClick={() => onSort('city')}
-                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors text-xs sm:text-sm"
+                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#0a4f42] dark:hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         Источник
                         <SortIcon field="city" />
@@ -255,7 +197,7 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                     <TableHead className="w-[18%] py-2 sm:py-3 px-2 sm:px-4">
                       <button 
                         onClick={() => onSort('createdAt')}
-                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#FEC004] transition-colors text-xs sm:text-sm"
+                        className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-[#0a4f42] dark:hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         Дата и время
                         <SortIcon field="createdAt" />
@@ -273,17 +215,22 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   {loading ? (
                     <TableRow>
                       <td colSpan={5} className="text-center py-12">
-                        <LoadingState message="Загрузка звонков..." size="md" />
+                        <LoadingState
+                          isDark={isDark}
+                          message="Загрузка звонков..."
+                        />
                       </td>
                     </TableRow>
                   ) : displayedGroupsCount === 0 ? (
                     <TableRow>
                       <td colSpan={5} className="text-center py-12">
                         <EmptyState
-                          title="Звонки не найдены"
-                          description={searchTerm || activeFilter !== 'all' 
-                            ? "Попробуйте изменить параметры фильтрации" 
-                            : "Нет данных для отображения"
+                          title={hasNetworkError ? 'Не удалось загрузить звонки' : 'Звонки не найдены'}
+                          description={hasNetworkError
+                            ? 'Проверьте соединение и попробуйте снова.'
+                            : searchTerm
+                              ? 'Попробуйте изменить параметры фильтрации'
+                              : 'Нет данных для отображения'
                           }
                         />
                       </td>
@@ -350,15 +297,17 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   }}
                   disabled={loading}
                 >
-                  <SelectTrigger className="w-14 sm:w-16 h-7 sm:h-8 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-xs sm:text-sm">
+                  <SelectTrigger className={`w-14 sm:w-16 h-7 sm:h-8 text-xs sm:text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
+                    isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-700'
+                  }`}>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#1e2530] border-gray-200 dark:border-gray-600">
+                  <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
                     {GROUP_SIZES.map((size) => (
                       <SelectItem 
                         key={size.value} 
                         value={size.value}
-                        className="text-gray-800 dark:text-gray-200 focus:bg-[#FEC004]/10"
+                        className={isDark ? 'text-white focus:bg-white/10 focus:text-white' : 'text-gray-800 focus:bg-black/5'}
                       >
                         {size.label}
                       </SelectItem>

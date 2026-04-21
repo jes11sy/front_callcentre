@@ -6,12 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Order, OrdersResponse } from '@/types/orders';
-import { STATUS_COLORS, STATUS_COLORS_V2, PAGE_SIZES } from '@/constants/orders';
-import { LoadingState } from '@/components/ui/loading';
+import { STATUS_COLORS_V2, PAGE_SIZES } from '@/constants/orders';
+import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
+import { NetworkError } from '@/components/ui/network-error';
 import React, { useCallback, ReactNode } from 'react';
 import { useDesignStore } from '@/store/designStore';
 
@@ -39,6 +40,8 @@ const OrdersTableComponent = ({
   filtersComponent
 }: OrdersTableProps) => {
   const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
+  const createButtonClass = isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#FEC004] text-[#111113] hover:bg-[#e3ac00]';
   
   // Мемоизированная функция форматирования даты (используется в цикле)
   const formatDate = useCallback((dateString: string) => {
@@ -56,37 +59,31 @@ const OrdersTableComponent = ({
 
   if (isLoading) {
     return (
-      <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad">
+      <Card className={`rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
         <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
           {/* Мобильный вид */}
           <div className="flex flex-col gap-2 sm:hidden mb-4">
-            {filtersComponent}
             <Button 
               onClick={onCreateOrder}
-              className="w-full bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+              className={`w-full ${createButtonClass}`}
             >
               <Plus className="mr-2 h-4 w-4" />
               Новый
             </Button>
+            {filtersComponent}
           </div>
           {/* Десктопный вид */}
-          <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
-            <div className="flex-1">
-              {filtersComponent}
-            </div>
+          <div className="hidden sm:flex items-center justify-end gap-2 mb-4">
             <Button 
               onClick={onCreateOrder}
-              className="shrink-0 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+              className={`shrink-0 ${createButtonClass}`}
             >
               <Plus className="mr-2 h-4 w-4" />
               Создать заказ
             </Button>
+            {filtersComponent}
           </div>
-          <LoadingState 
-            message="Загрузка заказов..." 
-            size="lg"
-            className="py-12"
-          />
+          <LoadingState isDark={isDark} message="Загрузка заказов..." />
         </CardContent>
       </Card>
     );
@@ -94,31 +91,29 @@ const OrdersTableComponent = ({
 
   if (ordersData?.orders?.length === 0) {
     return (
-      <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad">
+      <Card className={`rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
         <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
           {/* Мобильный вид */}
           <div className="flex flex-col gap-2 sm:hidden mb-4">
-            {filtersComponent}
             <Button 
               onClick={onCreateOrder}
-              className="w-full bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+              className={`w-full ${createButtonClass}`}
             >
               <Plus className="mr-2 h-4 w-4" />
               Новый
             </Button>
+            {filtersComponent}
           </div>
           {/* Десктопный вид */}
-          <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
-            <div className="flex-1">
-              {filtersComponent}
-            </div>
+          <div className="hidden sm:flex items-center justify-end gap-2 mb-4">
             <Button 
               onClick={onCreateOrder}
-              className="shrink-0 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+              className={`shrink-0 ${createButtonClass}`}
             >
               <Plus className="mr-2 h-4 w-4" />
               Создать заказ
             </Button>
+            {filtersComponent}
           </div>
           <EmptyState
             title="Заказы не найдены"
@@ -129,42 +124,74 @@ const OrdersTableComponent = ({
     );
   }
 
+  if (!ordersData?.orders) {
+    return (
+      <Card className={`rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
+        <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
+          <div className="flex flex-col gap-2 sm:hidden mb-4">
+            <Button 
+              onClick={onCreateOrder}
+              className={`w-full ${createButtonClass}`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Новый
+            </Button>
+            {filtersComponent}
+          </div>
+          <div className="hidden sm:flex items-center justify-end gap-2 mb-4">
+            <Button 
+              onClick={onCreateOrder}
+              className={`shrink-0 ${createButtonClass}`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Создать заказ
+            </Button>
+            {filtersComponent}
+          </div>
+
+          <NetworkError
+            isDark={isDark}
+            onRetry={() => window.location.reload()}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   const statusColors = STATUS_COLORS_V2;
 
   return (
-    <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad">
+    <Card className={`rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
       <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
         {/* Мобильный вид: кнопки в колонку на всю ширину */}
         <div className="flex flex-col gap-2 sm:hidden mb-4">
-          {filtersComponent}
           <Button 
             onClick={onCreateOrder}
-            className="w-full bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+            className={`w-full ${createButtonClass}`}
           >
             <Plus className="mr-2 h-4 w-4" />
             Новый
           </Button>
+          {filtersComponent}
         </div>
         
         {/* Десктопный вид: кнопки в строку */}
-        <div className="hidden sm:flex items-center justify-between gap-4 mb-4">
-          <div className="flex-1">
-            {filtersComponent}
-          </div>
+        <div className="hidden sm:flex items-center justify-end gap-2 mb-4">
           <Button 
             onClick={onCreateOrder}
-            className="shrink-0 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+            className={`shrink-0 ${createButtonClass}`}
           >
             <Plus className="mr-2 h-4 w-4" />
             Создать заказ
           </Button>
+          {filtersComponent}
         </div>
         {ordersData?.orders && ordersData.orders.length > 0 ? (
           <>
             <div className="overflow-x-auto w-full -mx-2 sm:mx-0 px-2 sm:px-0">
               <Table className="w-full min-w-[900px]">
                 <TableHeader>
-                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]">
+                  <TableRow className={`border-b-2 ${isDark ? 'bg-white/[0.04] border-white/20 hover:bg-white/[0.04]' : 'bg-gray-50 border-gray-200 hover:bg-gray-50'}`}>
                     <TableHead className="w-14 sm:w-16 text-xs sm:text-sm text-gray-600 dark:text-gray-400">ID</TableHead>
                     <TableHead className="w-14 sm:w-20 text-xs sm:text-sm text-gray-600 dark:text-gray-400">РК</TableHead>
                     <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Город</TableHead>
@@ -183,7 +210,7 @@ const OrdersTableComponent = ({
                   {ordersData.orders.map((order) => (
                     <TableRow 
                       key={order.id} 
-                      className="min-w-[900px] border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a] cursor-pointer transition-colors"
+                      className={`min-w-[900px] border-b cursor-pointer transition-colors ${isDark ? 'border-white/10 hover:bg-white/[0.04]' : 'border-gray-200 hover:bg-black/[0.02]'}`}
                       onClick={() => onViewOrder(order)}
                     >
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">{order.id}</TableCell>
@@ -223,9 +250,15 @@ const OrdersTableComponent = ({
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
+<<<<<<< Updated upstream
                         <div className="max-w-20 sm:max-w-28 truncate" title={order.equipmentType?.name || '—'}>
                           <Badge variant="outline" className="text-[10px] sm:text-xs border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10">
                             {order.equipmentType?.name || '—'}
+=======
+                        <div className="max-w-20 sm:max-w-28 truncate" title={order.typeEquipment}>
+                          <Badge variant="outline" className={`text-[10px] sm:text-xs ${isDark ? 'border-white/20 text-white bg-white/10' : 'border-[#FEC004]/40 text-[#b58500] bg-[#FEC004]/15'}`}>
+                            {order.typeEquipment}
+>>>>>>> Stashed changes
                           </Badge>
                         </div>
                       </TableCell>
@@ -264,12 +297,12 @@ const OrdersTableComponent = ({
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-16 sm:w-20 h-8 sm:h-9 text-xs sm:text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 [&_svg]:text-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                      <SelectTrigger className={`w-16 sm:w-20 h-8 sm:h-9 text-xs sm:text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${isDark ? 'bg-white/[0.04] border-white/15 text-white [&_svg]:text-white/70' : 'bg-white border-gray-200 text-gray-700 [&_svg]:text-gray-500 focus:border-gray-300'}`}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-[#1e2530] border-gray-200 dark:border-gray-600">
+                      <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
                         {PAGE_SIZES.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                          <SelectItem key={size.value} value={size.value} className={isDark ? 'text-xs sm:text-sm text-white focus:bg-white/10' : 'text-xs sm:text-sm text-gray-700 focus:bg-black/5'}>
                             {size.label}
                           </SelectItem>
                         ))}
@@ -292,12 +325,7 @@ const OrdersTableComponent = ({
               </div>
             )}
           </>
-        ) : (
-          <div className="text-center py-8">
-            <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-500 dark:text-gray-400">Нет данных для отображения</p>
-          </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

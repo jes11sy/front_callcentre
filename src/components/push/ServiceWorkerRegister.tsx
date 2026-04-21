@@ -12,12 +12,24 @@ export function ServiceWorkerRegister() {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return;
     }
-    
-    // Не регистрируем на localhost (dev режим)
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1';
-    if (isLocalhost) {
-      console.log('[SW] Skipping registration on localhost');
+
+    // В dev режиме всегда отключаем SW и чистим старые регистрации/кэши
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((reg) => reg.unregister())))
+        .catch((error) => {
+          console.warn('[SW] Failed to unregister in dev:', error);
+        });
+
+      if ('caches' in window) {
+        caches.keys()
+          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+          .catch((error) => {
+            console.warn('[SW] Failed to clear caches in dev:', error);
+          });
+      }
+
+      console.log('[SW] Disabled in development mode');
       return;
     }
 

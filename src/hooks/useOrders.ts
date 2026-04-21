@@ -63,10 +63,6 @@ export const useOrders = () => {
   const { data: ordersData, isLoading, error } = useQuery<OrdersResponse>({
     queryKey: ['orders', queryParams, user?.id, user?.role],
     queryFn: async () => {
-      if (!user) {
-        throw new Error('Данные пользователя не загружены');
-      }
-      
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -80,7 +76,15 @@ export const useOrders = () => {
         ...(filters.closingDate && { closingDate: filters.closingDate }),
       });
 
-      const response = await api.get(`/orders?${params}`);
+      const response = await api.get(`/orders?${params}`, {
+        timeout: 6000,
+        __retryConfig: {
+          maxRetries: 0,
+          retryDelay: 0,
+          backoff: false,
+          retryOnStatus: [],
+        },
+      } as any);
       
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -88,17 +92,20 @@ export const useOrders = () => {
       
       throw new Error('Неверный формат ответа API');
     },
-    enabled: !!user
+    enabled: !!user,
+    // Для /orders всегда делаем реальный запрос при входе на страницу.
+    staleTime: 0,
+    refetchOnMount: 'always',
+    retry: 0,
+    // Не храним неактивный кэш заказов, чтобы при повторном входе
+    // не было мгновенного рендера без видимого состояния загрузки.
+    gcTime: 0
   });
 
   // 🕐 Получение всех активных заказов для временной шкалы (на выбранную дату)
   const { data: timelineOrdersData } = useQuery<OrdersResponse>({
     queryKey: ['orders-timeline', user?.id, user?.role, formatDateForApi(timelineDate)],
     queryFn: async () => {
-      if (!user) {
-        throw new Error('Данные пользователя не загружены');
-      }
-      
       // Получаем выбранную дату в формате YYYY-MM-DD (локальное время)
       const dateFrom = formatDateForApi(timelineDate);
       const dateTo = dateFrom;
@@ -111,7 +118,15 @@ export const useOrders = () => {
         dateTo,
       });
 
-      const response = await api.get(`/orders?${params}`);
+      const response = await api.get(`/orders?${params}`, {
+        timeout: 6000,
+        __retryConfig: {
+          maxRetries: 0,
+          retryDelay: 0,
+          backoff: false,
+          retryOnStatus: [],
+        },
+      } as any);
       
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -119,7 +134,6 @@ export const useOrders = () => {
       
       throw new Error('Неверный формат ответа API');
     },
-    enabled: !!user,
     staleTime: 30000, // Кэшируем на 30 секунд
   });
 

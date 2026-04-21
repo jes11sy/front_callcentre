@@ -3,27 +3,30 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 import { 
-  Globe, 
-  Loader2, 
-  AlertCircle, 
   Plus,
+<<<<<<< Updated upstream
   Phone,
   User,
   MapPin,
   MessageSquare,
   Clock,
   AlarmClock
+=======
+>>>>>>> Stashed changes
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
+<<<<<<< Updated upstream
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
+=======
+import { LoadingState } from '@/components/ui/loading-state';
+>>>>>>> Stashed changes
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
@@ -76,22 +79,29 @@ const formatCallbackTime = (callbackAt: string): string => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Создан':
+<<<<<<< Updated upstream
       return 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30';
     case 'В обработке':
       return 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30';
     case 'Перезвонить':
       return 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30';
+=======
+      return 'bg-[#0a4f42]/10 text-[#0a4f42] border-[#0a4f42]/20 dark:bg-white/10 dark:text-white dark:border-white/20';
+>>>>>>> Stashed changes
     case 'Не отвечает':
-      return 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-500/30';
+      return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-400/20';
     case 'Отказ':
-      return 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30';
+      return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-200 dark:border-red-400/20';
     default:
+<<<<<<< Updated upstream
       return 'bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-500/30';
+=======
+      return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-white/5 dark:text-white/70 dark:border-white/10';
+>>>>>>> Stashed changes
   }
 };
 
 export default function SiteOrdersPage() {
-  const { user } = useAuthStore();
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -117,6 +127,7 @@ export default function SiteOrdersPage() {
       return response.data;
     },
   });
+  const hasNetworkError = Boolean(error);
 
   // Update status mutation
   const updateStatusMutation = useMutation({
@@ -182,24 +193,8 @@ export default function SiteOrdersPage() {
   if (isLoading && !data) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FEC004]" />
-            <p className="text-gray-500 dark:text-gray-400">Загрузка заявок...</p>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
-          <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <p className="text-red-400">Ошибка при загрузке заявок</p>
-          </div>
+        <div className="w-full min-h-screen px-4 py-6 bg-[#f5f5f7] dark:bg-[#111113]">
+          <LoadingState isDark={isDark} message="Загрузка заявок..." fullPage />
         </div>
       </DashboardLayout>
     );
@@ -207,28 +202,58 @@ export default function SiteOrdersPage() {
 
   return (
     <DashboardLayout>
-      <div className="w-full py-4 px-4 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+      <div className="w-full py-6 px-4 min-h-screen bg-[#f5f5f7] dark:bg-[#111113] font-myriad">
         <div className="w-full">
+          {hasNetworkError && (
+            <div className={`mb-4 rounded-[16px] border px-4 py-3 text-sm ${
+              isDark
+                ? 'border-red-400/40 bg-red-500/10 text-red-100'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }`}>
+              <div className="flex items-center justify-between gap-3">
+                <span>Вы оффлайн или недоступен сервер. Интерфейс открыт, данные временно не обновляются.</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className={isDark ? 'border-white/20 bg-transparent text-white hover:bg-white/10' : ''}
+                >
+                  Повторить
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Filters */}
-          <div className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
+          <div className={`rounded-[20px] border p-4 mb-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
                 <Input
                   placeholder="Поиск по имени, телефону, сайту..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                  className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
+                    isDark
+                      ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/45 focus-visible:border-white/35 focus-visible:ring-white/20'
+                      : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:border-gray-300 focus-visible:ring-gray-200'
+                  }`}
                 />
               </div>
               <div className="w-[200px]">
                 <Select value={statusFilter || ''} onValueChange={(val) => setStatusFilter(val === 'all' ? '' : val)}>
-                  <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                  <SelectTrigger className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
+                    isDark
+                      ? 'bg-white/[0.04] border-white/15 text-white [&_[data-placeholder]]:text-white/45 [&_svg]:text-white/70 focus-visible:border-white/35 focus-visible:ring-white/20'
+                      : 'bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500'
+                  }`}>
                     <SelectValue placeholder="Все статусы" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                    <SelectItem value="all" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">Все статусы</SelectItem>
+                  <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                    <SelectItem value="all" className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
+                      Все статусы
+                    </SelectItem>
                     {STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status} value={status} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                      <SelectItem key={status} value={status} className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
                         {status}
                       </SelectItem>
                     ))}
@@ -239,11 +264,11 @@ export default function SiteOrdersPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div className={`rounded-[20px] border overflow-hidden ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-[#252d3a] border-b border-gray-200 dark:border-gray-700">
+                  <tr className={`border-b-2 ${isDark ? 'bg-white/[0.04] border-white/20' : 'bg-gray-50 border-gray-200'}`}>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">ID</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
                       <div className="flex items-center gap-2">
@@ -284,7 +309,7 @@ export default function SiteOrdersPage() {
                     data.data.map((order) => (
                       <tr 
                         key={order.id} 
-                        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a] transition-colors"
+                        className={`border-b transition-colors ${isDark ? 'border-white/10 hover:bg-white/[0.04]' : 'border-gray-200 hover:bg-black/[0.02]'}`}
                       >
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{order.id}</td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{order.city?.name || '—'}</td>
@@ -312,16 +337,16 @@ export default function SiteOrdersPage() {
                             disabled={order.status === 'Заказ создан'}
                           >
                             <SelectTrigger 
-                              className={`w-[150px] h-8 text-xs border ${getStatusColor(order.status)} bg-transparent [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0`}
+                              className={`w-[150px] h-8 text-xs border outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-white/35 focus-visible:ring-white/20 ${getStatusColor(order.status)} bg-transparent [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400`}
                             >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                            <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
                               {STATUS_OPTIONS.map((status) => (
                                 <SelectItem 
                                   key={status} 
                                   value={status} 
-                                  className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
+                                  className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}
                                 >
                                   {status}
                                 </SelectItem>
@@ -340,7 +365,11 @@ export default function SiteOrdersPage() {
                               <Input
                                 value={editingComment.value}
                                 onChange={(e) => setEditingComment({ ...editingComment, value: e.target.value })}
-                                className="h-8 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                                className={`h-8 text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
+                                  isDark
+                                    ? 'bg-white/[0.04] border-white/15 text-white focus-visible:border-white/35 focus-visible:ring-white/20'
+                                    : 'bg-white border-gray-200 text-gray-900 focus-visible:border-gray-300 focus-visible:ring-gray-200'
+                                }`}
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') handleSaveComment(order.id);
                                   if (e.key === 'Escape') setEditingComment(null);
@@ -350,7 +379,7 @@ export default function SiteOrdersPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleSaveComment(order.id)}
-                                className="h-8 bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]"
+                                className={isDark ? 'h-8 bg-white text-[#111113] hover:bg-gray-100' : 'h-8 bg-[#0a4f42] text-white hover:bg-[#083f35]'}
                               >
                                 ОК
                               </Button>
@@ -369,13 +398,13 @@ export default function SiteOrdersPage() {
                             <Button
                               size="sm"
                               onClick={() => handleCreateOrder(order)}
-                              className="h-8 bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
+                              className={isDark ? 'h-8 bg-white hover:bg-gray-100 text-[#111113] font-semibold' : 'h-8 bg-[#0a4f42] hover:bg-[#083f35] text-white font-semibold'}
                             >
                               <Plus className="h-4 w-4 mr-1" />
                               Заказ
                             </Button>
                           ) : (
-                            <span className="text-sm text-green-600 dark:text-green-400">
+                            <span className={isDark ? 'text-sm text-white/80' : 'text-sm text-[#0a4f42]'}>
                               Заказ #{order.orderId}
                             </span>
                           )}
@@ -385,7 +414,7 @@ export default function SiteOrdersPage() {
                   ) : (
                     <tr>
                       <td colSpan={9} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                        Заявки не найдены
+                        {hasNetworkError ? 'Нет данных: проверьте подключение к сети' : 'Заявки не найдены'}
                       </td>
                     </tr>
                   )}
@@ -395,15 +424,41 @@ export default function SiteOrdersPage() {
 
             {/* Pagination */}
             {data?.pagination && data.pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+              <div className={`flex items-center justify-between px-4 py-3 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Показано {data.data.length} из {data.pagination.total} заявок
                 </div>
+<<<<<<< Updated upstream
                 <OptimizedPagination
                   currentPage={page}
                   totalPages={data.pagination.totalPages}
                   onPageChange={setPage}
                 />
+=======
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className={isDark ? 'border-white/15 text-white hover:bg-white/10 hover:border-white/20' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03] hover:border-gray-300'}
+                  >
+                    Назад
+                  </Button>
+                  <span className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
+                    {page} / {data.pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
+                    disabled={page === data.pagination.totalPages}
+                    className={isDark ? 'border-white/15 text-white hover:bg-white/10 hover:border-white/20' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03] hover:border-gray-300'}
+                  >
+                    Далее
+                  </Button>
+                </div>
+>>>>>>> Stashed changes
               </div>
             )}
           </div>

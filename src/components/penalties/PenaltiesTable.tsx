@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Plus, AlertTriangle } from 'lucide-react';
-import { LoadingState } from '@/components/ui/loading';
+import { LoadingState } from '@/components/ui/loading-state';
 import { useDesignStore } from '@/store/designStore';
 import React from 'react';
 
@@ -55,11 +55,8 @@ export const PenaltiesTable = ({
     });
   };
 
-  // Общие стили для карточки
-  const cardClass = "bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad";
-
-  // Стили для кнопки создания
-  const createBtnClass = "bg-[#FEC004] text-gray-900 hover:bg-[#e6ac00]";
+  const cardClass = `rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`;
+  const createBtnClass = isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#FEC004] text-[#111113] hover:bg-[#e3ac00]';
 
   if (isLoading) {
     return (
@@ -72,11 +69,7 @@ export const PenaltiesTable = ({
               <span className="sm:hidden">Новый</span>
             </Button>
           </div>
-          <LoadingState 
-            message="Загрузка штрафов..." 
-            size="lg"
-            className="py-12"
-          />
+          <LoadingState isDark={isDark} message="Загрузка штрафов..." />
         </CardContent>
       </Card>
     );
@@ -95,7 +88,7 @@ export const PenaltiesTable = ({
           </div>
           <div className="flex flex-col items-center justify-center py-12">
             <AlertTriangle className="h-10 w-10 sm:h-12 sm:w-12 mb-4 text-gray-400" />
-            <p className="text-base sm:text-lg text-gray-600">Нет штрафов</p>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300">Нет штрафов</p>
           </div>
         </CardContent>
       </Card>
@@ -119,7 +112,7 @@ export const PenaltiesTable = ({
           {penalties.map((penalty) => (
             <div 
               key={penalty.id}
-              className="p-3 rounded-lg bg-gray-50 dark:bg-[#252d3a] border border-gray-200 dark:border-gray-700"
+              className={`p-3 rounded-xl border ${isDark ? 'bg-white/[0.04] border-white/10' : 'bg-gray-50 border-gray-200'}`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
@@ -144,7 +137,7 @@ export const PenaltiesTable = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => onEditPenalty(penalty)}
-                  className="h-8 px-3 text-[#FEC004] hover:bg-[#FEC004]/10"
+                  className={isDark ? 'h-8 px-3 text-white hover:bg-white/10' : 'h-8 px-3 text-[#b58500] hover:bg-[#FEC004]/15'}
                 >
                   <Edit className="h-4 w-4 mr-1" />
                   <span className="text-xs">Изменить</span>
@@ -168,10 +161,10 @@ export const PenaltiesTable = ({
         </div>
 
         {/* Десктопный вид - таблица */}
-        <div className="hidden sm:block rounded-md border overflow-hidden border-gray-200 dark:border-gray-700">
+        <div className={`hidden sm:block rounded-xl border overflow-hidden ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50 dark:bg-[#252d3a] hover:bg-gray-50 dark:hover:bg-[#252d3a] border-b border-gray-200 dark:border-gray-700">
+              <TableRow className={`border-b-2 ${isDark ? 'bg-white/[0.04] border-white/20 hover:bg-white/[0.04]' : 'bg-gray-50 border-gray-200 hover:bg-gray-50'}`}>
                 <TableHead className="font-semibold text-gray-600 dark:text-gray-300">Город</TableHead>
                 <TableHead className="font-semibold text-gray-600 dark:text-gray-300">Причина</TableHead>
                 <TableHead className="font-semibold text-gray-600 dark:text-gray-300">Сумма</TableHead>
@@ -183,7 +176,7 @@ export const PenaltiesTable = ({
               {penalties.map((penalty) => (
                 <TableRow 
                   key={penalty.id}
-                  className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252d3a]"
+                  className={`border-b ${isDark ? 'border-white/10 hover:bg-white/[0.04]' : 'border-gray-100 hover:bg-black/[0.02]'}`}
                 >
                   <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                     {penalty.city}
@@ -203,7 +196,7 @@ export const PenaltiesTable = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onEditPenalty(penalty)}
-                        className="text-[#FEC004] hover:bg-[#FEC004]/10 hover:text-[#FEC004]"
+                        className={isDark ? 'text-white hover:bg-white/10 hover:text-white' : 'text-[#b58500] hover:bg-[#FEC004]/15 hover:text-[#b58500]'}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

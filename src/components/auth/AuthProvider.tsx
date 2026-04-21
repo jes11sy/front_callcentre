@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { TokenRefresher } from './TokenRefresher';
@@ -17,7 +17,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ✅ FIX: Добавляем _hasHydrated для ожидания гидратации Zustand
   const { user, setUser, setLoading, isLoading, _hasHydrated } = useAuthStore();
   const pathname = usePathname();
-  const router = useRouter();
   const initRef = useRef(false);
   const isRestoringRef = useRef(false);
 
@@ -67,9 +66,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
     }
 
+<<<<<<< Updated upstream
     authLogger.log('No user in store, redirecting to login');
+=======
+    // Нет пользователя - просто продолжаем без авторизации
+    authLogger.log('No user in store, auth disabled for frontend');
+>>>>>>> Stashed changes
     setLoading(false);
-    router.replace('/login');
 
     async function validateSessionInBackground() {
       try {
@@ -108,11 +111,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
               // Keep cached user
             }
           } else if (!cancelled) {
+<<<<<<< Updated upstream
+=======
+            // Не удалось восстановить - остаемся без авторизации
+>>>>>>> Stashed changes
             authLogger.log('Could not restore session');
             localStorage.removeItem('user');
             localStorage.removeItem('auth-storage');
             setUser(null);
-            router.replace('/login');
           }
         } finally {
           isRestoringRef.current = false;
@@ -136,7 +142,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, [setUser, setLoading, isPublicPage, router, user, _hasHydrated]);
+  }, [setUser, setLoading, isPublicPage, user, _hasHydrated]);
 
   // ✅ Показываем loading пока ждём гидратации или если нет пользователя
   // Store инициализируется с user из localStorage, поэтому мерцания не будет

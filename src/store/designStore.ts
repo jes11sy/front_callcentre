@@ -44,8 +44,14 @@ export function useDesignStoreHydrated(): DesignState & { isHydrated: boolean } 
     setIsHydrated(true);
   }, []);
   
-  // До гидратации возвращаем дефолтные значения для SSR
-  const theme: ThemeMode = isHydrated ? store.theme : 'light';
+  // До гидратации берём тему из html-класса, чтобы избежать белой вспышки
+  const htmlPrefersDark =
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const systemPrefersDark =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme: ThemeMode = isHydrated ? store.theme : ((htmlPrefersDark || systemPrefersDark) ? 'dark' : 'light');
   
   return {
     ...store,

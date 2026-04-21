@@ -1,8 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { UserCheck, Clock, AlertCircle, CheckCircle, MessageSquare, Phone, Users, FileText, Hash, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +12,7 @@ export default function EmployeeRulesPage() {
 
   return (
     <DashboardLayout variant="operator" requiredRole="operator">
-      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#f5f5f7] dark:bg-[#111113] font-myriad">
         <div className="max-w-4xl space-y-8 sm:space-y-10">
           
           {/* Кнопка назад - только мобилка */}
@@ -64,7 +62,7 @@ export default function EmployeeRulesPage() {
               <ul className="space-y-1 ml-4">
                 <li>Уточнение по поводу качественно выполненного ремонта</li>
                 <li>Уточнение суммы</li>
-                <li className="text-red-600 dark:text-red-400">Если клиент не доволен или цена отличается от заявленной в CRM — срочно оповестить директора</li>
+                <li className="text-gray-900 dark:text-gray-100">Если клиент не доволен или цена отличается от заявленной в CRM — срочно оповестить директора</li>
               </ul>
             </div>
           </section>
@@ -100,15 +98,15 @@ export default function EmployeeRulesPage() {
               <div>МС — Мастер</div>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-1 text-gray-700 dark:text-gray-300">
-              <div><span className="text-red-600 dark:text-red-400">Незаказ</span> — Техника, которую не ремонтируем</div>
+              <div><span className="text-[#0a4f42] dark:text-white">Незаказ</span> — Техника, которую не ремонтируем</div>
               <div><span className="text-gray-500 dark:text-gray-400">Модерн</span> — Мастер забрал технику на ремонт</div>
             </div>
           </section>
 
           {/* Важно */}
-          <section className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-500/30">
-            <h2 className="text-lg text-red-700 dark:text-red-400 mb-2">Важно</h2>
-            <p className="text-red-700 dark:text-red-400">
+          <section className="bg-white dark:bg-white/[0.03] p-6 rounded-[20px] border border-black/[0.08] dark:border-white/10">
+            <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-2">Важно</h2>
+            <p className="text-gray-700 dark:text-gray-300">
               Занимаемся ли ремонтом инверторов у СМ? Если да, то на какое время принять и от какой суммы.
             </p>
           </section>

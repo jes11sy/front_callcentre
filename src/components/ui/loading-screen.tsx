@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useDesignStoreHydrated } from '@/store/designStore';
+import { useEffect, useMemo, useState } from 'react';
 
 interface LoadingScreenProps {
   /** Текст под спиннером */
@@ -22,17 +22,49 @@ interface LoadingScreenProps {
  * Поддерживает светлую и тёмную тему
  */
 export function LoadingScreen({ 
-  message, 
+  message: _message, 
   fullScreen = true,
   className
 }: LoadingScreenProps) {
-  const { theme, isHydrated } = useDesignStoreHydrated();
-  
-  // До гидратации - показываем светлую тему
-  const effectiveTheme = isHydrated ? theme : 'light';
-  const isDark = effectiveTheme === 'dark';
-  const bgColor = isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]';
-  
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDarkTheme = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+
+    try {
+      const cookieMatch = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+      const cookieTheme = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+
+      if (cookieTheme === 'dark') return true;
+      if (cookieTheme === 'light') return false;
+
+      const raw = localStorage.getItem('design-storage');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const state = parsed?.state ?? parsed;
+        if (state?.theme === 'dark') return true;
+        if (state?.theme === 'light') return false;
+      }
+    } catch {
+      // ignore and fallback
+    }
+
+    return document.documentElement.classList.contains('dark');
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className={cn(
+        "min-h-screen min-h-[100dvh] bg-[#f5f5f7] dark:bg-[#111113]",
+        className
+      )} />
+    );
+  }
+
   const content = (
     <div 
       className="flex flex-col items-center justify-center px-4"
@@ -40,28 +72,24 @@ export function LoadingScreen({
     >
       {/* Logo */}
       <div className="mb-8">
-        <Image 
-          src={isDark ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
-          alt="Logo" 
-          width={200} 
-          height={50} 
-          className="h-12 w-auto" 
+        <Image
+          src={isDarkTheme ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"}
+          alt="Logo"
+          width={200}
+          height={50}
+          className="h-12 w-auto"
         />
       </div>
 
       {/* Spinner */}
-      <div className="relative w-12 h-12">
-        <div className="w-full h-full rounded-full border-4 border-[#FEC004]/20" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#FEC004] animate-spin" />
-      </div>
+      <div className={`h-12 w-12 animate-spin rounded-full border-b-2 ${isDarkTheme ? 'border-white' : 'border-[#FEC004]'}`} />
     </div>
   );
 
   if (fullScreen) {
     return (
       <div className={cn(
-        "min-h-screen min-h-[100dvh] flex items-center justify-center transition-colors duration-300",
-        bgColor,
+        `min-h-screen min-h-[100dvh] flex items-center justify-center transition-colors duration-300 ${isDarkTheme ? 'bg-[#111113]' : 'bg-[#f5f5f7]'}`,
         className
       )}>
         {content}
@@ -70,7 +98,7 @@ export function LoadingScreen({
   }
 
   return (
-    <div className={cn("flex items-center justify-center py-12 transition-colors duration-300", bgColor, className)}>
+    <div className={cn(`flex items-center justify-center py-12 transition-colors duration-300 ${isDarkTheme ? 'bg-[#111113]' : 'bg-[#f5f5f7]'}`, className)}>
       {content}
     </div>
   );
@@ -94,9 +122,8 @@ export function LoadingSpinner({
 
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
-      <div className={cn(sizeClasses[size], "rounded-full border-2 border-[#FEC004]/20")} />
       <div className={cn(
-        "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin border-t-[#FEC004]",
+        "absolute top-0 left-0 rounded-full border-2 border-transparent animate-spin border-b-[#FEC004] dark:border-b-white",
         sizeClasses[size]
       )} />
     </div>
@@ -115,19 +142,13 @@ export function LoadingState({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const { theme, isHydrated } = useDesignStoreHydrated();
-  const isDark = isHydrated ? theme === 'dark' : false;
-  
   return (
     <div className={cn(
       "flex flex-col items-center justify-center py-8 space-y-3",
       className
     )}>
       <LoadingSpinner size={size} />
-      <p className={cn(
-        "text-sm", 
-        isDark ? 'text-gray-400' : 'text-gray-600'
-      )}>{message}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
     </div>
   );
 }
@@ -144,16 +165,12 @@ export function LoadingOverlay({
   message?: string;
   children: React.ReactNode;
 }) {
-  const { theme, isHydrated } = useDesignStoreHydrated();
-  const isDark = isHydrated ? theme === 'dark' : false;
-  
   return (
     <div className="relative">
       {children}
       {isLoading && (
         <div className={cn(
-          "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50",
-          isDark ? 'bg-[#111827]/80' : 'bg-[#F3F3EE]/80'
+          "absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50 bg-[#F3F3EE]/80 dark:bg-[#111827]/80"
         )}>
           <LoadingState message={message} />
         </div>

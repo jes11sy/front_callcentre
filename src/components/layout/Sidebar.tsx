@@ -11,12 +11,24 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { GlobalSearchOverlay } from './GlobalSearch';
 import { 
   User, 
-  Sun,
-  Moon,
+  SunMedium,
+  MoonStar,
   Menu,
   X,
+  ChevronLeft,
+  ChevronRight,
   Bell,
   Check,
+<<<<<<< Updated upstream
+=======
+  Trash2,
+  Phone,
+  ClipboardList,
+  Globe,
+  Gavel,
+  ChartColumnBig,
+  BookOpenText,
+>>>>>>> Stashed changes
   PhoneIncoming,
   PhoneMissed,
   PhoneOutgoing,
@@ -30,6 +42,7 @@ import {
 
 // Ключ для localStorage
 const NOTIFICATIONS_POSITION_KEY = 'notifications-panel-position';
+const SIDEBAR_COLLAPSED_KEY = 'sidebar-collapsed-cc';
 
 // Дефолтная позиция
 const DEFAULT_POSITION = { x: 240, y: 100 }; // left-60 = 240px
@@ -40,6 +53,11 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+  });
+  const [hasLoadedSidebarState, setHasLoadedSidebarState] = useState(() => typeof window !== 'undefined');
   const notificationsRef = useRef<HTMLDivElement>(null);
   const notificationsPanelRef = useRef<HTMLDivElement>(null);
   const mobileNotificationsPanelRef = useRef<HTMLDivElement>(null);
@@ -71,6 +89,20 @@ export function Sidebar() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    setHasLoadedSidebarState(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSidebarState) return;
+    const html = document.documentElement;
+    html.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(isSidebarCollapsed));
+    return () => {
+      html.classList.remove('sidebar-collapsed');
+    };
+  }, [isSidebarCollapsed, hasLoadedSidebarState]);
 
   // Сохраняем позицию в localStorage
   const savePosition = useCallback((pos: { x: number; y: number }) => {
@@ -215,6 +247,7 @@ export function Sidebar() {
     }
   };
 
+<<<<<<< Updated upstream
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navItems: Array<{ name: string; href: string; icon?: string; lucideIcon?: LucideIcon }> = [
@@ -225,9 +258,18 @@ export function Sidebar() {
     { name: 'Штрафы', href: '/penalties', icon: '/img/navigate/penalties.svg' },
     { name: 'Статистика', href: '/stats', icon: '/img/navigate/stats.svg' },
     { name: 'Справочник', href: '/reference', icon: '/img/navigate/reference.svg' },
+=======
+  const navItems = [
+    { name: 'Телефония', href: '/telephony', icon: Phone },
+    { name: 'Заказы', href: '/orders', icon: ClipboardList },
+    { name: 'Заявки Сайт', href: '/site-orders', icon: Globe },
+    { name: 'Штрафы', href: '/penalties', icon: Gavel },
+    { name: 'Статистика', href: '/stats', icon: ChartColumnBig },
+    { name: 'Справочник', href: '/reference', icon: BookOpenText },
+>>>>>>> Stashed changes
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   // Контент меню (переиспользуется для десктопа и мобильной версии)
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -248,18 +290,46 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className={`flex-1 px-5 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
+      <nav className={`flex-1 ${isMobile ? 'px-5 space-y-4' : isSidebarCollapsed ? 'px-3 space-y-2' : 'px-3 space-y-2'}`}>
         {navItems.map((item) => {
           const active = isActive(item.href);
+          const Icon = item.icon;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
-                isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+              title={!isMobile && isSidebarCollapsed ? item.name : undefined}
+              className={`group relative flex items-center transition-all duration-200 ${
+                isMobile
+                  ? 'gap-3 px-3 py-3.5 text-base'
+                  : isSidebarCollapsed
+                    ? 'mx-auto min-h-[52px] w-14 justify-center rounded-2xl px-0'
+                    : 'min-h-[48px] gap-3 rounded-2xl px-4 text-sm'
+              } ${
+                active
+                  ? (isSidebarCollapsed && !isMobile
+                      ? 'bg-transparent text-[#FEC004] dark:text-[#FEC004]'
+                      : 'cc-sidebar-item-active-expanded')
+                  : (isSidebarCollapsed
+                      ? 'bg-transparent text-[#6e6e73] hover:text-[#FEC004] dark:text-white/78 dark:hover:text-[#FEC004]'
+                      : 'text-[#3a3a3c] hover:bg-black/[0.035] dark:text-white/92 dark:hover:bg-white/[0.04]')
               }`}
+              style={
+                active && (!isSidebarCollapsed || isMobile)
+                  ? (theme === 'dark'
+                      ? {
+                          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                          boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.06)',
+                        }
+                      : {
+                          backgroundColor: '#ececf1',
+                          boxShadow: 'inset 0 0 0 1px rgba(17, 17, 19, 0.08)',
+                        })
+                  : undefined
+              }
               onClick={() => setIsMobileMenuOpen(false)}
             >
+<<<<<<< Updated upstream
               {/* Индикатор активной вкладки - тонкая скобка */}
               <span 
                 className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
@@ -290,6 +360,25 @@ export function Sidebar() {
                 />
               )}
               <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
+=======
+              <Icon
+                className={`${isMobile ? 'h-6 w-6' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 transition-all duration-200 ${
+                  !isMobile && isSidebarCollapsed ? 'group-hover:scale-110' : ''
+                } ${
+                  active
+                    ? 'text-[#FEC004] dark:text-[#FEC004]'
+                    : (isSidebarCollapsed
+                        ? 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]'
+                        : 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]')
+                }`}
+                strokeWidth={1.9}
+              />
+              <span
+                className={`${(!isMobile && isSidebarCollapsed) ? 'hidden' : ''} min-w-0 truncate font-medium tracking-[-0.01em] ${
+                  active ? 'text-[#FEC004]' : 'text-[#3a3a3c] dark:text-white/92'
+                }`}
+              >
+>>>>>>> Stashed changes
                 {item.name}
               </span>
             </Link>
@@ -298,41 +387,73 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className={`px-5 ${isMobile ? 'space-y-4 pb-16' : 'space-y-3 pb-6'}`}>
-        {/* Theme Toggle */}
-        <div className={`flex items-center gap-3 px-3 ${isMobile ? 'py-3' : 'py-2'}`}>
-          <Sun className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'light' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-          <button
-            onClick={toggleTheme}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-              theme === 'dark' ? 'bg-[#FEC004]' : 'bg-gray-300'
-            }`}
-          >
-            <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
-                theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
-              }`}
-            />
-          </button>
-          <Moon className={`transition-colors ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} ${theme === 'dark' ? 'text-[#FEC004]' : 'text-gray-400'}`} />
-        </div>
+      <div className={`${isMobile ? 'px-5 space-y-4 pb-16' : isSidebarCollapsed ? 'px-3 space-y-2 pb-6' : 'px-3 space-y-2 pb-6'}`}>
+        {/* Theme Toggle - same pattern as director */}
+        <button
+          onClick={toggleTheme}
+          title={!isMobile && isSidebarCollapsed ? 'Переключить тему' : undefined}
+          className={`group flex items-center transition-all duration-200 ${
+            isMobile
+              ? 'gap-3 px-3 py-3.5 text-base rounded-2xl text-[#3a3a3c] hover:bg-black/[0.035] hover:text-[#111113] dark:text-white/92 dark:hover:bg-white/[0.04] dark:hover:text-white'
+              : isSidebarCollapsed
+                ? 'mx-auto min-h-[52px] w-14 justify-center rounded-2xl px-0 bg-transparent text-[#3a3a3c] hover:text-[#FEC004] dark:text-white/92 dark:hover:text-[#FEC004]'
+                : 'min-h-[48px] gap-3 rounded-2xl px-4 text-sm text-[#3a3a3c] hover:bg-black/[0.035] dark:text-white/92 dark:hover:bg-white/[0.04]'
+          }`}
+          aria-label="Переключить тему"
+        >
+          {theme === 'dark' ? (
+            <SunMedium className={`${isMobile ? 'h-5 w-5' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 text-[#6e6e73] transition-colors duration-200 ${!isMobile ? 'group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]' : 'group-hover:text-[#111113] dark:group-hover:text-white'} dark:text-white/78 ${isSidebarCollapsed && !isMobile ? 'transition-transform duration-200 group-hover:scale-110' : ''}`} />
+          ) : (
+            <MoonStar className={`${isMobile ? 'h-5 w-5' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 text-[#6e6e73] transition-colors duration-200 ${!isMobile ? 'group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]' : 'group-hover:text-[#111113] dark:group-hover:text-white'} dark:text-white/78 ${isSidebarCollapsed && !isMobile ? 'transition-transform duration-200 group-hover:scale-110' : ''}`} />
+          )}
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="truncate text-base font-medium tracking-[-0.01em] text-[#3a3a3c] dark:text-white/92">
+              Тема
+            </span>
+          )}
+        </button>
 
         {/* Notifications - только для десктопа */}
         {!isMobile && (
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={toggleDropdown}
-              className="relative flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-gray-800 dark:text-gray-200 hover:text-[#FEC004] transition-colors w-full group"
+              title={isSidebarCollapsed ? 'Уведомления' : undefined}
+              className={`relative flex items-center text-sm font-normal transition-all duration-200 w-full group ${
+                isDropdownOpen
+                  ? (isSidebarCollapsed
+                      ? 'bg-transparent text-[#FEC004] dark:text-[#FEC004]'
+                      : 'cc-sidebar-item-active-expanded')
+                  : isSidebarCollapsed
+                    ? 'text-[#3a3a3c] hover:text-[#FEC004] dark:text-white/78 dark:hover:text-[#FEC004]'
+                    : 'text-[#3a3a3c] dark:text-white/92'
+              } ${
+                isSidebarCollapsed
+                  ? 'mx-auto min-h-[52px] w-14 justify-center rounded-2xl px-0'
+                  : `gap-3 rounded-2xl px-4 py-2.5 ${isDropdownOpen ? '' : 'hover:bg-black/[0.035] dark:hover:bg-white/[0.04]'}`
+              }`}
             >
               <div className="relative">
-                <Bell className="h-5 w-5" />
+                <Bell
+                  className={`h-5 w-5 shrink-0 transition-all duration-200 ${
+                    isDropdownOpen
+                      ? 'text-[#FEC004] dark:text-[#FEC004]'
+                      : isSidebarCollapsed
+                        ? 'text-[#3a3a3c] dark:text-white/78 group-hover:scale-110 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]'
+                        : 'text-[#3a3a3c] dark:text-white/78 group-hover:scale-105 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]'
+                  }`}
+                />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </div>
-              <span className="group-hover:text-[#FEC004] transition-colors">
+              <span
+                className={`${isSidebarCollapsed ? 'hidden' : ''} ${
+                  isDropdownOpen ? 'text-[#FEC004]' : 'text-[#3a3a3c] dark:text-white/92'
+                }`}
+              >
                 Уведомления
               </span>
             </button>
@@ -341,11 +462,19 @@ export function Sidebar() {
             {isDropdownOpen && (
               <div 
                 ref={notificationsPanelRef}
-                className="fixed w-96 max-h-96 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[9999] flex flex-col bg-white dark:bg-[#1e2736]"
+                className={`fixed w-96 max-h-96 rounded-2xl shadow-2xl border overflow-hidden z-[9999] flex flex-col ${
+                  theme === 'dark'
+                    ? 'bg-[#111113] border-white/10'
+                    : 'bg-white border-gray-200'
+                }`}
                 style={{ left: panelPosition.x, top: panelPosition.y }}
               >
                 <div 
-                  className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0 cursor-move select-none"
+                  className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 cursor-move select-none ${
+                    theme === 'dark'
+                      ? 'border-white/10 bg-[#1a1a1d]'
+                      : 'border-gray-200 bg-white'
+                  }`}
                   onMouseDown={handleDragStart}
                 >
                   <div className="flex items-center gap-2">
@@ -353,11 +482,39 @@ export function Sidebar() {
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   </div>
                   <div className="flex items-center gap-3">
+<<<<<<< Updated upstream
+=======
+                    {/* Push notifications button - всегда показываем, как debug кнопка */}
+                    <button
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        subscribePush(); 
+                      }}
+                      disabled={isPushSubscribing}
+                      className={`text-xs font-medium transition-colors ${
+                        isPushSubscribed 
+                          ? 'text-emerald-500 dark:text-emerald-300' 
+                          : 'text-[#0a4f42] dark:text-[#ffd84a]'
+                      } disabled:opacity-50`}
+                    >
+                      {isPushLoading 
+                        ? 'Загрузка...'
+                        : isPushSubscribing 
+                          ? 'Подключение...' 
+                          : isPushSubscribed 
+                            ? 'Push включен' 
+                            : pushPermission === 'denied'
+                              ? 'Push заблокирован'
+                              : 'Включить push'
+                      }
+                    </button>
+>>>>>>> Stashed changes
                     {unreadCount > 0 && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
-                        className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                        className="text-xs text-[#0a4f42] dark:text-white/75 hover:underline flex items-center gap-1"
                       >
                         <Check className="h-3 w-3" />
                         Прочитать все
@@ -365,7 +522,7 @@ export function Sidebar() {
                     )}
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto bg-white dark:bg-[#1a1f2e]">
+                <div className={`flex-1 overflow-y-auto ${theme === 'dark' ? 'bg-[#111113]' : 'bg-white'}`}>
                   {notifications.length > 0 ? (
                     notifications.map((notification) => {
                       const Icon = getNotificationIcon(notification.type);
@@ -375,8 +532,8 @@ export function Sidebar() {
                           onClick={() => handleNotificationClick(notification)}
                           className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 cursor-pointer ${
                             !notification.read 
-                              ? 'bg-[#FEC004]/10 hover:bg-[#FEC004]/20' 
-                              : 'bg-white dark:bg-[#1a1f2e] hover:bg-gray-50 dark:hover:bg-[#252d3a]'
+                              ? 'bg-[#0a4f42]/8 dark:bg-white/10 hover:bg-[#0a4f42]/12 dark:hover:bg-white/15' 
+                              : 'bg-white dark:bg-[#111113] hover:bg-gray-50 dark:hover:bg-white/[0.04]'
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -395,7 +552,7 @@ export function Sidebar() {
                               </p>
                             </div>
                             {!notification.read && (
-                              <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                              <span className="w-2 h-2 bg-[#0a4f42] dark:bg-[#f4c84b] rounded-full flex-shrink-0 mt-1.5" />
                             )}
                           </div>
                         </div>
@@ -403,7 +560,7 @@ export function Sidebar() {
                     })
                   ) : (
                     <div className="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
-                      <Bell className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                      <Bell className="h-10 w-10 mx-auto mb-3 opacity-40" />
                       <p className="text-sm">Нет уведомлений</p>
                     </div>
                   )}
@@ -416,28 +573,36 @@ export function Sidebar() {
         {/* Profile with user name */}
         <Link
           href="/profile"
-          className={`nav-icon-hover relative flex items-center gap-3 px-3 font-normal transition-colors group ${
-            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+          title={!isMobile && isSidebarCollapsed ? (user?.name || user?.login || 'Профиль') : undefined}
+          className={`group relative flex items-center font-normal transition-colors ${
+            isActive('/profile')
+              ? (isSidebarCollapsed && !isMobile
+                  ? 'bg-transparent text-[#FEC004] dark:text-[#FEC004]'
+                  : 'cc-sidebar-item-active-expanded')
+              : 'text-[#3a3a3c] dark:text-white/92'
+          } ${
+            isMobile
+              ? 'gap-3 px-3 py-3.5 text-base'
+              : isSidebarCollapsed
+                ? 'mx-auto min-h-[52px] w-14 justify-center rounded-2xl px-0'
+                : `min-h-[48px] gap-3 rounded-2xl px-4 text-sm ${isActive('/profile') ? '' : 'hover:bg-black/[0.035] dark:hover:bg-white/[0.04]'}`
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <span 
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
-              isActive('/profile') ? 'opacity-100' : 'opacity-0'
-            } ${isMobile ? 'h-12' : 'h-10'}`}
+          <User className={`${isMobile ? 'h-6 w-6' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 transition-all duration-200 ${
+            !isMobile && isSidebarCollapsed ? 'group-hover:scale-110' : ''
+          } ${
+            isActive('/profile')
+              ? 'text-[#FEC004] dark:text-[#FEC004]'
+              : (isSidebarCollapsed
+                  ? 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]'
+                  : 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]')
+          }`} />
+          <span
+            className={`${(!isMobile && isSidebarCollapsed) ? 'hidden' : ''} min-w-0 truncate ${
+              isActive('/profile') ? 'text-[#FEC004]' : 'text-[#3a3a3c] dark:text-white/92'
+            }`}
           >
-            <svg viewBox="0 0 6 40" fill="none" className="w-full h-full">
-              <path 
-                d="M5 1C2.5 1 1 4.5 1 10v20c0 5.5 1.5 9 4 9" 
-                stroke="#FEC004" 
-                strokeWidth="1.5" 
-                strokeLinecap="round"
-                fill="none"
-              />
-            </svg>
-          </span>
-          <User className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`} />
-          <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
             {user?.name || user?.login || 'Профиль'}
           </span>
         </Link>
@@ -448,7 +613,7 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <header className={`lg:hidden fixed top-0 left-0 w-screen z-[9999] h-16 bg-white dark:bg-[#1e2530] flex items-center justify-between px-6 transition-all ${
+      <header className={`lg:hidden fixed top-0 left-0 w-screen z-[9999] h-16 bg-white/90 dark:bg-[#1e2530] flex items-center justify-between px-6 transition-all ${
         isMobileMenuOpen ? '' : 'border-b border-gray-200 dark:border-gray-700'
       }`}>
         <Link href="/telephony">
@@ -474,14 +639,14 @@ export function Sidebar() {
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={toggleDropdown}
-              className={`p-2 transition-colors relative ${
-                isDropdownOpen 
-                  ? 'text-[#FEC004]' 
-                  : 'text-gray-600 dark:text-gray-300 hover:text-[#FEC004]'
+              className={`group p-2 transition-colors relative ${
+                isDropdownOpen
+                  ? 'text-[#111113] dark:text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-[#111113] dark:hover:text-white'
               }`}
               aria-label="Уведомления"
             >
-              <Bell className="h-6 w-6" />
+              <Bell className="h-6 w-6 transition-transform duration-200 group-hover:-translate-y-0.5" />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
@@ -493,15 +658,47 @@ export function Sidebar() {
             {isDropdownOpen && (
               <div 
                 ref={mobileNotificationsPanelRef}
-                className="fixed left-4 right-4 top-20 bg-white dark:bg-[#252d3a] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-[10000]"
+                className={`fixed left-4 right-4 top-20 rounded-[24px] shadow-xl border overflow-hidden z-[10000] ${
+                  theme === 'dark'
+                    ? 'bg-[#111113] border-white/10'
+                    : 'bg-white border-gray-200'
+                }`}
               >
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div className={`px-4 py-3 border-b flex items-center justify-between ${
+                  theme === 'dark'
+                    ? 'border-white/10 bg-[#1a1a1d]'
+                    : 'border-gray-200 bg-white'
+                }`}>
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">
+<<<<<<< Updated upstream
+=======
+                    {/* Push notifications button - mobile, всегда показываем */}
+                    <button
+                      onClick={() => subscribePush()}
+                      disabled={isPushSubscribing}
+                      className={`text-xs font-medium transition-colors ${
+                        isPushSubscribed 
+                          ? 'text-emerald-500 dark:text-emerald-300' 
+                          : 'text-[#0a4f42] dark:text-[#ffd84a]'
+                      } disabled:opacity-50`}
+                    >
+                      {isPushLoading 
+                        ? 'Загрузка...'
+                        : isPushSubscribing 
+                          ? 'Подключение...' 
+                          : isPushSubscribed 
+                            ? 'Push включен' 
+                            : pushPermission === 'denied'
+                              ? 'Push заблокирован'
+                              : 'Включить push'
+                      }
+                    </button>
+>>>>>>> Stashed changes
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}
-                        className="text-xs text-[#FEC004] hover:underline flex items-center gap-1"
+                        className="text-xs text-[#0a4f42] dark:text-white/75 hover:underline flex items-center gap-1"
                       >
                         <Check className="h-3 w-3" />
                         Прочитать все
@@ -517,8 +714,8 @@ export function Sidebar() {
                         <div
                           key={notification.id}
                           onClick={() => handleNotificationClick(notification)}
-                          className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer ${
-                            !notification.read ? 'bg-[#FEC004]/5' : ''
+                          className={`px-4 py-3 border-b border-gray-100 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-white/[0.04] cursor-pointer ${
+                            !notification.read ? 'bg-[#0a4f42]/8 dark:bg-white/10' : ''
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -537,7 +734,7 @@ export function Sidebar() {
                               </p>
                             </div>
                             {!notification.read && (
-                              <span className="w-2 h-2 bg-[#FEC004] rounded-full flex-shrink-0 mt-1.5" />
+                              <span className="w-2 h-2 bg-[#0a4f42] dark:bg-[#f4c84b] rounded-full flex-shrink-0 mt-1.5" />
                             )}
                           </div>
                         </div>
@@ -571,7 +768,7 @@ export function Sidebar() {
 
       {/* Mobile Full-screen Menu */}
       <aside 
-        className={`lg:hidden fixed top-16 left-0 w-screen h-[calc(100vh-4rem)] bg-white dark:bg-[#1e2530] z-[9998] transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
+        className={`lg:hidden fixed top-16 left-0 w-screen h-[calc(100vh-4rem)] bg-white/95 dark:bg-[#1e2530] z-[9998] transform transition-transform duration-300 ease-in-out flex flex-col font-myriad ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -581,21 +778,48 @@ export function Sidebar() {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-56 bg-white dark:bg-[#1e2530] h-screen flex-col border-r border-gray-200 dark:border-gray-700 fixed left-0 top-0 font-myriad z-[100]">
+      <aside className="hidden lg:block fixed left-0 top-0 z-40 h-screen pointer-events-none">
+        <div className={`pointer-events-auto ml-4 mt-4 flex h-[calc(100vh-2rem)] flex-col rounded-[30px] border p-3 font-myriad ${hasLoadedSidebarState ? 'transition-all duration-300' : ''} ${
+          isSidebarCollapsed ? 'w-[120px]' : 'w-[272px]'
+        } ${theme === 'dark'
+          ? 'bg-[#111113]/92 backdrop-blur-xl border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.35)]'
+          : 'bg-[#f5f5f7] border-black/[0.08] shadow-none backdrop-blur-none'
+        }`}>
         {/* Logo */}
-        <div className="p-6 pb-16">
+        <div className={`pb-8 pt-3 ${isSidebarCollapsed ? 'grid w-full grid-cols-[28px_1fr_28px] items-center px-0' : 'flex items-center justify-between px-3'}`}>
+          {isSidebarCollapsed && <span aria-hidden="true" className="block h-7 w-7" />}
           <Link href="/telephony">
             <Image 
-              src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
+              src={isSidebarCollapsed ? "/img/logo/favicon.png" : (theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png")} 
               alt="Logo" 
               width={160} 
               height={45} 
-              className="h-10 w-auto cursor-pointer" 
+              className={isSidebarCollapsed ? "h-10 w-10 cursor-pointer object-contain" : "h-10 w-auto cursor-pointer"} 
             />
           </Link>
+          {isSidebarCollapsed ? (
+            <button
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="flex h-7 w-7 items-center justify-center justify-self-end rounded-full text-[#6e6e73] transition-colors hover:bg-black/[0.04] hover:text-[#111113] dark:text-white/60 dark:hover:bg-white/[0.05] dark:hover:text-white"
+              aria-label="Развернуть меню"
+              title="Развернуть меню"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-[#6e6e73] transition-colors hover:bg-black/[0.04] hover:text-[#111113] dark:text-white/60 dark:hover:bg-white/[0.05] dark:hover:text-white"
+              aria-label="Свернуть меню"
+              title="Свернуть меню"
+            >
+              <ChevronLeft className="h-[18px] w-[18px]" />
+            </button>
+          )}
         </div>
 
         <MenuContent isMobile={false} />
+        </div>
       </aside>
 
       {/* Global Search Overlay */}

@@ -1,8 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ClipboardList, FileText, Clock, CheckCircle, AlertCircle, User, MessageSquare, DollarSign, Phone, Shield, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
 import { useRouter } from 'next/navigation';
@@ -17,7 +15,7 @@ export default function OrderRulesPage() {
 
   return (
     <DashboardLayout>
-      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#f5f5f7] dark:bg-[#111113] font-myriad">
         <div className="max-w-4xl space-y-8 sm:space-y-10">
           
           {/* Кнопка назад - только мобилка */}
@@ -102,8 +100,8 @@ export default function OrderRulesPage() {
           </section>
 
           {/* Описание проблемы - важно */}
-          <section className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-500/30">
-            <h2 className="text-lg text-red-700 dark:text-red-400 mb-4">Критически важно: описание проблемы</h2>
+          <section className="bg-white dark:bg-white/[0.03] p-6 rounded-[20px] border border-black/[0.08] dark:border-white/10">
+            <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4">Критически важно: описание проблемы</h2>
             <div className="space-y-4 text-gray-700 dark:text-gray-300">
               <div>
                 <p className="font-medium mb-1">Обязательно указывать суммы:</p>
@@ -112,7 +110,7 @@ export default function OrderRulesPage() {
               </div>
               <div>
                 <p className="font-medium mb-1">Для заказов с Авито:</p>
-                <p className="text-red-600 dark:text-red-400">Обязательно дописывать: «ОБЯЗАТЕЛЬНО ОТЗЫВ!»</p>
+                <p className="text-gray-900 dark:text-gray-100">Обязательно дописывать: «ОБЯЗАТЕЛЬНО ОТЗЫВ!»</p>
               </div>
             </div>
           </section>
@@ -152,9 +150,9 @@ export default function OrderRulesPage() {
           <section>
             <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Типы заявок</h2>
             <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-              <li><span className="text-blue-600 dark:text-blue-400">Впервые</span> — новый клиент, первое обращение</li>
-              <li><span className="text-green-600 dark:text-green-400">Повтор</span> — повторное обращение существующего клиента</li>
-              <li><span className="text-orange-600 dark:text-orange-400">Гарантия</span> — обращение по гарантийному случаю</li>
+              <li><span className="text-[#0a4f42] dark:text-white">Впервые</span> — новый клиент, первое обращение</li>
+              <li><span className="text-[#0a4f42] dark:text-white">Повтор</span> — повторное обращение существующего клиента</li>
+              <li><span className="text-[#0a4f42] dark:text-white">Гарантия</span> — обращение по гарантийному случаю</li>
             </ul>
           </section>
 

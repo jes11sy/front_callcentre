@@ -1,9 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DollarSign, Wrench, Monitor, Home, ChevronLeft } from 'lucide-react';
+import { Monitor, Wrench, Home, ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
 import { useRouter } from 'next/navigation';
@@ -216,7 +213,7 @@ export default function PricingPage() {
 
   return (
     <DashboardLayout>
-      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#F3F3EE] dark:bg-[#111827] font-myriad">
+      <div className="py-6 sm:py-10 px-4 sm:px-10 min-h-screen bg-[#f5f5f7] dark:bg-[#111113] font-myriad">
         <div className="max-w-4xl space-y-8 sm:space-y-10">
           
           {/* Кнопка назад - только мобилка */}
@@ -240,7 +237,7 @@ export default function PricingPage() {
                       {subcategory.services.map((service, serviceIndex) => (
                         <div key={serviceIndex} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                           <span className="text-gray-700 dark:text-gray-300">{service.name}</span>
-                          <span className="text-[#FEC004] font-medium">{service.price}</span>
+                          <span className="text-[#0a4f42] dark:text-white font-medium">{service.price}</span>
                         </div>
                       ))}
                     </div>
@@ -251,8 +248,8 @@ export default function PricingPage() {
           ))}
 
           {/* Доп информация */}
-          <section className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border border-orange-200 dark:border-orange-500/30">
-            <h2 className="text-lg text-orange-700 dark:text-orange-400 mb-4">Дополнительная информация</h2>
+          <section className="bg-white dark:bg-white/[0.03] p-6 rounded-[20px] border border-black/[0.08] dark:border-white/10">
+            <h2 className="text-lg text-gray-900 dark:text-gray-100 mb-4">Дополнительная информация</h2>
             <ul className="space-y-2 text-gray-700 dark:text-gray-300">
               <li>Гарантия на все виды работ — 3-6 месяцев</li>
               <li>Оплата производится после выполнения работ</li>

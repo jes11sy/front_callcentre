@@ -283,7 +283,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     }}
                     className={cn(
                       "flex items-center gap-1 text-[10px] sm:text-xs transition-colors mt-0.5",
-                      "text-gray-500 dark:text-gray-400 hover:text-[#FEC004]"
+                      "text-gray-500 dark:text-gray-400 hover:text-[#0a4f42] dark:hover:text-white"
                     )}
                   >
                     <span>+{groupCalls.length - 1} {pluralize(groupCalls.length - 1, 'звонок', 'звонка', 'звонков')}</span>
@@ -300,7 +300,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             <div className={cn("flex items-center gap-2", "pl-2 sm:pl-4")}>
               <div className={cn(
                 "w-0.5 h-5 rounded",
-                "bg-[#FEC004]/40"
+                "bg-[#0a4f42]/30 dark:bg-white/30"
               )} />
               {/* Иконка статуса/направления - только для V1 */}
               {false && (
@@ -346,7 +346,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 variant="outline" 
                 className={cn(
                   "text-[10px] sm:text-xs max-w-[100px] sm:max-w-[150px] truncate",
-                  "border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/5 dark:bg-[#FEC004]/10"
+                  "border-[#0a4f42]/20 text-[#0a4f42] bg-[#0a4f42]/10 dark:border-white/20 dark:text-white dark:bg-white/10"
                 )}
                 title={call.source || call.phone?.source || ''}
               >
@@ -388,7 +388,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               className={cn(
                 "text-[10px] sm:text-xs flex items-center gap-0.5 sm:gap-1",
                 isCallback 
-                  ? "border-[#FEC004]/50 text-[#FEC004] bg-[#FEC004]/10" 
+                  ? "border-[#0a4f42]/30 text-[#0a4f42] bg-[#0a4f42]/10 dark:border-white/20 dark:text-white dark:bg-white/10" 
                   : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700"
               )}
             >
@@ -423,8 +423,8 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     className={cn(
                       "h-7 w-7 sm:h-8 sm:w-8 p-0",
                       isPlaying 
-                        ? "text-[#FEC004] bg-[#FEC004]/20" 
-                        : "text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                        ? "text-[#0a4f42] bg-[#0a4f42]/15 dark:text-white dark:bg-white/10" 
+                        : "text-gray-500 dark:text-gray-400 hover:text-[#0a4f42] dark:hover:text-white hover:bg-[#0a4f42]/10 dark:hover:bg-white/10"
                     )}
                     title="Прослушать"
                   >
@@ -436,7 +436,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                     onClick={() => onDownloadRecording(call)}
                     className={cn(
                       "h-7 w-7 sm:h-8 sm:w-8 p-0 hidden sm:flex",
-                      "text-gray-500 dark:text-gray-400 hover:text-[#FEC004] hover:bg-[#FEC004]/10"
+                      "text-gray-500 dark:text-gray-400 hover:text-[#0a4f42] dark:hover:text-white hover:bg-[#0a4f42]/10 dark:hover:bg-white/10"
                     )}
                     title="Скачать"
                   >
@@ -450,7 +450,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 onClick={() => setAppealModalOpen(true)}
                 className={cn(
                   "h-7 sm:h-8 font-medium px-2 sm:px-3 text-xs sm:text-sm",
-                  "bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900"
+                  "bg-[#0a4f42] hover:bg-[#083f35] text-white"
                 )}
               >
                 <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1" />
@@ -465,7 +465,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
                 onClick={() => onPlayRecording(call)}
                 className={cn(
                   "h-6 w-6 sm:h-7 sm:w-7 p-0",
-                  "text-gray-500 dark:text-gray-400 hover:text-[#FEC004]"
+                  "text-gray-500 dark:text-gray-400 hover:text-[#0a4f42] dark:hover:text-white"
                 )}
               >
                 <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

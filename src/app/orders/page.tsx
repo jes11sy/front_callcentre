@@ -4,7 +4,6 @@ import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Loader2, AlertCircle } from 'lucide-react';
 import CreateOrderModal from '@/components/orders/CreateOrderModal';
 import { 
   OrdersFilters, 
@@ -18,11 +17,17 @@ import { StickyAudioPlayer } from '@/components/telephony/v2/StickyAudioPlayer';
 import { Call } from '@/types/orders';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { useDesignStore } from '@/store/designStore';
+import { useAuthStore } from '@/store/authStore';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
 
 function OrdersContent() {
+  const { theme } = useDesignStore();
+  const { _hasHydrated, isLoading: isAuthLoading } = useAuthStore();
+  const isDark = theme === 'dark';
   const searchParams = useSearchParams();
   const orderIdFromUrl = searchParams.get('orderId');
   const openedRef = useRef(false);
@@ -114,6 +119,7 @@ function OrdersContent() {
     openOrderById,
     setTimelineDate
   } = useOrders();
+  const hasNetworkError = Boolean(error);
 
   // Обработчик клика на город во временной шкале — передаёт cityId
   const handleCityClick = React.useCallback((cityId: string) => {
@@ -131,34 +137,52 @@ function OrdersContent() {
     }
   }, [orderIdFromUrl, isLoading, openOrderById]);
 
-  // Показываем загрузку, пока не получены данные пользователя
-  if (isLoading && !user) {
+  const shouldWaitForAuth = !_hasHydrated || (isAuthLoading && !user);
+  const shouldShowInitialLoader = isLoading && !ordersData;
+
+  if (shouldWaitForAuth) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка данных пользователя...</p>
-        </div>
-      </div>
+      <DashboardLayout>
+        <LoadingScreen fullScreen />
+      </DashboardLayout>
     );
   }
 
-  if (error) {
+  if (shouldShowInitialLoader) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">Ошибка при загрузке заказов</p>
-        </div>
-      </div>
+      <DashboardLayout>
+        <LoadingScreen fullScreen />
+      </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <div className="w-full py-2 sm:py-4 px-2 sm:px-4 min-h-screen custom-scrollbar bg-[#F3F3EE] dark:bg-[#111827]">
+      <div className="w-full min-h-screen px-4 py-6 custom-scrollbar bg-[#f5f5f7] dark:bg-[#111113]">
         <div className="w-full">
           <div className="space-y-4 w-full">
+            {hasNetworkError && (
+              <div className={`rounded-[16px] border px-4 py-3 text-sm ${
+                isDark
+                  ? 'border-[#FEC004]/35 bg-[#FEC004]/10 text-[#ffe9a6]'
+                  : 'border-[#FEC004]/45 bg-[#FFF7D6] text-[#8a6500]'
+              }`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Вы оффлайн или сервер недоступен. Интерфейс открыт, данные могут быть неактуальны.</span>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      isDark
+                        ? 'border-[#FEC004]/45 text-[#ffe9a6] hover:bg-[#FEC004]/15'
+                        : 'border-[#FEC004]/55 text-[#8a6500] hover:bg-[#FEC004]/18'
+                    }`}
+                  >
+                    Повторить
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Time Slots Table */}
             <TimeSlotsTable 
               orders={timelineOrders} 
@@ -181,7 +205,11 @@ function OrdersContent() {
                 <OrdersFilters 
                   filters={filters}
                   onFilterChange={updateFilter}
+<<<<<<< Updated upstream
                   onReset={resetFilters}
+=======
+                  iconOnly
+>>>>>>> Stashed changes
                 />
               }
             />
@@ -254,7 +282,13 @@ function OrdersContent() {
 
 export default function OrdersPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={(
+        <DashboardLayout>
+          <LoadingScreen fullScreen />
+        </DashboardLayout>
+      )}
+    >
       <OrdersContent />
     </Suspense>
   );

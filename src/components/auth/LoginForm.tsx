@@ -3,10 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Loader2, Sun, Moon } from 'lucide-react';
+import { ArrowRight, CircleUserRound, Eye, EyeOff, LockKeyhole, MoonStar, SunMedium } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 
@@ -161,21 +160,6 @@ export function LoginForm() {
     }
   };
 
-  // Переключатель темы
-  const ThemeToggle = () => (
-    <button
-      onClick={toggleTheme}
-      className={`absolute top-4 right-4 p-2 rounded-lg transition-colors ${
-        theme === 'dark' 
-          ? 'text-[#FEC004] hover:bg-gray-700/50' 
-          : 'text-gray-500 hover:bg-gray-100'
-      }`}
-      title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
-    >
-      {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-    </button>
-  );
-
   // Показываем загрузку пока проверяем авторизацию или ждём гидратации store
   // Это предотвращает ошибку гидратации React #418
   if (isCheckingAuth || !isHydrated) {
@@ -187,26 +171,43 @@ export function LoginForm() {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 relative transition-colors duration-300 ${
-      theme === 'dark' ? 'bg-[#1e2530]' : 'bg-[#F3F3EE]'
-    }`} style={{ fontFamily: "'Myriad Pro', sans-serif" }}>
+    <div
+      className={`relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 transition-colors duration-300 ${
+        theme === 'dark'
+          ? 'bg-[#111113] text-white'
+          : 'bg-[#f7f7f5] text-[#1d1d1f]'
+      }`}
+      style={{
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif'
+      }}
+    >
+      <div
+        className={`pointer-events-none absolute inset-0 ${
+          theme === 'dark'
+            ? 'bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.05),_transparent_24%),linear-gradient(180deg,_#111113,_#0c0c0d)]'
+            : 'bg-[linear-gradient(180deg,_#ffffff,_#f7f7f5),radial-gradient(circle_at_top,_rgba(254,192,4,0.16),_transparent_28%)]'
+        }`}
+      />
+      <div
+        className={`pointer-events-none absolute left-1/2 top-16 h-40 w-40 -translate-x-1/2 rounded-full blur-3xl ${
+          theme === 'dark' ? 'bg-white/[0.025]' : 'bg-[#FEC004]/20'
+        }`}
+      />
 
-      {/* Login Card */}
-      <div className={`w-full max-w-md rounded-2xl p-10 shadow-xl relative z-10 transition-colors duration-300 ${
-        theme === 'dark' ? 'bg-[#2a3441]' : 'bg-white'
-      }`}>
-        <ThemeToggle />
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <Image 
-            src={theme === 'dark' ? "/img/logo/dark_logo_v2.png" : "/img/logo/logo_v2.png"} 
-            alt="Logo" 
-            width={180} 
-            height={40} 
-            className="h-10 w-auto" 
-          />
-        </div>
+      <button
+        onClick={toggleTheme}
+        className={`absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
+          theme === 'dark'
+            ? 'border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.06]'
+            : 'border-black/[0.06] bg-white/80 text-[#6e6e73] hover:bg-white'
+        }`}
+        title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+      >
+        {theme === 'dark' ? <SunMedium className="h-4 w-4" /> : <MoonStar className="h-4 w-4" />}
+      </button>
 
+<<<<<<< Updated upstream
         {/* Title */}
         <h1 className={`text-2xl font-semibold text-center mb-8 transition-colors ${
           theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
@@ -231,71 +232,157 @@ export function LoginForm() {
                   ? 'bg-[#1e2530] border-gray-600 text-gray-100 placeholder:text-gray-500 hover:border-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30' 
                   : 'bg-[#F3F3EE] border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30'
               }`}
+=======
+      <div className="relative w-full max-w-[360px]">
+        <div className="mb-10 flex flex-col items-center text-center">
+          <div className="mb-7 flex justify-center">
+            <Image
+              src={theme === 'dark' ? '/img/logo/dark_logo_v2.png' : '/img/logo/logo_v2.png'}
+              alt="LEADS CREATE"
+              width={240}
+              height={56}
+              className="h-[52px] w-auto object-contain opacity-95"
+              priority
+>>>>>>> Stashed changes
             />
           </div>
+        </div>
 
-          <div>
-            <Label className={`text-sm font-medium mb-2 block transition-colors ${
-              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              Пароль
-            </Label>
-            <div className="relative">
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Введите пароль"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                className={`h-12 pr-12 border transition-colors rounded-lg ${
-                  theme === 'dark' 
-                    ? 'bg-[#1e2530] border-gray-600 text-gray-100 placeholder:text-gray-500 hover:border-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30' 
-                    : 'bg-[#F3F3EE] border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30'
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="login" className="sr-only">
+                Логин
+              </Label>
+              <div
+                className={`group relative overflow-hidden rounded-2xl border transition-all ${
+                  theme === 'dark'
+                    ? 'border-white/10 bg-[#1c1c1e] focus-within:border-white/30 focus-within:shadow-[0_0_0_3px_rgba(255,255,255,0.07)]'
+                    : 'border-[#d2d2d7] bg-white/95 focus-within:border-[#FEC004] focus-within:shadow-[0_0_0_3px_rgba(254,192,4,0.22)]'
                 }`}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className={`absolute right-0 top-0 h-12 px-3 hover:bg-transparent transition-colors ${
-                  theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-800'
-                }`}
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </Button>
+                <CircleUserRound
+                  className={`pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    theme === 'dark'
+                      ? 'text-white/35 group-focus-within:text-white/70'
+                      : 'text-[#8e8e93] group-focus-within:text-[#b58500]'
+                  }`}
+                />
+                <input
+                  id="login"
+                  type="text"
+                  placeholder="Введите логин"
+                  value={login}
+                  onChange={(e) => setLogin(e.target.value)}
+                  className={`h-[56px] w-full border-0 bg-transparent pl-12 pr-4 text-[16px] outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
+                    theme === 'dark'
+                      ? 'text-white placeholder:text-white/25'
+                      : 'text-[#1d1d1f] placeholder:text-[#8e8e93]'
+                  }`}
+                  style={{ WebkitAppearance: 'none' }}
+                  required
+                  autoComplete="username"
+                  maxLength={50}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="sr-only">
+                Пароль
+              </Label>
+              <div
+                className={`group relative overflow-hidden rounded-2xl border transition-all ${
+                  theme === 'dark'
+                    ? 'border-white/10 bg-[#1c1c1e] focus-within:border-white/30 focus-within:shadow-[0_0_0_3px_rgba(255,255,255,0.07)]'
+                    : 'border-[#d2d2d7] bg-white/95 focus-within:border-[#FEC004] focus-within:shadow-[0_0_0_3px_rgba(254,192,4,0.22)]'
+                }`}
+              >
+                <LockKeyhole
+                  className={`pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    theme === 'dark'
+                      ? 'text-white/35 group-focus-within:text-white/70'
+                      : 'text-[#8e8e93] group-focus-within:text-[#b58500]'
+                  }`}
+                />
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Введите пароль"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`h-[56px] w-full border-0 bg-transparent pl-12 pr-12 text-[16px] outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
+                    theme === 'dark'
+                      ? 'text-white placeholder:text-white/25'
+                      : 'text-[#1d1d1f] placeholder:text-[#8e8e93]'
+                  }`}
+                  style={{ WebkitAppearance: 'none' }}
+                  required
+                  autoComplete="current-password"
+                  maxLength={100}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition-colors ${
+                    theme === 'dark'
+                      ? 'text-white/38 hover:bg-white/5 hover:text-white/72'
+                      : 'text-[#8e8e93] hover:bg-black/[0.03] hover:text-[#1d1d1f]'
+                  }`}
+                >
+                  {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                </button>
+              </div>
             </div>
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-200">
+            <p className="text-center text-sm text-red-500">
               {error}
-            </div>
+            </p>
           )}
 
           <Button
+<<<<<<< Updated upstream
             type="submit"
             className="w-full h-12 bg-[#FEC004] hover:bg-[#e5ad04] text-gray-900 font-semibold rounded-lg transition-colors"
+=======
+            type="button"
+            onClick={handleLogin}
+            className={`h-14 w-full rounded-full border-0 px-5 text-[17px] font-medium shadow-none transition-colors ${
+              theme === 'dark'
+                ? 'bg-white text-[#111113] hover:bg-white/90'
+                : 'bg-[#FEC004] text-[#1d1d1f] hover:bg-[#e8b304]'
+            }`}
+>>>>>>> Stashed changes
             disabled={isLoading}
           >
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <span className="flex items-center justify-center">
+                <svg className="mr-3 h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 Вход...
-              </>
+              </span>
             ) : (
-              'Войти'
+              <span className="flex items-center justify-center gap-2">
+                Войти
+                <ArrowRight className="h-4 w-4" />
+              </span>
             )}
           </Button>
         </form>
       </div>
 
-      {/* Footer */}
-      <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center text-sm transition-colors ${
-        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+      <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-xs transition-colors ${
+        theme === 'dark' ? 'text-white/35' : 'text-[#6e6e73]'
       }`}>
+<<<<<<< Updated upstream
         © {new Date().getFullYear()} Новые схемы
+=======
+        © 2026 Новые Схемы
+>>>>>>> Stashed changes
       </div>
     </div>
   );

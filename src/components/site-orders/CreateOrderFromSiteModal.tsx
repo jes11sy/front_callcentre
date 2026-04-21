@@ -13,8 +13,7 @@ import {
   Plus, 
   User, 
   FileText, 
-  Settings,
-  X
+  Settings
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -167,15 +166,26 @@ export default function CreateOrderFromSiteModal({
 
   if (!open) return null;
 
+<<<<<<< Updated upstream
   const selectTriggerClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
   const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
   const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
   const inputClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20";
+=======
+  // Стили
+  const selectTriggerClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:[&_[data-placeholder]]:text-white/45 dark:[&_svg]:text-white/70";
+  
+  const selectContentClass = "bg-white border-gray-200 dark:bg-[#1e1e20] dark:border-white/10";
+  
+  const selectItemClass = "text-gray-700 data-[highlighted]:bg-black/5 dark:text-white dark:data-[highlighted]:bg-white/10";
+  
+  const inputClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45";
+>>>>>>> Stashed changes
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-[#F3F3EE] dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 shadow-xl w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-lg font-myriad">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252d3a]">
+      <div className="bg-[#f5f5f7] dark:bg-[#111113] border border-black/[0.08] dark:border-white/10 shadow-xl w-[90vw] max-w-5xl h-[95vh] flex flex-col rounded-[20px] font-myriad">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03]">
           <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
             Создать заказ из заявки сайта
             {siteOrder && (
@@ -186,19 +196,19 @@ export default function CreateOrderFromSiteModal({
           </h2>
           <button
             onClick={handleClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-white/10 rounded flex items-center justify-center"
           >
-            <X className="h-4 w-4" />
+            <span className="text-lg leading-none">×</span>
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
             {/* Основная информация */}
-            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10">
               <CardHeader className="pb-1">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                  <FileText className="h-5 w-5 text-[#FEC004]" />
+                  <FileText className="h-5 w-5 text-[#0a4f42] dark:text-white/80" />
                   Основная информация
                 </CardTitle>
               </CardHeader>
@@ -257,10 +267,10 @@ export default function CreateOrderFromSiteModal({
             </Card>
 
             {/* Информация о клиенте */}
-            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10">
               <CardHeader className="pb-1">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                  <User className="h-5 w-5 text-[#FEC004]" />
+                  <User className="h-5 w-5 text-[#0a4f42] dark:text-white/80" />
                   Информация о клиенте
                 </CardTitle>
               </CardHeader>
@@ -328,10 +338,10 @@ export default function CreateOrderFromSiteModal({
             </Card>
 
             {/* Детали заказа */}
-            <Card className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10">
               <CardHeader className="pb-1">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                  <Settings className="h-5 w-5 text-[#FEC004]" />
+                  <Settings className="h-5 w-5 text-[#0a4f42] dark:text-white/80" />
                   Детали заказа
                 </CardTitle>
               </CardHeader>
@@ -401,7 +411,7 @@ export default function CreateOrderFromSiteModal({
                     {...register('comment')}
                     placeholder="Комментарий к заказу"
                     rows={2}
-                    className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20 resize-none"
+                    className="outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45 resize-none"
                   />
                 </div>
               </CardContent>
@@ -421,7 +431,7 @@ export default function CreateOrderFromSiteModal({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold"
+                className={isDark ? 'bg-white hover:bg-gray-100 text-[#111113] font-semibold' : 'bg-[#0a4f42] hover:bg-[#083f35] text-white font-semibold'}
               >
                 {isSubmitting ? (
                   <>

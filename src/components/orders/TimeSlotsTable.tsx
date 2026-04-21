@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { Order } from '@/types/orders';
-import { TIME_SLOTS, EQUIPMENT_TYPE_COLORS } from '@/constants/orders';
+import { TIME_SLOTS } from '@/constants/orders';
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { useDesignStore } from '@/store/designStore';
 
@@ -74,6 +74,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
   const equipmentColors = EQUIPMENT_TYPE_COLORS_V2;
   
   // Текущий временной слот для выделения
@@ -240,7 +241,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           return (
             <div 
               key={`${typeEquipment}-${_index}`} 
-              className={`text-center ${isCurrentSlot ? 'bg-[#FEC004]/20 rounded' : ''}`}
+              className={`text-center ${isCurrentSlot ? (isDark ? 'bg-white/10 rounded' : 'bg-[#FEC004]/15 rounded') : ''}`}
             >
               <div className={`text-sm sm:text-lg font-bold ${
                 count > 0 ? colorClass : 'text-gray-400 dark:text-gray-500'
@@ -263,7 +264,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
     : activeCity;
 
   return (
-    <Card className="bg-white dark:bg-[#1e2530] border border-gray-200 dark:border-gray-700 font-myriad">
+    <Card className={`rounded-[20px] border font-myriad ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
       <CardHeader className="pb-2 px-3 sm:px-6">
         {/* Мобильный вид: одна строка */}
         <div className="flex sm:hidden items-center justify-between gap-2">
@@ -271,7 +272,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <div className="flex items-center gap-1">
             <button
               onClick={goToPrevDay}
-              className="p-1.5 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 active:bg-[#FEC004]/20 border border-gray-200 dark:border-gray-600"
+              className={`p-1.5 rounded-lg border ${isDark ? 'bg-white/[0.04] border-white/15 text-white active:bg-white/10' : 'bg-gray-50 border-gray-200 text-gray-600 active:bg-black/5'}`}
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -280,8 +281,8 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               onClick={goToToday}
               className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 isSelectedToday
-                  ? 'bg-[#FEC004] text-gray-900'
-                  : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                  ? (isDark ? 'bg-white text-[#111113]' : 'bg-[#FEC004] text-[#111113]')
+                  : (isDark ? 'bg-white/[0.04] border border-white/15 text-white' : 'bg-gray-50 border border-gray-200 text-gray-600')
               }`}
             >
               {formatDateLabel(selectedDate, true)}
@@ -289,7 +290,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             
             <button
               onClick={goToNextDay}
-              className="p-1.5 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 active:bg-[#FEC004]/20 border border-gray-200 dark:border-gray-600"
+              className={`p-1.5 rounded-lg border ${isDark ? 'bg-white/[0.04] border-white/15 text-white active:bg-white/10' : 'bg-gray-50 border-gray-200 text-gray-600 active:bg-black/5'}`}
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -299,10 +300,10 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all border ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
             >
               <span className="max-w-[80px] truncate">{activeCityLabel}</span>
-              <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20 text-[#FEC004]">
+              <span className={`px-1 py-0.5 rounded text-[10px] ${isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]'}`}>
                 {cityCounts[activeCity] || cityCounts.all || 0}
               </span>
               <ChevronDown className={`h-3 w-3 transition-transform ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
@@ -310,7 +311,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
             
             {/* Dropdown menu */}
             {isCityDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg shadow-lg border bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+              <div className={`absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg shadow-lg border ${isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}`}>
                 <button
                   onClick={() => {
                     handleCityClick('all');
@@ -318,12 +319,12 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
                     activeCity === 'all'
-                      ? 'bg-[#FEC004]/20 text-[#FEC004]'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]'
+                      ? (isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]')
+                      : (isDark ? 'text-white/80 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-50')
                   }`}
                 >
                   <span>Все города</span>
-                  <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts.all || 0}</span>
+                  <span className={`px-1 py-0.5 rounded text-[10px] ${isDark ? 'bg-white/10' : 'bg-[#FEC004]/15'}`}>{cityCounts.all || 0}</span>
                 </button>
                 {cities.map(c => (
                   <button
@@ -333,6 +334,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                       setIsCityDropdownOpen(false);
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
+<<<<<<< Updated upstream
                       activeCity === c.name
                         ? 'bg-[#FEC004]/20 text-[#FEC004]'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]'
@@ -340,6 +342,15 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   >
                     <span>{c.name}</span>
                     <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts[c.name] || 0}</span>
+=======
+                      activeCity === city
+                        ? (isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]')
+                        : (isDark ? 'text-white/80 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-50')
+                    }`}
+                  >
+                    <span>{city}</span>
+                    <span className={`px-1 py-0.5 rounded text-[10px] ${isDark ? 'bg-white/10' : 'bg-[#FEC004]/15'}`}>{cityCounts[city] || 0}</span>
+>>>>>>> Stashed changes
                   </button>
                 ))}
               </div>
@@ -353,7 +364,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={goToPrevDay}
-              className="p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
+              className={`p-2 rounded-lg border transition-all ${isDark ? 'bg-white/[0.04] border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-black/5'}`}
               title="Предыдущий день"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -363,13 +374,21 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               onClick={goToToday}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 isSelectedToday
-                  ? 'bg-[#FEC004] text-gray-900'
-                  : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
+                  ? (isDark ? 'bg-white text-[#111113]' : 'bg-[#FEC004] text-[#111113]')
+                  : (isDark ? 'bg-white/[0.04] border border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-black/5')
               }`}
             >
               {formatDateLabel(selectedDate)}
             </button>
             
+            <button
+              onClick={goToNextDay}
+              className={`p-2 rounded-lg border transition-all ${isDark ? 'bg-white/[0.04] border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-black/5'}`}
+              title="Следующий день"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+
             <input
               type="date"
               value={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`}
@@ -380,16 +399,8 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   onDateChange(newDate);
                 }
               }}
-              className="px-2 py-1.5 rounded-lg text-sm bg-white dark:bg-[#252d3a] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:border-[#FEC004]/50 focus:border-[#FEC004] focus:outline-none dark:[color-scheme:dark]"
+              className={`px-2 py-1.5 rounded-lg text-sm border outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 dark:[color-scheme:dark] ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-700'}`}
             />
-            
-            <button
-              onClick={goToNextDay}
-              className="p-2 rounded-lg bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600 transition-all"
-              title="Следующий день"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
           </div>
           
           {/* Табы городов */}
@@ -398,15 +409,15 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
               onClick={() => handleCityClick('all')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 activeCity === 'all'
-                  ? 'bg-[#FEC004] text-gray-900'
-                  : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
+                  ? (isDark ? 'bg-white text-[#111113]' : 'bg-[#FEC004] text-[#111113]')
+                  : (isDark ? 'bg-white/[0.04] border border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-black/5')
               }`}
             >
               Все города
               <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
                 activeCity === 'all' 
                   ? 'bg-gray-900/10'
-                  : 'bg-[#FEC004]/20 text-[#FEC004]'
+                  : (isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]')
               }`}>
                 {cityCounts.all || 0}
               </span>
@@ -417,16 +428,22 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                 key={c.id}
                 onClick={() => handleCityClick(c.name)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+<<<<<<< Updated upstream
                   activeCity === c.name
                     ? 'bg-[#FEC004] text-gray-900'
                     : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
+=======
+                  activeCity === city
+                    ? (isDark ? 'bg-white text-[#111113]' : 'bg-[#FEC004] text-[#111113]')
+                    : (isDark ? 'bg-white/[0.04] border border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-black/5')
+>>>>>>> Stashed changes
                 }`}
               >
                 {c.name}
                 <span className={`ml-1 px-1.5 py-0.5 rounded text-xs ${
                   activeCity === c.name 
                     ? 'bg-gray-900/10'
-                    : 'bg-[#FEC004]/20 text-[#FEC004]'
+                    : (isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]')
                 }`}>
                   {cityCounts[c.name] || 0}
                 </span>
@@ -438,7 +455,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
       <CardContent className="px-3 sm:px-6">
         <div 
           ref={scrollContainerRef}
-          className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0 scrollbar-thin"
+          className={`overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0 scrollbar-thin ${isDark ? 'orders-dark-scroll' : ''}`}
         >
           <div className="space-y-2 sm:space-y-4 min-w-[600px]">
             {/* Header with time slots */}
@@ -451,7 +468,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                     key={timeString} 
                     className={`text-xs sm:text-sm font-medium text-center ${
                       isCurrentSlot 
-                        ? 'text-[#FEC004] bg-[#FEC004]/20 rounded px-1'
+                        ? (isDark ? 'text-white bg-white/10 rounded px-1' : 'text-[#b58500] bg-[#FEC004]/15 rounded px-1')
                         : 'text-gray-600 dark:text-gray-400'
                     }`}
                   >

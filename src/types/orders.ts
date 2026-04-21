@@ -37,9 +37,6 @@ export interface Order {
   source?: string;
   siteOrderId?: number;
   problem?: string;
-  qaStatus?: string;
-  qaAmountConfirmed?: boolean;
-  qaNote?: string;
   operator: {
     id: number;
     name: string;

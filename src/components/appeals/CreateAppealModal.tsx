@@ -14,11 +14,13 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
-import { useCities, useRKs, useEquipmentTypes, useSources } from '@/hooks/useStaticData';
+import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
 import { STATUS_LABELS, STATUS_FLOW } from '@/app/appeals/page';
 import type { AppealStatus } from '@/app/appeals/page';
 
 type ModalMode = 'appeal' | 'order';
+
+const SOURCE_OPTIONS = ['call', 'chat', 'site_order', 'manual'] as const;
 
 const formSchema = z.object({
   phone: z.string().min(1, 'Укажите телефон клиента'),
@@ -111,8 +113,6 @@ export function CreateAppealModal({
   const { data: cities = [] } = useCities();
   const { data: rks = [] } = useRKs();
   const { data: equipmentTypes = [] } = useEquipmentTypes();
-  const { data: sources = [] } = useSources();
-
   const clientPhone = callContext?.phone || appeal?.phone || initialPhone || '';
 
   const { data: historyOrders = [], isLoading: historyLoading } = useQuery<HistoryOrder[]>({
@@ -186,8 +186,6 @@ export function CreateAppealModal({
           address: data.address || '',
           dateMeeting: data.dateMeeting || undefined,
           equipmentTypeId: data.equipmentTypeId ? Number(data.equipmentTypeId) : undefined,
-          description: data.description || undefined,
-          source: data.source || undefined,
           operatorId: user?.id || 0,
         };
         const response = await api.post('/orders/from-call', orderPayload);
@@ -247,7 +245,7 @@ export function CreateAppealModal({
 
   const isOrder = mode === 'order';
 
-  const sourceOptions = [...sources];
+  const sourceOptions = [...SOURCE_OPTIONS];
   if (watchSource && !sourceOptions.includes(watchSource)) {
     sourceOptions.unshift(watchSource);
   }

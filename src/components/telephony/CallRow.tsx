@@ -74,9 +74,9 @@ export const CallRow: React.FC<CallRowProps> = React.memo(({
       <TableCell className="text-white">{call.city?.name || '—'}</TableCell>
       
       <TableCell>
-        {(call.source || call.phone?.source) ? (
+        {call.source ? (
           <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-            {call.source || call.phone?.source}
+            {call.source}
           </Badge>
         ) : (
           <span className="text-gray-400">—</span>

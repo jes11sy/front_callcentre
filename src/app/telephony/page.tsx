@@ -76,7 +76,7 @@ export default function TelephonyPage() {
       callId: answeredCallForOrder.id,
       cityId: answeredCallForOrder.cityId,
       rkId: answeredCallForOrder.rkId,
-      source: answeredCallForOrder.source ?? answeredCallForOrder.phone?.source,
+      source: answeredCallForOrder.source,
       cityName: answeredCallForOrder.cityName ?? answeredCallForOrder.city?.name,
       rkName: answeredCallForOrder.rkName ?? answeredCallForOrder.rk?.name,
     };

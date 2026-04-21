@@ -341,16 +341,16 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
               <span className="text-gray-400">•</span>
               <span className="text-gray-600 dark:text-gray-400">{call.rk?.name || '—'}</span>
             </div>
-            {(call.source || call.phone?.source) && (
+            {call.source && (
               <Badge 
                 variant="outline" 
                 className={cn(
                   "text-[10px] sm:text-xs max-w-[100px] sm:max-w-[150px] truncate",
                   "border-[#0a4f42]/20 text-[#0a4f42] bg-[#0a4f42]/10 dark:border-white/20 dark:text-white dark:bg-white/10"
                 )}
-                title={call.source || call.phone?.source || ''}
+                title={call.source}
               >
-                {call.source || call.phone?.source}
+                {call.source}
               </Badge>
             )}
           </div>
@@ -483,7 +483,7 @@ export const CallRowV4: React.FC<CallRowV4Props> = React.memo(({
             callId: call.id,
             cityId: call.cityId,
             rkId: call.rkId,
-            source: call.source ?? call.phone?.source ?? undefined,
+            source: call.source ?? undefined,
             cityName: call.cityName ?? call.city?.name,
             rkName: call.rkName ?? call.rk?.name,
           }}

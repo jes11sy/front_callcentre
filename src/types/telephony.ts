@@ -33,13 +33,6 @@ export interface Call {
     id: number;
     name: string;
   };
-  phone?: {
-    id: number;
-    number: string;
-    rkId?: number;
-    cityId?: number;
-    source?: string | null;
-  };
 }
 
 export interface CallsResponse {

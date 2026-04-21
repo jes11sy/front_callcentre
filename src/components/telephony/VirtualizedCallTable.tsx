@@ -95,9 +95,9 @@ const GroupHeader = React.memo(({
       <TableCell className="text-white">{latestCall.city?.name || '—'}</TableCell>
       
       <TableCell>
-        {(latestCall.source || latestCall.phone?.source) ? (
+        {latestCall.source ? (
           <Badge variant="outline" className="border-[#FFD700]/30 text-[#FFD700]">
-            {latestCall.source || latestCall.phone?.source}
+            {latestCall.source}
           </Badge>
         ) : (
           <span className="text-gray-400">—</span>

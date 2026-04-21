@@ -12,7 +12,6 @@ import { useCities } from '@/hooks/useStaticData';
 interface OrdersFiltersProps {
   filters: OrderFilters;
   onFilterChange: (key: keyof OrderFilters, value: string) => void;
-<<<<<<< Updated upstream
   onReset?: () => void;
 }
 
@@ -59,41 +58,7 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset }: OrdersFilter
           </Button>
         )}
       </div>
-=======
-  iconOnly?: boolean;
-}
 
-export const OrdersFilters = ({ filters, onFilterChange, iconOnly = false }: OrdersFiltersProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { data: citiesData } = useCities();
-  const { theme } = useDesignStore();
-  const isDark = theme === 'dark';
-  
-  // Получаем список городов из ответа API
-  const cities: string[] = citiesData?.data || citiesData || [];
-
-  return (
-    <div className={`font-myriad ${iconOnly ? 'relative w-auto' : 'w-full'}`}>
-      {/* Кнопка фильтров */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`justify-center border shadow-none ${
-          iconOnly
-            ? `h-10 w-10 rounded-xl p-0 border-transparent ${isDark ? 'bg-transparent text-white hover:bg-white/[0.08]' : 'bg-transparent text-gray-700 hover:bg-black/[0.03]'}`
-            : `w-full sm:w-auto min-w-[120px] sm:min-w-[140px] rounded-full ${
-                isDark
-                  ? 'bg-white/[0.04] border-white/15 text-white hover:bg-white/[0.08]'
-                  : 'bg-white border-gray-200 text-gray-700 hover:bg-black/[0.03] hover:border-gray-300'
-              }`
-        }`}
-        title="Фильтры"
-        aria-label="Фильтры"
-      >
-        <Filter className="h-4 w-4" />
-        {!iconOnly && 'Фильтры'}
-        {!iconOnly && (isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />)}
-      </Button>
->>>>>>> Stashed changes
 
       {/* Раскрывающиеся фильтры */}
       {isOpen && (
@@ -165,17 +130,9 @@ export const OrdersFilters = ({ filters, onFilterChange, iconOnly = false }: Ord
             
             <div className="space-y-2">
               <Label htmlFor="city" className="text-gray-600 dark:text-gray-400">Город</Label>
-<<<<<<< Updated upstream
               <Select value={filters.cityId || 'all'} onValueChange={(value) => onFilterChange('cityId', value === 'all' ? '' : value)}>
                 <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 hover:border-[#FEC004]/50 focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
-=======
-              <Select value={filters.city || 'all'} onValueChange={(value) => onFilterChange('city', value === 'all' ? '' : value)}>
-                <SelectTrigger className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                  isDark
-                    ? 'bg-white/[0.04] border-white/15 text-white data-[placeholder]:text-white/45 [&_svg]:text-white/60'
-                    : 'bg-white border-gray-200 text-gray-900 data-[placeholder]:text-gray-400 [&_svg]:text-gray-500'
-                }`}>
->>>>>>> Stashed changes
+
                   <SelectValue placeholder="Все города" />
                 </SelectTrigger>
                 <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
@@ -187,15 +144,10 @@ export const OrdersFilters = ({ filters, onFilterChange, iconOnly = false }: Ord
                   </SelectItem>
                   {cities.map((city) => (
                     <SelectItem 
-<<<<<<< Updated upstream
                       key={city.id} 
                       value={city.id.toString()} 
                       className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100"
-=======
-                      key={city} 
-                      value={city} 
-                      className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}
->>>>>>> Stashed changes
+
                     >
                       {city.name}
                     </SelectItem>

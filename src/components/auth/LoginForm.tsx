@@ -207,48 +207,20 @@ export function LoginForm() {
         {theme === 'dark' ? <SunMedium className="h-4 w-4" /> : <MoonStar className="h-4 w-4" />}
       </button>
 
-<<<<<<< Updated upstream
-        {/* Title */}
-        <h1 className={`text-2xl font-semibold text-center mb-8 transition-colors ${
+      <div
+        className={`relative z-10 w-full max-w-md rounded-[28px] border p-6 shadow-2xl ${
+          theme === 'dark'
+            ? 'border-white/10 bg-white/[0.04] backdrop-blur-xl'
+            : 'border-black/[0.06] bg-white/90 backdrop-blur-xl'
+        }`}
+      >
+        <h1 className={`mb-8 text-center text-2xl font-semibold transition-colors ${
           theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
         }`}>
           Авторизация
         </h1>
 
-        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-5">
-          <div>
-            <Label className={`text-sm font-medium mb-2 block transition-colors ${
-              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              Логин
-            </Label>
-            <Input
-              placeholder="Введите логин"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              disabled={isLoading}
-              className={`h-12 border transition-colors rounded-lg ${
-                theme === 'dark' 
-                  ? 'bg-[#1e2530] border-gray-600 text-gray-100 placeholder:text-gray-500 hover:border-gray-500 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30' 
-                  : 'bg-[#F3F3EE] border-gray-300 text-gray-800 placeholder:text-gray-400 hover:border-gray-400 focus-visible:border-[#FEC004] focus-visible:ring-[3px] focus-visible:ring-[#FEC004]/30'
-              }`}
-=======
-      <div className="relative w-full max-w-[360px]">
-        <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-7 flex justify-center">
-            <Image
-              src={theme === 'dark' ? '/img/logo/dark_logo_v2.png' : '/img/logo/logo_v2.png'}
-              alt="LEADS CREATE"
-              width={240}
-              height={56}
-              className="h-[52px] w-auto object-contain opacity-95"
-              priority
->>>>>>> Stashed changes
-            />
-          </div>
-        </div>
-
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="login" className="sr-only">
@@ -343,18 +315,9 @@ export function LoginForm() {
           )}
 
           <Button
-<<<<<<< Updated upstream
             type="submit"
             className="w-full h-12 bg-[#FEC004] hover:bg-[#e5ad04] text-gray-900 font-semibold rounded-lg transition-colors"
-=======
-            type="button"
-            onClick={handleLogin}
-            className={`h-14 w-full rounded-full border-0 px-5 text-[17px] font-medium shadow-none transition-colors ${
-              theme === 'dark'
-                ? 'bg-white text-[#111113] hover:bg-white/90'
-                : 'bg-[#FEC004] text-[#1d1d1f] hover:bg-[#e8b304]'
-            }`}
->>>>>>> Stashed changes
+
             disabled={isLoading}
           >
             {isLoading ? (
@@ -378,11 +341,8 @@ export function LoginForm() {
       <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-xs transition-colors ${
         theme === 'dark' ? 'text-white/35' : 'text-[#6e6e73]'
       }`}>
-<<<<<<< Updated upstream
         © {new Date().getFullYear()} Новые схемы
-=======
-        © 2026 Новые Схемы
->>>>>>> Stashed changes
+
       </div>
     </div>
   );

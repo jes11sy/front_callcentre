@@ -69,7 +69,6 @@ export default function TelephonyPage() {
     clearAnsweredCallForOrder
   } = useTelephony();
 
-<<<<<<< Updated upstream
   const appealCallContext = useMemo(() => {
     if (!answeredCallForOrder) return null;
     return {
@@ -84,9 +83,7 @@ export default function TelephonyPage() {
   }, [answeredCallForOrder]);
 
   // Показываем скелетон при загрузке (только для первой загрузки)
-=======
-  // Показываем единый экран загрузки при первой загрузке
->>>>>>> Stashed changes
+
   if (loading && calls.length === 0) {
     return (
       <DashboardLayout variant="operator">

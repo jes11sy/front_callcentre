@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
@@ -8,11 +9,8 @@ import { Toaster } from "sonner";
 import { WebVitalsScript } from "@/components/WebVitalsScript";
 import { SocketProviders } from "@/components/listeners/SocketProviders";
 import { ServiceWorkerRegister } from "@/components/push/ServiceWorkerRegister";
-<<<<<<< Updated upstream
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-=======
-import { cookies } from "next/headers";
->>>>>>> Stashed changes
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

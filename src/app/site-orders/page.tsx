@@ -7,26 +7,21 @@ import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 import { 
   Plus,
-<<<<<<< Updated upstream
   Phone,
   User,
   MapPin,
   MessageSquare,
   Clock,
   AlarmClock
-=======
->>>>>>> Stashed changes
+
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
-<<<<<<< Updated upstream
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
-=======
-import { LoadingState } from '@/components/ui/loading-state';
->>>>>>> Stashed changes
+
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
@@ -79,25 +74,19 @@ const formatCallbackTime = (callbackAt: string): string => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Создан':
-<<<<<<< Updated upstream
       return 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30';
     case 'В обработке':
       return 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30';
     case 'Перезвонить':
       return 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30';
-=======
-      return 'bg-[#0a4f42]/10 text-[#0a4f42] border-[#0a4f42]/20 dark:bg-white/10 dark:text-white dark:border-white/20';
->>>>>>> Stashed changes
+
     case 'Не отвечает':
       return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-400/20';
     case 'Отказ':
       return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-200 dark:border-red-400/20';
     default:
-<<<<<<< Updated upstream
       return 'bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-500/30';
-=======
-      return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-white/5 dark:text-white/70 dark:border-white/10';
->>>>>>> Stashed changes
+
   }
 };
 
@@ -428,37 +417,12 @@ export default function SiteOrdersPage() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Показано {data.data.length} из {data.pagination.total} заявок
                 </div>
-<<<<<<< Updated upstream
                 <OptimizedPagination
                   currentPage={page}
                   totalPages={data.pagination.totalPages}
                   onPageChange={setPage}
                 />
-=======
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className={isDark ? 'border-white/15 text-white hover:bg-white/10 hover:border-white/20' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03] hover:border-gray-300'}
-                  >
-                    Назад
-                  </Button>
-                  <span className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
-                    {page} / {data.pagination.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
-                    disabled={page === data.pagination.totalPages}
-                    className={isDark ? 'border-white/15 text-white hover:bg-white/10 hover:border-white/20' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03] hover:border-gray-300'}
-                  >
-                    Далее
-                  </Button>
-                </div>
->>>>>>> Stashed changes
+
               </div>
             )}
           </div>

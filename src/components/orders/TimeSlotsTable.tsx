@@ -334,7 +334,6 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                       setIsCityDropdownOpen(false);
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 text-xs ${
-<<<<<<< Updated upstream
                       activeCity === c.name
                         ? 'bg-[#FEC004]/20 text-[#FEC004]'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2530]'
@@ -342,15 +341,7 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                   >
                     <span>{c.name}</span>
                     <span className="px-1 py-0.5 rounded text-[10px] bg-[#FEC004]/20">{cityCounts[c.name] || 0}</span>
-=======
-                      activeCity === city
-                        ? (isDark ? 'bg-white/10 text-white' : 'bg-[#FEC004]/15 text-[#b58500]')
-                        : (isDark ? 'text-white/80 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-50')
-                    }`}
-                  >
-                    <span>{city}</span>
-                    <span className={`px-1 py-0.5 rounded text-[10px] ${isDark ? 'bg-white/10' : 'bg-[#FEC004]/15'}`}>{cityCounts[city] || 0}</span>
->>>>>>> Stashed changes
+
                   </button>
                 ))}
               </div>
@@ -428,15 +419,10 @@ const TimeSlotsTableComponent = ({ orders, selectedDate, onDateChange, onCityCli
                 key={c.id}
                 onClick={() => handleCityClick(c.name)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-<<<<<<< Updated upstream
                   activeCity === c.name
                     ? 'bg-[#FEC004] text-gray-900'
                     : 'bg-gray-50 dark:bg-[#252d3a] text-gray-600 dark:text-gray-300 hover:bg-[#FEC004]/10 hover:text-[#FEC004] border border-gray-200 dark:border-gray-600'
-=======
-                  activeCity === city
-                    ? (isDark ? 'bg-white text-[#111113]' : 'bg-[#FEC004] text-[#111113]')
-                    : (isDark ? 'bg-white/[0.04] border border-white/15 text-white hover:bg-white/10' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-black/5')
->>>>>>> Stashed changes
+
                 }`}
               >
                 {c.name}

@@ -157,16 +157,12 @@ export default function CreateOrderModal({
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-2">
-<<<<<<< Updated upstream
                   <Label htmlFor="rkId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Рекламная Компания *</Label>
-=======
-                  <Label htmlFor="rk" className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-300">Рекламная Компания *</Label>
->>>>>>> Stashed changes
+
                   <Controller
                     name="rkId"
                     control={form.control}
                     render={({ field }) => (
-<<<<<<< Updated upstream
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите РК" />
@@ -175,16 +171,7 @@ export default function CreateOrderModal({
                           {rks.map((rk) => (
                             <SelectItem key={rk.id} value={rk.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
                               {rk.name}
-=======
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={selectClassName}>
-                          <SelectValue placeholder="Выберите РК" />
-                        </SelectTrigger>
-                        <SelectContent className="border-black/[0.08] bg-white dark:border-white/10 dark:bg-[#161a20]">
-                          {RK_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">
-                              {option}
->>>>>>> Stashed changes
+
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -196,16 +183,12 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-<<<<<<< Updated upstream
                   <Label htmlFor="cityId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Город *</Label>
-=======
-                  <Label htmlFor="city" className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-300">Город *</Label>
->>>>>>> Stashed changes
+
                   <Controller
                     name="cityId"
                     control={form.control}
                     render={({ field }) => (
-<<<<<<< Updated upstream
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите город" />
@@ -214,16 +197,7 @@ export default function CreateOrderModal({
                           {cities.map((city) => (
                             <SelectItem key={city.id} value={city.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
                               {city.name}
-=======
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={selectClassName}>
-                          <SelectValue placeholder="Выберите город" />
-                        </SelectTrigger>
-                        <SelectContent className="border-black/[0.08] bg-white dark:border-white/10 dark:bg-[#161a20]">
-                          {CITY_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">
-                              {option}
->>>>>>> Stashed changes
+
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -234,30 +208,7 @@ export default function CreateOrderModal({
                     <p className="text-sm text-red-400">{errors.cityId.message}</p>
                   )}
                 </div>
-<<<<<<< Updated upstream
-=======
-                <div className="space-y-2">
-                  <Label htmlFor="avitoName" className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-300">Источник</Label>
-                  <Controller
-                    name="avitoName"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={selectClassName}>
-                          <SelectValue placeholder="Выберите источник" />
-                        </SelectTrigger>
-                        <SelectContent className="border-black/[0.08] bg-white dark:border-white/10 dark:bg-[#161a20]">
-                          {SOURCE_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
->>>>>>> Stashed changes
+
               </div>
             </CardContent>
           </Card>
@@ -371,16 +322,12 @@ export default function CreateOrderModal({
                   )}
                 </div>
                 <div className="space-y-2">
-<<<<<<< Updated upstream
                   <Label htmlFor="equipmentTypeId" className="text-sm font-medium text-gray-600 dark:text-gray-400">Тип техники *</Label>
-=======
-                  <Label htmlFor="typeEquipment" className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-300">Тип техники *</Label>
->>>>>>> Stashed changes
+
                   <Controller
                     name="equipmentTypeId"
                     control={form.control}
                     render={({ field }) => (
-<<<<<<< Updated upstream
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
                         <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
                           <SelectValue placeholder="Выберите тип техники" />
@@ -391,16 +338,7 @@ export default function CreateOrderModal({
                               {et.name}
                             </SelectItem>
                           ))}
-=======
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={selectClassName}>
-                          <SelectValue placeholder="Выберите тип техники" />
-                        </SelectTrigger>
-                        <SelectContent className="border-black/[0.08] bg-white dark:border-white/10 dark:bg-[#161a20]">
-                          <SelectItem value="КП" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">КП</SelectItem>
-                          <SelectItem value="БТ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">БТ</SelectItem>
-                          <SelectItem value="МНЧ" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">МНЧ</SelectItem>
->>>>>>> Stashed changes
+
                         </SelectContent>
                       </Select>
                     )}
@@ -422,22 +360,7 @@ export default function CreateOrderModal({
                   <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
                 )}
               </div>
-<<<<<<< Updated upstream
-=======
-              <div className="space-y-2">
-                <Label htmlFor="problem" className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-300">Описание проблемы *</Label>
-                <Textarea
-                  id="problem"
-                  {...register('problem')}
-                  placeholder="Опишите проблему"
-                  rows={2}
-                  className={`${fieldClassName} resize-none`}
-                />
-                {errors.problem && (
-                  <p className="text-sm text-red-400">{errors.problem.message}</p>
-                )}
-              </div>
->>>>>>> Stashed changes
+
             </CardContent>
           </Card>
 

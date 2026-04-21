@@ -250,15 +250,10 @@ const OrdersTableComponent = ({
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
-<<<<<<< Updated upstream
                         <div className="max-w-20 sm:max-w-28 truncate" title={order.equipmentType?.name || '—'}>
                           <Badge variant="outline" className="text-[10px] sm:text-xs border-[#FEC004]/30 text-[#FEC004] bg-[#FEC004]/10">
                             {order.equipmentType?.name || '—'}
-=======
-                        <div className="max-w-20 sm:max-w-28 truncate" title={order.typeEquipment}>
-                          <Badge variant="outline" className={`text-[10px] sm:text-xs ${isDark ? 'border-white/20 text-white bg-white/10' : 'border-[#FEC004]/40 text-[#b58500] bg-[#FEC004]/15'}`}>
-                            {order.typeEquipment}
->>>>>>> Stashed changes
+
                           </Badge>
                         </div>
                       </TableCell>

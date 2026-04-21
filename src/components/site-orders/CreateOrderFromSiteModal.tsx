@@ -166,12 +166,6 @@ export default function CreateOrderFromSiteModal({
 
   if (!open) return null;
 
-<<<<<<< Updated upstream
-  const selectTriggerClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
-  const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
-  const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
-  const inputClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/20";
-=======
   // Стили
   const selectTriggerClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:[&_[data-placeholder]]:text-white/45 dark:[&_svg]:text-white/70";
   
@@ -180,7 +174,7 @@ export default function CreateOrderFromSiteModal({
   const selectItemClass = "text-gray-700 data-[highlighted]:bg-black/5 dark:text-white dark:data-[highlighted]:bg-white/10";
   
   const inputClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45";
->>>>>>> Stashed changes
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

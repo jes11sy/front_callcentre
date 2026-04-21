@@ -8,7 +8,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { 
-<<<<<<< Updated upstream
   BarChart3, 
   Phone, 
   PhoneCall, 
@@ -18,9 +17,7 @@ import {
   RefreshCw,
   TrendingUp,
   Target
-=======
-  RefreshCw
->>>>>>> Stashed changes
+
 } from 'lucide-react';
 import React from 'react';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -154,11 +151,11 @@ export default function StatsPage() {
                   <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Заказы</span>
                   <span className={`text-xl sm:text-2xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{stats.orders.total}</span>
                 </div>
-<<<<<<< Updated upstream
                 <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                   в среднем {avgOrdersPerDay} заказа/день
                 </p>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Конверсия */}
               <div className={`p-4 rounded-lg ${isDark ? 'bg-[#1e2530]' : 'bg-white'}`}>
@@ -200,45 +197,7 @@ export default function StatsPage() {
                   </div>
                 </div>
               )}
-=======
-                <p className={`text-xs sm:text-sm font-light mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>за период</p>
-                </CardContent>
-              </Card>
 
-              {/* Ежедневная динамика */}
-              <Card className={`rounded-[20px] border ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]'}`}>
-                <CardContent className="p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className={`text-sm sm:text-base font-light ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>По дням</span>
-                    <span className={`text-xs sm:text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                      {processedDailyStats.sortedStats.length} дн.
-                    </span>
-                  </div>
-                  <div className="space-y-3">
-                    {processedDailyStats.sortedStats.length > 0 ? (
-                      processedDailyStats.sortedStats.map((day) => (
-                        <div key={day.date} className="flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className={`text-sm ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{formatDate(day.date)}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-24 sm:w-36 h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
-                              <div
-                                className={`h-full rounded-full ${isDark ? 'bg-white' : 'bg-[#0a4f42]'}`}
-                                style={{ width: `${Math.min((day.calls / processedDailyStats.maxCalls) * 100, 100)}%` }}
-                              />
-                            </div>
-                            <span className={`w-7 text-right text-sm ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{day.calls}</span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Нет данных за выбранный период</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
->>>>>>> Stashed changes
             </div>
           ) : null}
         </div>

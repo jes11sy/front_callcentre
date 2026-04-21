@@ -91,12 +91,10 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
   onLimitChange,
   stats
 }) => {
-<<<<<<< Updated upstream
-=======
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
   
->>>>>>> Stashed changes
+
   // Local state
   const [searchTerm, setSearchTerm] = useState('');
   const [stickyPlayerCall, setStickyPlayerCall] = useState<Call | null>(null);

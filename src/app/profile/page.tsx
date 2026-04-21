@@ -34,11 +34,8 @@ import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
-<<<<<<< Updated upstream
 import { usePushNotifications } from '@/hooks/usePushNotifications';
-=======
-import { LoadingState } from '@/components/ui/loading-state';
->>>>>>> Stashed changes
+
 
 // Схемы валидации
 const profileSchema = z.object({
@@ -419,109 +416,9 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-<<<<<<< Updated upstream
-            </>
-          )}
+            </div>
 
-          {/* Информация */}
-          <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
-          
           <div className="space-y-4">
-            {/* Рабочий статус */}
-            <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Рабочий статус</span>
-              {isEditing ? (
-                <Select 
-                  value={profileForm.watch('status')} 
-                  onValueChange={(value) => profileForm.setValue('status', value)}
-                >
-                  <SelectTrigger className={`w-32 ${
-                    isDark 
-                      ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                      : 'bg-white border-gray-200 text-gray-900'
-                  }`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-[#1e2530] border-gray-600' : 'bg-white border-gray-200'}>
-                    <SelectItem value="offline" className={isDark ? 'text-gray-100' : 'text-gray-900'}>Оффлайн</SelectItem>
-                    <SelectItem value="online" className={isDark ? 'text-gray-100' : 'text-gray-900'}>В сети</SelectItem>
-                    <SelectItem value="break" className={isDark ? 'text-gray-100' : 'text-gray-900'}>Перерыв</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.status)}</span>
-              )}
-=======
->>>>>>> Stashed changes
-            </div>
-
-            <div className="space-y-4">
-              <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
-                <button onClick={() => setIsChangingPassword(!isChangingPassword)} className={`w-full rounded-xl px-4 py-2 text-sm text-left transition-colors ${isDark ? 'bg-white/[0.06] text-gray-200 hover:bg-white/[0.1]' : 'bg-black/[0.04] text-gray-700 hover:bg-black/[0.08]'}`}>
-                  {isChangingPassword ? 'Отмена' : 'Сменить пароль'}
-                </button>
-                {isChangingPassword && (
-                  <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="mt-4 space-y-4">
-                    <div className="space-y-1">
-                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Текущий пароль</Label>
-                      <div className="relative">
-                        <Input type={showCurrentPassword ? 'text' : 'password'} {...passwordForm.register('currentPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
-                        <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Новый пароль</Label>
-                      <div className="relative">
-                        <Input type={showNewPassword ? 'text' : 'password'} {...passwordForm.register('newPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
-                        <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Подтвердите пароль</Label>
-                      <div className="relative">
-                        <Input type={showConfirmPassword ? 'text' : 'password'} {...passwordForm.register('confirmPassword')} className={`pr-10 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
-                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <Button type="submit" disabled={changePasswordMutation.isPending} className={isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#0a4f42] text-white hover:bg-[#083f35]'}>
-                      {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Сохранить пароль
-                    </Button>
-                  </form>
-                )}
-              </div>
-
-<<<<<<< Updated upstream
-            {/* Дата начала */}
-            <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
-              <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.createdAt)}</span>
-            </div>
-
-            {/* Примечание */}
-            <div className={`flex justify-between items-start py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Примечание</span>
-              {isEditing ? (
-                <Textarea
-                  {...profileForm.register('note')}
-                  className={`w-64 ${
-                    isDark 
-                      ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                      : 'bg-white border-gray-200 text-gray-900'
-                  }`}
-                  rows={2}
-                />
-              ) : (
-                <span className={`text-right max-w-xs ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.note || 'Не указано'}</span>
-              )}
-            </div>
-          </div>
 
           {/* Смена пароля */}
           <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
@@ -609,18 +506,12 @@ export default function ProfilePage() {
                 >
                   {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   Сохранить пароль
-=======
-              <div className={`rounded-[20px] border p-4 ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/10'}`}>
-                <Button onClick={handleLogout} variant="ghost" className={`w-full justify-start gap-2 ${isDark ? 'text-red-300 hover:text-red-200 hover:bg-white/10' : 'text-red-600 hover:text-red-700 hover:bg-red-50'}`}>
-                  <LogOut className="h-4 w-4" />
-                  Выйти из аккаунта
->>>>>>> Stashed changes
+
                 </Button>
-              </div>
-            </div>
+              </form>
+            )}
           </div>
 
-<<<<<<< Updated upstream
           {/* Push-уведомления */}
           {isPushSupported && (
             <>
@@ -673,10 +564,11 @@ export default function ProfilePage() {
             Выйти из аккаунта
           </Button>
 
-=======
->>>>>>> Stashed changes
+
         </div>
       </div>
+    </div>
+    </div>
     </DashboardLayout>
   );
 }

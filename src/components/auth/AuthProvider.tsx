@@ -66,12 +66,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
     }
 
-<<<<<<< Updated upstream
     authLogger.log('No user in store, redirecting to login');
-=======
-    // Нет пользователя - просто продолжаем без авторизации
-    authLogger.log('No user in store, auth disabled for frontend');
->>>>>>> Stashed changes
+
     setLoading(false);
 
     async function validateSessionInBackground() {
@@ -111,10 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               // Keep cached user
             }
           } else if (!cancelled) {
-<<<<<<< Updated upstream
-=======
-            // Не удалось восстановить - остаемся без авторизации
->>>>>>> Stashed changes
+
             authLogger.log('Could not restore session');
             localStorage.removeItem('user');
             localStorage.removeItem('auth-storage');

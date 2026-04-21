@@ -19,16 +19,7 @@ import {
   ChevronRight,
   Bell,
   Check,
-<<<<<<< Updated upstream
-=======
-  Trash2,
-  Phone,
-  ClipboardList,
-  Globe,
-  Gavel,
-  ChartColumnBig,
-  BookOpenText,
->>>>>>> Stashed changes
+
   PhoneIncoming,
   PhoneMissed,
   PhoneOutgoing,
@@ -247,7 +238,6 @@ export function Sidebar() {
     }
   };
 
-<<<<<<< Updated upstream
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navItems: Array<{ name: string; href: string; icon?: string; lucideIcon?: LucideIcon }> = [
@@ -258,15 +248,7 @@ export function Sidebar() {
     { name: 'Штрафы', href: '/penalties', icon: '/img/navigate/penalties.svg' },
     { name: 'Статистика', href: '/stats', icon: '/img/navigate/stats.svg' },
     { name: 'Справочник', href: '/reference', icon: '/img/navigate/reference.svg' },
-=======
-  const navItems = [
-    { name: 'Телефония', href: '/telephony', icon: Phone },
-    { name: 'Заказы', href: '/orders', icon: ClipboardList },
-    { name: 'Заявки Сайт', href: '/site-orders', icon: Globe },
-    { name: 'Штрафы', href: '/penalties', icon: Gavel },
-    { name: 'Статистика', href: '/stats', icon: ChartColumnBig },
-    { name: 'Справочник', href: '/reference', icon: BookOpenText },
->>>>>>> Stashed changes
+
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
@@ -329,7 +311,6 @@ export function Sidebar() {
               }
               onClick={() => setIsMobileMenuOpen(false)}
             >
-<<<<<<< Updated upstream
               {/* Индикатор активной вкладки - тонкая скобка */}
               <span 
                 className={`absolute left-0 top-1/2 -translate-y-1/2 w-[6px] transition-all ${
@@ -360,25 +341,7 @@ export function Sidebar() {
                 />
               )}
               <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
-=======
-              <Icon
-                className={`${isMobile ? 'h-6 w-6' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 transition-all duration-200 ${
-                  !isMobile && isSidebarCollapsed ? 'group-hover:scale-110' : ''
-                } ${
-                  active
-                    ? 'text-[#FEC004] dark:text-[#FEC004]'
-                    : (isSidebarCollapsed
-                        ? 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]'
-                        : 'text-[#3a3a3c] dark:text-white/78 group-hover:text-[#FEC004] dark:group-hover:text-[#FEC004]')
-                }`}
-                strokeWidth={1.9}
-              />
-              <span
-                className={`${(!isMobile && isSidebarCollapsed) ? 'hidden' : ''} min-w-0 truncate font-medium tracking-[-0.01em] ${
-                  active ? 'text-[#FEC004]' : 'text-[#3a3a3c] dark:text-white/92'
-                }`}
-              >
->>>>>>> Stashed changes
+
                 {item.name}
               </span>
             </Link>
@@ -482,34 +445,7 @@ export function Sidebar() {
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   </div>
                   <div className="flex items-center gap-3">
-<<<<<<< Updated upstream
-=======
-                    {/* Push notifications button - всегда показываем, как debug кнопка */}
-                    <button
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        subscribePush(); 
-                      }}
-                      disabled={isPushSubscribing}
-                      className={`text-xs font-medium transition-colors ${
-                        isPushSubscribed 
-                          ? 'text-emerald-500 dark:text-emerald-300' 
-                          : 'text-[#0a4f42] dark:text-[#ffd84a]'
-                      } disabled:opacity-50`}
-                    >
-                      {isPushLoading 
-                        ? 'Загрузка...'
-                        : isPushSubscribing 
-                          ? 'Подключение...' 
-                          : isPushSubscribed 
-                            ? 'Push включен' 
-                            : pushPermission === 'denied'
-                              ? 'Push заблокирован'
-                              : 'Включить push'
-                      }
-                    </button>
->>>>>>> Stashed changes
+
                     {unreadCount > 0 && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
@@ -671,30 +607,7 @@ export function Sidebar() {
                 }`}>
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Уведомления</h3>
                   <div className="flex items-center gap-3">
-<<<<<<< Updated upstream
-=======
-                    {/* Push notifications button - mobile, всегда показываем */}
-                    <button
-                      onClick={() => subscribePush()}
-                      disabled={isPushSubscribing}
-                      className={`text-xs font-medium transition-colors ${
-                        isPushSubscribed 
-                          ? 'text-emerald-500 dark:text-emerald-300' 
-                          : 'text-[#0a4f42] dark:text-[#ffd84a]'
-                      } disabled:opacity-50`}
-                    >
-                      {isPushLoading 
-                        ? 'Загрузка...'
-                        : isPushSubscribing 
-                          ? 'Подключение...' 
-                          : isPushSubscribed 
-                            ? 'Push включен' 
-                            : pushPermission === 'denied'
-                              ? 'Push заблокирован'
-                              : 'Включить push'
-                      }
-                    </button>
->>>>>>> Stashed changes
+
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}

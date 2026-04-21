@@ -205,11 +205,8 @@ function OrdersContent() {
                 <OrdersFilters 
                   filters={filters}
                   onFilterChange={updateFilter}
-<<<<<<< Updated upstream
                   onReset={resetFilters}
-=======
-                  iconOnly
->>>>>>> Stashed changes
+
                 />
               }
             />

@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/ui/error-boundary';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Call } from '@/types/telephony';
+import { useDesignStore } from '@/store/designStore';
 
 // Размеры для пагинации по группам
 const GROUP_SIZES = [

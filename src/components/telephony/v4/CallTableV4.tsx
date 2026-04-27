@@ -326,7 +326,6 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   showPrevNext={true}
                   maxVisiblePages={3}
                   disabled={loading}
-                  variant="v2"
                 />
               )}
             </div>

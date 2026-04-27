@@ -3,11 +3,13 @@ import { CreateOrderFromCallData, CreateOrderData, ApiResponse } from '@/types/c
 import api from '@/lib/api'; // Используем настроенный axios instance
 
 export interface CashTransactionData {
-  type: 'income' | 'expense';
+  type?: 'income' | 'expense';
   amount: number;
   cityId?: number;
   paymentPurpose?: string;
   description?: string;
+  note?: string;
+  name?: string;
   date?: string;
 }
 
@@ -46,7 +48,7 @@ export const ordersApi = {
 
   // Обновление статуса заказа
   async updateStatus(id: number, status: string): Promise<ApiResponse> {
-    const response = await api.patch(`/orders/${id}/status`, { status });
+    const response = await api.put(`/orders/${id}/status`, { status });
     return response.data;
   },
 

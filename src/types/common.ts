@@ -1,3 +1,5 @@
+import type { Control } from 'react-hook-form';
+
 // Общие типы для устранения дублирования кода
 
 // Базовые поля заказа
@@ -104,9 +106,9 @@ export interface OrderModalProps extends ModalProps {
 
 // Формы
 export interface FormFieldProps {
-  register?: unknown;
-  control?: unknown;
-  errors: Record<string, { message?: string }>;
+  register: (...args: unknown[]) => Record<string, unknown>;
+  control?: Control<any>;
+  errors: Partial<Record<string, { message?: string }>>;
   className?: string;
 }
 

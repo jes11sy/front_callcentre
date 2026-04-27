@@ -81,6 +81,10 @@ async function openDB(): Promise<IDBDatabase> {
 
 const DEVICE_SECRET_KEY = 'callcentre_device_secret'
 
+function toArrayBuffer(view: Uint8Array): ArrayBuffer {
+  return view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength) as ArrayBuffer
+}
+
 /**
  * Генерирует или извлекает уникальный секрет устройства из IndexedDB.
  * Этот секрет создаётся один раз и не может быть воспроизведён злоумышленником
@@ -135,7 +139,7 @@ async function generateEncryptionKey(salt: Uint8Array): Promise<CryptoKey> {
 
   const baseKey = await crypto.subtle.importKey(
     'raw',
-    fingerprint,
+    toArrayBuffer(fingerprint),
     'PBKDF2',
     false,
     ['deriveKey']
@@ -144,7 +148,7 @@ async function generateEncryptionKey(salt: Uint8Array): Promise<CryptoKey> {
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: toArrayBuffer(salt),
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -165,9 +169,9 @@ async function encryptToken(token: string): Promise<SavedToken> {
 
   const encodedData = new TextEncoder().encode(token)
   const encryptedBuffer = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: toArrayBuffer(iv) },
     key,
-    encodedData
+    toArrayBuffer(encodedData)
   )
 
   return {
@@ -194,9 +198,9 @@ async function decryptToken(saved: SavedToken): Promise<string | null> {
     const key = await generateEncryptionKey(salt)
 
     const decryptedBuffer = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      { name: 'AES-GCM', iv: toArrayBuffer(iv) },
       key,
-      encryptedData
+      toArrayBuffer(encryptedData)
     )
 
     return new TextDecoder().decode(decryptedBuffer)

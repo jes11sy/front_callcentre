@@ -250,7 +250,7 @@ const OrdersTableComponent = ({
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
                         <div className="text-xs sm:text-sm whitespace-nowrap text-gray-700 dark:text-gray-300">
-                          {formatDate(order.dateMeeting)}
+                          {formatDate(order.dateMeeting || order.createdAt)}
                         </div>
                       </TableCell>
                       <TableCell className="py-2 sm:py-3 px-2 sm:px-4">
@@ -318,7 +318,6 @@ const OrdersTableComponent = ({
                     showPrevNext={true}
                     maxVisiblePages={3}
                     disabled={isLoading}
-                    variant="v2"
                   />
                 )}
               </div>

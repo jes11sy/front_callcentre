@@ -35,11 +35,12 @@ export function CallPushListener() {
     if (!canNotify) return;
 
     // Слушаем входящие звонки
-    const unsubIncoming = on('call:incoming', (data: {
-      phone?: string;
-      callerName?: string;
-      callId?: string;
-    }) => {
+    const unsubIncoming = on('call:incoming', (...args: unknown[]) => {
+      const data = (args[0] ?? {}) as {
+        phone?: string;
+        callerName?: string;
+        callId?: string;
+      };
       // Показываем уведомление только если вкладка не активна
       if (document.visibilityState === 'hidden') {
         showLocalNotification({
@@ -52,12 +53,12 @@ export function CallPushListener() {
     });
 
     // Слушаем пропущенные звонки
-    const unsubMissed = on('call:missed', (data: {
-      phone?: string;
-      callerName?: string;
-      callId?: string;
-      duration?: number;
-    }) => {
+    const unsubMissed = on('call:missed', (...args: unknown[]) => {
+      const data = (args[0] ?? {}) as {
+        phone?: string;
+        callerName?: string;
+        callId?: string;
+      };
       showLocalNotification({
         title: 'Пропущенный звонок',
         body: data.callerName || data.phone || 'Неизвестный номер',
@@ -67,12 +68,13 @@ export function CallPushListener() {
     });
 
     // Также слушаем notification:new для звонков
-    const unsubNotification = on('notification:new', (notification: {
-      type: string;
-      title: string;
-      message: string;
-      id: string;
-    }) => {
+    const unsubNotification = on('notification:new', (...args: unknown[]) => {
+      const notification = (args[0] ?? {}) as {
+        type: string;
+        title: string;
+        message: string;
+        id: string;
+      };
       if (notification.type === 'call_incoming' || notification.type === 'call_missed') {
         // Показываем только если вкладка не активна (для incoming)
         // или всегда (для missed)
@@ -114,9 +116,7 @@ async function showLocalNotification(options: {
       icon: '/img/logo/pwa_logo.png',
       badge: '/img/logo/favicon.png',
       tag: options.tag,
-      renotify: true,
       requireInteraction: options.type === 'call_incoming',
-      vibrate: [200, 100, 200],
       data: {
         type: options.type,
         url: '/telephony',

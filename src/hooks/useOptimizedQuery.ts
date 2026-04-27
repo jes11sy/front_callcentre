@@ -1,9 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 
 interface OptimizedQueryOptions {
   staleTime?: number;
-  cacheTime?: number;
+  gcTime?: number;
   refetchOnWindowFocus?: boolean;
   refetchOnMount?: boolean;
   retry?: number;
@@ -18,7 +18,7 @@ export const useOptimizedQuery = <T>(
 
   const {
     staleTime = 2 * 60 * 1000,
-    cacheTime = 5 * 60 * 1000,
+    gcTime = 5 * 60 * 1000,
     refetchOnWindowFocus = false,
     refetchOnMount = false,
     retry = 2,
@@ -26,36 +26,29 @@ export const useOptimizedQuery = <T>(
 
   const mergedOptions = useMemo(() => ({
     staleTime,
-    cacheTime,
+    gcTime,
     refetchOnWindowFocus,
     refetchOnMount,
     retry,
-  }), [staleTime, cacheTime, refetchOnWindowFocus, refetchOnMount, retry]);
-
-  // Стабилизируем queryKey через ref + сравнение по значению
-  const queryKeyRef = useRef(queryKey);
-  if (JSON.stringify(queryKeyRef.current) !== JSON.stringify(queryKey)) {
-    queryKeyRef.current = queryKey;
-  }
-  const stableQueryKey = queryKeyRef.current;
+  }), [staleTime, gcTime, refetchOnWindowFocus, refetchOnMount, retry]);
 
   const query = useQuery({
-    queryKey: stableQueryKey,
+    queryKey,
     queryFn,
     ...mergedOptions
   });
 
   const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: stableQueryKey });
-  }, [queryClient, stableQueryKey]);
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
 
   const prefetch = useCallback(() => {
     queryClient.prefetchQuery({
-      queryKey: stableQueryKey,
+      queryKey,
       queryFn,
       ...mergedOptions
     });
-  }, [queryClient, stableQueryKey, queryFn, mergedOptions]);
+  }, [queryClient, queryKey, queryFn, mergedOptions]);
 
   return {
     ...query,

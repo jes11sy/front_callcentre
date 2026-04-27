@@ -20,7 +20,7 @@ type OrderFormType = 'chat' | 'call' | 'full';
 interface UseOrderFormOptions {
   type: OrderFormType;
   defaultValues?: Partial<OrderBaseFormData>;
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: unknown) => Promise<void>;
 }
 
 export function useOrderForm({ type, defaultValues, onSubmit }: UseOrderFormOptions) {
@@ -38,7 +38,7 @@ export function useOrderForm({ type, defaultValues, onSubmit }: UseOrderFormOpti
     }
   };
 
-  const form = useForm({
+  const form = useForm<OrderBaseFormData | ChatOrderFormData | CallOrderFormData | FullOrderFormData>({
     resolver: zodResolver(getSchema()),
     defaultValues: {
       typeOrder: 'Впервые',
@@ -52,7 +52,7 @@ export function useOrderForm({ type, defaultValues, onSubmit }: UseOrderFormOpti
   });
 
   // Обработка отправки формы с единой логикой ошибок
-  const handleSubmit = useCallback(async (data: any) => {
+  const handleSubmit = useCallback(async (data: OrderBaseFormData | ChatOrderFormData | CallOrderFormData | FullOrderFormData) => {
     try {
       await onSubmit(data);
     } catch (error: unknown) {
@@ -68,8 +68,8 @@ export function useOrderForm({ type, defaultValues, onSubmit }: UseOrderFormOpti
   }, [form]);
 
   // Установка значений формы
-  const setFormValue = useCallback((field: string, value: any) => {
-    form.setValue(field as any, value);
+  const setFormValue = useCallback((field: keyof (OrderBaseFormData | ChatOrderFormData | CallOrderFormData | FullOrderFormData), value: unknown) => {
+    form.setValue(field, value as never);
   }, [form]);
 
   return {

@@ -46,7 +46,7 @@ export function setupAxiosRetry(axiosInstance: AxiosInstance, config?: RetryConf
       config.__retryCount = config.__retryCount ?? 0;
       config.__retryConfig = config.__retryConfig ?? retryConfig;
       
-      const { maxRetries, retryDelay, backoff, retryOnStatus } = config.__retryConfig;
+      const { maxRetries, retryDelay, backoff, retryOnStatus } = config.__retryConfig as Required<RetryConfig>;
 
       // Определяем статус код (0 для сетевых ошибок)
       const statusCode = error.response?.status ?? 0;

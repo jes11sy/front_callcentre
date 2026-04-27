@@ -16,46 +16,12 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import api from '@/lib/api';
 import { getFormDateFieldClass } from '@/components/ui/form-styles';
+import { profileService, statsService } from '@/services';
+import type { PeriodStats, ProfileStats } from '@/types/profile';
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
-
-interface ProfileStats {
-  operator: {
-    id: number;
-    name: string;
-    city: string;
-    startDate: string;
-  };
-  total: {
-    calls: number;
-    orders: number;
-  };
-  monthly: {
-    calls: number;
-    orders: number;
-  };
-  today: {
-    calls: number;
-    orders: number;
-  };
-}
-
-interface PeriodStats {
-  calls: {
-    total: number;
-    accepted: number;
-    missed: number;
-    acceptanceRate: number;
-  };
-  orders: {
-    total: number;
-    byStatus: Record<string, number>;
-  };
-  dailyStats: Array<{ date: string; calls: number }>;
-}
 
 function getMonthRange() {
   const now = new Date();
@@ -77,21 +43,12 @@ export default function SalaryPage() {
 
   const { data: profileStats, isLoading: profileLoading } = useQuery<ProfileStats>({
     queryKey: ['profileStats'],
-    queryFn: async () => {
-      const response = await api.get('/auth/profile/stats');
-      return response.data.data || response.data;
-    },
+    queryFn: () => profileService.getProfileStats(),
   });
 
   const { data: periodStats, isLoading: periodLoading, refetch } = useQuery<PeriodStats>({
     queryKey: ['salaryPeriodStats', startDate, endDate],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('startDate', startDate);
-      params.append('endDate', endDate);
-      const response = await api.get(`/stats/my?${params}`);
-      return response.data;
-    },
+    queryFn: () => statsService.getMyStats(startDate, endDate),
     enabled: !!startDate && !!endDate,
   });
 

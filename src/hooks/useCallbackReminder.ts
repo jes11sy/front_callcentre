@@ -4,14 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'sonner';
-
-interface SiteOrder {
-  id: number;
-  clientName: string;
-  phone: string;
-  status: string;
-  callbackAt: string | null;
-}
+import type { SiteOrder } from '@/types/site-orders';
 
 /**
  * Проверяет заявки с сайта со статусом "Перезвонить" и показывает

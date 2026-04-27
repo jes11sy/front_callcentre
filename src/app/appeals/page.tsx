@@ -18,68 +18,20 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import api from '@/lib/api';
 import { CreateAppealModal } from '@/components/appeals/CreateAppealModal';
 import { getFormFieldClass, getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
+import { appealsService } from '@/services';
+import {
+  APPEAL_STATUS_COLORS,
+  APPEAL_STATUS_FLOW,
+  APPEAL_STATUS_LABELS,
+  type Appeal,
+  type AppealStatus,
+  type AppealsResponse,
+} from '@/types/appeals';
 
 export const dynamic = 'force-dynamic';
 
-export type AppealStatus = 'new' | 'in_progress' | 'waiting' | 'closed_solved' | 'closed_rejected';
-
-export interface Appeal {
-  id: number;
-  phone: string;
-  clientName?: string;
-  description: string;
-  status: AppealStatus;
-  statusId?: number;
-  statusName?: string;
-  statusColor?: string;
-  callId?: string | number;
-  siteOrderId?: number;
-  operator?: { id: number; name: string };
-  cityId?: number;
-  rkId?: number;
-  source?: string;
-  cityName?: string;
-  rkName?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AppealsResponse {
-  data: Appeal[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-export const STATUS_LABELS: Record<AppealStatus, string> = {
-  new: 'Новое',
-  in_progress: 'В работе',
-  waiting: 'Ожидает',
-  closed_solved: 'Решено',
-  closed_rejected: 'Отклонено',
-};
-
-export const STATUS_COLORS: Record<AppealStatus, string> = {
-  new: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30',
-  in_progress: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-500/30',
-  waiting: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30',
-  closed_solved: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-500/30',
-  closed_rejected: 'bg-gray-100 dark:bg-gray-600/20 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-500/30',
-};
-
-export const STATUS_FLOW: AppealStatus[] = [
-  'new',
-  'in_progress',
-  'waiting',
-  'closed_solved',
-  'closed_rejected',
-];
 
 export default function AppealsPage() {
   const { theme } = useDesignStore();
@@ -98,29 +50,26 @@ export default function AppealsPage() {
   const { data, isLoading, error } = useQuery<AppealsResponse>({
     queryKey: ['appeals', page, search, statusFilter],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('page', page.toString());
-      params.append('limit', '50');
-      if (search) params.append('search', search);
-      if (statusFilter) params.append('status', statusFilter);
-      const response = await api.get(`/appeals?${params.toString()}`);
-      return response.data;
+      return appealsService.getAppeals({
+        page,
+        limit: 50,
+        search,
+        status: statusFilter,
+      });
     },
   });
 
   const { data: statsData } = useQuery<{ success: boolean; data: { total: number; byStatus: Record<string, number> } }>({
     queryKey: ['appeals-stats'],
     queryFn: async () => {
-      const response = await api.get('/appeals/stats');
-      return response.data;
+      return appealsService.getAppealsStats();
     },
     staleTime: 30000,
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: AppealStatus }) => {
-      const response = await api.patch(`/appeals/${id}`, { status });
-      return response.data;
+      return appealsService.updateAppealStatus(id, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appeals'] });
@@ -132,7 +81,7 @@ export default function AppealsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await api.delete(`/appeals/${id}`);
+      await appealsService.deleteAppeal(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appeals'] });
@@ -218,8 +167,8 @@ export default function AppealsPage() {
                     </SelectTrigger>
                     <SelectContent className={selectContentClass}>
                       <SelectItem value="all" className={selectItemClass}>Все статусы</SelectItem>
-                      {STATUS_FLOW.map((s) => (
-                        <SelectItem key={s} value={s} className={selectItemClass}>{STATUS_LABELS[s]}</SelectItem>
+                      {APPEAL_STATUS_FLOW.map((s) => (
+                        <SelectItem key={s} value={s} className={selectItemClass}>{APPEAL_STATUS_LABELS[s]}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -236,7 +185,7 @@ export default function AppealsPage() {
 
             {/* Статистика */}
             <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5 lg:grid-cols-9">
-              {STATUS_FLOW.map((s) => {
+              {APPEAL_STATUS_FLOW.map((s) => {
                 const count = statsData?.data?.byStatus?.[s] ?? 0;
                 return (
                     <button
@@ -249,7 +198,7 @@ export default function AppealsPage() {
                       }`}
                     >
                       <div className={`text-xl font-light ${bodyTextClass}`}>{count}</div>
-                      <div className={`mt-0.5 text-xs font-light leading-tight ${mutedTextClass}`}>{STATUS_LABELS[s]}</div>
+                      <div className={`mt-0.5 text-xs font-light leading-tight ${mutedTextClass}`}>{APPEAL_STATUS_LABELS[s]}</div>
                     </button>
                   );
                 })}
@@ -293,14 +242,14 @@ export default function AppealsPage() {
                             >
                               <SelectTrigger
                                 onClick={(e) => e.stopPropagation()}
-                                className={`w-[160px] h-7 text-xs border ${STATUS_COLORS[appeal.status]} bg-transparent focus-visible:ring-0`}
+                                className={`w-[160px] h-7 text-xs border ${APPEAL_STATUS_COLORS[appeal.status]} bg-transparent focus-visible:ring-0`}
                               >
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className={selectContentClass}>
-                                {STATUS_FLOW.map((s) => (
+                                {APPEAL_STATUS_FLOW.map((s) => (
                                   <SelectItem key={s} value={s} className={selectItemClass}>
-                                    {STATUS_LABELS[s]}
+                                    {APPEAL_STATUS_LABELS[s]}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -445,8 +394,8 @@ export default function AppealsPage() {
 
                 {/* Статус */}
                 <div>
-                  <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${STATUS_COLORS[detailAppeal.status]}`}>
-                    {STATUS_LABELS[detailAppeal.status]}
+                  <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${APPEAL_STATUS_COLORS[detailAppeal.status]}`}>
+                    {APPEAL_STATUS_LABELS[detailAppeal.status]}
                   </span>
                 </div>
 
@@ -494,16 +443,16 @@ export default function AppealsPage() {
                 <div>
                   <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${mutedTextClass}`}>Изменить статус</p>
                   <div className="flex flex-col gap-1.5">
-                    {STATUS_FLOW.filter((s) => s !== detailAppeal.status).map((s) => (
+                    {APPEAL_STATUS_FLOW.filter((s) => s !== detailAppeal.status).map((s) => (
                       <button
                         key={s}
                         onClick={() => {
                           updateStatusMutation.mutate({ id: detailAppeal.id, status: s });
                           setDetailAppeal({ ...detailAppeal, status: s });
                         }}
-                        className={`text-left text-xs px-3 py-2 rounded-xl border transition-colors ${STATUS_COLORS[s]} opacity-80 hover:opacity-100`}
+                        className={`text-left text-xs px-3 py-2 rounded-xl border transition-colors ${APPEAL_STATUS_COLORS[s]} opacity-80 hover:opacity-100`}
                       >
-                        → {STATUS_LABELS[s]}
+                        → {APPEAL_STATUS_LABELS[s]}
                       </button>
                     ))}
                   </div>

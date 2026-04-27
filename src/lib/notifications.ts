@@ -201,7 +201,7 @@ export const notificationUtils = {
   autoClose(message: string, type: keyof typeof NOTIFICATION_CONFIG = 'info', delay: number = 3000) {
     const id = createNotification(type, message);
     setTimeout(() => {
-      notifications.dismiss(id);
+      notifications.dismiss(String(id));
     }, delay);
     return id;
   },

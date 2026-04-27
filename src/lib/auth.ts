@@ -288,7 +288,7 @@ export const authApi = {
   saveUser: async (user: User, rememberMe: boolean = false) => {
     if (typeof window !== 'undefined') {
       const { sanitizeObject } = await import('./xss-protection');
-      const sanitizedUser = sanitizeObject(user as Record<string, unknown>);
+      const sanitizedUser = sanitizeObject(user as unknown as Record<string, unknown>);
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem('user', JSON.stringify(sanitizedUser));
     }

@@ -10,6 +10,7 @@ import React from 'react';
 
 export interface Penalty {
   id: number;
+  cityId: number;
   city: string;
   note: string; // Причина
   amount: number;

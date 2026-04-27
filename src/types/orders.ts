@@ -94,6 +94,14 @@ export type OrderTab = 'description' | 'master' | 'documents';
 export interface Call {
   id: number;
   createdAt: string;
+  phoneClient?: string;
+  status?: 'answered' | 'missed' | 'busy' | 'no_answer';
+  duration?: number;
+  operator?: {
+    id: number;
+    name: string;
+    login: string;
+  };
   recordingPath?: string;
 }
 

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDesignStore } from '@/store/designStore';
-import api from '@/lib/api';
 import { 
   Plus,
   Phone,
@@ -12,7 +11,8 @@ import {
   MapPin,
   MessageSquare,
   Clock,
-  AlarmClock
+  AlarmClock,
+  Loader2,
 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,34 +30,12 @@ import {
   getFormSelectItemClass,
   getFormSelectTriggerClass,
 } from '@/components/ui/form-styles';
+import { siteOrdersService } from '@/services';
+import type { SiteOrder, SiteOrdersResponse } from '@/types/site-orders';
 
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
-
-interface SiteOrder {
-  id: number;
-  city: { id: number; name: string } | null;
-  site: string;
-  clientName: string;
-  phone: string;
-  status: string;
-  comment: string | null;
-  commentOperator: string | null;
-  callbackAt: string | null;
-  createdAt: string;
-  orderId: number | null;
-}
-
-interface SiteOrdersResponse {
-  data: SiteOrder[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
 
 const STATUS_OPTIONS = ['Создан', 'В обработке', 'Перезвонить', 'Не отвечает', 'Отказ'] as const;
 
@@ -121,14 +99,12 @@ export default function SiteOrdersPage() {
   const { data, isLoading, error } = useQuery<SiteOrdersResponse>({
     queryKey: ['site-orders', page, search, statusFilter],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('page', page.toString());
-      params.append('limit', '50');
-      if (search) params.append('search', search);
-      if (statusFilter) params.append('status', statusFilter);
-      
-      const response = await api.get(`/site-orders?${params.toString()}`);
-      return response.data;
+      return siteOrdersService.getSiteOrders({
+        page,
+        limit: 50,
+        search,
+        status: statusFilter,
+      });
     },
   });
   const hasNetworkError = Boolean(error);
@@ -136,8 +112,7 @@ export default function SiteOrdersPage() {
   // Update status mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status, callbackAt }: { id: number; status: string; callbackAt?: string }) => {
-      const response = await api.patch(`/site-orders/${id}/status`, { status, callbackAt });
-      return response.data;
+      return siteOrdersService.updateStatus(id, status, callbackAt);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-orders'] });
@@ -151,8 +126,7 @@ export default function SiteOrdersPage() {
   // Update operator comment mutation
   const updateCommentMutation = useMutation({
     mutationFn: async ({ id, commentOperator }: { id: number; commentOperator: string }) => {
-      const response = await api.patch(`/site-orders/${id}`, { commentOperator });
-      return response.data;
+      return siteOrdersService.updateOperatorComment(id, commentOperator);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-orders'] });

@@ -53,8 +53,8 @@ export interface CallsResponse {
 export interface CallFilters {
   dateFrom?: string;
   dateTo?: string;
-  cityId?: number;
-  rkId?: number;
+  cityId?: string;
+  rkId?: string;
   status?: string;
 }
 

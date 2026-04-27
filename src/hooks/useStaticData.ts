@@ -2,7 +2,7 @@
 
 // 🍪 Хуки для получения справочных данных с /references/*
 import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { referencesService } from '@/services';
 
 const STALE_TIME = 30 * 60 * 1000; // 30 минут
 const GC_TIME = 60 * 60 * 1000;    // 1 час
@@ -11,10 +11,7 @@ const GC_TIME = 60 * 60 * 1000;    // 1 час
 export const useCities = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['cities'],
-    queryFn: async () => {
-      const response = await api.get('/references/cities', { params: { isActive: true } });
-      return (response.data?.data || []).map((c: { id: number; name: string }) => ({ id: c.id, name: c.name }));
-    },
+    queryFn: () => referencesService.getCities(),
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     retry: 1,
@@ -26,10 +23,7 @@ export const useCities = () => {
 export const useRKs = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['rks'],
-    queryFn: async () => {
-      const response = await api.get('/references/rk', { params: { isActive: true } });
-      return (response.data?.data || []).map((r: { id: number; name: string }) => ({ id: r.id, name: r.name }));
-    },
+    queryFn: () => referencesService.getRks(),
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     retry: 1,
@@ -41,10 +35,7 @@ export const useRKs = () => {
 export const useEquipmentTypes = () => {
   return useQuery<Array<{ id: number; name: string }>>({
     queryKey: ['equipmentTypes'],
-    queryFn: async () => {
-      const response = await api.get('/references/equipment-types', { params: { isActive: true } });
-      return (response.data?.data || []).map((e: { id: number; name: string }) => ({ id: e.id, name: e.name }));
-    },
+    queryFn: () => referencesService.getEquipmentTypes(),
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     retry: 1,
@@ -65,12 +56,7 @@ interface OrderStatus {
 export const useOrderStatuses = (group?: 'appeal' | 'order') => {
   return useQuery<OrderStatus[]>({
     queryKey: ['orderStatuses', group],
-    queryFn: async () => {
-      const response = await api.get('/references/order-statuses');
-      const all: OrderStatus[] = response.data?.data || [];
-      if (group) return all.filter(s => s.group === group && s.isActive);
-      return all.filter(s => s.isActive);
-    },
+    queryFn: () => referencesService.getOrderStatuses(group),
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     retry: 1,
@@ -81,10 +67,7 @@ export const useOrderStatuses = (group?: 'appeal' | 'order') => {
 export const useSources = () => {
   return useQuery<string[]>({
     queryKey: ['sources'],
-    queryFn: async () => {
-      const response = await api.get('/phones/sources');
-      return response.data?.data || [];
-    },
+    queryFn: () => referencesService.getSources(),
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     retry: 1,
@@ -96,10 +79,7 @@ export const useSources = () => {
 export const useOperators = () => {
   return useQuery({
     queryKey: ['operators'],
-    queryFn: async () => {
-      const response = await api.get('/operators');
-      return response.data;
-    },
+    queryFn: () => referencesService.getOperators(),
     staleTime: 15 * 60 * 1000, // 15 минут (операторы могут меняться чаще)
     gcTime: 30 * 60 * 1000, // 30 минут
     retry: 1,

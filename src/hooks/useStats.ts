@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api'; // 🍪 Используем настроенный axios instance
+import { statsService } from '@/services';
 
 interface OperatorStats {
   operator: {
@@ -46,14 +46,7 @@ export const useStats = (startDate: string, endDate: string) => {
   // 🍪 Получение статистики через axios
   const { data: stats, isLoading, error, refetch } = useQuery<OperatorStats>({
     queryKey: ['operatorStats', startDate, endDate],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (startDate) params.append('startDate', startDate);
-      if (endDate) params.append('endDate', endDate);
-
-      const response = await api.get(`/stats/my?${params}`);
-      return response.data;
-    },
+    queryFn: () => statsService.getMyStats(startDate, endDate),
     enabled: !!startDate && !!endDate
   });
 

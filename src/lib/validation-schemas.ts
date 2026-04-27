@@ -10,13 +10,13 @@ export const orderBaseSchema = z.object({
   phone: z.string().min(1, 'Номер телефона обязателен'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  equipmentTypeId: z.number({ required_error: 'Выберите тип техники' }).min(1, 'Выберите тип техники'),
+  equipmentTypeId: z.number().min(1, 'Выберите тип техники'),
 });
 
 // Единая схема заказа с rkId и cityId (используется для создания из чата, звонка и с нуля)
 export const orderWithLocationSchema = orderBaseSchema.extend({
-  rkId: z.number({ required_error: 'РК обязателен' }).min(1, 'РК обязателен'),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
+  rkId: z.number().min(1, 'РК обязателен'),
+  cityId: z.number().min(1, 'Город обязателен'),
 });
 
 // Алиасы для обратной совместимости

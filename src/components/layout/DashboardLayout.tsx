@@ -7,6 +7,8 @@ import { useCallbackReminder } from '@/hooks/useCallbackReminder';
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  variant?: string;
+  requiredRole?: string;
 }
 
 function DashboardContent({ children }: DashboardLayoutProps) {

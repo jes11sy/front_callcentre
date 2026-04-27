@@ -1,16 +1,17 @@
 // Утилиты для защиты от XSS атак
 // Использует DOMPurify для надежной санитизации
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
 
 // Конфигурация DOMPurify для строгой санитизации
-const STRICT_CONFIG: DOMPurify.Config = {
+const STRICT_CONFIG: Config = {
   ALLOWED_TAGS: [], // Не разрешаем никакие теги
   ALLOWED_ATTR: [], // Не разрешаем никакие атрибуты
   KEEP_CONTENT: true, // Сохраняем текстовое содержимое
 };
 
 // Конфигурация для HTML с ограниченным набором тегов
-const SAFE_HTML_CONFIG: DOMPurify.Config = {
+const SAFE_HTML_CONFIG: Config = {
   ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'p', 'span', 'a'],
   ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
   ADD_ATTR: ['target', 'rel'],

@@ -13,8 +13,8 @@ import { getFormFieldClass, getFormSelectContentClass, getFormSelectItemClass, g
 interface CreatePenaltyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { city: string; reason: string; amount: number; orderNumber?: string }) => Promise<void>;
-  cities: string[]; // Список городов из заказов
+  onSave: (data: { cityId: number; reason: string; amount: number; orderNumber?: string }) => Promise<void>;
+  cities: Array<{ id: number; name: string }>;
 }
 
 const PENALTY_REASONS = [
@@ -26,19 +26,19 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
   
-  const [city, setCity] = useState('');
+  const [cityId, setCityId] = useState('');
   const [reason, setReason] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [amount, setAmount] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [errors, setErrors] = useState<{ city?: string; reason?: string; amount?: string; orderNumber?: string }>({});
+  const [errors, setErrors] = useState<{ cityId?: string; reason?: string; amount?: string; orderNumber?: string }>({});
 
   const handleSave = async () => {
     // Валидация
-    const newErrors: { city?: string; reason?: string; amount?: string; orderNumber?: string } = {};
+    const newErrors: { cityId?: string; reason?: string; amount?: string; orderNumber?: string } = {};
     
-    if (!city) {
-      newErrors.city = 'Выберите город';
+    if (!cityId) {
+      newErrors.cityId = 'Выберите город';
     }
     
     if (!reason) {
@@ -63,14 +63,14 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
     try {
       setIsSaving(true);
       await onSave({
-        city,
+        cityId: Number(cityId),
         reason,
         amount: amountNum,
         orderNumber: reason === 'Отмена из-за переноса' ? orderNumber.trim() : undefined,
       });
       
       // Очистка формы
-      setCity('');
+      setCityId('');
       setReason('');
       setOrderNumber('');
       setAmount('');
@@ -85,7 +85,7 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
 
   const handleClose = () => {
     if (!isSaving) {
-      setCity('');
+      setCityId('');
       setReason('');
       setOrderNumber('');
       setAmount('');
@@ -117,15 +117,15 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
             <Label htmlFor="city" className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Город *
             </Label>
-            <Select value={city} onValueChange={setCity}>
+            <Select value={cityId} onValueChange={setCityId}>
               <SelectTrigger id="city" className={`h-11 ${selectTriggerClass}`}>
                 <SelectValue placeholder="Выберите город" />
               </SelectTrigger>
               <SelectContent className={selectContentClass}>
                 {cities.length > 0 ? (
-                  cities.map((cityName) => (
-                    <SelectItem key={cityName} value={cityName} className={selectItemClass}>
-                      {cityName}
+                  cities.map((city) => (
+                    <SelectItem key={city.id} value={city.id.toString()} className={selectItemClass}>
+                      {city.name}
                     </SelectItem>
                   ))
                 ) : (
@@ -135,8 +135,8 @@ export const CreatePenaltyModal = ({ isOpen, onClose, onSave, cities }: CreatePe
                 )}
               </SelectContent>
             </Select>
-            {errors.city && (
-              <p className="text-sm text-red-400">{errors.city}</p>
+            {errors.cityId && (
+              <p className="text-sm text-red-400">{errors.cityId}</p>
             )}
           </div>
 

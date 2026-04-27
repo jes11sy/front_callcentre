@@ -3,11 +3,12 @@
 'use client';
 
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
 import { escapeHtml, containsXSS } from '@/lib/xss-protection';
 import { AlertTriangle } from 'lucide-react';
 
 // Конфигурация DOMPurify для безопасного HTML
-const SAFE_HTML_CONFIG: DOMPurify.Config = {
+const SAFE_HTML_CONFIG: Config = {
   ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'p', 'span', 'a', 'ul', 'ol', 'li'],
   ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
   ADD_ATTR: ['target', 'rel'],

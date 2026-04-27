@@ -27,7 +27,7 @@ import {
 
 const orderSchema = z.object({
   rkId: z.number().optional(),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
+  cityId: z.number().min(1, 'Город обязателен'),
   typeOrder: z.enum(['Впервые', 'Повтор', 'Гарантия']),
   clientName: z.string().min(1, 'Введите имя клиента'),
   address: z.string().min(1, 'Введите адрес'),
@@ -265,8 +265,8 @@ export function CreateOrderModal({
   useEffect(() => {
     if (call && open) {
       setTimeout(() => {
-        setValue('rkId', call.rkId);
-        setValue('cityId', call.cityId);
+        setValue('rkId', call.rkId ?? undefined);
+        setValue('cityId', call.cityId ?? 0);
         setValue('typeOrder', 'Впервые');
         setValue('equipmentTypeId', undefined);
         setValue('clientName', '');

@@ -8,6 +8,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, X, PhoneCall, Clock, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,8 +16,12 @@ import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
 import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
-import { STATUS_LABELS, STATUS_FLOW } from '@/app/appeals/page';
-import type { AppealStatus } from '@/app/appeals/page';
+import {
+  APPEAL_STATUS_FLOW,
+  APPEAL_STATUS_LABELS,
+  type Appeal,
+  type AppealStatus,
+} from '@/types/appeals';
 import {
   getFormDateFieldClass,
   getFormFieldClass,
@@ -54,20 +59,6 @@ interface CallContext {
   source?: string | null;
   cityName?: string;
   rkName?: string;
-}
-
-interface Appeal {
-  id: number;
-  phone: string;
-  clientName?: string;
-  description: string;
-  status: string;
-  statusId?: number;
-  callId?: string | number;
-  siteOrderId?: number;
-  cityId?: number;
-  rkId?: number;
-  source?: string;
 }
 
 interface HistoryOrder {
@@ -253,7 +244,7 @@ export function CreateAppealModal({
 
   const isOrder = mode === 'order';
 
-  const sourceOptions = [...SOURCE_OPTIONS];
+  const sourceOptions: string[] = [...SOURCE_OPTIONS];
   if (watchSource && !sourceOptions.includes(watchSource)) {
     sourceOptions.unshift(watchSource);
   }
@@ -389,7 +380,7 @@ export function CreateAppealModal({
                   <Select value={currentStatus} onValueChange={(v) => setValue('status', v)}>
                     <SelectTrigger className={selectTriggerCls}><SelectValue /></SelectTrigger>
                     <SelectContent className={selectContentCls}>
-                      {STATUS_FLOW.map((s) => <SelectItem key={s} value={s} className={selectItemCls}>{STATUS_LABELS[s]}</SelectItem>)}
+                      {APPEAL_STATUS_FLOW.map((s) => <SelectItem key={s} value={s} className={selectItemCls}>{APPEAL_STATUS_LABELS[s]}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -438,7 +429,7 @@ export function CreateAppealModal({
               {/* Примечание */}
               <div>
                 <Label className={labelCls}>Примечание</Label>
-                <textarea {...register('description')} rows={3} placeholder="Детали разговора..." className={`mt-1 w-full ${inputCls} h-auto min-h-[96px] resize-none`} />
+                <Textarea {...register('description')} rows={3} placeholder="Детали разговора..." className={`mt-1 w-full ${inputCls} h-auto min-h-[96px] resize-none`} />
               </div>
             </div>
 

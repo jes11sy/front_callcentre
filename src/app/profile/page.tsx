@@ -29,7 +29,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
@@ -42,13 +41,17 @@ import {
   getFormSelectTriggerClass,
 } from '@/components/ui/form-styles';
 import { LoadingState } from '@/components/ui/loading-state';
+import { profileService } from '@/services';
+import type { Profile, ProfileStats } from '@/types/profile';
+import { notifyApiError } from '@/lib/error-handling';
 
 
 // Схемы валидации
 const profileSchema = z.object({
   name: z.string().min(2, 'Имя должно содержать минимум 2 символа'),
   city: z.string().min(2, 'Город должен содержать минимум 2 символа'),
-  status: z.string().min(1, 'Выберите рабочий статус'),
+  status: z.string().min(1, 'Выберите статус'),
+  statusWork: z.string().min(1, 'Выберите рабочий статус'),
   note: z.string().optional()
 });
 
@@ -63,45 +66,6 @@ const passwordSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
-
-interface Profile {
-  id: number;
-  name: string;
-  login: string;
-  city: string;
-  status: string;
-  passport?: string;
-  contract?: string;
-  createdAt: string;
-  note?: string;
-  role: string;
-  updatedAt: string;
-  _count?: {
-    calls: number;
-    orders: number;
-  };
-}
-
-interface ProfileStats {
-  operator: {
-    id: number;
-    name: string;
-    city: string;
-    startDate: string;
-  };
-  total: {
-    calls: number;
-    orders: number;
-  };
-  monthly: {
-    calls: number;
-    orders: number;
-  };
-  today: {
-    calls: number;
-    orders: number;
-  };
-}
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -135,7 +99,7 @@ export default function ProfilePage() {
       logout();
       router.push('/login');
     } catch (error) {
-      console.error('Logout error:', error);
+      notifyApiError(error, 'Ошибка выхода из аккаунта', 'profile.handleLogout');
       logout();
       router.push('/login');
     }
@@ -153,28 +117,19 @@ export default function ProfilePage() {
   // Получение профиля через axios
   const { data: profile, isLoading, error } = useQuery<Profile>({
     queryKey: ['profile'],
-    queryFn: async () => {
-      const response = await api.get('/auth/profile');
-      return response.data.data || response.data;
-    }
+    queryFn: () => profileService.getProfile(),
   });
 
   // Получение статистики профиля (только для операторов) через axios
   const { data: profileStats } = useQuery<ProfileStats>({
     queryKey: ['profileStats'],
-    queryFn: async () => {
-      const response = await api.get('/auth/profile/stats');
-      return response.data.data || response.data;
-    },
+    queryFn: () => profileService.getProfileStats(),
     enabled: profile?.role === 'operator'
   });
 
   // Обновление профиля через axios
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: ProfileFormData) => {
-      const response = await api.put('/auth/profile', data);
-      return response.data.data || response.data;
-    },
+    mutationFn: (data: ProfileFormData) => profileService.updateProfile(data),
     onSuccess: () => {
       toast.success('Профиль успешно обновлен');
       setIsEditing(false);
@@ -188,13 +143,7 @@ export default function ProfilePage() {
 
   // Смена пароля через axios
   const changePasswordMutation = useMutation({
-    mutationFn: async (data: PasswordFormData) => {
-      const response = await api.put('/auth/profile', {
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword
-      });
-      return response.data.data || response.data;
-    },
+    mutationFn: (data: PasswordFormData) => profileService.changePassword(data.currentPassword, data.newPassword),
     onSuccess: () => {
       toast.success('Пароль успешно изменен');
       setIsChangingPassword(false);
@@ -215,6 +164,7 @@ export default function ProfilePage() {
         name: profile.name,
         city: profile.city,
         status: profile.status,
+        statusWork: profile.statusWork || profile.status,
         note: profile.note || ''
       });
     }
@@ -232,6 +182,7 @@ export default function ProfilePage() {
         name: profile.name,
         city: profile.city,
         status: profile.status,
+        statusWork: profile.statusWork || profile.status,
         note: profile.note || ''
       });
     }
@@ -403,7 +354,7 @@ export default function ProfilePage() {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.statusWork)}</span>
+                    <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{getWorkStatusText(profile.statusWork || profile.status)}</span>
                   )}
                 </div>
                 <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
@@ -416,7 +367,7 @@ export default function ProfilePage() {
                 </div>
                 <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Дата начала</span>
-                  <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.dateCreate)}</span>
+                  <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{formatDate(profile.dateCreate || profile.createdAt)}</span>
                 </div>
                 <div className="flex justify-between items-start py-3">
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Примечание</span>

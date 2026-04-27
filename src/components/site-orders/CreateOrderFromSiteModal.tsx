@@ -23,6 +23,8 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
+import type { SiteOrder } from '@/types/site-orders';
+import { notifyApiError } from '@/lib/error-handling';
 import {
   getFormDateFieldClass,
   getFormFieldClass,
@@ -32,8 +34,8 @@ import {
 } from '@/components/ui/form-styles';
 
 const orderSchema = z.object({
-  rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
+  rkId: z.number().min(1, 'Рекламная Компания обязательна'),
+  cityId: z.number().min(1, 'Город обязателен'),
   phone: z.string()
     .min(11, 'Телефон должен содержать 11 цифр')
     .max(11, 'Телефон должен содержать 11 цифр')
@@ -44,21 +46,11 @@ const orderSchema = z.object({
   clientName: z.string().min(1, 'Имя клиента обязательно'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  equipmentTypeId: z.number({ required_error: 'Тип техники обязателен' }).min(1, 'Тип техники обязателен'),
+  equipmentTypeId: z.number().min(1, 'Тип техники обязателен'),
   comment: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
-
-interface SiteOrder {
-  id: number;
-  city: string;
-  site: string;
-  clientName: string;
-  phone: string;
-  status: string;
-  comment: string | null;
-}
 
 interface CreateOrderFromSiteModalProps {
   open: boolean;
@@ -123,9 +115,12 @@ export default function CreateOrderFromSiteModal({
       setValue('clientName', siteOrder.clientName);
       setValue('phone', phone);
       
-      const cityMatch = availableCities.find((c: { id: number; name: string }) => 
-        c.name.toLowerCase() === siteOrder.city.toLowerCase()
-      );
+      const cityName = siteOrder.city?.name;
+      const cityMatch = cityName
+        ? availableCities.find((c: { id: number; name: string }) =>
+          c.name.toLowerCase() === cityName.toLowerCase()
+        )
+        : undefined;
       if (cityMatch) {
         setValue('cityId', cityMatch.id);
       }
@@ -159,8 +154,7 @@ export default function CreateOrderFromSiteModal({
       handleClose();
       onOrderCreated?.();
     } catch (error) {
-      console.error('Error creating order:', error);
-      toast.error('Ошибка при создании заказа');
+      notifyApiError(error, 'Ошибка при создании заказа', 'CreateOrderFromSiteModal.onSubmit');
     } finally {
       setIsSubmitting(false);
     }

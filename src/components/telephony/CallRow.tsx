@@ -8,9 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  History,
-  ExternalLink,
-  Loader2
+  ExternalLink
 } from 'lucide-react';
 import { Call } from '@/types/telephony';
 import { AudioPlayer } from './AudioPlayer';
@@ -25,7 +23,7 @@ interface CallRowProps {
   formatDate: (dateString: string) => string;
   getStatusBadge: (status: string) => React.ReactNode;
   onToggleGroup: (phoneClient: string) => void;
-  onCreateOrder: (call: Call) => void;
+  onCreateOrder: (call: Call, groupCalls: Call[]) => void;
   onLoadOrderHistory: (call: Call) => void;
   onDownloadRecording: (call: Call) => void;
   onLoadRecording: (call: Call) => void;

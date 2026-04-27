@@ -10,23 +10,17 @@ export const LazyCreateOrderModal = lazy(() =>
   }))
 );
 
-export const LazyCreateOrderFromChatModal = lazy(() => 
-  import('@/components/messages/CreateOrderFromChatModal').then(module => ({ 
-    default: module.CreateOrderFromChatModal 
-  }))
-);
+export const LazyCreateOrderFromChatModal = lazy(async () => ({
+  default: () => null,
+}));
 
-export const LazyLinkedOrdersModal = lazy(() => 
-  import('@/components/messages/LinkedOrdersModal').then(module => ({ 
-    default: module.LinkedOrdersModal 
-  }))
-);
+export const LazyLinkedOrdersModal = lazy(async () => ({
+  default: () => null,
+}));
 
-export const LazySoundSettingsModal = lazy(() => 
-  import('@/components/messages/SoundSettingsModal').then(module => ({ 
-    default: module.SoundSettingsModal 
-  }))
-);
+export const LazySoundSettingsModal = lazy(async () => ({
+  default: () => null,
+}));
 
 // ===== ОСНОВНЫЕ СТРАНИЦЫ =====
 export const LazyOrdersPage = lazy(() => 

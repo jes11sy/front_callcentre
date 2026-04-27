@@ -121,7 +121,9 @@ export default async function RootLayout({
                   } else {
                     setThemePaint(false);
                   }
-                } catch (e) {}
+                } catch (e) {
+                  console.warn('Theme bootstrap failed', e);
+                }
               })();
             `,
           }}

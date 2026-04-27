@@ -31,8 +31,8 @@ import {
 } from '@/components/ui/form-styles';
 
 const orderSchema = z.object({
-  rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
-  cityId: z.number({ required_error: 'Город обязателен' }).min(1, 'Город обязателен'),
+  rkId: z.number().min(1, 'Рекламная Компания обязательна'),
+  cityId: z.number().min(1, 'Город обязателен'),
   phone: z.string()
     .min(11, 'Телефон должен содержать 11 цифр')
     .max(11, 'Телефон должен содержать 11 цифр')
@@ -43,7 +43,7 @@ const orderSchema = z.object({
   clientName: z.string().min(1, 'Имя клиента обязательно'),
   address: z.string().min(1, 'Адрес обязателен'),
   dateMeeting: z.string().min(1, 'Дата встречи обязательна'),
-  equipmentTypeId: z.number({ required_error: 'Тип техники обязателен' }).min(1, 'Тип техники обязателен'),
+  equipmentTypeId: z.number().min(1, 'Тип техники обязателен'),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;

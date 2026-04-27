@@ -116,11 +116,17 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[10001] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[12vh]">
+    <div className="fixed inset-0 z-[10001] flex items-start justify-center bg-black/65 backdrop-blur-md pt-[8vh] sm:pt-[10vh]">
       <div
         ref={panelRef}
-        className="mx-4 w-full max-w-2xl overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-2xl dark:border-white/15 dark:bg-[#141a22]"
+        className="mx-4 w-full max-w-3xl overflow-hidden rounded-[24px] border border-black/[0.08] bg-[#f5f5f7] shadow-[0_24px_60px_rgba(15,23,42,0.35)] dark:border-white/12 dark:bg-[#111113]"
       >
+        <div className="border-b border-black/[0.08] px-4 py-2.5 dark:border-white/10">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6e6e73] dark:text-white/45">
+            Глобальный поиск
+          </p>
+        </div>
+
         {/* Search input */}
         <div className="flex items-center gap-3 border-b border-black/[0.08] px-4 py-3.5 dark:border-white/10">
           <Search className="h-5 w-5 shrink-0 text-[#6e6e73] dark:text-white/60" />
@@ -139,18 +145,22 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
         </div>
 
         {/* Results */}
-        <div className="max-h-[52vh] overflow-y-auto bg-white dark:bg-[#141a22]">
+        <div className="max-h-[56vh] overflow-y-auto bg-[#f5f5f7] dark:bg-[#111113]">
           {query.length < 3 ? (
-            <div className="px-4 py-10 text-center text-sm text-[#8e8e93] dark:text-white/45">
-              Введите минимум 3 символа для поиска
+            <div className="px-4 py-14 text-center">
+              <Search className="mx-auto mb-3 h-6 w-6 text-[#8e8e93] dark:text-white/35" />
+              <p className="text-sm text-[#8e8e93] dark:text-white/45">Введите минимум 3 символа для поиска</p>
             </div>
           ) : loading ? (
             <div className="px-4 py-8 text-center">
               <Loader2 className="h-6 w-6 animate-spin mx-auto text-[#FEC004]" />
             </div>
           ) : results && totalResults === 0 ? (
-            <div className="px-4 py-10 text-center text-sm text-[#8e8e93] dark:text-white/45">
-              Ничего не найдено по запросу &ldquo;{query}&rdquo;
+            <div className="px-4 py-14 text-center">
+              <Search className="mx-auto mb-3 h-6 w-6 text-[#8e8e93] dark:text-white/35" />
+              <p className="text-sm text-[#8e8e93] dark:text-white/45">
+                Ничего не найдено по запросу &ldquo;{query}&rdquo;
+              </p>
             </div>
           ) : results ? (
             <div className="py-2.5">
@@ -163,7 +173,7 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
                     <button
                       key={`order-${order.id}`}
                       onClick={() => navigateTo(`/orders?orderId=${order.id}`)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                      className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     >
                       <FileText className="h-4 w-4 text-[#FEC004] shrink-0" />
                       <div className="flex-1 min-w-0">
@@ -190,7 +200,7 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
                     <button
                       key={`call-${call.id}`}
                       onClick={() => navigateTo('/telephony')}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                      className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     >
                       <Phone className="h-4 w-4 text-emerald-500 shrink-0" />
                       <div className="flex-1 min-w-0">
@@ -217,7 +227,7 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
                     <button
                       key={`so-${so.id}`}
                       onClick={() => navigateTo('/site-orders')}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                      className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     >
                       <Globe className="h-4 w-4 text-blue-500 shrink-0" />
                       <div className="flex-1 min-w-0">

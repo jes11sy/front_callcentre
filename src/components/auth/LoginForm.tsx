@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { ArrowRight, CircleUserRound, Eye, EyeOff, LockKeyhole, MoonStar, SunMedium } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,8 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 import { authApi } from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useDesignStoreHydrated } from '@/store/designStore';
+
+type SessionError = Error & { isSessionExpired?: boolean };
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -105,20 +106,10 @@ export function LoginForm() {
       // Save user data (tokens in cookies + IndexedDB)
       await authApi.saveTokens(response.data.accessToken || '', response.data.refreshToken || '', true);
       await authApi.saveUser(response.data.user, true);
-      
-      // ✅ FIX: Записываем auth-storage напрямую перед редиректом
-      // Без этого zustand persist перезапишет store стухшими данными { user: null }
-      // при полной перезагрузке страницы, что вызывает мерцание
-      const u = response.data.user;
-      try {
-        localStorage.setItem('auth-storage', JSON.stringify({
-          state: {
-            user: { id: u.id, login: u.login, name: u.name || '', role: u.role, cities: u.cities },
-            isAuthenticated: true,
-          },
-          version: 0,
-        }));
-      } catch {}
+
+      // Обновляем in-memory Zustand до редиректа, чтобы все protected страницы
+      // сразу увидели валидное состояние сессии.
+      authLogin(response.data.user);
       
       // ✅ FIX: Используем router.replace вместо window.location.href
       // Это предотвращает полную перезагрузку и бесконечный цикл редиректов
@@ -126,7 +117,8 @@ export function LoginForm() {
       
     } catch (error: unknown) {
       // Don't show error if session expired (already redirecting to login)
-      if ((error as any)?.message === 'SESSION_EXPIRED' || (error as any)?.isSessionExpired) {
+      const maybeSessionError = error as SessionError;
+      if (maybeSessionError?.message === 'SESSION_EXPIRED' || maybeSessionError?.isSessionExpired) {
         return;
       }
       

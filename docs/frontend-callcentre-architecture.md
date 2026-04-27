@@ -1,5 +1,7 @@
 # Frontend Callcentre Architecture Rules
 
+See also: `docs/frontend-callcentre-target-blueprint.md` for target module structure and phased migration plan.
+
 ## Data Access
 - Do not call `api.get/post/put/patch/delete` directly from `app/*` pages.
 - All HTTP access must go through `src/services/*`.

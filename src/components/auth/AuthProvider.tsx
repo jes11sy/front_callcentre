@@ -66,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
     }
 
-    authLogger.log('No user in store, redirecting to login');
+    authLogger.log('No user in store, waiting for ProtectedRoute decision');
 
     setLoading(false);
 

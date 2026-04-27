@@ -1,7 +1,7 @@
 // ✅ FIX #151: Добавлен axios retry logic
 import axios from 'axios';
 import { authLogger } from '@/lib/logger';
-import { setupAxiosRetry, classifyAxiosError, getUserFriendlyAxiosError } from './axios-retry';
+import { setupAxiosRetry } from './axios-retry';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
@@ -91,6 +91,14 @@ api.interceptors.request.use(async (config) => {
 let refreshPromise: Promise<boolean> | null = null;
 let refreshSubscribers: Array<(success: boolean) => void> = [];
 
+type SessionExpiredError = Error & { isSessionExpired: true };
+
+const createSessionExpiredError = (): SessionExpiredError => {
+  const error = new Error('SESSION_EXPIRED') as SessionExpiredError;
+  error.isSessionExpired = true;
+  return error;
+};
+
 /**
  * Выполняет refresh токена с mutex защитой
  * Если refresh уже выполняется - возвращает тот же Promise
@@ -148,9 +156,7 @@ api.interceptors.response.use(
     
     // Предотвращаем повторные попытки обновления токена
     if (originalRequest._retry) {
-      const sessionError = new Error('SESSION_EXPIRED');
-      (sessionError as any).isSessionExpired = true;
-      return Promise.reject(sessionError);
+      return Promise.reject(createSessionExpiredError());
     }
     
     // Обрабатываем 401 ошибки (токен истек или отсутствует)
@@ -163,9 +169,7 @@ api.interceptors.response.use(
               originalRequest._retry = true;
               api.request(originalRequest).then(resolve).catch(reject);
             } else {
-              const sessionError = new Error('SESSION_EXPIRED');
-              (sessionError as any).isSessionExpired = true;
-              reject(sessionError);
+              reject(createSessionExpiredError());
             }
           });
         });
@@ -199,9 +203,7 @@ api.interceptors.response.use(
         originalRequest._retry = true;
         return api.request(originalRequest);
       } else {
-        const sessionError = new Error('SESSION_EXPIRED');
-        (sessionError as any).isSessionExpired = true;
-        return Promise.reject(sessionError);
+        return Promise.reject(createSessionExpiredError());
       }
     }
     return Promise.reject(error);
@@ -270,6 +272,36 @@ export const authApi = {
   getProfile: async (): Promise<ProfileResponse> => {
     const response = await api.get('/auth/profile');
     return response.data;
+  },
+
+  /**
+   * Принудительно обновляет cookie-сессию через refresh endpoint.
+   * Использует отдельный refreshApi instance без рекурсивных interceptor'ов.
+   */
+  refreshSession: async (): Promise<boolean> => {
+    try {
+      const response = await refreshApi.post('/auth/refresh', {});
+      if (!response.data?.success) {
+        return false;
+      }
+
+      if (response.data?.data?.refreshToken) {
+        try {
+          const { saveRefreshToken } = await import('./remember-me');
+          await saveRefreshToken(response.data.data.refreshToken);
+        } catch {
+          // IndexedDB persistence is optional.
+        }
+      }
+
+      return true;
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 401 || status === 403) {
+        return false;
+      }
+      return false;
+    }
   },
 
   /**
@@ -356,7 +388,7 @@ export const authApi = {
    */
   restoreSessionFromIndexedDB: async (): Promise<boolean> => {
     try {
-      const { getRefreshToken, saveRefreshToken, clearRefreshToken } = await import('./remember-me');
+      const { getRefreshToken, saveRefreshToken } = await import('./remember-me');
       const refreshToken = await getRefreshToken();
       
       if (!refreshToken) {

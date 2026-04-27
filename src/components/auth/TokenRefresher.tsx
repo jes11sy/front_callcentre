@@ -5,9 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { authLogger } from '@/lib/logger';
-import axios from 'axios';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.lead-schem.ru/api/v1';
 
 const REFRESH_INTERVAL = 4 * 60 * 1000; // 4 минуты (токен живёт 15 минут)
 const INITIAL_REFRESH_DELAY = 30 * 1000; // 30 секунд после монтирования
@@ -33,46 +30,14 @@ export function TokenRefresher() {
   const isLoginPage = pathname === '/login';
 
   const doRefresh = useCallback(async (): Promise<boolean> => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/refresh`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Use-Cookies': 'true',
-          },
-          timeout: 10000,
-        }
-      );
-
-      if (response.data?.success) {
-        authLogger.log('Silent refresh successful');
-        
-        if (response.data?.data?.refreshToken) {
-          try {
-            const { saveRefreshToken } = await import('@/lib/remember-me');
-            await saveRefreshToken(response.data.data.refreshToken);
-          } catch {
-            // IndexedDB errors are non-critical
-          }
-        }
-        
-        return true;
-      }
-      return false;
-    } catch (error: unknown) {
-      const status = (error as { response?: { status?: number } })?.response?.status;
-      
-      if (status === 401 || status === 403) {
-        authLogger.log('Silent refresh failed - token expired or invalid');
-        return false;
-      }
-      
-      authLogger.warn('Silent refresh network error, will retry');
-      return false;
+    const refreshed = await authApi.refreshSession();
+    if (refreshed) {
+      authLogger.log('Silent refresh successful');
+      return true;
     }
+
+    authLogger.log('Silent refresh failed - token expired or invalid');
+    return false;
   }, []);
 
   const tryRestoreFromIndexedDB = useCallback(async (): Promise<boolean> => {

@@ -15,6 +15,7 @@ import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { NetworkError } from '@/components/ui/network-error';
 import React, { useCallback, ReactNode } from 'react';
 import { useDesignStore } from '@/store/designStore';
+import { getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
 
 interface OrdersTableProps {
   ordersData: OrdersResponse | undefined;
@@ -41,6 +42,9 @@ const OrdersTableComponent = ({
 }: OrdersTableProps) => {
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+  const paginationSelectTriggerClass = `${getFormSelectTriggerClass(isDark, 'sm')} w-16 sm:w-20 h-8 sm:h-9 text-xs sm:text-sm`;
+  const paginationSelectContentClass = getFormSelectContentClass(isDark);
+  const paginationSelectItemClass = getFormSelectItemClass(isDark, true);
   const createButtonClass = isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#FEC004] text-[#111113] hover:bg-[#e3ac00]';
   
   // Мемоизированная функция форматирования даты (используется в цикле)
@@ -292,12 +296,12 @@ const OrdersTableComponent = ({
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className={`w-16 sm:w-20 h-8 sm:h-9 text-xs sm:text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${isDark ? 'bg-white/[0.04] border-white/15 text-white [&_svg]:text-white/70' : 'bg-white border-gray-200 text-gray-700 [&_svg]:text-gray-500 focus:border-gray-300'}`}>
+                      <SelectTrigger className={paginationSelectTriggerClass}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                      <SelectContent className={paginationSelectContentClass}>
                         {PAGE_SIZES.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className={isDark ? 'text-xs sm:text-sm text-white focus:bg-white/10' : 'text-xs sm:text-sm text-gray-700 focus:bg-black/5'}>
+                          <SelectItem key={size.value} value={size.value} className={paginationSelectItemClass}>
                             {size.label}
                           </SelectItem>
                         ))}

@@ -14,6 +14,13 @@ import { ORDER_TYPES, STATUS_OPTIONS } from '@/constants/orders';
 import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 interface OrderEditModalProps {
   isOpen: boolean;
@@ -35,6 +42,7 @@ export const OrderEditModal = ({
   onOrderChange 
 }: OrderEditModalProps) => {
   const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
   const { data: cities = [] } = useCities();
   const { data: rks = [] } = useRKs();
   const { data: equipmentTypes = [] } = useEquipmentTypes();
@@ -56,13 +64,11 @@ export const OrderEditModal = ({
   };
 
   // Стили для V2
-  const selectTriggerClass = "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0";
-  
-  const selectContentClass = "bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600";
-  
-  const selectItemClass = "text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100";
-  
-  const inputClass = "h-9 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-[#FEC004] focus-visible:border-[#FEC004]";
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'sm');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
+  const inputClass = getFormFieldClass(isDark, 'sm');
+  const dateInputClass = getFormDateFieldClass(isDark, 'sm');
 
   return (
     <div 
@@ -200,7 +206,7 @@ export const OrderEditModal = ({
                   type="datetime-local"
                   value={order.dateMeeting ? new Date(order.dateMeeting).toISOString().slice(0, 16) : ''} 
                   onChange={(e) => handleDateChange('dateMeeting', e.target.value)}
-                  className={`${inputClass} dark:[color-scheme:dark]`}
+                  className={dateInputClass}
                 />
               </Row>
 
@@ -235,7 +241,7 @@ export const OrderEditModal = ({
               <Textarea 
                 value={order.description || ''} 
                 onChange={(e) => handleOrderChange('description', e.target.value)}
-                className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 resize-none focus:border-[#FEC004] focus-visible:border-[#FEC004]"
+                className={`${inputClass} min-h-[60px] sm:min-h-[80px] h-auto resize-none`}
                 placeholder="Примечание к заказу..."
               />
             </Row>

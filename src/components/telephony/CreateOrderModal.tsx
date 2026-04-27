@@ -17,6 +17,13 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
 import { CallHistoryPanel, OrderHistoryPanel, AudioPlayerBar } from './create-order';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 const orderSchema = z.object({
   rkId: z.number().optional(),
@@ -135,6 +142,12 @@ export function CreateOrderModal({
   const { user } = useAuthStore();
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+  const fieldClass = getFormFieldClass(isDark, 'sm');
+  const dateFieldClass = getFormDateFieldClass(isDark, 'sm');
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'sm');
+  const selectContentClass = `${getFormSelectContentClass(isDark, 'z-[10000]')} max-h-60`;
+  const selectContentClassNoCap = getFormSelectContentClass(isDark, 'z-[10000]');
+  const selectItemClass = getFormSelectItemClass(isDark);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -328,12 +341,12 @@ export function CreateOrderModal({
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                          <SelectTrigger className="h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                          <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите РК</span>} />
                           </SelectTrigger>
-                          <SelectContent className="z-[10000] max-h-60 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                          <SelectContent className={selectContentClass}>
                             {availableRKs.map((rk: { id: number; name: string }) => (
-                              <SelectItem key={rk.id} value={rk.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">{rk.name}</SelectItem>
+                              <SelectItem key={rk.id} value={rk.id.toString()} className={selectItemClass}>{rk.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -347,12 +360,12 @@ export function CreateOrderModal({
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                          <SelectTrigger className="h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                          <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Выберите город</span>} />
                           </SelectTrigger>
-                          <SelectContent className="z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                          <SelectContent className={selectContentClassNoCap}>
                             {availableCities.map((city: { id: number; name: string }) => (
-                              <SelectItem key={city.id} value={city.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">{city.name}</SelectItem>
+                              <SelectItem key={city.id} value={city.id.toString()} className={selectItemClass}>{city.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -370,12 +383,12 @@ export function CreateOrderModal({
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                          <SelectTrigger className="h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                          <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder={<span className="text-gray-500 dark:text-gray-400">Не указано</span>} />
                           </SelectTrigger>
-                          <SelectContent className="z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                          <SelectContent className={selectContentClassNoCap}>
                             {availableEquipmentTypes.map((et: { id: number; name: string }) => (
-                              <SelectItem key={et.id} value={et.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">{et.name}</SelectItem>
+                              <SelectItem key={et.id} value={et.id.toString()} className={selectItemClass}>{et.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -389,13 +402,13 @@ export function CreateOrderModal({
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                          <SelectTrigger className={selectTriggerClass}>
                             <SelectValue placeholder="Выберите тип" />
                           </SelectTrigger>
-                          <SelectContent className="z-[10000] bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
-                            <SelectItem value="Впервые" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">Впервые</SelectItem>
-                            <SelectItem value="Повтор" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">Повтор</SelectItem>
-                            <SelectItem value="Гарантия" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10">Гарантия</SelectItem>
+                          <SelectContent className={selectContentClassNoCap}>
+                            <SelectItem value="Впервые" className={selectItemClass}>Впервые</SelectItem>
+                            <SelectItem value="Повтор" className={selectItemClass}>Повтор</SelectItem>
+                            <SelectItem value="Гарантия" className={selectItemClass}>Гарантия</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -412,7 +425,7 @@ export function CreateOrderModal({
                     <Input
                       {...register('clientName')}
                       placeholder="Введите имя"
-                      className="h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30"
+                      className={`${fieldClass} placeholder:text-gray-500 dark:placeholder:text-gray-400`}
                     />
                     {errors.clientName && <p className="text-xs text-red-400 mt-1">{errors.clientName.message}</p>}
                   </div>
@@ -421,7 +434,7 @@ export function CreateOrderModal({
                     <Input
                       {...register('address')}
                       placeholder="Введите адрес"
-                      className="h-9 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30"
+                      className={`${fieldClass} placeholder:text-gray-500 dark:placeholder:text-gray-400`}
                     />
                     {errors.address && <p className="text-xs text-red-400 mt-1">{errors.address.message}</p>}
                   </div>
@@ -433,7 +446,7 @@ export function CreateOrderModal({
                     <Input
                       type="datetime-local"
                       {...register('dateMeeting')}
-                      className="h-9 text-sm bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30 dark:[color-scheme:dark]"
+                      className={dateFieldClass}
                     />
                     {errors.dateMeeting && <p className="text-xs text-red-400 mt-1">{errors.dateMeeting.message}</p>}
                   </div>
@@ -445,7 +458,7 @@ export function CreateOrderModal({
                     {...register('comment' as keyof OrderFormData)}
                     placeholder="Комментарий к заказу..."
                     rows={3}
-                    className="text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus-visible:border-[#FEC004] focus-visible:ring-[#FEC004]/30"
+                    className={`${fieldClass} h-auto resize-none placeholder:text-gray-500 dark:placeholder:text-gray-400`}
                   />
                 </div>
               </form>

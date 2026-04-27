@@ -22,6 +22,13 @@ import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
 import { useDesignStore } from '@/store/designStore';
 import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 const orderSchema = z.object({
   rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
@@ -112,19 +119,16 @@ export default function CreateOrderModal({
 
   if (!open) return null;
 
-  const fieldClassName = isDark
-    ? 'h-9 border-white/15 bg-white/[0.04] text-white placeholder:text-white/30 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:border-white/35'
-    : 'h-9 border-black/[0.1] bg-white text-[#111113] placeholder:text-[#8e8e93] outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#FEC004]/55';
-  const selectClassName = `${fieldClassName} [&_[data-placeholder]]:${isDark ? 'text-white/30' : 'text-[#8e8e93]'} [&_svg]:${isDark ? 'text-white/60' : 'text-[#6f7177]'}`;
+  const fieldClassName = getFormFieldClass(isDark, 'sm');
+  const dateFieldClassName = getFormDateFieldClass(isDark, 'sm');
+  const selectClassName = getFormSelectTriggerClass(isDark, 'sm');
   const sectionCardClass = isDark
     ? 'rounded-2xl border border-white/10 bg-white/[0.03] shadow-none'
     : 'rounded-2xl border border-black/[0.08] bg-white shadow-none';
   const sectionTitleIconClass = isDark ? 'text-white' : 'text-[#b58500]';
   const modalBodyClass = isDark ? 'bg-[#111113]' : 'bg-[#f5f5f7]';
-  const selectContentClass = isDark ? 'rounded-2xl border-white/10 bg-[#1e1e20]' : 'rounded-2xl border-gray-200 bg-white';
-  const selectItemClass = isDark
-    ? 'text-white data-[highlighted]:bg-[#FEC004]/20 data-[highlighted]:text-white data-[state=checked]:bg-[#FEC004]/15'
-    : 'text-[#111113] data-[highlighted]:bg-[#FEC004]/12 data-[highlighted]:text-[#111113] data-[state=checked]:bg-[#FEC004]/10';
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 sm:p-6">
@@ -313,10 +317,10 @@ export default function CreateOrderModal({
                         <SelectTrigger className={selectClassName}>
                           <SelectValue placeholder="Выберите тип заказа" />
                         </SelectTrigger>
-                        <SelectContent className="border-black/[0.08] bg-white dark:border-white/10 dark:bg-[#161a20]">
-                          <SelectItem value="Впервые" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">Впервые</SelectItem>
-                          <SelectItem value="Повтор" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">Повтор</SelectItem>
-                          <SelectItem value="Гарантия" className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-black/[0.04] data-[highlighted]:text-[#111113] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white">Гарантия</SelectItem>
+                        <SelectContent className={selectContentClass}>
+                          <SelectItem value="Впервые" className={selectItemClass}>Впервые</SelectItem>
+                          <SelectItem value="Повтор" className={selectItemClass}>Повтор</SelectItem>
+                          <SelectItem value="Гарантия" className={selectItemClass}>Гарантия</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -358,7 +362,7 @@ export default function CreateOrderModal({
                   id="dateMeeting"
                   type="datetime-local"
                   {...register('dateMeeting')}
-                  className={`${fieldClassName} dark:[color-scheme:dark]`}
+                  className={dateFieldClassName}
                 />
                 {errors.dateMeeting && (
                   <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>

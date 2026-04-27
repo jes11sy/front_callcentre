@@ -10,6 +10,13 @@ import { OrderFilters } from '@/types/orders';
 import { STATUS_OPTIONS } from '@/constants/orders';
 import { useCities } from '@/hooks/useStaticData';
 import { useDesignStore } from '@/store/designStore';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 interface OrdersFiltersProps {
   filters: OrderFilters;
@@ -69,16 +76,12 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
     }
   };
 
-  const fieldClass = `w-full min-h-[44px] px-4 rounded-2xl text-[15px] shadow-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-    isDark
-      ? 'bg-white/[0.04] border-white/25 text-white placeholder:text-white/30'
-      : 'border border-[#cfd2d8] bg-white text-[#111113] placeholder:text-[#8e8e93] shadow-[0_1px_2px_rgba(15,23,42,0.06)]'
-  }`;
-  const selectItemClass = `rounded-xl mx-1 my-0.5 cursor-pointer ${
-    isDark
-      ? 'text-white data-[highlighted]:bg-[#FEC004]/20 data-[highlighted]:text-white data-[state=checked]:bg-[#FEC004]/15'
-      : 'text-[#111113] data-[highlighted]:bg-[#FEC004]/12 data-[highlighted]:text-[#111113] data-[state=checked]:bg-[#FEC004]/12'
-  }`;
+  const fieldClass = `${getFormFieldClass(isDark, 'lg')} w-full min-h-[44px] px-4 text-[15px] shadow-sm`;
+  const compactFieldClass = getFormFieldClass(isDark, 'md');
+  const dateFieldClass = `${getFormDateFieldClass(isDark, 'lg')} w-full min-h-[44px] px-4 text-[15px] shadow-sm`;
+  const selectTriggerClass = `${getFormSelectTriggerClass(isDark, 'lg')} w-full min-h-[44px] px-4 text-[15px] shadow-sm`;
+  const selectContentClass = getFormSelectContentClass(isDark, 'z-[11000]');
+  const selectItemClass = getFormSelectItemClass(isDark);
 
   return (
     <div className={`${iconOnly ? 'relative inline-flex' : 'w-full'} font-myriad`}>
@@ -183,10 +186,10 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                   <div className="space-y-2">
                     <Label htmlFor="status" className="text-gray-600 dark:text-gray-400">Статус</Label>
                     <Select value={draftFilters.status || 'all'} onValueChange={(value) => setDraftFilters((prev) => ({ ...prev, status: value === 'all' ? '' : value }))}>
-                      <SelectTrigger className={fieldClass}>
+                      <SelectTrigger className={selectTriggerClass}>
                         <SelectValue placeholder="Все статусы" />
                       </SelectTrigger>
-                      <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
+                      <SelectContent className={selectContentClass}>
                         <SelectItem value="all" className={selectItemClass}>Все статусы</SelectItem>
                         {STATUS_OPTIONS.filter((option) => option.value !== 'all').map((option) => (
                           <SelectItem
@@ -204,10 +207,10 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                   <div className="space-y-2">
                     <Label htmlFor="city" className="text-gray-600 dark:text-gray-400">Город</Label>
                     <Select value={draftFilters.cityId || 'all'} onValueChange={(value) => setDraftFilters((prev) => ({ ...prev, cityId: value === 'all' ? '' : value }))}>
-                      <SelectTrigger className={fieldClass}>
+                      <SelectTrigger className={selectTriggerClass}>
                         <SelectValue placeholder="Все города" />
                       </SelectTrigger>
-                      <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
+                      <SelectContent className={selectContentClass}>
                         <SelectItem value="all" className={selectItemClass}>Все города</SelectItem>
                         {cities.map((city) => (
                           <SelectItem
@@ -240,7 +243,7 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                       type="date"
                       value={draftFilters.closingDate}
                       onChange={(e) => setDraftFilters((prev) => ({ ...prev, closingDate: e.target.value }))}
-                      className={`${fieldClass} dark:[color-scheme:dark]`}
+                      className={dateFieldClass}
                     />
                   </div>
                 </div>
@@ -282,25 +285,19 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
               placeholder="ID заказа"
               value={filters.searchId}
               onChange={(e) => onFilterChange('searchId', e.target.value)}
-              className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                isDark ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/45' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'
-              }`}
+              className={compactFieldClass}
             />
             <Input
               placeholder="Номер телефона"
               value={filters.searchPhone}
               onChange={(e) => onFilterChange('searchPhone', e.target.value)}
-              className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                isDark ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/45' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'
-              }`}
+              className={compactFieldClass}
             />
             <Input
               placeholder="Адрес"
               value={filters.searchAddress}
               onChange={(e) => onFilterChange('searchAddress', e.target.value)}
-              className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                isDark ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/45' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'
-              }`}
+              className={compactFieldClass}
             />
           </div>
         </div>

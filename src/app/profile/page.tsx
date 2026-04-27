@@ -35,6 +35,12 @@ import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import {
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 
 // Схемы валидации
@@ -108,6 +114,10 @@ export default function ProfilePage() {
   
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+  const fieldClass = getFormFieldClass(isDark, 'sm');
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'sm');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
 
   const {
     isSupported: isPushSupported,
@@ -382,13 +392,13 @@ export default function ProfilePage() {
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Рабочий статус</span>
                   {isEditing ? (
                     <Select value={profileForm.watch('statusWork')} onValueChange={(value) => profileForm.setValue('statusWork', value)}>
-                      <SelectTrigger className={`w-32 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                      <SelectTrigger className={`w-32 ${selectTriggerClass}`}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
-                        <SelectItem value="offline">Оффлайн</SelectItem>
-                        <SelectItem value="online">В сети</SelectItem>
-                        <SelectItem value="break">Перерыв</SelectItem>
+                      <SelectContent className={selectContentClass}>
+                        <SelectItem value="offline" className={selectItemClass}>Оффлайн</SelectItem>
+                        <SelectItem value="online" className={selectItemClass}>В сети</SelectItem>
+                        <SelectItem value="break" className={selectItemClass}>Перерыв</SelectItem>
                       </SelectContent>
                     </Select>
                   ) : (
@@ -398,7 +408,7 @@ export default function ProfilePage() {
                 <div className={`flex justify-between items-center py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Город</span>
                   {isEditing ? (
-                    <Input {...profileForm.register('city')} className={`w-40 text-right ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
+                    <Input {...profileForm.register('city')} className={`w-40 text-right ${fieldClass}`} />
                   ) : (
                     <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{profile.city}</span>
                   )}
@@ -410,7 +420,7 @@ export default function ProfilePage() {
                 <div className="flex justify-between items-start py-3">
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Примечание</span>
                   {isEditing ? (
-                    <Textarea {...profileForm.register('note')} className={`w-64 ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-900'}`} rows={2} />
+                    <Textarea {...profileForm.register('note')} className={`w-64 ${fieldClass} h-auto min-h-[72px]`} rows={2} />
                   ) : (
                     <span className={`text-right max-w-xs ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{profile.note || 'Не указано'}</span>
                   )}
@@ -439,11 +449,7 @@ export default function ProfilePage() {
                     <Input
                       type={showCurrentPassword ? 'text' : 'password'}
                       {...passwordForm.register('currentPassword')}
-                      className={`pr-10 ${
-                        isDark 
-                          ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`pr-10 ${fieldClass}`}
                     />
                     <button
                       type="button"
@@ -461,11 +467,7 @@ export default function ProfilePage() {
                     <Input
                       type={showNewPassword ? 'text' : 'password'}
                       {...passwordForm.register('newPassword')}
-                      className={`pr-10 ${
-                        isDark 
-                          ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`pr-10 ${fieldClass}`}
                     />
                     <button
                       type="button"
@@ -483,11 +485,7 @@ export default function ProfilePage() {
                     <Input
                       type={showConfirmPassword ? 'text' : 'password'}
                       {...passwordForm.register('confirmPassword')}
-                      className={`pr-10 ${
-                        isDark 
-                          ? 'bg-[#1e2530] border-gray-600 text-gray-100' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`pr-10 ${fieldClass}`}
                     />
                     <button
                       type="button"

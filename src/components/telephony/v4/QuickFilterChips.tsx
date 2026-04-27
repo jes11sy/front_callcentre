@@ -9,6 +9,7 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getFormFieldClass } from '@/components/ui/form-styles';
 
 interface QuickFilterChipsProps {
   searchTerm: string;
@@ -21,6 +22,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
 }) => {
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+  const searchFieldClass = `${getFormFieldClass(isDark, 'sm')} h-9`;
 
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -32,11 +34,7 @@ export const QuickFilterChips: React.FC<QuickFilterChipsProps> = ({
           placeholder="Поиск по номеру..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className={`h-9 w-full rounded-2xl pl-9 text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-[2px] ${
-            isDark
-              ? 'border-white/15 bg-white/[0.04] text-white placeholder:text-white/30 caret-white focus-visible:border-white focus-visible:ring-white/35'
-              : 'border-[#cfd2d8] bg-white text-[#111113] placeholder:text-[#8e8e93] focus-visible:border-white focus-visible:ring-gray-200'
-          }`}
+          className={`${searchFieldClass} w-full rounded-2xl pl-9`}
         />
         {searchTerm && (
           <button

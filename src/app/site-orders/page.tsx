@@ -22,6 +22,14 @@ import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
 import { LoadingState } from '@/components/ui/loading-state';
+import {
+  formControlResetClass,
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 
 // Force dynamic rendering to avoid SSG issues with React Query
@@ -102,6 +110,12 @@ export default function SiteOrdersPage() {
   const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
   const [editingComment, setEditingComment] = useState<{ id: number; value: string } | null>(null);
   const [callbackModal, setCallbackModal] = useState<{ id: number; value: string } | null>(null);
+  const fieldClass = getFormFieldClass(isDark, 'md');
+  const compactFieldClass = getFormFieldClass(isDark, 'sm');
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'md');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
+  const dateFieldClass = getFormDateFieldClass(isDark, 'md');
 
   // Fetch site orders
   const { data, isLoading, error } = useQuery<SiteOrdersResponse>({
@@ -222,28 +236,20 @@ export default function SiteOrdersPage() {
                   placeholder="Поиск по имени, телефону, сайту..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                    isDark
-                      ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/45 focus-visible:border-white/35 focus-visible:ring-white/20'
-                      : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:border-gray-300 focus-visible:ring-gray-200'
-                  }`}
+                  className={fieldClass}
                 />
               </div>
               <div className="w-[200px]">
                 <Select value={statusFilter || ''} onValueChange={(val) => setStatusFilter(val === 'all' ? '' : val)}>
-                  <SelectTrigger className={`outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                    isDark
-                      ? 'bg-white/[0.04] border-white/15 text-white [&_[data-placeholder]]:text-white/45 [&_svg]:text-white/70 focus-visible:border-white/35 focus-visible:ring-white/20'
-                      : 'bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500'
-                  }`}>
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue placeholder="Все статусы" />
                   </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
-                    <SelectItem value="all" className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
+                  <SelectContent className={selectContentClass}>
+                    <SelectItem value="all" className={selectItemClass}>
                       Все статусы
                     </SelectItem>
                     {STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status} value={status} className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
+                      <SelectItem key={status} value={status} className={selectItemClass}>
                         {status}
                       </SelectItem>
                     ))}
@@ -327,16 +333,16 @@ export default function SiteOrdersPage() {
                             disabled={order.status === 'Заказ создан'}
                           >
                             <SelectTrigger 
-                              className={`w-[150px] h-8 text-xs border outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-white/35 focus-visible:ring-white/20 ${getStatusColor(order.status)} bg-transparent [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400`}
+                              className={`w-[150px] h-8 text-xs border ${formControlResetClass} ${getStatusColor(order.status)} bg-transparent [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400`}
                             >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                            <SelectContent className={selectContentClass}>
                               {STATUS_OPTIONS.map((status) => (
                                 <SelectItem 
                                   key={status} 
                                   value={status} 
-                                  className={isDark ? 'text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white' : 'text-gray-700 data-[highlighted]:bg-black/5'}
+                                  className={selectItemClass}
                                 >
                                   {status}
                                 </SelectItem>
@@ -355,11 +361,7 @@ export default function SiteOrdersPage() {
                               <Input
                                 value={editingComment.value}
                                 onChange={(e) => setEditingComment({ ...editingComment, value: e.target.value })}
-                                className={`h-8 text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                                  isDark
-                                    ? 'bg-white/[0.04] border-white/15 text-white focus-visible:border-white/35 focus-visible:ring-white/20'
-                                    : 'bg-white border-gray-200 text-gray-900 focus-visible:border-gray-300 focus-visible:ring-gray-200'
-                                }`}
+                                className={`h-8 text-sm ${compactFieldClass}`}
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') handleSaveComment(order.id);
                                   if (e.key === 'Escape') setEditingComment(null);
@@ -447,11 +449,7 @@ export default function SiteOrdersPage() {
               type="datetime-local"
               value={callbackModal.value}
               onChange={(e) => setCallbackModal({ ...callbackModal, value: e.target.value })}
-              className={`w-full h-10 px-3 rounded-lg border text-sm mb-4 focus:outline-none focus:border-purple-400 ${
-                isDark
-                  ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
-                  : 'bg-white border-gray-200 text-gray-900'
-              }`}
+              className={`w-full mb-4 ${dateFieldClass}`}
             />
             <div className="flex gap-3 justify-end">
               <Button

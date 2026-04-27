@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 import { Penalty } from './PenaltiesTable';
 import { useDesignStore } from '@/store/designStore';
+import { getFormFieldClass, getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
 
 interface EditPenaltyModalProps {
   isOpen: boolean;
@@ -115,13 +116,10 @@ export const EditPenaltyModal = ({ isOpen, onClose, penalty, onSave, cities }: E
   // Стили
   const dialogClass = "bg-[#f5f5f7] dark:bg-[#111113] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-100 w-[calc(100%-2rem)] sm:max-w-md font-myriad rounded-[20px]";
   
-  const selectTriggerClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:[&_[data-placeholder]]:text-white/45 dark:[&_svg]:text-white/70";
-  
-  const selectContentClass = "bg-white border-gray-200 dark:bg-[#1e1e20] dark:border-white/10";
-  
-  const selectItemClass = "text-gray-700 data-[highlighted]:bg-black/5 dark:text-white dark:data-[highlighted]:bg-white/10";
-  
-  const inputClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45";
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'lg');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
+  const inputClass = getFormFieldClass(isDark, 'lg');
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

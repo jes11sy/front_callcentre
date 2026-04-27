@@ -20,6 +20,7 @@ import {
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { CreateAppealModal } from '@/components/appeals/CreateAppealModal';
+import { getFormFieldClass, getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
 
 export const dynamic = 'force-dynamic';
 
@@ -162,11 +163,10 @@ export default function AppealsPage() {
   const cardClass = isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]';
   const mutedTextClass = isDark ? 'text-white/60' : 'text-[#6e6e73]';
   const bodyTextClass = isDark ? 'text-white/92' : 'text-[#3a3a3c]';
-  const fieldClass = `h-10 rounded-2xl border outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-    isDark
-      ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/40'
-      : 'bg-white border-gray-200 text-[#111113] placeholder:text-[#8e8e93]'
-  }`;
+  const fieldClass = getFormFieldClass(isDark, 'md');
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'md');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
 
   if (isLoading && !data) {
     return (
@@ -213,13 +213,13 @@ export default function AppealsPage() {
                 </div>
                 <div className="w-[160px]">
                   <Select value={statusFilter || 'all'} onValueChange={(v) => { setStatusFilter(v === 'all' ? '' : v); setPage(1); }}>
-                    <SelectTrigger className={fieldClass}>
+                    <SelectTrigger className={selectTriggerClass}>
                       <SelectValue placeholder="Все статусы" />
                     </SelectTrigger>
-                    <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
-                      <SelectItem value="all" className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>Все статусы</SelectItem>
+                    <SelectContent className={selectContentClass}>
+                      <SelectItem value="all" className={selectItemClass}>Все статусы</SelectItem>
                       {STATUS_FLOW.map((s) => (
-                        <SelectItem key={s} value={s} className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>{STATUS_LABELS[s]}</SelectItem>
+                        <SelectItem key={s} value={s} className={selectItemClass}>{STATUS_LABELS[s]}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -297,9 +297,9 @@ export default function AppealsPage() {
                               >
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                              <SelectContent className={selectContentClass}>
                                 {STATUS_FLOW.map((s) => (
-                                  <SelectItem key={s} value={s} className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
+                                  <SelectItem key={s} value={s} className={selectItemClass}>
                                     {STATUS_LABELS[s]}
                                   </SelectItem>
                                 ))}

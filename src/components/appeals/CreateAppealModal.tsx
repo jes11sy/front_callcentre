@@ -17,6 +17,13 @@ import { useAuthStore } from '@/store/authStore';
 import { useCities, useRKs, useEquipmentTypes } from '@/hooks/useStaticData';
 import { STATUS_LABELS, STATUS_FLOW } from '@/app/appeals/page';
 import type { AppealStatus } from '@/app/appeals/page';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 type ModalMode = 'appeal' | 'order';
 
@@ -229,11 +236,12 @@ export function CreateAppealModal({
 
   if (!open) return null;
 
-  const inputCls = `${isDark ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/35' : 'bg-white border-[#cfd2d8] text-[#111113] placeholder:text-[#8e8e93]'} rounded-2xl focus:border-[#FEC004] focus-visible:ring-0 focus-visible:border-[#FEC004]`;
+  const inputCls = getFormFieldClass(isDark, 'md');
+  const dateInputCls = getFormDateFieldClass(isDark, 'md');
   const labelCls = `text-xs ${isDark ? 'text-white/60' : 'text-[#6e6e73]'}`;
-  const selectTriggerCls = `h-10 mt-1 rounded-2xl text-sm ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-[#cfd2d8] text-[#111113]'} focus:border-[#FEC004] focus-visible:ring-0`;
-  const selectContentCls = isDark ? 'bg-[#1e1e20] border-white/10 rounded-2xl' : 'bg-white border-gray-200 rounded-2xl';
-  const selectItemCls = isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5';
+  const selectTriggerCls = `mt-1 ${getFormSelectTriggerClass(isDark, 'md')}`;
+  const selectContentCls = getFormSelectContentClass(isDark);
+  const selectItemCls = getFormSelectItemClass(isDark);
   const sectionCls = `mb-2 text-[10px] font-semibold uppercase tracking-wider ${isDark ? 'text-white/45' : 'text-[#6e6e73]'}`;
 
   const currentStatus = watch('status') as AppealStatus;
@@ -322,12 +330,12 @@ export function CreateAppealModal({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <Label className={labelCls}>Телефон *</Label>
-                  <Input {...register('phone')} placeholder="+7 999 000-00-00" readOnly={isFromCall} className={`mt-1 h-10 text-sm ${inputCls} ${isFromCall ? 'opacity-70' : ''}`} />
+                  <Input {...register('phone')} placeholder="+7 999 000-00-00" readOnly={isFromCall} className={`mt-1 ${inputCls} ${isFromCall ? 'opacity-70' : ''}`} />
                   {errors.phone && <p className="text-[10px] text-red-400 mt-0.5">{errors.phone.message}</p>}
                 </div>
                 <div>
                   <Label className={labelCls}>Имя клиента{isOrder ? ' *' : ''}</Label>
-                  <Input {...register('clientName')} placeholder="Имя клиента" className={`mt-1 h-10 text-sm ${inputCls}`} autoFocus={isFromCall} />
+                  <Input {...register('clientName')} placeholder="Имя клиента" className={`mt-1 ${inputCls}`} autoFocus={isFromCall} />
                 </div>
               </div>
 
@@ -417,11 +425,11 @@ export function CreateAppealModal({
                     </div>
                     <div>
                       <Label className={labelCls}>Адрес *</Label>
-                      <Input {...register('address')} placeholder="Адрес клиента" className={`mt-1 h-10 text-sm ${inputCls}`} />
+                      <Input {...register('address')} placeholder="Адрес клиента" className={`mt-1 ${inputCls}`} />
                     </div>
                     <div>
                       <Label className={labelCls}>Дата встречи *</Label>
-                      <Input type="datetime-local" {...register('dateMeeting')} className={`mt-1 h-10 text-sm ${inputCls} ${isDark ? '[color-scheme:dark]' : ''}`} />
+                      <Input type="datetime-local" {...register('dateMeeting')} className={`mt-1 ${dateInputCls}`} />
                     </div>
                   </div>
                 </div>
@@ -430,7 +438,7 @@ export function CreateAppealModal({
               {/* Примечание */}
               <div>
                 <Label className={labelCls}>Примечание</Label>
-                <textarea {...register('description')} rows={3} placeholder="Детали разговора..." className={`mt-1 w-full rounded-2xl border px-3 py-2 text-sm resize-none ${inputCls}`} />
+                <textarea {...register('description')} rows={3} placeholder="Детали разговора..." className={`mt-1 w-full ${inputCls} h-auto min-h-[96px] resize-none`} />
               </div>
             </div>
 

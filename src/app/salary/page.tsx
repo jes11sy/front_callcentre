@@ -17,6 +17,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import api from '@/lib/api';
+import { getFormDateFieldClass } from '@/components/ui/form-styles';
 
 // Force dynamic rendering to avoid SSG issues with React Query
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,7 @@ export default function SalaryPage() {
   const { theme } = useDesignStore();
   const { user } = useAuthStore();
   const isDark = theme === 'dark';
+  const dateFieldClass = getFormDateFieldClass(isDark, 'sm');
 
   const defaultRange = getMonthRange();
   const [startDate, setStartDate] = useState(defaultRange.start);
@@ -125,22 +127,14 @@ export default function SalaryPage() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${
-                  isDark
-                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
-                    : 'bg-white border-gray-200 text-gray-900'
-                }`}
+                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${dateFieldClass}`}
               />
               <span className="text-gray-400">—</span>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${
-                  isDark
-                    ? 'bg-[#252d3a] border-gray-600 text-gray-100 [color-scheme:dark]'
-                    : 'bg-white border-gray-200 text-gray-900'
-                }`}
+                className={`flex-1 sm:flex-none sm:w-[140px] h-10 sm:h-9 text-sm font-light ${dateFieldClass}`}
               />
             </div>
             <Button

@@ -23,6 +23,13 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 import api from '@/lib/api';
 import { useCities, useEquipmentTypes, useRKs } from '@/hooks/useStaticData';
+import {
+  getFormDateFieldClass,
+  getFormFieldClass,
+  getFormSelectContentClass,
+  getFormSelectItemClass,
+  getFormSelectTriggerClass,
+} from '@/components/ui/form-styles';
 
 const orderSchema = z.object({
   rkId: z.number({ required_error: 'Рекламная Компания обязательна' }).min(1, 'Рекламная Компания обязательна'),
@@ -167,13 +174,11 @@ export default function CreateOrderFromSiteModal({
   if (!open) return null;
 
   // Стили
-  const selectTriggerClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:[&_[data-placeholder]]:text-white/45 dark:[&_svg]:text-white/70";
-  
-  const selectContentClass = "bg-white border-gray-200 dark:bg-[#1e1e20] dark:border-white/10";
-  
-  const selectItemClass = "text-gray-700 data-[highlighted]:bg-black/5 dark:text-white dark:data-[highlighted]:bg-white/10";
-  
-  const inputClass = "outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45";
+  const selectTriggerClass = getFormSelectTriggerClass(isDark, 'md');
+  const selectContentClass = getFormSelectContentClass(isDark);
+  const selectItemClass = getFormSelectItemClass(isDark);
+  const inputClass = getFormFieldClass(isDark, 'md');
+  const dateInputClass = getFormDateFieldClass(isDark, 'md');
 
 
   return (
@@ -392,7 +397,7 @@ export default function CreateOrderFromSiteModal({
                     id="dateMeeting"
                     type="datetime-local"
                     {...register('dateMeeting')}
-                    className={`${inputClass} dark:[color-scheme:dark]`}
+                    className={dateInputClass}
                   />
                   {errors.dateMeeting && (
                     <p className="text-sm text-red-400">{errors.dateMeeting.message}</p>
@@ -405,7 +410,7 @@ export default function CreateOrderFromSiteModal({
                     {...register('comment')}
                     placeholder="Комментарий к заказу"
                     rows={2}
-                    className="outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 dark:bg-white/[0.04] dark:border-white/15 dark:text-white dark:placeholder:text-white/45 resize-none"
+                    className={`${inputClass} h-auto resize-none`}
                   />
                 </div>
               </CardContent>

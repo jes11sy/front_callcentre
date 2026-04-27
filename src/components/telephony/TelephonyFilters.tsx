@@ -14,6 +14,8 @@ import {
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CallFilters } from '@/types/telephony';
+import { useDesignStore } from '@/store/designStore';
+import { getFormDateFieldClass, getFormFieldClass, getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
 
 interface TelephonyFiltersProps {
   sortBy: string;
@@ -47,6 +49,13 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
   errors: _errors
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useDesignStore();
+  const isDark = theme === 'dark';
+  const fieldClass = getFormFieldClass(isDark, 'sm');
+  const dateFieldClass = getFormDateFieldClass(isDark, 'sm');
+  const triggerClass = getFormSelectTriggerClass(isDark, 'sm');
+  const contentClass = getFormSelectContentClass(isDark);
+  const itemClass = getFormSelectItemClass(isDark);
 
   return (
     <div className="w-full">
@@ -77,16 +86,16 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                 onSortChange(field);
               }}
             >
-              <SelectTrigger className="w-48 bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white">
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
-              <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                <SelectItem value="createdAt-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (новые)</SelectItem>
-                <SelectItem value="createdAt-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Дата звонка (старые)</SelectItem>
-                <SelectItem value="city-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Город (А-Я)</SelectItem>
-                <SelectItem value="city-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Город (Я-А)</SelectItem>
-                <SelectItem value="rk-asc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">РК (А-Я)</SelectItem>
-                <SelectItem value="rk-desc" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">РК (Я-А)</SelectItem>
+              <SelectContent className={contentClass}>
+                <SelectItem value="createdAt-desc" className={itemClass}>Дата звонка (новые)</SelectItem>
+                <SelectItem value="createdAt-asc" className={itemClass}>Дата звонка (старые)</SelectItem>
+                <SelectItem value="city-asc" className={itemClass}>Город (А-Я)</SelectItem>
+                <SelectItem value="city-desc" className={itemClass}>Город (Я-А)</SelectItem>
+                <SelectItem value="rk-asc" className={itemClass}>РК (А-Я)</SelectItem>
+                <SelectItem value="rk-desc" className={itemClass}>РК (Я-А)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -100,7 +109,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                   id="dateFrom"
                   type="datetime-local"
                   {...register('dateFrom')}
-                  className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                  className={dateFieldClass}
                 />
               </div>
               <div>
@@ -109,21 +118,21 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                   id="dateTo"
                   type="datetime-local"
                   {...register('dateTo')}
-                  className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                  className={dateFieldClass}
                 />
               </div>
               <div>
                 <Label htmlFor="status" className="text-gray-300">Статус</Label>
                 <Select onValueChange={(value) => register('status').onChange({ target: { value } })}>
-                  <SelectTrigger className="bg-[#0f0f23] border-gray-600 text-white hover:border-[#FFD700]/50 focus:border-[#FFD700] [&>span]:text-white">
+                  <SelectTrigger className={triggerClass}>
                     <SelectValue placeholder="Все статусы" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#17212b] border-[#FFD700]/30">
-                    <SelectItem value="all" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Все статусы</SelectItem>
-                    <SelectItem value="answered" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Отвечен</SelectItem>
-                    <SelectItem value="missed" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Пропущен</SelectItem>
-                    <SelectItem value="busy" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Занято</SelectItem>
-                    <SelectItem value="no_answer" className="!text-white focus:bg-[#FFD700]/20 focus:!text-white">Не отвечает</SelectItem>
+                  <SelectContent className={contentClass}>
+                    <SelectItem value="all" className={itemClass}>Все статусы</SelectItem>
+                    <SelectItem value="answered" className={itemClass}>Отвечен</SelectItem>
+                    <SelectItem value="missed" className={itemClass}>Пропущен</SelectItem>
+                    <SelectItem value="busy" className={itemClass}>Занято</SelectItem>
+                    <SelectItem value="no_answer" className={itemClass}>Не отвечает</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -133,7 +142,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                   id="cityId"
                   placeholder="ID города"
                   {...register('cityId')}
-                  className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                  className={fieldClass}
                 />
               </div>
               <div>
@@ -142,7 +151,7 @@ const TelephonyFiltersComponent: React.FC<TelephonyFiltersProps> = ({
                   id="rkId"
                   placeholder="ID рекламной кампании"
                   {...register('rkId')}
-                  className="bg-[#0f0f23] border-gray-600 text-white placeholder:text-gray-500 hover:border-[#FFD700]/50 focus:border-[#FFD700]"
+                  className={fieldClass}
                 />
               </div>
             </div>

@@ -30,6 +30,7 @@ import { QuickFilterChips } from './QuickFilterChips';
 import { StickyAudioPlayer } from '../v2/StickyAudioPlayer';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getFormSelectContentClass, getFormSelectItemClass, getFormSelectTriggerClass } from '@/components/ui/form-styles';
 
 interface CallTableV4Props {
   calls: Call[];
@@ -94,6 +95,9 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
 }) => {
   const { theme } = useDesignStore();
   const isDark = theme === 'dark';
+  const pageSizeTriggerClass = `${getFormSelectTriggerClass(isDark, 'sm')} w-14 sm:w-16 h-7 sm:h-8 text-xs sm:text-sm`;
+  const pageSizeContentClass = getFormSelectContentClass(isDark);
+  const pageSizeItemClass = getFormSelectItemClass(isDark, true);
   
 
   // Local state
@@ -296,17 +300,15 @@ export const CallTableV4: React.FC<CallTableV4Props> = ({
                   }}
                   disabled={loading}
                 >
-                  <SelectTrigger className={`w-14 sm:w-16 h-7 sm:h-8 text-xs sm:text-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
-                    isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-gray-200 text-gray-700'
-                  }`}>
+                  <SelectTrigger className={pageSizeTriggerClass}>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                  <SelectContent className={pageSizeContentClass}>
                     {GROUP_SIZES.map((size) => (
                       <SelectItem 
                         key={size.value} 
                         value={size.value}
-                        className={isDark ? 'text-white focus:bg-white/10 focus:text-white' : 'text-gray-800 focus:bg-black/5'}
+                        className={pageSizeItemClass}
                       >
                         {size.label}
                       </SelectItem>

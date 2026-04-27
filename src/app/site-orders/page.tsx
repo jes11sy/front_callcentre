@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import CreateOrderFromSiteModal from '@/components/site-orders/CreateOrderFromSiteModal';
 import { OptimizedPagination } from '@/components/ui/optimized-pagination';
+import { LoadingState } from '@/components/ui/loading-state';
 
 
 // Force dynamic rendering to avoid SSG issues with React Query

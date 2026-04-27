@@ -158,10 +158,20 @@ export default function AppealsPage() {
     setConfirmDeleteId(id);
   };
 
+  const pageBgClass = isDark ? 'bg-[#111113]' : 'bg-[#f5f5f7]';
+  const cardClass = isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-black/[0.08]';
+  const mutedTextClass = isDark ? 'text-white/60' : 'text-[#6e6e73]';
+  const bodyTextClass = isDark ? 'text-white/92' : 'text-[#3a3a3c]';
+  const fieldClass = `h-10 rounded-2xl border outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
+    isDark
+      ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/40'
+      : 'bg-white border-gray-200 text-[#111113] placeholder:text-[#8e8e93]'
+  }`;
+
   if (isLoading && !data) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
+        <div className={`flex min-h-screen items-center justify-center ${pageBgClass}`}>
           <Loader2 className="h-8 w-8 animate-spin text-[#FEC004]" />
         </div>
       </DashboardLayout>
@@ -171,11 +181,11 @@ export default function AppealsPage() {
   if (error) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen bg-[#F3F3EE] dark:bg-[#111827]">
-          <div className="text-center">
+        <div className={`flex min-h-screen items-center justify-center ${pageBgClass} px-4`}>
+          <div className={`w-full max-w-md rounded-[20px] border p-6 text-center font-myriad ${cardClass}`}>
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-red-500 dark:text-red-400">Ошибка загрузки обращений</p>
-            <p className="text-sm text-gray-500 mt-1">API /appeals не подключён к бэкенду</p>
+            <p className={`mt-1 text-sm ${mutedTextClass}`}>Попробуйте обновить страницу или проверить подключение API.</p>
           </div>
         </div>
       </DashboardLayout>
@@ -184,41 +194,39 @@ export default function AppealsPage() {
 
   return (
     <DashboardLayout>
-      <div className={`w-full py-4 px-4 min-h-screen font-myriad transition-colors ${
-        isDark ? 'bg-[#111827]' : 'bg-[#F3F3EE]'
-      }`}>
+      <div className={`w-full min-h-screen px-4 py-6 font-myriad transition-colors ${pageBgClass}`}>
         <div className="w-full flex gap-4">
 
           {/* Основная таблица */}
           <div className={`flex-1 min-w-0 ${detailAppeal ? 'hidden sm:block' : ''}`}>
 
             {/* Фильтры */}
-            <div className={`rounded-lg p-4 mb-4 border ${isDark ? 'bg-[#1e2530] border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={`mb-4 rounded-[20px] border p-4 ${cardClass}`}>
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex-1 min-w-[200px]">
                   <Input
                     placeholder="Поиск по телефону, имени, описанию..."
                     value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    className={`h-9 ${isDark ? 'bg-[#252d3a] border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`}
+                    className={fieldClass}
                   />
                 </div>
                 <div className="w-[160px]">
                   <Select value={statusFilter || 'all'} onValueChange={(v) => { setStatusFilter(v === 'all' ? '' : v); setPage(1); }}>
-                    <SelectTrigger className={`h-9 ${isDark ? 'bg-[#252d3a] border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`}>
+                    <SelectTrigger className={fieldClass}>
                       <SelectValue placeholder="Все статусы" />
                     </SelectTrigger>
-                    <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
-                      <SelectItem value="all" className={isDark ? 'text-gray-200' : 'text-gray-700'}>Все статусы</SelectItem>
+                    <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
+                      <SelectItem value="all" className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>Все статусы</SelectItem>
                       {STATUS_FLOW.map((s) => (
-                        <SelectItem key={s} value={s} className={isDark ? 'text-gray-200' : 'text-gray-700'}>{STATUS_LABELS[s]}</SelectItem>
+                        <SelectItem key={s} value={s} className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>{STATUS_LABELS[s]}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <Button
                   onClick={handleOpenCreate}
-                  className="h-9 bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold ml-auto"
+                  className={`h-10 rounded-2xl font-semibold ml-auto ${isDark ? 'bg-white text-[#111113] hover:bg-gray-100' : 'bg-[#FEC004] text-[#111113] hover:bg-[#e3ac00]'}`}
                 >
                   <Plus className="h-4 w-4 mr-1.5" />
                   Обращение
@@ -227,40 +235,40 @@ export default function AppealsPage() {
             </div>
 
             {/* Статистика */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 mb-4">
+            <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5 lg:grid-cols-9">
               {STATUS_FLOW.map((s) => {
                 const count = statsData?.data?.byStatus?.[s] ?? 0;
                 return (
                     <button
                       key={s}
                       onClick={() => { setStatusFilter(statusFilter === s ? '' : s); setPage(1); }}
-                      className={`p-2.5 rounded-lg border text-left transition-all ${
+                      className={`rounded-2xl border p-3 text-left transition-all ${
                         statusFilter === s
-                          ? isDark ? 'bg-[#FEC004]/20 border-[#FEC004]/50' : 'bg-[#FEC004]/10 border-[#FEC004]/40'
-                          : isDark ? 'bg-[#1e2530] border-gray-700 hover:border-gray-600' : 'bg-white border-gray-200 hover:border-gray-300'
+                          ? isDark ? 'bg-white/[0.08] border-white/30' : 'bg-[#ececf1] border-black/15'
+                          : `${cardClass} hover:border-black/20 dark:hover:border-white/20`
                       }`}
                     >
-                      <div className={`text-xl font-light ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{count}</div>
-                      <div className={`text-xs font-light leading-tight mt-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{STATUS_LABELS[s]}</div>
+                      <div className={`text-xl font-light ${bodyTextClass}`}>{count}</div>
+                      <div className={`mt-0.5 text-xs font-light leading-tight ${mutedTextClass}`}>{STATUS_LABELS[s]}</div>
                     </button>
                   );
                 })}
             </div>
 
             {/* Таблица */}
-            <div className={`rounded-lg border overflow-hidden ${isDark ? 'bg-[#1e2530] border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={`overflow-hidden rounded-[20px] border ${cardClass}`}>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className={`border-b ${isDark ? 'bg-[#252d3a] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>ID</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Статус</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Дата</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Источник</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Телефон</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Имя</th>
-                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Примечание</th>
-                      <th className={`px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}></th>
+                    <tr className={`border-b ${isDark ? 'bg-white/[0.04] border-white/15' : 'bg-gray-50 border-gray-200'}`}>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>ID</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Статус</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Дата</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Источник</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Телефон</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Имя</th>
+                      <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}>Примечание</th>
+                      <th className={`px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide ${mutedTextClass}`}></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -271,11 +279,11 @@ export default function AppealsPage() {
                           onClick={() => setDetailAppeal(appeal)}
                           className={`border-b cursor-pointer transition-colors ${
                             detailAppeal?.id === appeal.id
-                              ? isDark ? 'bg-[#FEC004]/10' : 'bg-[#FEC004]/5'
-                              : isDark ? 'border-gray-700 hover:bg-[#252d3a]' : 'border-gray-100 hover:bg-gray-50'
+                              ? isDark ? 'bg-white/[0.06]' : 'bg-black/[0.025]'
+                              : isDark ? 'border-white/10 hover:bg-white/[0.04]' : 'border-gray-100 hover:bg-black/[0.015]'
                           }`}
                         >
-                          <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{appeal.id}</td>
+                          <td className={`px-4 py-3 text-sm ${mutedTextClass}`}>{appeal.id}</td>
                           <td className="px-4 py-3">
                             <Select
                               value={appeal.status}
@@ -289,38 +297,38 @@ export default function AppealsPage() {
                               >
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className={isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200'}>
+                              <SelectContent className={isDark ? 'bg-[#1e1e20] border-white/10' : 'bg-white border-gray-200'}>
                                 {STATUS_FLOW.map((s) => (
-                                  <SelectItem key={s} value={s} className={isDark ? 'text-gray-200' : 'text-gray-700'}>
+                                  <SelectItem key={s} value={s} className={isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5'}>
                                     {STATUS_LABELS[s]}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </td>
-                          <td className={`px-4 py-3 text-sm whitespace-nowrap ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <td className={`px-4 py-3 text-sm whitespace-nowrap ${mutedTextClass}`}>
                             {new Date(appeal.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1 text-xs sm:text-sm">
-                              {appeal.cityName && <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{appeal.cityName}</span>}
+                              {appeal.cityName && <span className={bodyTextClass}>{appeal.cityName}</span>}
                               {appeal.cityName && appeal.rkName && <span className="text-gray-400">•</span>}
-                              {appeal.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>{appeal.rkName}</span>}
+                              {appeal.rkName && <span className={mutedTextClass}>{appeal.rkName}</span>}
                               {(appeal.cityName || appeal.rkName) && appeal.source && <span className="text-gray-400">•</span>}
                               {appeal.source && <span className="text-[#FEC004]">{appeal.source}</span>}
-                              {!appeal.cityName && !appeal.rkName && !appeal.source && <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>—</span>}
+                              {!appeal.cityName && !appeal.rkName && !appeal.source && <span className={mutedTextClass}>—</span>}
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <span className={`text-sm font-mono ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                            <span className={`text-sm font-mono ${bodyTextClass}`}>
                               {appeal.phone}
                             </span>
                           </td>
-                          <td className={`px-4 py-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <td className={`px-4 py-3 text-sm ${bodyTextClass}`}>
                             {appeal.clientName || '—'}
                           </td>
                           <td className="px-4 py-3">
-                            <p className={`text-sm max-w-[200px] truncate ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <p className={`max-w-[200px] truncate text-sm ${bodyTextClass}`}>
                               {appeal.description || '—'}
                             </p>
                           </td>
@@ -330,7 +338,7 @@ export default function AppealsPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleOpenEdit(appeal)}
-                                className={`h-7 w-7 p-0 ${isDark ? 'text-gray-400 hover:text-[#FEC004]' : 'text-gray-500 hover:text-[#FEC004]'}`}
+                                className={`h-7 w-7 p-0 ${mutedTextClass} hover:text-[#FEC004]`}
                                 title="Редактировать"
                               >
                                 <Edit2 className="h-3.5 w-3.5" />
@@ -351,8 +359,8 @@ export default function AppealsPage() {
                     ) : (
                       <tr>
                         <td colSpan={8} className="py-16 text-center">
-                          <MessageSquare className={`h-10 w-10 mx-auto mb-3 ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
-                          <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Обращений не найдено</p>
+                          <MessageSquare className={`h-10 w-10 mx-auto mb-3 ${mutedTextClass}`} />
+                          <p className={`text-sm ${mutedTextClass}`}>Обращений не найдено</p>
                         </td>
                       </tr>
                     )}
@@ -362,8 +370,8 @@ export default function AppealsPage() {
 
               {/* Пагинация */}
               {data?.pagination && data.pagination.totalPages > 1 && (
-                <div className={`flex items-center justify-between px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className={`flex items-center justify-between px-4 py-3 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+                  <div className={`text-sm ${mutedTextClass}`}>
                     Показано {data.data.length} из {data.pagination.total}
                   </div>
                   <div className="flex gap-2">
@@ -372,11 +380,11 @@ export default function AppealsPage() {
                       size="sm"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className={`${isDark ? 'border-gray-600 text-gray-300 hover:bg-[#FEC004]/10' : 'border-gray-200 text-gray-700 hover:bg-[#FEC004]/10'} hover:text-[#FEC004] hover:border-[#FEC004]`}
+                      className={`${isDark ? 'border-white/20 text-white/85 hover:bg-white/[0.06]' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03]'} rounded-xl`}
                     >
                       Назад
                     </Button>
-                    <span className={`px-3 py-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <span className={`px-3 py-1 text-sm ${mutedTextClass}`}>
                       {page} / {data.pagination.totalPages}
                     </span>
                     <Button
@@ -384,7 +392,7 @@ export default function AppealsPage() {
                       size="sm"
                       onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
                       disabled={page === data.pagination.totalPages}
-                      className={`${isDark ? 'border-gray-600 text-gray-300 hover:bg-[#FEC004]/10' : 'border-gray-200 text-gray-700 hover:bg-[#FEC004]/10'} hover:text-[#FEC004] hover:border-[#FEC004]`}
+                      className={`${isDark ? 'border-white/20 text-white/85 hover:bg-white/[0.06]' : 'border-gray-200 text-gray-700 hover:bg-black/[0.03]'} rounded-xl`}
                     >
                       Далее
                     </Button>
@@ -396,12 +404,10 @@ export default function AppealsPage() {
 
           {/* Боковая панель детали обращения */}
           {detailAppeal && (
-            <div className={`w-full sm:w-[360px] shrink-0 rounded-lg border overflow-hidden self-start sticky top-4 ${
-              isDark ? 'bg-[#1e2530] border-gray-700' : 'bg-white border-gray-200'
-            }`}>
+            <div className={`w-full sm:w-[360px] shrink-0 self-start sticky top-4 overflow-hidden rounded-[20px] border ${cardClass}`}>
               {/* Шапка */}
-              <div className={`flex items-center justify-between px-4 py-3 border-b ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
-                <h3 className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+              <div className={`flex items-center justify-between px-4 py-3 border-b ${isDark ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-gray-50'}`}>
+                <h3 className={`font-semibold ${bodyTextClass}`}>
                   Обращение #{detailAppeal.id}
                 </h3>
                 <div className="flex items-center gap-1">
@@ -409,7 +415,7 @@ export default function AppealsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleOpenEdit(detailAppeal)}
-                    className={`h-8 w-8 p-0 ${isDark ? 'text-gray-400 hover:text-[#FEC004]' : 'text-gray-500 hover:text-[#FEC004]'}`}
+                    className={`h-8 w-8 p-0 ${mutedTextClass} hover:text-[#FEC004]`}
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
@@ -417,7 +423,7 @@ export default function AppealsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setDetailAppeal(null)}
-                    className={`h-8 w-8 p-0 ${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-500 hover:text-gray-900'}`}
+                    className={`h-8 w-8 p-0 ${mutedTextClass} hover:text-[#111113] dark:hover:text-white`}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -427,13 +433,13 @@ export default function AppealsPage() {
               <div className="p-4 space-y-4">
                 {/* Клиент */}
                 <div>
-                  <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Клиент</p>
+                  <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${mutedTextClass}`}>Клиент</p>
                   <div className="flex items-center gap-2">
-                    <Phone className={`h-4 w-4 shrink-0 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
-                    <span className={`font-mono text-sm ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{detailAppeal.phone}</span>
+                    <Phone className={`h-4 w-4 shrink-0 ${mutedTextClass}`} />
+                    <span className={`font-mono text-sm ${bodyTextClass}`}>{detailAppeal.phone}</span>
                   </div>
                   {detailAppeal.clientName && (
-                    <p className={`text-sm mt-1 ml-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{detailAppeal.clientName}</p>
+                    <p className={`mt-1 ml-6 text-sm ${mutedTextClass}`}>{detailAppeal.clientName}</p>
                   )}
                 </div>
 
@@ -447,11 +453,11 @@ export default function AppealsPage() {
                 {/* Источник */}
                 {(detailAppeal.cityName || detailAppeal.rkName || detailAppeal.source) && (
                   <div>
-                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Источник</p>
+                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${mutedTextClass}`}>Источник</p>
                     <div className="flex items-center gap-1.5 text-sm">
-                      {detailAppeal.cityName && <span className={isDark ? 'text-gray-100' : 'text-gray-900'}>{detailAppeal.cityName}</span>}
+                      {detailAppeal.cityName && <span className={bodyTextClass}>{detailAppeal.cityName}</span>}
                       {detailAppeal.cityName && detailAppeal.rkName && <span className="text-gray-400">•</span>}
-                      {detailAppeal.rkName && <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>{detailAppeal.rkName}</span>}
+                      {detailAppeal.rkName && <span className={mutedTextClass}>{detailAppeal.rkName}</span>}
                       {(detailAppeal.cityName || detailAppeal.rkName) && detailAppeal.source && <span className="text-gray-400">•</span>}
                       {detailAppeal.source && <span className="text-[#FEC004]">{detailAppeal.source}</span>}
                     </div>
@@ -461,32 +467,32 @@ export default function AppealsPage() {
                 {/* Примечание */}
                 {detailAppeal.description && (
                   <div>
-                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Примечание</p>
-                    <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{detailAppeal.description}</p>
+                    <p className={`text-xs font-medium uppercase tracking-wide mb-1.5 ${mutedTextClass}`}>Примечание</p>
+                    <p className={`text-sm leading-relaxed ${bodyTextClass}`}>{detailAppeal.description}</p>
                   </div>
                 )}
 
                 {/* Привязки */}
                 <div className="space-y-1.5">
                   {detailAppeal.callId && (
-                    <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Звонок: <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>#{detailAppeal.callId}</span></p>
+                    <p className={`text-xs ${mutedTextClass}`}>Звонок: <span className={bodyTextClass}>#{detailAppeal.callId}</span></p>
                   )}
                   {detailAppeal.siteOrderId && (
-                    <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Заявка с сайта: <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>#{detailAppeal.siteOrderId}</span></p>
+                    <p className={`text-xs ${mutedTextClass}`}>Заявка с сайта: <span className={bodyTextClass}>#{detailAppeal.siteOrderId}</span></p>
                   )}
                   {detailAppeal.operator && (
-                    <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Оператор: <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{detailAppeal.operator.name}</span></p>
+                    <p className={`text-xs ${mutedTextClass}`}>Оператор: <span className={bodyTextClass}>{detailAppeal.operator.name}</span></p>
                   )}
                 </div>
 
                 {/* Дата */}
-                <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                <p className={`text-xs ${mutedTextClass}`}>
                   {new Date(detailAppeal.createdAt).toLocaleString('ru-RU')}
                 </p>
 
                 {/* Кнопки смены статуса */}
                 <div>
-                  <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Изменить статус</p>
+                  <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${mutedTextClass}`}>Изменить статус</p>
                   <div className="flex flex-col gap-1.5">
                     {STATUS_FLOW.filter((s) => s !== detailAppeal.status).map((s) => (
                       <button
@@ -495,7 +501,7 @@ export default function AppealsPage() {
                           updateStatusMutation.mutate({ id: detailAppeal.id, status: s });
                           setDetailAppeal({ ...detailAppeal, status: s });
                         }}
-                        className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${STATUS_COLORS[s]} opacity-80 hover:opacity-100`}
+                        className={`text-left text-xs px-3 py-2 rounded-xl border transition-colors ${STATUS_COLORS[s]} opacity-80 hover:opacity-100`}
                       >
                         → {STATUS_LABELS[s]}
                       </button>
@@ -534,7 +540,7 @@ export default function AppealsPage() {
       {/* Confirm Delete Dialog */}
       {confirmDeleteId !== null && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4">
-          <div className={`w-full max-w-sm rounded-xl p-6 shadow-2xl ${isDark ? 'bg-[#1e2530] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+          <div className={`w-full max-w-sm rounded-[24px] p-6 shadow-2xl ${cardClass}`}>
             <div className="flex items-center gap-3 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-500 dark:text-red-400" />

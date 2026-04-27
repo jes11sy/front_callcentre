@@ -256,18 +256,33 @@ export function Sidebar() {
   // Контент меню (переиспользуется для десктопа и мобильной версии)
   const MenuContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
-      {/* Search — styled like nav items */}
-      <div className={`px-5 ${isMobile ? 'mb-1' : 'mb-1'}`}>
+      {/* Search */}
+      <div className={isMobile ? 'px-5 mb-1' : isSidebarCollapsed ? 'px-3 mb-1' : 'px-3 mb-1'}>
         <button
-          onClick={() => { setSearchOpen(true); if (isMobile) setIsMobileMenuOpen(false); }}
-          className={`relative flex items-center gap-3 px-3 w-full font-normal transition-colors group ${
-            isMobile ? 'py-3.5 text-base' : 'py-2.5 text-sm'
+          onClick={() => {
+            setSearchOpen(true);
+            if (isMobile) setIsMobileMenuOpen(false);
+          }}
+          title={!isMobile && isSidebarCollapsed ? 'Поиск' : undefined}
+          className={`group relative flex w-full items-center font-normal transition-all duration-200 ${
+            isMobile
+              ? 'gap-3 px-3 py-3.5 text-base rounded-2xl text-[#3a3a3c] hover:bg-black/[0.035] dark:text-white/92 dark:hover:bg-white/[0.04]'
+              : isSidebarCollapsed
+                ? 'mx-auto min-h-[52px] w-14 justify-center rounded-2xl px-0 text-[#3a3a3c] dark:text-white/78'
+                : 'min-h-[48px] gap-3 rounded-2xl px-4 text-sm text-[#3a3a3c] hover:bg-black/[0.035] dark:text-white/92 dark:hover:bg-white/[0.04]'
           }`}
+          aria-label="Поиск"
         >
-          <Search className={`transition-all shrink-0 text-gray-500 dark:text-gray-400 group-hover:text-[#FEC004] ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
-          <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
-            Поиск
-          </span>
+          <Search
+            className={`${isMobile ? 'h-6 w-6' : isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} shrink-0 transition-all duration-200 ${
+              !isMobile && isSidebarCollapsed ? 'group-hover:scale-110' : ''
+            } text-[#6e6e73] group-hover:text-[#FEC004] dark:text-white/78 dark:group-hover:text-[#FEC004]`}
+          />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="text-gray-800 dark:text-gray-200 transition-colors">
+              Поиск
+            </span>
+          )}
         </button>
       </div>
 
@@ -293,7 +308,7 @@ export function Sidebar() {
                       ? 'bg-transparent text-[#FEC004] dark:text-[#FEC004]'
                       : 'cc-sidebar-item-active-expanded')
                   : (isSidebarCollapsed
-                      ? 'bg-transparent text-[#6e6e73] hover:text-[#FEC004] dark:text-white/78 dark:hover:text-[#FEC004]'
+                      ? 'bg-transparent text-[#6e6e73] dark:text-white/78'
                       : 'text-[#3a3a3c] hover:bg-black/[0.035] dark:text-white/92 dark:hover:bg-white/[0.04]')
               }`}
               style={
@@ -340,7 +355,7 @@ export function Sidebar() {
                   className={`nav-icon transition-all ${active ? 'nav-icon-active' : ''} ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`}
                 />
               )}
-              <span className="text-gray-800 dark:text-gray-200 group-hover:text-[#FEC004] transition-colors">
+              <span className="text-gray-800 dark:text-gray-200 transition-colors">
 
                 {item.name}
               </span>

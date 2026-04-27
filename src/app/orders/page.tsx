@@ -206,7 +206,7 @@ function OrdersContent() {
                   filters={filters}
                   onFilterChange={updateFilter}
                   onReset={resetFilters}
-
+                  iconOnly
                 />
               }
             />

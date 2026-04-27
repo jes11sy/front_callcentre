@@ -121,6 +121,10 @@ export default function CreateOrderModal({
     : 'rounded-2xl border border-black/[0.08] bg-white shadow-none';
   const sectionTitleIconClass = isDark ? 'text-white' : 'text-[#b58500]';
   const modalBodyClass = isDark ? 'bg-[#111113]' : 'bg-[#f5f5f7]';
+  const selectContentClass = isDark ? 'rounded-2xl border-white/10 bg-[#1e1e20]' : 'rounded-2xl border-gray-200 bg-white';
+  const selectItemClass = isDark
+    ? 'text-white data-[highlighted]:bg-[#FEC004]/20 data-[highlighted]:text-white data-[state=checked]:bg-[#FEC004]/15'
+    : 'text-[#111113] data-[highlighted]:bg-[#FEC004]/12 data-[highlighted]:text-[#111113] data-[state=checked]:bg-[#FEC004]/10';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 sm:p-6">
@@ -164,12 +168,12 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                        <SelectTrigger className={selectClassName}>
                           <SelectValue placeholder="Выберите РК" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                        <SelectContent className={selectContentClass}>
                           {rks.map((rk) => (
-                            <SelectItem key={rk.id} value={rk.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                            <SelectItem key={rk.id} value={rk.id.toString()} className={selectItemClass}>
                               {rk.name}
 
                             </SelectItem>
@@ -190,12 +194,12 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                        <SelectTrigger className={selectClassName}>
                           <SelectValue placeholder="Выберите город" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                        <SelectContent className={selectContentClass}>
                           {cities.map((city) => (
-                            <SelectItem key={city.id} value={city.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                            <SelectItem key={city.id} value={city.id.toString()} className={selectItemClass}>
                               {city.name}
 
                             </SelectItem>
@@ -329,12 +333,12 @@ export default function CreateOrderModal({
                     control={form.control}
                     render={({ field }) => (
                       <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? field.value.toString() : ''}>
-                        <SelectTrigger className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 [&_[data-placeholder]]:text-gray-400 [&_svg]:text-gray-500 dark:[&_svg]:text-gray-400 focus:border-[#FEC004] focus-visible:border-[#FEC004] focus-visible:ring-2 focus-visible:ring-[#FEC004]/20 focus-visible:ring-offset-0">
+                        <SelectTrigger className={selectClassName}>
                           <SelectValue placeholder="Выберите тип техники" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#252d3a] border-gray-200 dark:border-gray-600">
+                        <SelectContent className={selectContentClass}>
                           {equipmentTypes.map((et) => (
-                            <SelectItem key={et.id} value={et.id.toString()} className="text-gray-700 dark:text-gray-200 data-[highlighted]:bg-[#FEC004]/10 data-[highlighted]:text-gray-900 dark:data-[highlighted]:text-gray-100">
+                            <SelectItem key={et.id} value={et.id.toString()} className={selectItemClass}>
                               {et.name}
                             </SelectItem>
                           ))}

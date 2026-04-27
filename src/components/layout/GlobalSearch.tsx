@@ -116,32 +116,32 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[10001] bg-black/50 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[15vh]">
+    <div className="fixed inset-0 z-[10001] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[12vh]">
       <div
         ref={panelRef}
-        className="w-full max-w-2xl mx-4 bg-white dark:bg-[#1e2530] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="mx-4 w-full max-w-2xl overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-2xl dark:border-white/15 dark:bg-[#141a22]"
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <Search className="h-5 w-5 text-gray-400 shrink-0" />
+        <div className="flex items-center gap-3 border-b border-black/[0.08] px-4 py-3.5 dark:border-white/10">
+          <Search className="h-5 w-5 shrink-0 text-[#6e6e73] dark:text-white/60" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Поиск по телефону, имени клиента..."
-            className="flex-1 bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-400 outline-none text-sm"
+            className="flex-1 bg-transparent text-sm text-[#111113] outline-none placeholder:text-[#8e8e93] dark:text-white dark:placeholder:text-white/35"
           />
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-[#6e6e73] dark:text-white/60" />}
+          <button onClick={onClose} className="text-[#6e6e73] hover:text-[#111113] dark:text-white/60 dark:hover:text-white">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Results */}
-        <div className="max-h-[50vh] overflow-y-auto">
+        <div className="max-h-[52vh] overflow-y-auto bg-white dark:bg-[#141a22]">
           {query.length < 3 ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+            <div className="px-4 py-10 text-center text-sm text-[#8e8e93] dark:text-white/45">
               Введите минимум 3 символа для поиска
             </div>
           ) : loading ? (
@@ -149,28 +149,28 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
               <Loader2 className="h-6 w-6 animate-spin mx-auto text-[#FEC004]" />
             </div>
           ) : results && totalResults === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+            <div className="px-4 py-10 text-center text-sm text-[#8e8e93] dark:text-white/45">
               Ничего не найдено по запросу &ldquo;{query}&rdquo;
             </div>
           ) : results ? (
-            <div className="py-2">
+            <div className="py-2.5">
               {results.orders.length > 0 && (
                 <div>
-                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8e8e93] dark:text-white/45">
                     Заказы ({results.orders.length})
                   </div>
                   {results.orders.map((order) => (
                     <button
                       key={`order-${order.id}`}
                       onClick={() => navigateTo(`/orders?orderId=${order.id}`)}
-                      className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#FEC004]/10 transition-colors text-left"
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
                     >
                       <FileText className="h-4 w-4 text-[#FEC004] shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-900 dark:text-gray-100">
+                        <div className="text-sm text-[#111113] dark:text-white">
                           #{order.id} — {order.clientName}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-xs text-[#6e6e73] dark:text-white/55">
                           <span>{order.phone}</span>
                           {order.city?.name && <span>&bull; {order.city.name}</span>}
                           {order.status?.name && <span>&bull; {order.status.name}</span>}
@@ -183,21 +183,21 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
 
               {results.calls.length > 0 && (
                 <div>
-                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8e8e93] dark:text-white/45">
                     Звонки ({results.calls.length})
                   </div>
                   {results.calls.map((call) => (
                     <button
                       key={`call-${call.id}`}
                       onClick={() => navigateTo('/telephony')}
-                      className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#FEC004]/10 transition-colors text-left"
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
                     >
                       <Phone className="h-4 w-4 text-emerald-500 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-900 dark:text-gray-100 font-mono">
+                        <div className="font-mono text-sm text-[#111113] dark:text-white">
                           {call.phoneClient}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-xs text-[#6e6e73] dark:text-white/55">
                           <span>{new Date(call.createdAt).toLocaleString('ru-RU')}</span>
                           <span>&bull; {call.status === 'answered' ? 'Отвечен' : call.status === 'missed' ? 'Пропущен' : call.status}</span>
                           {call.operator?.name && <span>&bull; {call.operator.name}</span>}
@@ -210,21 +210,21 @@ export function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchProps) {
 
               {results.siteOrders.length > 0 && (
                 <div>
-                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8e8e93] dark:text-white/45">
                     Заявки с сайта ({results.siteOrders.length})
                   </div>
                   {results.siteOrders.map((so) => (
                     <button
                       key={`so-${so.id}`}
                       onClick={() => navigateTo('/site-orders')}
-                      className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#FEC004]/10 transition-colors text-left"
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
                     >
                       <Globe className="h-4 w-4 text-blue-500 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-900 dark:text-gray-100">
+                        <div className="text-sm text-[#111113] dark:text-white">
                           #{so.id} — {so.clientName}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-xs text-[#6e6e73] dark:text-white/55">
                           <span>{so.phone}</span>
                           <span>&bull; {so.site}</span>
                           <span>&bull; {so.status}</span>

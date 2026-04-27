@@ -74,6 +74,11 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
       ? 'bg-white/[0.04] border-white/25 text-white placeholder:text-white/30'
       : 'border border-[#cfd2d8] bg-white text-[#111113] placeholder:text-[#8e8e93] shadow-[0_1px_2px_rgba(15,23,42,0.06)]'
   }`;
+  const selectItemClass = `rounded-xl mx-1 my-0.5 cursor-pointer ${
+    isDark
+      ? 'text-white data-[highlighted]:bg-[#FEC004]/20 data-[highlighted]:text-white data-[state=checked]:bg-[#FEC004]/15'
+      : 'text-[#111113] data-[highlighted]:bg-[#FEC004]/12 data-[highlighted]:text-[#111113] data-[state=checked]:bg-[#FEC004]/12'
+  }`;
 
   return (
     <div className={`${iconOnly ? 'relative inline-flex' : 'w-full'} font-myriad`}>
@@ -182,12 +187,12 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                         <SelectValue placeholder="Все статусы" />
                       </SelectTrigger>
                       <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
-                        <SelectItem value="all" className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}>Все статусы</SelectItem>
+                        <SelectItem value="all" className={selectItemClass}>Все статусы</SelectItem>
                         {STATUS_OPTIONS.filter((option) => option.value !== 'all').map((option) => (
                           <SelectItem
                             key={option.value}
                             value={option.value}
-                            className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}
+                            className={selectItemClass}
                           >
                             {option.label}
                           </SelectItem>
@@ -203,12 +208,12 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                         <SelectValue placeholder="Все города" />
                       </SelectTrigger>
                       <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
-                        <SelectItem value="all" className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}>Все города</SelectItem>
+                        <SelectItem value="all" className={selectItemClass}>Все города</SelectItem>
                         {cities.map((city) => (
                           <SelectItem
                             key={city.id}
                             value={city.id.toString()}
-                            className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}
+                            className={selectItemClass}
                           >
                             {city.name}
                           </SelectItem>

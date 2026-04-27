@@ -71,7 +71,7 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
 
   const fieldClass = `w-full min-h-[44px] px-4 rounded-2xl text-[15px] shadow-sm outline-none ring-0 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ${
     isDark
-      ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/30'
+      ? 'bg-white/[0.04] border-white/25 text-white placeholder:text-white/30'
       : 'border border-[#cfd2d8] bg-white text-[#111113] placeholder:text-[#8e8e93] shadow-[0_1px_2px_rgba(15,23,42,0.06)]'
   }`;
 
@@ -84,10 +84,10 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
           aria-label={buttonLabel}
           className={
             iconOnly
-              ? `relative h-10 w-10 rounded-2xl border p-0 transition-all duration-200 ${
+              ? `relative h-10 w-10 rounded-2xl border-0 bg-transparent p-0 shadow-none transition-all duration-200 ${
                   isDark
-                    ? 'bg-transparent border-white/15 text-white/85 hover:bg-white/[0.06] hover:text-white'
-                    : 'bg-white border-gray-200 text-[#3a3a3c] hover:bg-black/[0.035] hover:text-[#111113]'
+                    ? 'text-white/85 hover:bg-white/[0.06] hover:text-white'
+                    : 'text-[#3a3a3c] hover:bg-black/[0.035] hover:text-[#111113]'
                 }`
               : `w-full sm:w-auto justify-center bg-white dark:bg-[#252d3a] border text-gray-700 dark:text-gray-200 hover:bg-[#FEC004]/10 hover:text-[#FEC004] hover:border-[#FEC004] min-w-[120px] sm:min-w-[140px] ${
                   hasActiveFilters
@@ -128,7 +128,7 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
               isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
             } ${
               isDark
-                ? 'bg-[#111113]/92 backdrop-blur-xl border-l md:border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.35)]'
+                ? 'bg-[#111113]/92 backdrop-blur-xl border-l md:border border-white/25 shadow-[0_24px_60px_rgba(0,0,0,0.35)]'
                 : 'bg-white border-l md:border border-black/[0.08] shadow-[0_24px_60px_rgba(15,23,42,0.12)]'
             }`}
           >
@@ -181,9 +181,9 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                       <SelectTrigger className={fieldClass}>
                         <SelectValue placeholder="Все статусы" />
                       </SelectTrigger>
-                      <SelectContent className={`rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
+                      <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
                         <SelectItem value="all" className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}>Все статусы</SelectItem>
-                        {STATUS_OPTIONS.map((option) => (
+                        {STATUS_OPTIONS.filter((option) => option.value !== 'all').map((option) => (
                           <SelectItem
                             key={option.value}
                             value={option.value}
@@ -202,7 +202,7 @@ export const OrdersFilters = ({ filters, onFilterChange, onReset, iconOnly = fal
                       <SelectTrigger className={fieldClass}>
                         <SelectValue placeholder="Все города" />
                       </SelectTrigger>
-                      <SelectContent className={`rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
+                      <SelectContent className={`z-[11000] rounded-2xl border-0 shadow-xl ${isDark ? 'bg-[#1e1e20]' : 'bg-white'}`}>
                         <SelectItem value="all" className={`rounded-xl mx-1 my-0.5 cursor-pointer ${isDark ? 'text-white focus:bg-white/10' : 'text-[#111113] focus:bg-black/5'}`}>Все города</SelectItem>
                         {cities.map((city) => (
                           <SelectItem

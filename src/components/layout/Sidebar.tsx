@@ -296,7 +296,7 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               title={!isMobile && isSidebarCollapsed ? item.name : undefined}
-              className={`group relative flex items-center transition-all duration-200 ${
+              className={`group nav-icon-hover relative flex items-center transition-all duration-200 ${
                 isMobile
                   ? 'gap-3 px-3 py-3.5 text-base'
                   : isSidebarCollapsed

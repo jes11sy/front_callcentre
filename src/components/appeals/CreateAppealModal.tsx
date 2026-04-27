@@ -229,12 +229,12 @@ export function CreateAppealModal({
 
   if (!open) return null;
 
-  const inputCls = `${isDark ? 'bg-[#1e2530] border-gray-600 text-gray-100 placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} focus:border-[#FEC004] focus-visible:ring-0 focus-visible:border-[#FEC004]`;
-  const labelCls = `text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`;
-  const selectTriggerCls = `h-8 mt-1 text-sm ${isDark ? 'bg-[#1e2530] border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-900'} focus:border-[#FEC004] focus-visible:ring-0`;
-  const selectContentCls = isDark ? 'bg-[#252d3a] border-gray-600' : 'bg-white border-gray-200';
-  const selectItemCls = isDark ? 'text-gray-200' : 'text-gray-700';
-  const sectionCls = `text-[10px] font-semibold uppercase tracking-wider mb-1.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`;
+  const inputCls = `${isDark ? 'bg-white/[0.04] border-white/15 text-white placeholder:text-white/35' : 'bg-white border-[#cfd2d8] text-[#111113] placeholder:text-[#8e8e93]'} rounded-2xl focus:border-[#FEC004] focus-visible:ring-0 focus-visible:border-[#FEC004]`;
+  const labelCls = `text-xs ${isDark ? 'text-white/60' : 'text-[#6e6e73]'}`;
+  const selectTriggerCls = `h-10 mt-1 rounded-2xl text-sm ${isDark ? 'bg-white/[0.04] border-white/15 text-white' : 'bg-white border-[#cfd2d8] text-[#111113]'} focus:border-[#FEC004] focus-visible:ring-0`;
+  const selectContentCls = isDark ? 'bg-[#1e1e20] border-white/10 rounded-2xl' : 'bg-white border-gray-200 rounded-2xl';
+  const selectItemCls = isDark ? 'text-white data-[highlighted]:bg-white/10' : 'text-gray-700 data-[highlighted]:bg-black/5';
+  const sectionCls = `mb-2 text-[10px] font-semibold uppercase tracking-wider ${isDark ? 'text-white/45' : 'text-[#6e6e73]'}`;
 
   const currentStatus = watch('status') as AppealStatus;
   const watchCityId = watch('cityId');
@@ -262,23 +262,23 @@ export function CreateAppealModal({
       onClick={() => onOpenChange(false)}
     >
       <div
-        className={`w-full sm:max-w-4xl rounded-t-xl sm:rounded-xl overflow-hidden shadow-xl flex flex-col sm:flex-row max-h-[92vh] ${
-          isDark ? 'bg-[#1e2530] border border-gray-700' : 'bg-white border border-gray-200'
+        className={`w-full sm:max-w-4xl rounded-t-[24px] sm:rounded-[24px] overflow-hidden shadow-xl flex flex-col sm:flex-row max-h-[92vh] ${
+          isDark ? 'bg-[#111113] border border-white/10' : 'bg-[#f5f5f7] border border-black/[0.08]'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left: Form */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <div className={`px-4 py-3 border-b shrink-0 ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`px-5 py-4 border-b shrink-0 ${isDark ? 'border-white/10 bg-white/[0.04]' : 'border-black/[0.08] bg-white'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {isFromCall && <PhoneCall className="h-4 w-4 text-[#FEC004]" />}
-                <h2 className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                <h2 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[#111113]'}`}>
                   {isEdit ? `Обращение #${appeal.id}` : isFromCall ? 'Входящий звонок' : 'Новое обращение'}
                 </h2>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className={`h-7 w-7 p-0 ${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-500 hover:text-gray-900'}`}>
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className={`h-8 w-8 rounded-xl p-0 ${isDark ? 'text-white/60 hover:text-white hover:bg-white/[0.06]' : 'text-[#6e6e73] hover:text-[#111113] hover:bg-black/[0.04]'}`}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -286,15 +286,15 @@ export function CreateAppealModal({
 
           {/* Mode toggle */}
           {!isEdit && (
-            <div className={`px-4 pt-3 pb-0 shrink-0`}>
-              <div className={`flex rounded-lg p-0.5 ${isDark ? 'bg-[#252d3a]' : 'bg-gray-100'}`}>
+            <div className="px-5 pt-4 pb-0 shrink-0">
+              <div className={`flex rounded-2xl p-1 ${isDark ? 'bg-white/[0.04]' : 'bg-black/[0.04]'}`}>
                 <button
                   type="button"
                   onClick={() => setMode('appeal')}
-                  className={`flex-1 py-1.5 px-3 rounded-md text-xs font-medium transition-all ${
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all ${
                     mode === 'appeal'
-                      ? `${isDark ? 'bg-[#1e2530] text-[#FEC004] shadow-sm' : 'bg-white text-gray-900 shadow-sm'}`
-                      : `${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`
+                      ? `${isDark ? 'bg-white text-[#111113] shadow-sm' : 'bg-white text-[#111113] shadow-sm'}`
+                      : `${isDark ? 'text-white/65 hover:text-white' : 'text-[#6e6e73] hover:text-[#111113]'}`
                   }`}
                 >
                   Обращение
@@ -302,10 +302,10 @@ export function CreateAppealModal({
                 <button
                   type="button"
                   onClick={() => setMode('order')}
-                  className={`flex-1 py-1.5 px-3 rounded-md text-xs font-medium transition-all ${
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all ${
                     mode === 'order'
-                      ? `${isDark ? 'bg-[#1e2530] text-[#FEC004] shadow-sm' : 'bg-white text-gray-900 shadow-sm'}`
-                      : `${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`
+                      ? `${isDark ? 'bg-white text-[#111113] shadow-sm' : 'bg-white text-[#111113] shadow-sm'}`
+                      : `${isDark ? 'text-white/65 hover:text-white' : 'text-[#6e6e73] hover:text-[#111113]'}`
                   }`}
                 >
                   Заказ
@@ -316,25 +316,25 @@ export function CreateAppealModal({
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="overflow-y-auto flex-1">
-            <div className="px-4 py-3 space-y-3">
+            <div className="px-5 py-4 space-y-4">
 
               {/* Контакт */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <Label className={labelCls}>Телефон *</Label>
-                  <Input {...register('phone')} placeholder="+7 999 000-00-00" readOnly={isFromCall} className={`mt-1 h-8 text-sm ${inputCls} ${isFromCall ? 'opacity-70' : ''}`} />
+                  <Input {...register('phone')} placeholder="+7 999 000-00-00" readOnly={isFromCall} className={`mt-1 h-10 text-sm ${inputCls} ${isFromCall ? 'opacity-70' : ''}`} />
                   {errors.phone && <p className="text-[10px] text-red-400 mt-0.5">{errors.phone.message}</p>}
                 </div>
                 <div>
                   <Label className={labelCls}>Имя клиента{isOrder ? ' *' : ''}</Label>
-                  <Input {...register('clientName')} placeholder="Имя клиента" className={`mt-1 h-8 text-sm ${inputCls}`} autoFocus={isFromCall} />
+                  <Input {...register('clientName')} placeholder="Имя клиента" className={`mt-1 h-10 text-sm ${inputCls}`} autoFocus={isFromCall} />
                 </div>
               </div>
 
               {/* Источник */}
               <div>
                 <p className={sectionCls}>Источник</p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div>
                     <Label className={labelCls}>Город{isOrder ? ' *' : ''}</Label>
                     <Select value={citySelectValue} onValueChange={(v) => setValue('cityId', v === 'none' ? '' : v)}>
@@ -392,7 +392,7 @@ export function CreateAppealModal({
                 <div>
                   <p className={sectionCls}>Детали заказа</p>
                   <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div>
                         <Label className={labelCls}>Тип заказа</Label>
                         <Select value={watchTypeOrder || 'Впервые'} onValueChange={(v) => setValue('typeOrder', v)}>
@@ -417,11 +417,11 @@ export function CreateAppealModal({
                     </div>
                     <div>
                       <Label className={labelCls}>Адрес *</Label>
-                      <Input {...register('address')} placeholder="Адрес клиента" className={`mt-1 h-8 text-sm ${inputCls}`} />
+                      <Input {...register('address')} placeholder="Адрес клиента" className={`mt-1 h-10 text-sm ${inputCls}`} />
                     </div>
                     <div>
                       <Label className={labelCls}>Дата встречи *</Label>
-                      <Input type="datetime-local" {...register('dateMeeting')} className={`mt-1 h-8 text-sm ${inputCls} ${isDark ? '[color-scheme:dark]' : ''}`} />
+                      <Input type="datetime-local" {...register('dateMeeting')} className={`mt-1 h-10 text-sm ${inputCls} ${isDark ? '[color-scheme:dark]' : ''}`} />
                     </div>
                   </div>
                 </div>
@@ -430,16 +430,16 @@ export function CreateAppealModal({
               {/* Примечание */}
               <div>
                 <Label className={labelCls}>Примечание</Label>
-                <textarea {...register('description')} rows={2} placeholder="Детали разговора..." className={`mt-1 w-full rounded-md border px-3 py-1.5 text-sm resize-none ${inputCls}`} />
+                <textarea {...register('description')} rows={3} placeholder="Детали разговора..." className={`mt-1 w-full rounded-2xl border px-3 py-2 text-sm resize-none ${inputCls}`} />
               </div>
             </div>
 
             {/* Footer */}
-            <div className={`flex items-center justify-end gap-2 px-4 py-3 border-t shrink-0 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-              <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)} className={isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-600 hover:text-gray-900'}>
+            <div className={`flex items-center justify-end gap-3 px-5 py-4 border-t shrink-0 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-black/[0.08] bg-white'}`}>
+              <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)} className={isDark ? 'rounded-xl text-white/65 hover:text-white hover:bg-white/[0.06]' : 'rounded-xl text-[#6e6e73] hover:text-[#111113] hover:bg-black/[0.04]'}>
                 Отмена
               </Button>
-              <Button type="submit" size="sm" disabled={saveMutation.isPending} className="bg-[#FEC004] hover:bg-[#e6ac00] text-gray-900 font-semibold">
+              <Button type="submit" size="sm" disabled={saveMutation.isPending} className={isDark ? 'rounded-xl bg-white hover:bg-gray-100 text-[#111113] font-semibold' : 'rounded-xl bg-[#FEC004] hover:bg-[#e3ac00] text-[#111113] font-semibold'}>
                 {saveMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
                 {isEdit ? 'Сохранить' : isOrder ? 'Создать заказ' : 'Создать обращение'}
               </Button>
@@ -448,13 +448,13 @@ export function CreateAppealModal({
         </div>
 
         {/* Right: History panel */}
-        <div className={`w-full sm:w-72 border-t sm:border-t-0 sm:border-l flex flex-col overflow-hidden shrink-0 ${isDark ? 'border-gray-700 bg-[#252d3a]' : 'border-gray-200 bg-gray-50'}`}>
-          <div className={`px-3 py-2.5 border-b shrink-0 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-            <h3 className={`text-xs font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+        <div className={`w-full sm:w-72 border-t sm:border-t-0 sm:border-l flex flex-col overflow-hidden shrink-0 ${isDark ? 'border-white/10 bg-white/[0.02]' : 'border-black/[0.08] bg-white/[0.65]'}`}>
+          <div className={`px-3 py-3 border-b shrink-0 ${isDark ? 'border-white/10' : 'border-black/[0.08]'}`}>
+            <h3 className={`text-xs font-semibold ${isDark ? 'text-white/80' : 'text-[#3a3a3c]'}`}>
               История по номеру
             </h3>
             {clientPhone && (
-              <p className={`text-[10px] font-mono mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{clientPhone}</p>
+              <p className={`text-[10px] font-mono mt-0.5 ${isDark ? 'text-white/45' : 'text-[#8e8e93]'}`}>{clientPhone}</p>
             )}
           </div>
           <div className="flex-1 overflow-y-auto">

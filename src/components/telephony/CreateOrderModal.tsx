@@ -37,7 +37,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignStore } from '@/store/designStore';
 
 // Статические опции
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
+const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль', 'Липецк'] as const;
 const DIRECTION_OPTIONS = ['Не указано', 'КП', 'БТ', 'МНЧ'] as const;
 
 const orderSchema = z.object({

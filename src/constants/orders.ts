@@ -50,7 +50,8 @@ export const CITIES = [
   { value: 'Тольятти', label: 'Тольятти' },
   { value: 'Пенза', label: 'Пенза' },
   { value: 'Ярославль', label: 'Ярославль' },
-  { value: 'Омск', label: 'Омск' }
+  { value: 'Омск', label: 'Омск' },
+  { value: 'Липецк', label: 'Липецк' }
 ] as const;
 
 

@@ -29,7 +29,7 @@ import { useDesignStore } from '@/store/designStore';
 
 // Опции для выпадающих списков
 const RK_OPTIONS = ['Авито', 'Листовка'] as const;
-const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль'] as const;
+const CITY_OPTIONS = ['Саратов', 'Энгельс', 'Ульяновск', 'Пенза', 'Тольятти', 'Омск', 'Ярославль', 'Липецк'] as const;
 const SOURCE_OPTIONS = [
   'Не указано',
   'Владимир',
